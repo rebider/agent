@@ -1,0 +1,950 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.ImportDataWithProfitMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ImportDataWithProfit">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="MONTH" jdbcType="VARCHAR" property="month" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
+    <result column="BRAND_CODE" jdbcType="VARCHAR" property="brandCode" />
+    <result column="IMPORT_TYPE" jdbcType="VARCHAR" property="importType" />
+    <result column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
+    <result column="SHEET_COLUMN" jdbcType="DECIMAL" property="sheetColumn" />
+    <result column="UPLOAD_USER" jdbcType="VARCHAR" property="uploadUser" />
+    <result column="UPLOAD_TIME" jdbcType="VARCHAR" property="uploadTime" />
+    <result column="SHEET_ORDER" jdbcType="DECIMAL" property="sheetOrder" />
+    <result column="ROW_ORDER" jdbcType="DECIMAL" property="rowOrder" />
+    <result column="F7" jdbcType="VARCHAR" property="f7" />
+    <result column="F8" jdbcType="VARCHAR" property="f8" />
+    <result column="F9" jdbcType="VARCHAR" property="f9" />
+    <result column="F10" jdbcType="VARCHAR" property="f10" />
+    <result column="F11" jdbcType="VARCHAR" property="f11" />
+    <result column="F12" jdbcType="VARCHAR" property="f12" />
+    <result column="F13" jdbcType="VARCHAR" property="f13" />
+    <result column="F14" jdbcType="VARCHAR" property="f14" />
+    <result column="F15" jdbcType="VARCHAR" property="f15" />
+    <result column="F16" jdbcType="VARCHAR" property="f16" />
+    <result column="F17" jdbcType="VARCHAR" property="f17" />
+    <result column="F18" jdbcType="VARCHAR" property="f18" />
+    <result column="F19" jdbcType="VARCHAR" property="f19" />
+    <result column="F20" jdbcType="VARCHAR" property="f20" />
+    <result column="F21" jdbcType="VARCHAR" property="f21" />
+    <result column="F22" jdbcType="VARCHAR" property="f22" />
+    <result column="F23" jdbcType="VARCHAR" property="f23" />
+    <result column="F24" jdbcType="VARCHAR" property="f24" />
+    <result column="F25" jdbcType="VARCHAR" property="f25" />
+    <result column="F26" jdbcType="VARCHAR" property="f26" />
+    <result column="F27" jdbcType="VARCHAR" property="f27" />
+    <result column="F28" jdbcType="VARCHAR" property="f28" />
+    <result column="F29" jdbcType="VARCHAR" property="f29" />
+    <result column="F30" jdbcType="VARCHAR" property="f30" />
+    <result column="F31" jdbcType="VARCHAR" property="f31" />
+    <result column="F32" jdbcType="VARCHAR" property="f32" />
+    <result column="F33" jdbcType="VARCHAR" property="f33" />
+    <result column="F34" jdbcType="VARCHAR" property="f34" />
+    <result column="F35" jdbcType="VARCHAR" property="f35" />
+    <result column="F36" jdbcType="VARCHAR" property="f36" />
+    <result column="F37" jdbcType="VARCHAR" property="f37" />
+    <result column="F38" jdbcType="VARCHAR" property="f38" />
+    <result column="F39" jdbcType="VARCHAR" property="f39" />
+    <result column="F40" jdbcType="VARCHAR" property="f40" />
+    <result column="F41" jdbcType="VARCHAR" property="f41" />
+    <result column="F42" jdbcType="VARCHAR" property="f42" />
+    <result column="F43" jdbcType="VARCHAR" property="f43" />
+    <result column="F44" jdbcType="VARCHAR" property="f44" />
+    <result column="F45" jdbcType="VARCHAR" property="f45" />
+    <result column="F46" jdbcType="VARCHAR" property="f46" />
+    <result column="F47" jdbcType="VARCHAR" property="f47" />
+    <result column="F48" jdbcType="VARCHAR" property="f48" />
+    <result column="F49" jdbcType="VARCHAR" property="f49" />
+    <result column="F50" jdbcType="VARCHAR" property="f50" />
+    <result column="F51" jdbcType="VARCHAR" property="f51" />
+    <result column="F52" jdbcType="VARCHAR" property="f52" />
+    <result column="F53" jdbcType="VARCHAR" property="f53" />
+    <result column="F54" jdbcType="VARCHAR" property="f54" />
+    <result column="F55" jdbcType="VARCHAR" property="f55" />
+    <result column="F56" jdbcType="VARCHAR" property="f56" />
+    <result column="F57" jdbcType="VARCHAR" property="f57" />
+    <result column="F58" jdbcType="VARCHAR" property="f58" />
+    <result column="F59" jdbcType="VARCHAR" property="f59" />
+    <result column="F60" jdbcType="VARCHAR" property="f60" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, MONTH, AGENT_ID, AGENT_NAME, BUS_NUM, BUS_CODE, BRAND_CODE, IMPORT_TYPE, SHEET_NAME,
+    SHEET_COLUMN, UPLOAD_USER, UPLOAD_TIME, SHEET_ORDER, ROW_ORDER, F7, F8, F9, F10, 
+    F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, 
+    F28, F29, F30, F31, F32, F33, F34, F35, F36, F37, F38, F39, F40, F41, F42, F43, F44, 
+    F45, F46, F47, F48, F49, F50, F51, F52, F53, F54, F55, F56, F57, F58, F59, F60
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ImportDataWithProfitExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_IMPORT_DATA_WITH_PROFIT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_IMPORT_DATA_WITH_PROFIT
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ImportDataWithProfitExample">
+    delete from P_IMPORT_DATA_WITH_PROFIT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ImportDataWithProfit">
+    insert into P_IMPORT_DATA_WITH_PROFIT (ID, MONTH, AGENT_ID, 
+      AGENT_NAME, BUS_NUM, BUS_CODE, 
+      BRAND_CODE, IMPORT_TYPE, SHEET_NAME, 
+      SHEET_COLUMN, UPLOAD_USER, UPLOAD_TIME, 
+      SHEET_ORDER, ROW_ORDER, F7, 
+      F8, F9, F10, F11, 
+      F12, F13, F14, F15, 
+      F16, F17, F18, F19, 
+      F20, F21, F22, F23, 
+      F24, F25, F26, F27, 
+      F28, F29, F30, F31, 
+      F32, F33, F34, F35, 
+      F36, F37, F38, F39, 
+      F40, F41, F42, F43, 
+      F44, F45, F46, F47, 
+      F48, F49, F50, F51, 
+      F52, F53, F54, F55, 
+      F56, F57, F58, F59, 
+      F60)
+    values (#{id,jdbcType=VARCHAR}, #{month,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+      #{agentName,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{busCode,jdbcType=VARCHAR},
+      #{brandCode,jdbcType=VARCHAR}, #{importType,jdbcType=VARCHAR}, #{sheetName,jdbcType=VARCHAR},
+      #{sheetColumn,jdbcType=DECIMAL}, #{uploadUser,jdbcType=VARCHAR}, #{uploadTime,jdbcType=VARCHAR},
+      #{sheetOrder,jdbcType=DECIMAL}, #{rowOrder,jdbcType=DECIMAL}, #{f7,jdbcType=VARCHAR},
+      #{f8,jdbcType=VARCHAR}, #{f9,jdbcType=VARCHAR}, #{f10,jdbcType=VARCHAR}, #{f11,jdbcType=VARCHAR},
+      #{f12,jdbcType=VARCHAR}, #{f13,jdbcType=VARCHAR}, #{f14,jdbcType=VARCHAR}, #{f15,jdbcType=VARCHAR},
+      #{f16,jdbcType=VARCHAR}, #{f17,jdbcType=VARCHAR}, #{f18,jdbcType=VARCHAR}, #{f19,jdbcType=VARCHAR},
+      #{f20,jdbcType=VARCHAR}, #{f21,jdbcType=VARCHAR}, #{f22,jdbcType=VARCHAR}, #{f23,jdbcType=VARCHAR},
+      #{f24,jdbcType=VARCHAR}, #{f25,jdbcType=VARCHAR}, #{f26,jdbcType=VARCHAR}, #{f27,jdbcType=VARCHAR},
+      #{f28,jdbcType=VARCHAR}, #{f29,jdbcType=VARCHAR}, #{f30,jdbcType=VARCHAR}, #{f31,jdbcType=VARCHAR},
+      #{f32,jdbcType=VARCHAR}, #{f33,jdbcType=VARCHAR}, #{f34,jdbcType=VARCHAR}, #{f35,jdbcType=VARCHAR},
+      #{f36,jdbcType=VARCHAR}, #{f37,jdbcType=VARCHAR}, #{f38,jdbcType=VARCHAR}, #{f39,jdbcType=VARCHAR},
+      #{f40,jdbcType=VARCHAR}, #{f41,jdbcType=VARCHAR}, #{f42,jdbcType=VARCHAR}, #{f43,jdbcType=VARCHAR},
+      #{f44,jdbcType=VARCHAR}, #{f45,jdbcType=VARCHAR}, #{f46,jdbcType=VARCHAR}, #{f47,jdbcType=VARCHAR},
+      #{f48,jdbcType=VARCHAR}, #{f49,jdbcType=VARCHAR}, #{f50,jdbcType=VARCHAR}, #{f51,jdbcType=VARCHAR},
+      #{f52,jdbcType=VARCHAR}, #{f53,jdbcType=VARCHAR}, #{f54,jdbcType=VARCHAR}, #{f55,jdbcType=VARCHAR},
+      #{f56,jdbcType=VARCHAR}, #{f57,jdbcType=VARCHAR}, #{f58,jdbcType=VARCHAR}, #{f59,jdbcType=VARCHAR},
+      #{f60,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ImportDataWithProfit">
+    insert into P_IMPORT_DATA_WITH_PROFIT
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="month != null">
+        MONTH,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="busCode != null">
+        BUS_CODE,
+      </if>
+      <if test="brandCode != null">
+        BRAND_CODE,
+      </if>
+      <if test="importType != null">
+        IMPORT_TYPE,
+      </if>
+      <if test="sheetName != null">
+        SHEET_NAME,
+      </if>
+      <if test="sheetColumn != null">
+        SHEET_COLUMN,
+      </if>
+      <if test="uploadUser != null">
+        UPLOAD_USER,
+      </if>
+      <if test="uploadTime != null">
+        UPLOAD_TIME,
+      </if>
+      <if test="sheetOrder != null">
+        SHEET_ORDER,
+      </if>
+      <if test="rowOrder != null">
+        ROW_ORDER,
+      </if>
+      <if test="f7 != null">
+        F7,
+      </if>
+      <if test="f8 != null">
+        F8,
+      </if>
+      <if test="f9 != null">
+        F9,
+      </if>
+      <if test="f10 != null">
+        F10,
+      </if>
+      <if test="f11 != null">
+        F11,
+      </if>
+      <if test="f12 != null">
+        F12,
+      </if>
+      <if test="f13 != null">
+        F13,
+      </if>
+      <if test="f14 != null">
+        F14,
+      </if>
+      <if test="f15 != null">
+        F15,
+      </if>
+      <if test="f16 != null">
+        F16,
+      </if>
+      <if test="f17 != null">
+        F17,
+      </if>
+      <if test="f18 != null">
+        F18,
+      </if>
+      <if test="f19 != null">
+        F19,
+      </if>
+      <if test="f20 != null">
+        F20,
+      </if>
+      <if test="f21 != null">
+        F21,
+      </if>
+      <if test="f22 != null">
+        F22,
+      </if>
+      <if test="f23 != null">
+        F23,
+      </if>
+      <if test="f24 != null">
+        F24,
+      </if>
+      <if test="f25 != null">
+        F25,
+      </if>
+      <if test="f26 != null">
+        F26,
+      </if>
+      <if test="f27 != null">
+        F27,
+      </if>
+      <if test="f28 != null">
+        F28,
+      </if>
+      <if test="f29 != null">
+        F29,
+      </if>
+      <if test="f30 != null">
+        F30,
+      </if>
+      <if test="f31 != null">
+        F31,
+      </if>
+      <if test="f32 != null">
+        F32,
+      </if>
+      <if test="f33 != null">
+        F33,
+      </if>
+      <if test="f34 != null">
+        F34,
+      </if>
+      <if test="f35 != null">
+        F35,
+      </if>
+      <if test="f36 != null">
+        F36,
+      </if>
+      <if test="f37 != null">
+        F37,
+      </if>
+      <if test="f38 != null">
+        F38,
+      </if>
+      <if test="f39 != null">
+        F39,
+      </if>
+      <if test="f40 != null">
+        F40,
+      </if>
+      <if test="f41 != null">
+        F41,
+      </if>
+      <if test="f42 != null">
+        F42,
+      </if>
+      <if test="f43 != null">
+        F43,
+      </if>
+      <if test="f44 != null">
+        F44,
+      </if>
+      <if test="f45 != null">
+        F45,
+      </if>
+      <if test="f46 != null">
+        F46,
+      </if>
+      <if test="f47 != null">
+        F47,
+      </if>
+      <if test="f48 != null">
+        F48,
+      </if>
+      <if test="f49 != null">
+        F49,
+      </if>
+      <if test="f50 != null">
+        F50,
+      </if>
+      <if test="f51 != null">
+        F51,
+      </if>
+      <if test="f52 != null">
+        F52,
+      </if>
+      <if test="f53 != null">
+        F53,
+      </if>
+      <if test="f54 != null">
+        F54,
+      </if>
+      <if test="f55 != null">
+        F55,
+      </if>
+      <if test="f56 != null">
+        F56,
+      </if>
+      <if test="f57 != null">
+        F57,
+      </if>
+      <if test="f58 != null">
+        F58,
+      </if>
+      <if test="f59 != null">
+        F59,
+      </if>
+      <if test="f60 != null">
+        F60,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="month != null">
+        #{month,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busCode != null">
+        #{busCode,jdbcType=VARCHAR},
+      </if>
+      <if test="brandCode != null">
+        #{brandCode,jdbcType=VARCHAR},
+      </if>
+      <if test="importType != null">
+        #{importType,jdbcType=VARCHAR},
+      </if>
+      <if test="sheetName != null">
+        #{sheetName,jdbcType=VARCHAR},
+      </if>
+      <if test="sheetColumn != null">
+        #{sheetColumn,jdbcType=DECIMAL},
+      </if>
+      <if test="uploadUser != null">
+        #{uploadUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadTime != null">
+        #{uploadTime,jdbcType=VARCHAR},
+      </if>
+      <if test="sheetOrder != null">
+        #{sheetOrder,jdbcType=DECIMAL},
+      </if>
+      <if test="rowOrder != null">
+        #{rowOrder,jdbcType=DECIMAL},
+      </if>
+      <if test="f7 != null">
+        #{f7,jdbcType=VARCHAR},
+      </if>
+      <if test="f8 != null">
+        #{f8,jdbcType=VARCHAR},
+      </if>
+      <if test="f9 != null">
+        #{f9,jdbcType=VARCHAR},
+      </if>
+      <if test="f10 != null">
+        #{f10,jdbcType=VARCHAR},
+      </if>
+      <if test="f11 != null">
+        #{f11,jdbcType=VARCHAR},
+      </if>
+      <if test="f12 != null">
+        #{f12,jdbcType=VARCHAR},
+      </if>
+      <if test="f13 != null">
+        #{f13,jdbcType=VARCHAR},
+      </if>
+      <if test="f14 != null">
+        #{f14,jdbcType=VARCHAR},
+      </if>
+      <if test="f15 != null">
+        #{f15,jdbcType=VARCHAR},
+      </if>
+      <if test="f16 != null">
+        #{f16,jdbcType=VARCHAR},
+      </if>
+      <if test="f17 != null">
+        #{f17,jdbcType=VARCHAR},
+      </if>
+      <if test="f18 != null">
+        #{f18,jdbcType=VARCHAR},
+      </if>
+      <if test="f19 != null">
+        #{f19,jdbcType=VARCHAR},
+      </if>
+      <if test="f20 != null">
+        #{f20,jdbcType=VARCHAR},
+      </if>
+      <if test="f21 != null">
+        #{f21,jdbcType=VARCHAR},
+      </if>
+      <if test="f22 != null">
+        #{f22,jdbcType=VARCHAR},
+      </if>
+      <if test="f23 != null">
+        #{f23,jdbcType=VARCHAR},
+      </if>
+      <if test="f24 != null">
+        #{f24,jdbcType=VARCHAR},
+      </if>
+      <if test="f25 != null">
+        #{f25,jdbcType=VARCHAR},
+      </if>
+      <if test="f26 != null">
+        #{f26,jdbcType=VARCHAR},
+      </if>
+      <if test="f27 != null">
+        #{f27,jdbcType=VARCHAR},
+      </if>
+      <if test="f28 != null">
+        #{f28,jdbcType=VARCHAR},
+      </if>
+      <if test="f29 != null">
+        #{f29,jdbcType=VARCHAR},
+      </if>
+      <if test="f30 != null">
+        #{f30,jdbcType=VARCHAR},
+      </if>
+      <if test="f31 != null">
+        #{f31,jdbcType=VARCHAR},
+      </if>
+      <if test="f32 != null">
+        #{f32,jdbcType=VARCHAR},
+      </if>
+      <if test="f33 != null">
+        #{f33,jdbcType=VARCHAR},
+      </if>
+      <if test="f34 != null">
+        #{f34,jdbcType=VARCHAR},
+      </if>
+      <if test="f35 != null">
+        #{f35,jdbcType=VARCHAR},
+      </if>
+      <if test="f36 != null">
+        #{f36,jdbcType=VARCHAR},
+      </if>
+      <if test="f37 != null">
+        #{f37,jdbcType=VARCHAR},
+      </if>
+      <if test="f38 != null">
+        #{f38,jdbcType=VARCHAR},
+      </if>
+      <if test="f39 != null">
+        #{f39,jdbcType=VARCHAR},
+      </if>
+      <if test="f40 != null">
+        #{f40,jdbcType=VARCHAR},
+      </if>
+      <if test="f41 != null">
+        #{f41,jdbcType=VARCHAR},
+      </if>
+      <if test="f42 != null">
+        #{f42,jdbcType=VARCHAR},
+      </if>
+      <if test="f43 != null">
+        #{f43,jdbcType=VARCHAR},
+      </if>
+      <if test="f44 != null">
+        #{f44,jdbcType=VARCHAR},
+      </if>
+      <if test="f45 != null">
+        #{f45,jdbcType=VARCHAR},
+      </if>
+      <if test="f46 != null">
+        #{f46,jdbcType=VARCHAR},
+      </if>
+      <if test="f47 != null">
+        #{f47,jdbcType=VARCHAR},
+      </if>
+      <if test="f48 != null">
+        #{f48,jdbcType=VARCHAR},
+      </if>
+      <if test="f49 != null">
+        #{f49,jdbcType=VARCHAR},
+      </if>
+      <if test="f50 != null">
+        #{f50,jdbcType=VARCHAR},
+      </if>
+      <if test="f51 != null">
+        #{f51,jdbcType=VARCHAR},
+      </if>
+      <if test="f52 != null">
+        #{f52,jdbcType=VARCHAR},
+      </if>
+      <if test="f53 != null">
+        #{f53,jdbcType=VARCHAR},
+      </if>
+      <if test="f54 != null">
+        #{f54,jdbcType=VARCHAR},
+      </if>
+      <if test="f55 != null">
+        #{f55,jdbcType=VARCHAR},
+      </if>
+      <if test="f56 != null">
+        #{f56,jdbcType=VARCHAR},
+      </if>
+      <if test="f57 != null">
+        #{f57,jdbcType=VARCHAR},
+      </if>
+      <if test="f58 != null">
+        #{f58,jdbcType=VARCHAR},
+      </if>
+      <if test="f59 != null">
+        #{f59,jdbcType=VARCHAR},
+      </if>
+      <if test="f60 != null">
+        #{f60,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ImportDataWithProfitExample" resultType="java.lang.Long">
+    select count(*) from P_IMPORT_DATA_WITH_PROFIT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ImportDataWithProfit">
+    update P_IMPORT_DATA_WITH_PROFIT
+    <set>
+      <if test="month != null">
+        MONTH = #{month,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busCode != null">
+        BUS_CODE = #{busCode,jdbcType=VARCHAR},
+      </if>
+      <if test="brandCode != null">
+        BRAND_CODE = #{brandCode,jdbcType=VARCHAR},
+      </if>
+      <if test="importType != null">
+        IMPORT_TYPE = #{importType,jdbcType=VARCHAR},
+      </if>
+      <if test="sheetName != null">
+        SHEET_NAME = #{sheetName,jdbcType=VARCHAR},
+      </if>
+      <if test="sheetColumn != null">
+        SHEET_COLUMN = #{sheetColumn,jdbcType=DECIMAL},
+      </if>
+      <if test="uploadUser != null">
+        UPLOAD_USER = #{uploadUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadTime != null">
+        UPLOAD_TIME = #{uploadTime,jdbcType=VARCHAR},
+      </if>
+      <if test="sheetOrder != null">
+        SHEET_ORDER = #{sheetOrder,jdbcType=DECIMAL},
+      </if>
+      <if test="rowOrder != null">
+        ROW_ORDER = #{rowOrder,jdbcType=DECIMAL},
+      </if>
+      <if test="f7 != null">
+        F7 = #{f7,jdbcType=VARCHAR},
+      </if>
+      <if test="f8 != null">
+        F8 = #{f8,jdbcType=VARCHAR},
+      </if>
+      <if test="f9 != null">
+        F9 = #{f9,jdbcType=VARCHAR},
+      </if>
+      <if test="f10 != null">
+        F10 = #{f10,jdbcType=VARCHAR},
+      </if>
+      <if test="f11 != null">
+        F11 = #{f11,jdbcType=VARCHAR},
+      </if>
+      <if test="f12 != null">
+        F12 = #{f12,jdbcType=VARCHAR},
+      </if>
+      <if test="f13 != null">
+        F13 = #{f13,jdbcType=VARCHAR},
+      </if>
+      <if test="f14 != null">
+        F14 = #{f14,jdbcType=VARCHAR},
+      </if>
+      <if test="f15 != null">
+        F15 = #{f15,jdbcType=VARCHAR},
+      </if>
+      <if test="f16 != null">
+        F16 = #{f16,jdbcType=VARCHAR},
+      </if>
+      <if test="f17 != null">
+        F17 = #{f17,jdbcType=VARCHAR},
+      </if>
+      <if test="f18 != null">
+        F18 = #{f18,jdbcType=VARCHAR},
+      </if>
+      <if test="f19 != null">
+        F19 = #{f19,jdbcType=VARCHAR},
+      </if>
+      <if test="f20 != null">
+        F20 = #{f20,jdbcType=VARCHAR},
+      </if>
+      <if test="f21 != null">
+        F21 = #{f21,jdbcType=VARCHAR},
+      </if>
+      <if test="f22 != null">
+        F22 = #{f22,jdbcType=VARCHAR},
+      </if>
+      <if test="f23 != null">
+        F23 = #{f23,jdbcType=VARCHAR},
+      </if>
+      <if test="f24 != null">
+        F24 = #{f24,jdbcType=VARCHAR},
+      </if>
+      <if test="f25 != null">
+        F25 = #{f25,jdbcType=VARCHAR},
+      </if>
+      <if test="f26 != null">
+        F26 = #{f26,jdbcType=VARCHAR},
+      </if>
+      <if test="f27 != null">
+        F27 = #{f27,jdbcType=VARCHAR},
+      </if>
+      <if test="f28 != null">
+        F28 = #{f28,jdbcType=VARCHAR},
+      </if>
+      <if test="f29 != null">
+        F29 = #{f29,jdbcType=VARCHAR},
+      </if>
+      <if test="f30 != null">
+        F30 = #{f30,jdbcType=VARCHAR},
+      </if>
+      <if test="f31 != null">
+        F31 = #{f31,jdbcType=VARCHAR},
+      </if>
+      <if test="f32 != null">
+        F32 = #{f32,jdbcType=VARCHAR},
+      </if>
+      <if test="f33 != null">
+        F33 = #{f33,jdbcType=VARCHAR},
+      </if>
+      <if test="f34 != null">
+        F34 = #{f34,jdbcType=VARCHAR},
+      </if>
+      <if test="f35 != null">
+        F35 = #{f35,jdbcType=VARCHAR},
+      </if>
+      <if test="f36 != null">
+        F36 = #{f36,jdbcType=VARCHAR},
+      </if>
+      <if test="f37 != null">
+        F37 = #{f37,jdbcType=VARCHAR},
+      </if>
+      <if test="f38 != null">
+        F38 = #{f38,jdbcType=VARCHAR},
+      </if>
+      <if test="f39 != null">
+        F39 = #{f39,jdbcType=VARCHAR},
+      </if>
+      <if test="f40 != null">
+        F40 = #{f40,jdbcType=VARCHAR},
+      </if>
+      <if test="f41 != null">
+        F41 = #{f41,jdbcType=VARCHAR},
+      </if>
+      <if test="f42 != null">
+        F42 = #{f42,jdbcType=VARCHAR},
+      </if>
+      <if test="f43 != null">
+        F43 = #{f43,jdbcType=VARCHAR},
+      </if>
+      <if test="f44 != null">
+        F44 = #{f44,jdbcType=VARCHAR},
+      </if>
+      <if test="f45 != null">
+        F45 = #{f45,jdbcType=VARCHAR},
+      </if>
+      <if test="f46 != null">
+        F46 = #{f46,jdbcType=VARCHAR},
+      </if>
+      <if test="f47 != null">
+        F47 = #{f47,jdbcType=VARCHAR},
+      </if>
+      <if test="f48 != null">
+        F48 = #{f48,jdbcType=VARCHAR},
+      </if>
+      <if test="f49 != null">
+        F49 = #{f49,jdbcType=VARCHAR},
+      </if>
+      <if test="f50 != null">
+        F50 = #{f50,jdbcType=VARCHAR},
+      </if>
+      <if test="f51 != null">
+        F51 = #{f51,jdbcType=VARCHAR},
+      </if>
+      <if test="f52 != null">
+        F52 = #{f52,jdbcType=VARCHAR},
+      </if>
+      <if test="f53 != null">
+        F53 = #{f53,jdbcType=VARCHAR},
+      </if>
+      <if test="f54 != null">
+        F54 = #{f54,jdbcType=VARCHAR},
+      </if>
+      <if test="f55 != null">
+        F55 = #{f55,jdbcType=VARCHAR},
+      </if>
+      <if test="f56 != null">
+        F56 = #{f56,jdbcType=VARCHAR},
+      </if>
+      <if test="f57 != null">
+        F57 = #{f57,jdbcType=VARCHAR},
+      </if>
+      <if test="f58 != null">
+        F58 = #{f58,jdbcType=VARCHAR},
+      </if>
+      <if test="f59 != null">
+        F59 = #{f59,jdbcType=VARCHAR},
+      </if>
+      <if test="f60 != null">
+        F60 = #{f60,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.ImportDataWithProfit">
+    update P_IMPORT_DATA_WITH_PROFIT
+    set MONTH = #{month,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      BUS_CODE = #{busCode,jdbcType=VARCHAR},
+      BRAND_CODE = #{brandCode,jdbcType=VARCHAR},
+      IMPORT_TYPE = #{importType,jdbcType=VARCHAR},
+      SHEET_NAME = #{sheetName,jdbcType=VARCHAR},
+      SHEET_COLUMN = #{sheetColumn,jdbcType=DECIMAL},
+      UPLOAD_USER = #{uploadUser,jdbcType=VARCHAR},
+      UPLOAD_TIME = #{uploadTime,jdbcType=VARCHAR},
+      SHEET_ORDER = #{sheetOrder,jdbcType=DECIMAL},
+      ROW_ORDER = #{rowOrder,jdbcType=DECIMAL},
+      F7 = #{f7,jdbcType=VARCHAR},
+      F8 = #{f8,jdbcType=VARCHAR},
+      F9 = #{f9,jdbcType=VARCHAR},
+      F10 = #{f10,jdbcType=VARCHAR},
+      F11 = #{f11,jdbcType=VARCHAR},
+      F12 = #{f12,jdbcType=VARCHAR},
+      F13 = #{f13,jdbcType=VARCHAR},
+      F14 = #{f14,jdbcType=VARCHAR},
+      F15 = #{f15,jdbcType=VARCHAR},
+      F16 = #{f16,jdbcType=VARCHAR},
+      F17 = #{f17,jdbcType=VARCHAR},
+      F18 = #{f18,jdbcType=VARCHAR},
+      F19 = #{f19,jdbcType=VARCHAR},
+      F20 = #{f20,jdbcType=VARCHAR},
+      F21 = #{f21,jdbcType=VARCHAR},
+      F22 = #{f22,jdbcType=VARCHAR},
+      F23 = #{f23,jdbcType=VARCHAR},
+      F24 = #{f24,jdbcType=VARCHAR},
+      F25 = #{f25,jdbcType=VARCHAR},
+      F26 = #{f26,jdbcType=VARCHAR},
+      F27 = #{f27,jdbcType=VARCHAR},
+      F28 = #{f28,jdbcType=VARCHAR},
+      F29 = #{f29,jdbcType=VARCHAR},
+      F30 = #{f30,jdbcType=VARCHAR},
+      F31 = #{f31,jdbcType=VARCHAR},
+      F32 = #{f32,jdbcType=VARCHAR},
+      F33 = #{f33,jdbcType=VARCHAR},
+      F34 = #{f34,jdbcType=VARCHAR},
+      F35 = #{f35,jdbcType=VARCHAR},
+      F36 = #{f36,jdbcType=VARCHAR},
+      F37 = #{f37,jdbcType=VARCHAR},
+      F38 = #{f38,jdbcType=VARCHAR},
+      F39 = #{f39,jdbcType=VARCHAR},
+      F40 = #{f40,jdbcType=VARCHAR},
+      F41 = #{f41,jdbcType=VARCHAR},
+      F42 = #{f42,jdbcType=VARCHAR},
+      F43 = #{f43,jdbcType=VARCHAR},
+      F44 = #{f44,jdbcType=VARCHAR},
+      F45 = #{f45,jdbcType=VARCHAR},
+      F46 = #{f46,jdbcType=VARCHAR},
+      F47 = #{f47,jdbcType=VARCHAR},
+      F48 = #{f48,jdbcType=VARCHAR},
+      F49 = #{f49,jdbcType=VARCHAR},
+      F50 = #{f50,jdbcType=VARCHAR},
+      F51 = #{f51,jdbcType=VARCHAR},
+      F52 = #{f52,jdbcType=VARCHAR},
+      F53 = #{f53,jdbcType=VARCHAR},
+      F54 = #{f54,jdbcType=VARCHAR},
+      F55 = #{f55,jdbcType=VARCHAR},
+      F56 = #{f56,jdbcType=VARCHAR},
+      F57 = #{f57,jdbcType=VARCHAR},
+      F58 = #{f58,jdbcType=VARCHAR},
+      F59 = #{f59,jdbcType=VARCHAR},
+      F60 = #{f60,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+
+  <insert id="insertProfitData" parameterType="java.util.Map" >
+    insert into P_IMPORT_DATA_WITH_PROFIT  (
+      <include refid="Base_Column_List"/>
+    )
+    <foreach collection="profitDatas" item="item" index="index" separator="UNION ALL">
+      SELECT #{item.id}, #{item.month}, #{item.agentId},
+      #{item.agentName}, #{item.busNum}, #{item.busCode},
+      #{item.brandCode}, #{item.importType}, #{item.sheetName},
+      #{item.sheetColumn}, #{item.uploadUser}, #{item.uploadTime},
+      #{item.sheetOrder}, #{item.rowOrder}, #{item.f7},
+      #{item.f8}, #{item.f9}, #{item.f10}, #{item.f11},
+      #{item.f12}, #{item.f13}, #{item.f14}, #{item.f15},
+      #{item.f16}, #{item.f17}, #{item.f18}, #{item.f19},
+      #{item.f20}, #{item.f21}, #{item.f22}, #{item.f23},
+      #{item.f24}, #{item.f25}, #{item.f26}, #{item.f27},
+      #{item.f28}, #{item.f29}, #{item.f30}, #{item.f31},
+      #{item.f32}, #{item.f33}, #{item.f34}, #{item.f35},
+      #{item.f36}, #{item.f37}, #{item.f38}, #{item.f39},
+      #{item.f40}, #{item.f41}, #{item.f42}, #{item.f43},
+      #{item.f44}, #{item.f45}, #{item.f46}, #{item.f47},
+      #{item.f48}, #{item.f49}, #{item.f50}, #{item.f51},
+      #{item.f52}, #{item.f53}, #{item.f54}, #{item.f55},
+      #{item.f56}, #{item.f57}, #{item.f58}, #{item.f59},
+      #{item.f60}
+      FROM dual
+    </foreach>
+  </insert>
+
+  <delete id="deleteProfitDataByBatchCode" parameterType="java.lang.String">
+    DELETE FROM P_IMPORT_DATA_WITH_PROFIT PD
+    WHERE EXISTS(
+                  SELECT 1
+                  FROM P_IMPORT_DATA_WITH_PROFIT_LOG LOG
+                  WHERE LOG.ID = #{id,jdbcType=VARCHAR} AND PD.MONTH = LOG.MONTH
+                  AND PD.IMPORT_TYPE = LOG.IMPORT_TYPE AND PD.UPLOAD_USER = LOG.UPLOAD_USER
+                )
+  </delete>
+
+  <select id="checkDataAll" parameterType="java.util.Map" resultType="java.util.Map">
+    select * from (
+      <foreach collection="datas" item="item" index="index" separator="UNION ALL">
+        SELECT  #{item.agentId} as AGENT_ID,#{item.busCode} as BUS_PLATFORM,#{item.index} as ROW_NUM
+        FROM dual
+      </foreach>
+      )aa
+    where exists(
+    select 1
+    from (
+            select AGENT_ID,BUS_PLATFORM
+            from(<foreach collection="datas" item="item" index="index" separator="UNION ALL">
+                    SELECT  #{item.agentId} as AGENT_ID,#{item.busCode} as BUS_PLATFORM,#{item.index} as ROW_NUM
+                    FROM dual
+                 </foreach>)
+            MINUS
+            select AGENT_ID,,BUS_PLATFORM
+            from A_AGENT_BUSINFO
+           )bb
+    where aa.AGENT_ID=bb.AGENT_ID and aa.BUS_PLATFORM=bb.BUS_PLATFORM)
+  </select>
+
+</mapper>
