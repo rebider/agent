@@ -925,7 +925,7 @@ public class CompensateServiceImpl implements CompensateService {
                 termMachineService.unFreezeCompensate(FastMap.fastMap("taskId", refundPriceDiffDetailList.get(0).getRefundPriceDiffId()), refundPriceDiffDetailList.get(0).getPlatformType());
                 log.info("换活动冻结异常:{}", e.getMessage());
                 e.printStackTrace();
-                throw new ProcessException("政策调整，业务系统冻结失败！");
+                throw new ProcessException(e.getMessage());
             }
             return AgentResult.ok(priceDiffId);
         }catch (ProcessException e) {
