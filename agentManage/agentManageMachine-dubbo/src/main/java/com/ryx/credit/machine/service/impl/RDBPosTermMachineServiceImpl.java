@@ -294,7 +294,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
      * @throws Exception
      */
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws Exception {
 
         //封装参数
         String currentAgencyId = refundPriceDiffDetailList.get(0).getAgentId();

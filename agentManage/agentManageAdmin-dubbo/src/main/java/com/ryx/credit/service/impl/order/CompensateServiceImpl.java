@@ -595,13 +595,6 @@ public class CompensateServiceImpl implements CompensateService {
                     }
 
                     //检查目标活动和代理商平台码是否一致
-//                    if(oldActivity.getPlatform().equals(newActivity.getPlatform())){
-                        //活动没有跨平台，平台号也不允许跨平台
-//                        if(!refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())) {
-//                            throw new ProcessException("原平台编号与目标平台编号不一致");
-//                        }
-//                    }
-                    //检查目标活动和代理商平台码是否一致
                     if(refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())){
                         //平台号没有跨平台，活动也不允许跨平台
                         if(!oldActivity.getPlatform().equals(newActivity.getPlatform())) {
@@ -703,7 +696,7 @@ public class CompensateServiceImpl implements CompensateService {
                     }
                     refundPriceDiffDetail.setOldBrandCode(oldPlatForm.get(0).getBusplatform());
                     refundPriceDiffDetail.setNewBrandCode(newPlatForm.get(0).getBusplatform());
-                }  else if (PlatformType.SSPOS.getValue().equals(platForm.getPlatformType())) {
+                } else if (PlatformType.SSPOS.getValue().equals(platForm.getPlatformType())) {
                     List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",refundPriceDiffDetail.getOldOrgId()));
                     List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",refundPriceDiffDetail.getNewOrgId()));
                     if (null == oldPlatForm || oldPlatForm.size() != 1 || null == oldPlatForm.get(0).getBusplatform()) {
@@ -757,7 +750,8 @@ public class CompensateServiceImpl implements CompensateService {
                 throw new ProcessException("仅支持单品牌的活动调整申请。");
             }
 
-            AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check");
+            //业务平台接口，校验并冻结
+            AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check", "1");
             if(!synOrVerifyResult.isOK()){
                 throw new ProcessException(synOrVerifyResult.getMsg());
             }
@@ -879,8 +873,47 @@ public class CompensateServiceImpl implements CompensateService {
                         }
                     }
                 }
+            } else if (PlatformType.MPOS.getValue().equals(platformType)) {
+                JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
+                List<Map<String,Object>> resultList = (List<Map<String,Object>>)resData.get("resultList");
+                for (Map<String, Object> stringObjectMap : resultList) {
+                    String serialNumber = String.valueOf(stringObjectMap.get("serialNumber"));
+                    for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
+                        if(serialNumber.equals(refundPriceDiffDetail.getId())){
+                            Map<String, Object> oldOrganMap = JsonUtil.objectToMap(stringObjectMap.get("oldOrgan"));
+                            Map<String, Object> newOrganMap = JsonUtil.objectToMap(stringObjectMap.get("newOrgan"));
+                            String oldSupDorgId = String.valueOf(oldOrganMap.get("oldSupDorgId"));
+                            String oldSupDorgName = String.valueOf(oldOrganMap.get("oldSupDorgName"));
+                            String newSupDorgId = String.valueOf(newOrganMap.get("newSupDorgId"));
+                            String newSupDorgName = String.valueOf(newOrganMap.get("newSupDorgName"));
+                            String newOrgName = String.valueOf(newOrganMap.get("newOrgName"));
+                            String oldOrgName = String.valueOf(oldOrganMap.get("oldOrgName"));
+                            if(StringUtils.isNotBlank(oldSupDorgId) && !oldSupDorgId.equals("null")) {
+                                refundPriceDiffDetail.setOldSupdOrgId(oldSupDorgId);
+                            }
+                            if(StringUtils.isNotBlank(oldSupDorgName) && !oldSupDorgName.equals("null")) {
+                                refundPriceDiffDetail.setOldSupdOrgName(oldSupDorgName);
+                            }
+                            if(StringUtils.isNotBlank(newSupDorgId) && !newSupDorgId.equals("null")) {
+                                refundPriceDiffDetail.setNewSupdOrgId(newSupDorgId);
+                            }
+                            if(StringUtils.isNotBlank(newSupDorgName) && !newSupDorgName.equals("null")) {
+                                refundPriceDiffDetail.setNewSupdOrgName(newSupDorgName);
+                            }
+                            if(StringUtils.isNotBlank(newOrgName) && !newOrgName.equals("null")) {
+                                refundPriceDiffDetail.setNewOrgName(newOrgName);
+                            }
+                            if(StringUtils.isNotBlank(oldOrgName) && !oldOrgName.equals("null")) {
+                                refundPriceDiffDetail.setOldOrgName(oldOrgName);
+                            }
+                            int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
+                            if(i!=1){
+                                throw new ProcessException("更新返回数据失败");
+                            }
+                        }
+                    }
+                }
             }
-
             if(agentVo.getFlag().equals("2")){
                 startCompensateActiviy(priceDiffId,cUser);
             }
@@ -1079,7 +1112,7 @@ public class CompensateServiceImpl implements CompensateService {
                 List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
 
                 //校验是否能通过
-                AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check");
+                AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check", "0");
                 if(!synOrVerifyResult_check.isOK()){
                     throw new ProcessException(synOrVerifyResult_check.getMsg());
                 }
@@ -1277,7 +1310,7 @@ public class CompensateServiceImpl implements CompensateService {
 
         //审批通过校验是否能通过
         if (AgStatus.Approved.status.compareTo(agStatus) == 0){
-            AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check");
+            AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check", "0");
             if(!synOrVerifyResult_check.isOK()){
                 throw new ProcessException(synOrVerifyResult_check.getMsg());
             }
@@ -1393,10 +1426,10 @@ public class CompensateServiceImpl implements CompensateService {
             }
 
             //每次执行前校验
-            AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check");
+            AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check", "0");
             if (!synOrVerifyResult_check.isOK()) throw new MessageException(synOrVerifyResult_check.getMsg());
 
-            AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust");
+            AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust", "1");
             if (!synOrVerifyResult.isOK()) throw new MessageException(synOrVerifyResult.getMsg());
         }
         return AgentResult.ok();
