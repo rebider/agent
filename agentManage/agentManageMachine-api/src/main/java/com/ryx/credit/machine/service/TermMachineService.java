@@ -133,4 +133,12 @@ public interface TermMachineService {
      * @throws Exception
      */
     AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception;
+
+    /**
+     * 换活动解锁
+     * @param pamMap
+     * @return
+     * @throws Exception
+     */
+    AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception;
 }

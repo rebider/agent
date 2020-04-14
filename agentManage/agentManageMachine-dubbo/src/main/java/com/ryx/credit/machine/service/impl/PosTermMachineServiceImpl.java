@@ -457,4 +457,9 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
         return null;
     }
+
+    @Override
+    public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        return AgentResult.ok();
+    }
 }

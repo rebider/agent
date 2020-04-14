@@ -9,13 +9,17 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
+import com.ryx.credit.pojo.admin.order.OActivity;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
+import com.ryx.credit.service.order.OrderActivityService;
 import org.apache.commons.collections.FastHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +36,9 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     public static final String MPOS_SUCESS_respCode = "000000";//000000-成功，000002-系统报错，000003-缺失参数，000004-其他, 100000-失败
     public static final String MPOS_SUCESS_respType = "S";//S-成功，E-报错，R-重复请求
     private Logger logger = LoggerFactory.getLogger(MposTermMachineServiceImpl.class);
+
+    @Autowired
+    private OrderActivityService orderActivityService;
 
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{
@@ -273,7 +280,72 @@ public class MposTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws Exception {
-        return  AgentResult.ok("未联动");
+        //封装参数
+        String taskId = refundPriceDiffDetailList.get(0).getRefundPriceDiffId();
+        List<Map<String, Object>> reqList = new ArrayList<>();
+        for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
+
+            //判断机构编不能为空
+            if (null == refundPriceDiffDetail.getOldOrgId() || "".equals(refundPriceDiffDetail.getOldOrgId()))
+                return AgentResult.fail("请输入正确的机构编码");
+            if (null == refundPriceDiffDetail.getNewOrgId() || "".equals(refundPriceDiffDetail.getNewOrgId()))
+                return AgentResult.fail("请输入正确的机构编码");
+
+            Map<String, Object> reqMap = new HashMap<>();
+            //查询，新旧活动代码
+            OActivity oldActivity = orderActivityService.findById(refundPriceDiffDetail.getActivityFrontId());
+            OActivity newActivity = orderActivityService.findById(refundPriceDiffDetail.getActivityRealId());
+            reqMap.put("serialNumber", refundPriceDiffDetail.getId());
+            reqMap.put("posSnEnd", refundPriceDiffDetail.getEndSn());
+            reqMap.put("posSnBegin", refundPriceDiffDetail.getBeginSn());
+            reqMap.put("oldOrgId", refundPriceDiffDetail.getOldOrgId());
+            reqMap.put("newOrgId", refundPriceDiffDetail.getNewOrgId());
+            reqMap.put("newMachineId", newActivity.getBusProCode());
+            reqMap.put("oldMachineId", oldActivity.getBusProCode());
+            reqMap.put("posType", newActivity.getPosType());
+            if (null == newActivity.getStandTime()) {
+                reqMap.put("standTime", "0");
+            } else {
+                reqMap.put("standTime",  newActivity.getStandTime().setScale(0, BigDecimal.ROUND_HALF_UP).toString());
+            }
+            if (null == newActivity.getStandTime()) {
+                reqMap.put("deposit", "0");
+            } else {
+                reqMap.put("deposit", newActivity.getPosSpePrice().setScale(0,BigDecimal.ROUND_HALF_UP).toString());
+            }
+            reqList.add(reqMap);
+        }
+
+        try {
+            String httpString = JSONObject.toJSONString(FastMap.fastMap("taskId", taskId)
+                    .putKeyV("operation", operation)//如果是调整不传递true
+                    .putKeyV("snList", reqList)
+                    .putKeyV("isFreeze", isFreeze));
+
+
+            logger.info("手刷换活动查询参数:{},{}", AppConfig.getProperty("mpos.termCheckAndExecution"), httpString);
+            String retString = HttpClientUtil.doPostJson(AppConfig.getProperty("mpos.termCheckAndExecution"), httpString);
+            logger.info("手刷换活动查询返回值:{}", retString);
+
+            //验证返回值
+            if (!StringUtils.isNotBlank(retString)) return AgentResult.fail("手刷查询换活动接口，返回值为空。");
+            JSONObject resJson = JSONObject.parseObject(retString);
+
+            //返回最终查询结果
+            if (null != resJson.getString("code") && resJson.getString("code").equals("0000")) {
+                //可以更换活动，封装参参数返回
+                return AgentResult.ok(resJson.get("result"));
+            } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
+                //不可以更换活动
+                return AgentResult.fail(resJson.getString("msg") + "，不可以更换活动！");
+            } else {
+                //异常结果
+                return AgentResult.fail("查询手刷换活动返回值异常！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
@@ -299,5 +371,34 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     @Override
     public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
         return null;
+    }
+
+    @Override
+    public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        try {
+            String httpString = JSONObject.toJSONString(pamMap);
+            logger.info("手刷换活动解锁参数:{},{}", AppConfig.getProperty("mpos.termUnlock"), httpString);
+            String retString = HttpClientUtil.doPostJson(AppConfig.getProperty("mpos.termUnlock"), httpString);
+            logger.info("手刷换活动解锁返回值:{}", retString);
+
+            //验证返回值
+            if (!StringUtils.isNotBlank(retString)) return AgentResult.fail("手刷解锁换活动接口，返回值为空。");
+            JSONObject resJson = JSONObject.parseObject(retString);
+
+            //返回最终查询结果
+            if (null != resJson.getString("code") && resJson.getString("code").equals("0000")) {
+                //可以更换活动，封装参参数返回
+                return AgentResult.ok(resJson.get("result"));
+            } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
+                //不可以更换活动
+                return AgentResult.fail(resJson.getString("msg") + "，不可以更换活动！");
+            } else {
+                //异常结果
+                return AgentResult.fail("查询手刷换活动返回值异常！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

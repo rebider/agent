@@ -498,4 +498,9 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
             throw e;
         }
     }
+
+    @Override
+    public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        return AgentResult.ok();
+    }
 }

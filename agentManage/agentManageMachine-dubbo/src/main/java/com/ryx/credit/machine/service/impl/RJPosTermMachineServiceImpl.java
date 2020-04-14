@@ -207,6 +207,11 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
         }
     }
 
+    @Override
+    public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        return AgentResult.ok();
+    }
+
     /**
      * 查询活动
      * @param platformType

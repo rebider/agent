@@ -295,4 +295,20 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return AgentResult.fail("未实现的物流平台。");
         }
     }
+
+    @Override
+    public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        logger.info("业务平台解锁SN：{},{}", pamMap, platformType);
+        if (PlatformType.whetherPOS(platformType)) {
+            return posTermMachineServiceImpl.unFreezeCompensate(pamMap, platformType);
+        } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
+            return sPosTermMachineServiceImpl.unFreezeCompensate(pamMap, platformType);
+        } else if (PlatformType.MPOS.getValue().equals(platformType)) {
+            return mposTermMachineServiceImpl.unFreezeCompensate(pamMap, platformType);
+        } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
+            return rdbTermMachineServiceImpl.unFreezeCompensate(pamMap, platformType);
+        } else {
+            return AgentResult.ok();
+        }
+    }
 }
