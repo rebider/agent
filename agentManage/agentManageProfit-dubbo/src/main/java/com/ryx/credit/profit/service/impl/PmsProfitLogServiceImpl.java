@@ -277,28 +277,14 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                 Map<String, Object> saveSheetMap = new HashMap<>();
                 saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "月份错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行的平台下" + busCode + "不存在此行唯一码" + agentId);
                 saveSheetList.add(saveSheetMap);
-                /* throw new RuntimeException(sheetName + "sheet页第" + ((i+2)+(theadi*count)) + "行的平台下" + busCode + "不存在此行唯一码" + agentId);*/
 
             }
-         /*   if (!list.get(i).get("Cell1").trim().equals(mapData.get(0).get("AG_NAME").toString().trim())) {
-                logger.info("mapData=======================================" + mapData + "+++++++++++" + mapData.get(0).get("AG_NAME").toString().trim());
-                logger.info("mapData=======================================" + list.get(i).get("Cell1").trim());
-                throw new RuntimeException(sheetName + "sheet页第" + i + "行唯一标识与代理商名称不匹配");
-            }*/
             if (!month.equals((list.get(i).get("Cell2")))) {
                 Map<String, Object> saveSheetMap = new HashMap<>();
                 saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "平台错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行月份与选择不匹配");
                 saveSheetList.add(saveSheetMap);
-                /* throw new RuntimeException(sheetName + "sheet页第" + ((i+2)+(theadi*count)) + "行月份与选择不匹配");*/
 
             }
-/*
-            if (mapData.get(0).get("PLATFORM_NAME").toString().trim().indexOf(list.get(i).get("Cell4").trim()) == -1) {
-                logger.info("mapData=======================================" + mapData + "+++++++++++" + mapData.get(0).get("PLATFORM_NAME").toString().trim());
-                logger.info("mapData=======================================" + list.get(i).get("Cell4").trim());
-                throw new RuntimeException(sheetName + "sheet页第" + i + "行平台码与平台名称不匹配");
-            }*/
-
 
             pf.setAgentId((list.get(i).get("Cell1")));
             pf.setBusCode(list.get(i).get("Cell3").trim());
@@ -364,7 +350,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                 try {
                     SheetThead sheetThead = new SheetThead(list, sheetName, columnNum, month, userId, sheetOrder, listOne, z, count);
                     FutureTask<Map<String, Object>> thread = new FutureTask<>(sheetThead);
-                    taskNameList.add("{ SheetThead================================================================-" + sheetName + z + "}");
+                    taskNameList.add("{ SheetThead====" + sheetName + z + "}");
                     taskList.add(thread);
                     executor.execute(thread);
                 } catch (Exception e) {
@@ -436,8 +422,10 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                     rMap.put("disposeResult", saveSheetList);
                 }
             } catch (Exception e) {
+                e.getStackTrace();
+                logger.error("分润导入线程 执行结束-当前线程：{" + this.i + "}"+"错误："+e.getMessage());
                 rMap.put("result", "fail");
-                rMap.put("Err", e.getMessage());
+                rMap.put("Err", "读取Excel文件失败");
             }
             logger.info("分润导入线程 执行结束-当前线程：{" + this.i + "}");
             return rMap;
