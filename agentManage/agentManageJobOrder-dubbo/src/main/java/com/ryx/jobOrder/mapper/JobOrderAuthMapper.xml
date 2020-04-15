@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.jobOrder.dao.JobOrderAuthMapper">
+
+    <select id="getReqJobOrderAuth" resultType="java.util.Map">
+        select cr.NAME,cr.URL as jobOrderType
+        from c_resource cr
+                 left join c_role_resource crr
+                           on cr.id = crr.resource_id
+                 left join c_role cro
+                           on cro.id = crr.role_id
+                 left join c_user_role cur
+                           on cur.role_id = cro.id
+                 left join c_user cu
+                           on cu.id = cur.user_id
+        where cro.description like 'Group%' and cr.url is not null
+        <if test="userId != null">
+                 and cur.user_id = #{userId}
+        </if>
+    </select>
+    <select id="getAcceptCode" resultType="java.util.Map" parameterType="string">
+        select cr.id,cr.NAME,cr.SEQ,regexp_substr(cr.description,'[^\_]+', 1, 1)||'_'||regexp_substr(cr.description,'[^\_]+', 1, 2) as description ,cr.STATUS
+        from c_role cr
+        left join c_role_resource crr
+        on crr.role_id = cr.id
+        left join c_resource cre
+        on cre.id = crr.resource_id
+        where cr.status = '0'  and cr.DESCRIPTION like 'Group%' and cr.STATUS = '0'
+        <if test="jobOrderType != null">
+              and cre.url = #{jobOrderType}
+          </if>
+    </select>
+    <select id="getAcceptGroup" parameterType="string" resultType="java.util.Map">
+        select cro.id, cro.name, regexp_substr(cro.description,'[^\_]+', 1, 1)||'_'||regexp_substr(cro.description,'[^\_]+', 1, 2) as description , cur.id
+        from c_role cro
+        left join c_user_role cur
+        on cur.role_id in cro.id
+        left join c_user cu
+        on cu.id = cur.user_id
+        where cro.description like 'Group%' and  cro.status = '0'
+        <if test="userId != null">
+            and cu.id = #{userId}
+        </if>
+    </select>
+    <select id="getAllAcceptGroup" resultType="java.util.Map">
+        select cro.id, cro.name, cro.description
+        from c_role cro
+        where cro.description like 'Group%' and cro.status = 0 and cro.STATUS = '0'
+    </select>
+    <select id="getAcceptByAcceptCode" parameterType="string" resultType="java.util.Map">
+        select NAME,DESCRIPTION from C_ROLE where DESCRIPTION = #{acceptCode}
+    </select>
+    <select id="getAcceptByuserid" parameterType="string" resultType="java.util.Map">
+        select cr.NAME,regexp_substr(cr.description,'[^\_]+', 1, 1)||'_'||regexp_substr(cr.description,'[^\_]+', 1, 2) as description from C_ROLE cr
+        left join C_USER_ROLE cur on cur.ROLE_ID = cr.ID
+        left join C_USER cu on cu.ID = cur.USER_ID
+        where cr.DESCRIPTION like 'Group%'
+        <if test="userId != null">
+        and  cu.ID = #{userId}
+        </if>
+    </select>
+    <select id="getViewJobKeyManageNodesByUserId" parameterType="string" resultType="map">
+        select
+        jm1.ID as jm1_id,jm1.JO_KEY_TYPE as jm1_JO_KEY_TYPE,jm1.JO_KEY_NAME as jm1_JO_KEY_NAME,jm1.JO_KEY_BACK_NUM as jm1_JO_KEY_BACK_NUM,
+        jm2.ID as jm2_id,jm2.JO_KEY_TYPE as jm2_JO_KEY_TYPE,jm2.JO_KEY_NAME as jm2_JO_KEY_NAME,jm2.JO_KEY_BACK_NUM as jm2_JO_KEY_BACK_NUM,
+        jm3.ID as jm3_id,jm3.JO_KEY_TYPE as jm3_JO_KEY_TYPE,jm3.JO_KEY_NAME as jm3_JO_KEY_NAME,jm3.JO_KEY_BACK_NUM as jm3_JO_KEY_BACK_NUM
+        from JO_KEY_MANAGE jm1
+        left join JO_KEY_MANAGE jm2 on jm1.id = jm2.JO_KEY_BACK_NUM
+        left join JO_KEY_MANAGE jm3 on jm2.ID = jm3.JO_KEY_BACK_NUM
+        where jm3.id in
+        (select cre.url from C_RESOURCE cre
+        left join C_ROLE_RESOURCE crr on crr.RESOURCE_ID = cre.ID
+        left join C_ROLE cr on cr.ID = crr.ROLE_ID
+        left join C_USER_ROLE cur on cur.ROLE_ID = cr.ID
+        left join C_USER cu on cu.ID = cur.USER_ID
+        <where>
+            cr.DESCRIPTION like 'View%'
+            AND CRE.PID IS NOT NULL
+            <if test="userId!= null">
+                and cu.id = #{userId}
+            </if>
+            and cre.STATUS = '0'
+            and cre.OPENED = '1'
+        </where>
+        )
+        order by jm1.JO_KEY_SORT,jm2.JO_KEY_SORT,jm3.JO_KEY_SORT asc
+    </select>
+    <select id="getViewJobKeyManageModesByAgent" resultType="java.util.Map">
+        select
+        jm1.ID as jm1_id,jm1.JO_KEY_TYPE as jm1_JO_KEY_TYPE,jm1.JO_KEY_NAME as jm1_JO_KEY_NAME,jm1.JO_KEY_BACK_NUM as jm1_JO_KEY_BACK_NUM,
+        jm2.ID as jm2_id,jm2.JO_KEY_TYPE as jm2_JO_KEY_TYPE,jm2.JO_KEY_NAME as jm2_JO_KEY_NAME,jm2.JO_KEY_BACK_NUM as jm2_JO_KEY_BACK_NUM,
+        jm3.ID as jm3_id,jm3.JO_KEY_TYPE as jm3_JO_KEY_TYPE,jm3.JO_KEY_NAME as jm3_JO_KEY_NAME,jm3.JO_KEY_BACK_NUM as jm3_JO_KEY_BACK_NUM
+        from JO_KEY_MANAGE jm1
+        left join JO_KEY_MANAGE jm2 on jm1.id = jm2.JO_KEY_BACK_NUM
+        left join JO_KEY_MANAGE jm3 on jm2.ID = jm3.JO_KEY_BACK_NUM
+        where jm3.id in
+        (select cre.url from C_RESOURCE cre
+        left join C_ROLE_RESOURCE crr on crr.RESOURCE_ID = cre.ID
+        left join C_ROLE cr on cr.ID = crr.ROLE_ID
+        left join C_USER_ROLE cur on cur.ROLE_ID = cr.ID
+        left join C_USER cu on cu.ID = cur.USER_ID
+        where  cr.DESCRIPTION like 'Views_agent' AND CRE.PID IS NOT NULL  and cre.STATUS = '0' and cre.OPENED = '1')
+        order by jm1.JO_KEY_SORT,jm2.JO_KEY_SORT,jm3.JO_KEY_SORT asc
+    </select>
+</mapper>
