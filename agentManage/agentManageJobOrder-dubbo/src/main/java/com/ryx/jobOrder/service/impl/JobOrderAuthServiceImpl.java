@@ -55,6 +55,10 @@ public class JobOrderAuthServiceImpl implements JobOrderAuthService {
             logger.error("根据用户id获取用户的工单组参数为空");
             return  null;
         }
+        Agent agent = agentService.queryAgentByUserId(userId);
+        if(agent != null){
+            return jobOrderAuthMapper.getAcceptGroupAgent();
+        }
         Map<String, Object> acceptCode = jobOrderAuthMapper.getAcceptGroup(userId);
         logger.info("根据用户id获取用户的工单组"+userId+",工单组信息:"+acceptCode);
         return acceptCode;
