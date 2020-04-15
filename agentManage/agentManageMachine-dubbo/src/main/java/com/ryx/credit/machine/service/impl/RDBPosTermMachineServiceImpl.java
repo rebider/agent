@@ -356,14 +356,14 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
 
     /**
      * 活动调整结果查询
-     * @param serialNumber
+     * @param map
      * @param platformType
      * @return
      * @throws Exception
      */
     @Override
-    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
-
+    public AgentResult queryCompensateResult(Map<String, Object> map, String platformType) throws Exception {
+        String serialNumber = map.get("serialNumber").toString();
         //查询taskID
         Map<String, Object> detailMap = orderActivityService.queryTaskIdForChangeActive(serialNumber);
         if (null == detailMap.get("REFUND_PRICE_DIFF_ID")) throw new Exception("查询退补差价明细失败！");

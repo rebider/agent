@@ -347,8 +347,8 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult queryCompensateResult(String serialNumber, String platformType) throws Exception {
-        return null;
+    public AgentResult queryCompensateResult(Map<String, Object> map, String platformType) throws Exception {
+        return AgentResult.ok("04");
     }
 
     @Override

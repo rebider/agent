@@ -220,16 +220,18 @@ public class TermMachineServiceImpl  implements TermMachineService {
     }
 
     @Override
-    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
+    public AgentResult queryCompensateResult(Map<String, Object> map, String platformType) throws Exception {
         AgentResult agentResult = AgentResult.fail();
         if(PlatformType.whetherPOS(platformType)){
-            agentResult =  posTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
+            agentResult =  posTermMachineServiceImpl.queryCompensateResult(map,platformType);
         }else if(PlatformType.SSPOS.getValue().equals(platformType)){
-            agentResult =  sPosTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
+            agentResult =  sPosTermMachineServiceImpl.queryCompensateResult(map,platformType);
         }else if(PlatformType.MPOS.getValue().equals(platformType)){
-            agentResult =  mposTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
+            agentResult =  mposTermMachineServiceImpl.queryCompensateResult(map,platformType);
         }else if(PlatformType.RDBPOS.getValue().equals(platformType)){
-            agentResult =  rdbTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
+            agentResult =  rdbTermMachineServiceImpl.queryCompensateResult(map,platformType);
+        }else if(PlatformType.RJPOS.getValue().equals(platformType)){
+            agentResult =  rjTermMachineServiceImpl.queryCompensateResult(map,platformType);
         }else {
             //未调整
             return AgentResult.ok("04");

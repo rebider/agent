@@ -349,8 +349,44 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
-        return AgentResult.ok("04");
+    public AgentResult queryCompensateResult(Map<String, Object> map, String platformType) throws Exception {
+
+        logger.info("手刷活动调整结果查询参数:{},{}", AppConfig.getProperty("mpos.termCheckAndExecutionInquire"), JSONObject.toJSONString(map));
+        String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("mpos.termCheckAndExecutionInquire"), JSONObject.toJSONString(map));
+        logger.info("手刷活动调整结果查询返回参数:{}", httpResult);
+
+        JSONObject resJsonObj = JSONObject.parseObject(httpResult);
+        if (resJsonObj != null) {
+            String resultCode = resJsonObj.getString("resultCode");
+            String resultMsg = resJsonObj.getString("resultMsg");
+            String serialNumber = resJsonObj.getString("serialNumber");
+            String taskId = resJsonObj.getString("taskId");
+            if ("00".equals(resultCode)) {
+                //调整成功
+                logger.info("活动调整成功:{} {}", serialNumber, platformType);
+                return AgentResult.ok("00");
+            } else if ("01".equals(resultCode)) {
+                //调整中
+                logger.info("活动调整中:{} {}", serialNumber, platformType);
+                AgentResult result = AgentResult.ok("01");
+                result.setMsg(resultMsg);
+                return result;
+            } else if ("02".equals(resultCode)) {
+                //调整失败
+                logger.info("活动调整失败:{} {}", serialNumber, platformType);
+                AgentResult result = AgentResult.ok("02");
+                result.setMsg(resultMsg);
+                return result;
+            } else {
+                //未知结果
+                AgentResult result = AgentResult.ok("03");
+                result.setMsg(resultMsg);
+                return result;
+            }
+        } else {
+            //未知结果
+            return AgentResult.ok("03");
+        }
     }
 
     @Override

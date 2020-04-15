@@ -472,8 +472,51 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
-        return AgentResult.ok("04");
+    public AgentResult queryCompensateResult(Map<String, Object> map, String platformType) throws Exception {
+        String serialNumber = map.get("serialNumber").toString();
+        JSONObject data = new JSONObject();
+        data.put("serialNumber", serialNumber);
+        log.info("活动调整结果查询返回：{}",serialNumber);
+        AgentResult agentResult = request("ORG017", data);
+        log.info("活动调整结果查询返回：{},{}",serialNumber,agentResult);
+        if(agentResult.isOK()){
+            String resmsg = agentResult.getMsg();
+            if(resmsg!=null) {
+                JSONObject res_obj = JSONObject.parseObject(resmsg) ;
+                JSONObject res  = res_obj.getJSONObject("data");
+                String result_code = res.getString("result_code");
+                String snAdjStatus = res.getString("transferStatus");
+                String serialNumber_res = res.getString("serialNumber");
+                String resMsg = res.getString("resMsg");
+                if(serialNumber.equals(serialNumber_res) && "00".equals(snAdjStatus) && "000000".equals(result_code)){
+                    //调整成功
+                    log.info("活动调整成功:{} {}",serialNumber,platformType);
+                    return AgentResult.ok("00");
+                }else if(serialNumber.equals(serialNumber_res) && "01".equals(snAdjStatus) && "000000".equals(result_code)) {
+                    //调整中
+                    log.info("活动调整中:{} {}",serialNumber,platformType);
+                    AgentResult result = AgentResult.ok("01");
+                    result.setMsg(resMsg);
+                    return result;
+                }else if(serialNumber.equals(serialNumber_res) && "02".equals(snAdjStatus) && "000000".equals(result_code)) {
+                    //调整失败
+                    log.info("活动调整失败:{} {}",serialNumber,platformType);
+                    AgentResult result = AgentResult.ok("02");
+                    result.setMsg(resMsg);
+                    return result;
+                }else{
+                    //未知结果
+                    AgentResult result = AgentResult.ok("03");
+                    result.setMsg(resMsg);
+                    return result;
+                }
+            }else{
+                //未知结果
+                return AgentResult.ok("03");
+            }
+        }else{
+            return AgentResult.ok("03");
+        }
     }
 
 

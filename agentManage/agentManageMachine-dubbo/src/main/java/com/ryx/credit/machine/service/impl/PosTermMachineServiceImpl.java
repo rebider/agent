@@ -390,10 +390,11 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
 
     @Override
-    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception{
+    public AgentResult queryCompensateResult(Map<String, Object> map, String platformType) throws Exception {
+        String serialNumber = map.get("serialNumber").toString();
         JSONObject data = new JSONObject();
         data.put("serialNumber", serialNumber);
-        log.info("活动调整结果查询返回：{},{}",serialNumber);
+        log.info("活动调整结果查询返回：{}",serialNumber);
         AgentResult agentResult = request("ORG017", data);
         log.info("活动调整结果查询返回：{},{}",serialNumber,agentResult);
         if(agentResult.isOK()){

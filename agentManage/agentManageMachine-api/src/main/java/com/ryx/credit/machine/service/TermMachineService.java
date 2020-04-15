@@ -100,7 +100,7 @@ public interface TermMachineService {
     AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws Exception;
 
 
-    AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception;
+    AgentResult queryCompensateResult(Map<String, Object> map,String platformType) throws Exception;
 
     /**
      * 校验机具是否可变更
