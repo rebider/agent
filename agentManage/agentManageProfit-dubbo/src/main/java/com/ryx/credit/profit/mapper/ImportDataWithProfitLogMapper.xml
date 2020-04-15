@@ -154,4 +154,10 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <update id="updataNoteAndStatusByBatchCode">
+    update P_IMPORT_DATA_WITH_PROFIT_LOG set status = #{status,jdbcType=VARCHAR} , note = #{note,jdbcType=VARCHAR}
+    where id = #{batchCode,jdbcType=VARCHAR}
+  </update>
 </mapper>

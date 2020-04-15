@@ -892,11 +892,21 @@
       <include refid="Base_Column_List"/>
     )
     <foreach collection="profitDatas" item="item" index="index" separator="UNION ALL">
-      SELECT #{item.id}, #{item.month}, #{item.agentId},
-      #{item.agentName}, #{item.busNum}, #{item.busCode},
-      #{item.brandCode}, #{item.importType}, #{item.sheetName},
-      #{item.sheetColumn}, #{item.uploadUser}, #{item.uploadTime},
-      #{item.sheetOrder}, #{item.rowOrder}, #{item.f7},
+      SELECT #{item.id},
+             #{item.agentId},
+             #{item.agentName},
+             #{item.month},
+             #{item.busNum},
+             #{item.busCode},
+             #{item.brandCode},
+             #{item.importType},
+             #{item.sheetName},
+             #{item.sheetColumn},
+             #{item.uploadUser},
+             #{item.uploadTime},
+             #{item.sheetOrder},
+             #{item.rowOrder},
+             #{item.f7},
       #{item.f8}, #{item.f9}, #{item.f10}, #{item.f11},
       #{item.f12}, #{item.f13}, #{item.f14}, #{item.f15},
       #{item.f16}, #{item.f17}, #{item.f18}, #{item.f19},
@@ -928,7 +938,7 @@
   <select id="checkDataAll" parameterType="java.util.Map" resultType="java.util.Map">
     select * from (
       <foreach collection="datas" item="item" index="index" separator="UNION ALL">
-        SELECT  #{item.agentId} as AGENT_ID,#{item.busCode} as BUS_PLATFORM,#{item.index} as ROW_NUM
+        SELECT  #{item.agentId} as AGENT_ID,#{item.busCode} as BUS_PLATFORM,#{item.rowNum} as ROW_NUM,#{item.sheetName} as SHEET_NAME
         FROM dual
       </foreach>
       )aa
@@ -937,7 +947,7 @@
     from (
             select AGENT_ID,BUS_PLATFORM
             from(<foreach collection="datas" item="item" index="index" separator="UNION ALL">
-                    SELECT  #{item.agentId} as AGENT_ID,#{item.busCode} as BUS_PLATFORM,#{item.index} as ROW_NUM
+                    SELECT  #{item.agentId} as AGENT_ID,#{item.busCode} as BUS_PLATFORM,#{item.rowNum} as ROW_NUM,#{item.sheetName} as SHEET_NAME
                     FROM dual
                  </foreach>)
             MINUS

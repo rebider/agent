@@ -25,4 +25,6 @@ public interface ImportDataWithProfitMapper {
     int insertProfitData(List<Map<String, Object>> profitDatas);
 
     int deleteProfitDataByBatchCode(String batchCode);
+
+    List<Map<String,String>> checkDataAll(List<Map<String,String>> datas);
 }
