@@ -126,7 +126,8 @@ public enum TabId {
     O_INTERNET_LOGOUT_DETAIL("ILD%s%015d"),
     AUTH_SYS_CODE("ASC%s%015d"),
     AUTH_LOGIN_TOKEN("ALT%s%015d"),
-    O_PAY_DETAIL("OPDL%s%015d");
+    O_PAY_DETAIL("OPDL%s%015d"),
+    O_ORDER_ADJ_ACCOUNT("OAC%s%015d");
 
     public String patt;
 

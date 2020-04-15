@@ -104,6 +104,8 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
     private AgentColinfoMapper agentColinfoMapper;
     @Autowired
     private OrderOffsetService orderOffsetService;
+    @Autowired
+    private OrderAdjAccountMapper orderAdjAccountMapper;
 
     @Override
     public AgentResult refreshPaymentDetail(String orderId) {
@@ -242,7 +244,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
         orderAdj.setDifAmount(difAmount);
         List<String> attFiles = orderUpModelVo.getFiles();
         AttachmentRel recordAtt = new AttachmentRel();
-        if (attFiles.size()>0)
+        if (attFiles.size()>0){
             attFiles.forEach(attfile->{
                 recordAtt.setAttId(attfile);
                 recordAtt.setSrcId(orderAdj.getId());
@@ -257,6 +259,38 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                     throw new ProcessException("添加订单调整附件关系失败");
                 }
             });
+        }
+        List<String> accountFiles = orderUpModelVo.getFiles();
+        AttachmentRel recordAccountAtt = new AttachmentRel();
+        if (accountFiles.size()>0){
+            attFiles.forEach(attfile->{
+                recordAccountAtt.setAttId(attfile);
+                recordAccountAtt.setSrcId(orderAdj.getId());
+                recordAccountAtt.setcUser(orderAdj.getAdjUserId());
+                recordAccountAtt.setcTime(orderAdj.getAdjTm());
+                recordAccountAtt.setStatus(Status.STATUS_1.status);
+                recordAccountAtt.setBusType(AttachmentRelType.orderAdjustDk.name());
+                recordAccountAtt.setId(idService.genId(TabId.a_attachment_rel));
+                logger.info("添加订单调整附件关系,订单调整ID{},打款附件ID{}",orderAdj.getId(),attfile);
+                if (1 != attachmentRelMapper.insertSelective(recordAccountAtt)) {
+                    logger.info("订单调整:{}", "添加订单调整打款附件关系失败");
+                    throw new ProcessException("添加订单调整打款附件关系失败");
+                }
+            });
+        }
+
+        for (OrderAdjAccount adjAccount:orderUpModelVo.getAccounts()){
+            OrderAdjAccount account = new OrderAdjAccount();
+            account.setId(idService.genId(TabId.O_ORDER_ADJ_ACCOUNT));
+            account.setAdjId(orderUpModelVo.getId());
+            account.setOrderId(orderUpModelVo.getOrderId());
+            account.setType(adjAccount.getType());
+            account.setAccountName(adjAccount.getAccountName());
+            account.setAccountBank(adjAccount.getAccountBank());
+            account.setBranchLineNum(adjAccount.getBranchLineNum());
+//            orderAdjAccountMapper.insert();
+        }
+
         List<String> data = orderUpModelVo.getCustomStagingUser();
 
         Date da = Calendar.getInstance().getTime();

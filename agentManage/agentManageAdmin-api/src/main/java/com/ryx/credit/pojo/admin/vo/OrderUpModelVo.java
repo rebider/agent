@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ryx.credit.common.util.DateJsonDeserializer;
 import com.ryx.credit.common.util.DateJsonSerializer;
+import com.ryx.credit.pojo.admin.order.OrderAdjAccount;
 
 import javax.xml.crypto.Data;
 import java.io.Serializable;
@@ -42,6 +43,7 @@ public class OrderUpModelVo implements Serializable {
     private String settleAmount;
     private List<String> customStagingUser;//自定义分期数据
     private String customStaging;
+    private List<OrderAdjAccount> accounts;
 
     public String getSid() {
         return sid;
@@ -239,5 +241,13 @@ public class OrderUpModelVo implements Serializable {
 
     public void setCustomStaging(String customStaging) {
         this.customStaging = customStaging;
+    }
+
+    public List<OrderAdjAccount> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(List<OrderAdjAccount> accounts) {
+        this.accounts = accounts;
     }
 }
