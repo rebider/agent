@@ -18,6 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
+@Service("importDataWithProfitService")
 public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitService {
 
     Logger logger = LoggerFactory.getLogger(ImportDataWithProfitServiceImpl.class);

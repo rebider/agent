@@ -957,4 +957,155 @@
     where aa.AGENT_ID=bb.AGENT_ID and aa.BUS_PLATFORM=bb.BUS_PLATFORM)
   </select>
 
+  <select id="getDistinctDayBackList" resultType="java.util.Map" >
+    <include refid="OracleDialectPrefix" />
+    <include refid="distinctDayBackList_sql"/>
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <sql id="distinctDayBackList_sql">
+    select distinct pd.AGENT_ID, pd.MONTH,pd.AGENT_NAME
+    from P_IMPORT_DATA_WITH_PROFIT pd
+    left join (
+    select DISTINCT AGENT_ID,AG_DOC_PRO,AG_DOC_DISTRICT from A_AGENT_BUSINFO
+    )  ab  on pd.AGENT_ID = ab.AGENT_ID
+
+    where 1=1 and pd.ROW_ORDER != 1
+    <if test="param.agentId != '' and param.agentId != null ">
+      and pd.AGENT_ID = #{param.agentId}
+    </if>
+    <if test="param.agentName != '' and param.agentName != null ">
+      and pd.AGENT_NAME = #{param.agentName}
+    </if>
+    <if test="param.month != '' and param.month != null ">
+      and pd.MONTH = #{param.month}
+    </if>
+    <if test="param.agDoc != '' and param.agDoc != null">
+      and (ab.AG_DOC_PRO in ( select id from C_ORGANIZATION where PID = #{param.agDoc} )
+      or AG_DOC_PRO = #{param.agDoc} )
+    </if>
+    <if test="param.agDis != '' and param.agDis != null">
+      and ab.AG_DOC_DISTRICT = #{param.agDis}
+    </if>
+    <if test="param.type != '' and param.type != null">
+      and pd.IMPORT_TYPE = #{param.type}
+    </if>
+  </sql>
+
+  <select id="getCountDistinctDayBackList" resultType="java.lang.Long">
+    select count(1) from (
+    <include refid="distinctDayBackList_sql"/>
+    )
+  </select>
+
+  <select id="getDayBackDetailList" resultType="java.util.Map" >
+    <include refid="OracleDialectPrefix" />
+   <include refid="DayBackDetailList_sql"/>
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <sql id="DayBackDetailList_sql">
+    select pd.*
+    from P_IMPORT_DATA_WITH_PROFIT pd
+    left join (
+    select DISTINCT AGENT_ID,AG_DOC_PRO,AG_DOC_DISTRICT from A_AGENT_BUSINFO
+    )  ab  on pd.AGENT_ID = ab.AGENT_ID
+    where 1=1
+    <if test="param.agentId != '' and param.agentId != null ">
+      and pd.AGENT_ID = #{param.agentId}
+    </if>
+    <if test="param.agentName != '' and param.agentName != null ">
+      and pd.AGENT_NAME = #{param.agentName}
+    </if>
+    <if test="param.month != '' and param.month != null ">
+      and pd.MONTH = #{param.month}
+    </if>
+    <if test="param.agDoc != '' and param.agDoc != null">
+      and (ab.AG_DOC_PRO in ( select id from C_ORGANIZATION where PID = #{param.agDoc} )
+      or AG_DOC_PRO = #{param.agDoc} )
+    </if>
+    <if test="param.agDis != '' and param.agDis != null">
+      and ab.AG_DOC_DISTRICT = #{param.agDis}
+    </if>
+    <if test="param.type != '' and param.type != null">
+      and pd.IMPORT_TYPE = #{param.type}
+    </if>
+    <if test="param.sheetName != '' and param.sheetName != null">
+      and pd.SHEET_NAME = #{param.sheetName}
+    </if>
+    <if test="param.sheetOrder != '' and param.sheetOrder != null">
+      and pd.SHEET_ORDER = #{param.sheetOrder}
+    </if>
+  </sql>
+
+  <select id="getCountDayBackDetailList" resultType="java.lang.Long">
+    select count(1) from (
+    <include refid="DayBackDetailList_sql"/>
+    )
+  </select>
+
+  <select id="getDistinctSheetInfo" resultType="java.util.Map">
+    select pd.* from P_IMPORT_DATA_WITH_PROFIT pd
+      where pd.SHEET_ORDER in (
+        select a.SHEET_ORDER from P_IMPORT_DATA_WITH_PROFIT  a
+        left join A_AGENT_BUSINFO ab on a.AGENT_ID = ab.AGENT_ID
+        where 1=1
+        <choose>
+          <when test="param.agentId != '' and param.agentId != null">
+            and a.AGENT_ID = #{param.agentId}
+          </when>
+          <when test="param.agDoc != '' and param.agDoc != null">
+             and (ab.AG_DOC_PRO in ( select id from C_ORGANIZATION where PID = #{param.agDoc} )
+            or ab.AG_DOC_PRO = #{param.agDoc})
+          </when>
+        </choose>
+        <if test="param.agentName != '' and param.agentName != null">
+          and a.AGENT_NAME = #{param.agentName}
+        </if>
+        and a.MONTH = #{param.month}
+        and a.IMPORT_TYPE = #{param.type}
+      )
+    and pd.MONTH = #{param.month} and  pd.ROW_ORDER = '1' and pd.IMPORT_TYPE = #{param.type}
+    order by pd.SHEET_ORDER asc
+  </select>
+
+  <select id="getListBySheetInfo" resultType="java.util.Map">
+    select pd.* from P_IMPORT_DATA_WITH_PROFIT pd
+    left join A_AGENT_BUSINFO ab on pd.AGENT_ID = ab.AGENT_ID
+    where 1 = 1
+    <if test="param.type != '' and param.type != null">
+      and  pd.IMPORT_TYPE = #{param.type}
+    </if>
+    <if test="param.month != '' and param.month != null">
+      and  pd.MONTH = #{param.month}
+    </if>
+    <if test="param.agentId != '' and param.agentId != null">
+      and  pd.AGENT_ID = #{param.agentId}
+    </if>
+    <if test="param.agentName != '' and param.agentName != null">
+      and  pd.AGENT_NAME = #{param.agentName}
+    </if>
+    <if test="param.agDoc != '' and param.agDoc != null">
+      and  ( ab.AG_DOC_PRO in ( select id from C_ORGANIZATION where PID = #{param.agDoc} )
+      or ab.AG_DOC_PRO = #{param.agDoc} )
+    </if>
+    <if test="param.sheetName != '' and param.sheetName != null">
+      and pd.SHEET_NAME = #{param.sheetName}
+    </if>
+    <if test="param.sheetOrder != '' and param.sheetOrder != null">
+      and pd.SHEET_ORDER = #{param.sheetOrder}
+    </if>
+    <choose>
+        <when test="param.rowOrder == '1'">
+            and pd.ROW_ORDER = 1
+        </when>
+        <when test="param.rowOrder == '2'">
+        and pd.ROW_ORDER != 1
+        </when>
+    </choose>
+    order by pd.ROW_ORDER asc
+  </select>
+
+
+
 </mapper>
