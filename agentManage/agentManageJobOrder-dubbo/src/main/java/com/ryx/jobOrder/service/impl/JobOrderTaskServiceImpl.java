@@ -246,17 +246,15 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         endJoTask( joTaskOld );
 
 
-        if("0".equals(dealCode) || JoPowerGroup.SQ.key.equals(dealCode)){ // 选择的是发起人 或者 省区
-            if("0".equals(dealCode) ||JoPowerGroup.SQ.key.equals(newOrder.getAcceptGroupCode())){
-                // 如果 受理组一开始就是省区 那就是返回发起人
-                newOrder.setJoProgress(JoOrderStatus.YCL.getValue());
-                newOrder.setDealTimeEnd(new Date());
-                newOrder.setAcceptNowGroup(joTask.getDealGroup());
-                double dLength = (newOrder.getDealTimeEnd().getTime() - newOrder.getDealTimeStart().getTime() ) / (60 * 1000);
-                newOrder.setDealTimeLength(new BigDecimal(dLength).setScale(2, BigDecimal.ROUND_HALF_UP));
-                joOrderMapper.updateByPrimaryKeySelective(newOrder);
-                return FastMap.fastSuccessMap();
-            }
+        if("0".equals(dealCode)){ // 选择的是发起人
+            // 如果 那就是返回发起人
+            newOrder.setJoProgress(JoOrderStatus.YCL.getValue());
+            newOrder.setDealTimeEnd(new Date());
+            newOrder.setAcceptNowGroup(joTask.getDealGroup());
+            double dLength = (newOrder.getDealTimeEnd().getTime() - newOrder.getDealTimeStart().getTime() ) / (60 * 1000);
+            newOrder.setDealTimeLength(new BigDecimal(dLength).setScale(2, BigDecimal.ROUND_HALF_UP));
+            joOrderMapper.updateByPrimaryKeySelective(newOrder);
+            return FastMap.fastSuccessMap();
         }else{
             newOrder.setAcceptNowGroup(joTask.getDealGroup());
             joOrderMapper.updateByPrimaryKeySelective(newOrder);
