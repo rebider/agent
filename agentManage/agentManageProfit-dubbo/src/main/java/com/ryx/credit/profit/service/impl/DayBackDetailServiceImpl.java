@@ -32,15 +32,6 @@ public class DayBackDetailServiceImpl implements IDayBackDetailService {
     }
 
     @Override
-    public PageInfo getDetailByAgentIdAndMonth(Map<String, Object> map, Page page) {
-        PageInfo pageInfo = new PageInfo();
-        List<Map<String,Object>> list = importDataWithProfitMapper.getDayBackDetailList(map,page);
-        pageInfo.setRows(list);
-        pageInfo.setTotal((int)importDataWithProfitMapper.getCountDayBackDetailList(map,page));
-        return pageInfo;
-    }
-
-    @Override
     public List<Map<String,Object>> getDistinctSheetInfo(Map<String,Object> param){
         return importDataWithProfitMapper.getDistinctSheetInfo(param);
     }
@@ -49,4 +40,6 @@ public class DayBackDetailServiceImpl implements IDayBackDetailService {
     public List<Map<String, Object>> getListBySheet(Map<String, Object> map) {
         return importDataWithProfitMapper.getListBySheetInfo(map);
     }
+
+
 }

@@ -35,10 +35,6 @@ public interface ImportDataWithProfitMapper {
 
     long getCountDistinctDayBackList(@Param("param") Map<String,Object> param, @Param("page")Page page);
 
-    List<Map<String,Object>> getDayBackDetailList(@Param("param") Map<String,Object> param, @Param("page")Page page);
-
-    long getCountDayBackDetailList(@Param("param") Map<String,Object> param, @Param("page")Page page);
-
     List<Map<String,Object>> getDistinctSheetInfo(@Param("param") Map<String,Object> param);
 
     List<Map<String,Object>> getListBySheetInfo(@Param("param") Map<String,Object> param);

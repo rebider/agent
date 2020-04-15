@@ -21,20 +21,16 @@ public interface IDayBackDetailService {
     PageInfo getImportList(Map<String,Object> param, Page page);
 
     /**
-     * 根据月份、代理商唯一码、类型、页码,sheet页 查看明细列表
-     */
-    PageInfo getDetailByAgentIdAndMonth(Map<String,Object> param, Page page);
-
-    /**
      * 获取代理商某月的sheet页并字段信息
      */
     List<Map<String,Object>> getDistinctSheetInfo(Map<String,Object> param);
 
     /**
-     * 根据条件获取某sheet页内全部信息-AG，月份，代理商名称，所属省区，sheet页编号，sheet页名称，类型
+     * 根据条件获取某sheet页内全部信息-AG，月份，代理商名称，所属省区，sheet页编号，sheet页名称，类型,支持分页
      * @param param
      * @return
      */
     List<Map<String,Object>> getListBySheet(Map<String,Object> param);
+
 
 }
