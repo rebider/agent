@@ -68,6 +68,21 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         BigDecimal resAmt = BigDecimal.ZERO;
         AgentResult result = AgentResult.ok();
         if ( null == opaymentDetailList || !(opaymentDetailList.size()>0) || amount.compareTo(BigDecimal.ZERO)==0 || StringUtils.isBlank(srcId)){
+            OPayDetail oPayDetail = new OPayDetail();
+            oPayDetail.setAmount(BigDecimal.ZERO);
+            oPayDetail.setSrcId(srcId);
+            oPayDetail.setId(idService.genId(TabId.O_PAY_DETAIL));
+            oPayDetail.setArrId("");
+            oPayDetail.setPayType(paytype);
+            oPayDetail.setBusStat(Status.STATUS_0.status);
+            oPayDetail.setStatus(Status.STATUS_1.status);
+            oPayDetail.setVersion(Status.STATUS_1.status);
+            oPayDetail.setcTm(new Date());
+            oPayDetail.setcUser("");
+            if(1!=oPayDetailMapper.insertSelective(oPayDetail)){
+                logger.info("付款明细添加失败");
+                throw new MessageException("付款明细添加失败");
+            }
             resultMap.put("offsetPaymentDetails",resPaymentDetail);
             resultMap.put("residueAmt",amount);
            return AgentResult.okMap(resultMap);

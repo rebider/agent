@@ -1235,7 +1235,7 @@ union
     select
        distinct(ab.bus_platform) as bus_platform
       from A_AGENT_BUSINFO ab
-     where ab.AGENT_ID = #{reqMap.agentId} and ab.status = 1 and ab.BusStatus = 1
+     where ab.AGENT_ID = #{reqMap.agentId} and ab.status = 1 and ab.Bus_Status = 1
      <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
        and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
      </if>
@@ -1253,7 +1253,7 @@ union
     select
        distinct(ab.BUS_TYPE) as BUS_TYPE
       from A_AGENT_BUSINFO ab
-     where ab.AGENT_ID = #{reqMap.agentId} and ab.status = 1 and ab.BusStatus = 1
+     where ab.AGENT_ID = #{reqMap.agentId} and ab.status = 1 and ab.Bus_Status = 1
     <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
       and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
     </if>
