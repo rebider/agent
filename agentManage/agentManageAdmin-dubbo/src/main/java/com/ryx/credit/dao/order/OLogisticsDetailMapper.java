@@ -44,8 +44,6 @@ public interface OLogisticsDetailMapper {
 
     int updateByLogisticsId(OLogisticsDetail oLogisticsDetail);
 
-    int deleteDetailByLogisicalId(String logisticsId);
-
     /**
      * 查询物流明细发送状态
      * @param param

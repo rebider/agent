@@ -1,5 +1,7 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.enumc.PamentIdType;
+import com.ryx.credit.common.enumc.PaymentStatus;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -8,6 +10,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.order.OPayDetail;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import com.ryx.credit.pojo.admin.order.OSupplement;
@@ -15,6 +18,7 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OsupplementVo;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 订单补款
@@ -83,4 +87,12 @@ public interface OSupplementService {
     OPaymentDetail selectPaymentDetailById(String id);
 
     OPayment selectOpayment(String id);
+
+    public List<OPaymentDetail>selectCount(String orderId, String code);;
+
+    /**
+     * 查看补款详情
+     */
+    public List<OPayDetail> selectOpayDetail(OPaymentDetail oPaymentDetail);
+
 }

@@ -154,7 +154,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
             @Override
             public void run() {
                 try {
-                   Thread.sleep(1000);
+                   Thread.sleep(1500);
                 } catch (InterruptedException e) {
 
                 }
@@ -392,7 +392,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
 
                 }
@@ -481,7 +481,7 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(1500);
                 } catch (InterruptedException e) {
 
                 }

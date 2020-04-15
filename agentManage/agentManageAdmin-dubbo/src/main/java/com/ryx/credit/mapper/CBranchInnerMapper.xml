@@ -71,8 +71,7 @@
         <include refid="OracleDialectSuffix" />
     </select>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List" />
+        select *
         from C_BRANCH_INNER
         where ID = #{id,jdbcType=VARCHAR}
     </select>
@@ -178,10 +177,12 @@
     </update>
     <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.CBranchInner">
         update C_BRANCH_INNER
-        set BRANCH_ID = #{branchId,jdbcType=VARCHAR},
-          INNER = #{inner,jdbcType=VARCHAR},
-          C_USER_ID = #{cUserId,jdbcType=VARCHAR},
+        set
+          BRANCH_LOGIN = #{branchLogin,jdbcType=VARCHAR},
           BRANCH_NAME = #{branchName,jdbcType=VARCHAR},
+          INNER_LOGIN = #{innerLogin,jdbcType=VARCHAR},
+          INNER_NAME = #{innerName,jdbcType=VARCHAR},
+          C_USER_ID = #{cUserId,jdbcType=VARCHAR},
           C_TIME = #{cTime,jdbcType=TIMESTAMP},
           STATUS = #{status,jdbcType=DECIMAL},
           C_USER_NAME = #{cUserName,jdbcType=VARCHAR}
@@ -207,23 +208,12 @@
     </select>
 
     <update id="updateByPrimaryId" parameterType="string">
-        UPDATE
-            C_BRANCH_INNER
-        SET
-            STATUS = 2
-        WHERE
-            ID = #{id,jdbcType=VARCHAR}
+        UPDATE C_BRANCH_INNER SET STATUS = 2 WHERE ID = #{id,jdbcType=VARCHAR}
     </update>
 
     <select id="selectInnerLogin" parameterType="map" resultType="string">
-        SELECT
-            CBI.inner_login
-        FROM
-            C_BRANCH_INNER CBI
-            LEFT JOIN A_AGENT_BUSINFO AAB ON AAB.AG_DOC_PRO = CBI.branch_login
-        WHERE
-            CBI.STATUS = #{status,jdbcType=DECIMAL}
-            AND AAB.ID = #{busId,jdbcType=VARCHAR}
+        SELECT CBI.inner_login FROM C_BRANCH_INNER CBI LEFT JOIN A_AGENT_BUSINFO AAB ON AAB.AG_DOC_PRO = CBI.branch_login
+        WHERE CBI.STATUS = #{status,jdbcType=DECIMAL} AND AAB.ID = #{busId,jdbcType=VARCHAR}
     </select>
     <select id="selectBranchInnerByPage" parameterType="map" resultType="map">
         <include refid="OracleDialectPrefix"/>
@@ -255,5 +245,13 @@
 
     <select id="selectByBranchAndInnerLogin" parameterType="map" resultType="int">
         SELECT COUNT(1) FROM C_BRANCH_INNER CBI WHERE CBI.STATUS = #{map.status} AND CBI.BRANCH_LOGIN = #{map.branchId} AND CBI.INNER_LOGIN = #{map.innerLogin}
+    </select>
+
+    <select id="selectByMap" parameterType="map" resultMap="BaseResultMap">
+        SELECT * FROM C_BRANCH_INNER CBI WHERE CBI.STATUS = #{map.status} AND CBI.BRANCH_LOGIN = #{map.branchId} AND CBI.INNER_LOGIN = #{map.innerLogin}
+    </select>
+
+    <select id="selectInnerLoginByBranch" parameterType="string" resultType="string">
+        SELECT b.inner_login FROM C_BRANCH_INNER b WHERE b.branch_login = #{agDocCode}
     </select>
 </mapper>

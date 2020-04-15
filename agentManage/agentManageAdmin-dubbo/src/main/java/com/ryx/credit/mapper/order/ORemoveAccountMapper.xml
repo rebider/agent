@@ -22,6 +22,7 @@
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="LOGICAL_VERSION" jdbcType="VARCHAR" property="logicalVersion" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -53,9 +54,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, RMONTH, AG_ID, AG_NAME, BUS_NUM, BUS_PLATFORM, MACHINES_AMOUNT, SUBMIT_PERSON, 
-    SUBMIT_TIME, PAY_METHOD, RAMOUNT, REAL_RAMOUNT, RSTATUS, FINISH_TIME, BATCH_NUM, 
-    RTYPE, FAIL_CAUSE, REMARK, STATUS, VERSION
+    ID, RMONTH, AG_ID, AG_NAME, BUS_NUM, BUS_PLATFORM, MACHINES_AMOUNT, SUBMIT_PERSON,
+    SUBMIT_TIME, PAY_METHOD, RAMOUNT, REAL_RAMOUNT, RSTATUS, FINISH_TIME, BATCH_NUM,
+    RTYPE, FAIL_CAUSE, REMARK, STATUS, VERSION, LOGICAL_VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccountExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -74,10 +75,10 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_REMOVE_ACCOUNT
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and STATUS=1
   </select>
   <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccountExample">
     delete from O_REMOVE_ACCOUNT
@@ -86,20 +87,22 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccount">
-    insert into O_REMOVE_ACCOUNT (ID, RMONTH, AG_ID, 
-      AG_NAME, BUS_NUM, BUS_PLATFORM, 
-      MACHINES_AMOUNT, SUBMIT_PERSON, SUBMIT_TIME, 
-      PAY_METHOD, RAMOUNT, REAL_RAMOUNT, 
-      RSTATUS, FINISH_TIME, BATCH_NUM, 
-      RTYPE, FAIL_CAUSE, REMARK, 
-      STATUS, VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{rmonth,jdbcType=TIMESTAMP}, #{agId,jdbcType=VARCHAR}, 
-      #{agName,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, 
-      #{machinesAmount,jdbcType=DECIMAL}, #{submitPerson,jdbcType=VARCHAR}, #{submitTime,jdbcType=TIMESTAMP},
-      #{payMethod,jdbcType=VARCHAR}, #{ramount,jdbcType=DECIMAL}, #{realRamount,jdbcType=DECIMAL}, 
-      #{rstatus,jdbcType=DECIMAL}, #{finishTime,jdbcType=TIMESTAMP}, #{batchNum,jdbcType=VARCHAR}, 
-      #{rtype,jdbcType=DECIMAL}, #{failCause,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+    insert into O_REMOVE_ACCOUNT (ID, RMONTH, AG_ID,
+    AG_NAME, BUS_NUM, BUS_PLATFORM,
+    MACHINES_AMOUNT, SUBMIT_PERSON, SUBMIT_TIME,
+    PAY_METHOD, RAMOUNT, REAL_RAMOUNT,
+    RSTATUS, FINISH_TIME, BATCH_NUM,
+    RTYPE, FAIL_CAUSE, REMARK,
+    STATUS, VERSION, LOGICAL_VERSION
+    )
+    values (#{id,jdbcType=VARCHAR}, #{rmonth,jdbcType=TIMESTAMP}, #{agId,jdbcType=VARCHAR},
+    #{agName,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR},
+    #{machinesAmount,jdbcType=DECIMAL}, #{submitPerson,jdbcType=VARCHAR}, #{submitTime,jdbcType=TIMESTAMP},
+    #{payMethod,jdbcType=VARCHAR}, #{ramount,jdbcType=DECIMAL}, #{realRamount,jdbcType=DECIMAL},
+    #{rstatus,jdbcType=DECIMAL}, #{finishTime,jdbcType=TIMESTAMP}, #{batchNum,jdbcType=VARCHAR},
+    #{rtype,jdbcType=DECIMAL}, #{failCause,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{logicalVersion,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccount">
     insert into O_REMOVE_ACCOUNT
@@ -164,6 +167,9 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="logicalVersion != null">
+        LOGICAL_VERSION,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -225,6 +231,9 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="logicalVersion != null">
+        #{logicalVersion,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -294,35 +303,39 @@
       <if test="version != null">
         VERSION = VERSION + 1,
       </if>
+      <if test="logicalVersion != null">
+        LOGICAL_VERSION = #{logicalVersion,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION =  #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.ORemoveAccount">
     update O_REMOVE_ACCOUNT
     set RMONTH = #{rmonth,jdbcType=TIMESTAMP},
-      AG_ID = #{agId,jdbcType=VARCHAR},
-      AG_NAME = #{agName,jdbcType=VARCHAR},
-      BUS_NUM = #{busNum,jdbcType=VARCHAR},
-      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
-      MACHINES_AMOUNT = #{machinesAmount,jdbcType=DECIMAL},
-      SUBMIT_PERSON = #{submitPerson,jdbcType=VARCHAR},
-      SUBMIT_TIME = #{submitTime,jdbcType=TIMESTAMP},
-      PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
-      RAMOUNT = #{ramount,jdbcType=DECIMAL},
-      REAL_RAMOUNT = #{realRamount,jdbcType=DECIMAL},
-      RSTATUS = #{rstatus,jdbcType=DECIMAL},
-      FINISH_TIME = #{finishTime,jdbcType=TIMESTAMP},
-      BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
-      RTYPE = #{rtype,jdbcType=DECIMAL},
-      FAIL_CAUSE = #{failCause,jdbcType=VARCHAR},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-       VERSION = VERSION + 1,
+    AG_ID = #{agId,jdbcType=VARCHAR},
+    AG_NAME = #{agName,jdbcType=VARCHAR},
+    BUS_NUM = #{busNum,jdbcType=VARCHAR},
+    BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+    MACHINES_AMOUNT = #{machinesAmount,jdbcType=DECIMAL},
+    SUBMIT_PERSON = #{submitPerson,jdbcType=VARCHAR},
+    SUBMIT_TIME = #{submitTime,jdbcType=TIMESTAMP},
+    PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
+    RAMOUNT = #{ramount,jdbcType=DECIMAL},
+    REAL_RAMOUNT = #{realRamount,jdbcType=DECIMAL},
+    RSTATUS = #{rstatus,jdbcType=DECIMAL},
+    FINISH_TIME = #{finishTime,jdbcType=TIMESTAMP},
+    BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
+    RTYPE = #{rtype,jdbcType=DECIMAL},
+    FAIL_CAUSE = #{failCause,jdbcType=VARCHAR},
+    REMARK = #{remark,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = VERSION + 1,
+    LOGICAL_VERSION = #{logicalVersion,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR} and VERSION =  #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -332,6 +345,8 @@
   </sql>
 
 
+
+  <!--开始写sql-->
   <sql id="PAGING_START">
     <if test="begin != null  and end != null and end >0">
       SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
@@ -460,7 +475,7 @@ select count(1) from (
     left join a_agent ag on ag.id=ra.ag_id
     left join a_platform plat ON plat.platform_num = ra.bus_platform
     left join o_order o on o.id=o_payment_detail.order_id
-    where o_payment_detail.Payment_status in(4,6)
+    where o_payment_detail.Payment_status in(2,4,6)
     <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
     <include refid="PAGING_END" />
   </select>
@@ -473,7 +488,70 @@ select count(1) from (
     left join a_agent ag on ag.id=ra.ag_id
     left join a_platform plat ON plat.platform_num = ra.bus_platform
     left join o_order o on o.id=o_payment_detail.order_id
-    where o_payment_detail.Payment_status in(4,6)
+    where o_payment_detail.Payment_status in(2,4,6)
+    <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+  </select>
+
+  <select id="orderDetailListNew" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    select op.DOWN_PAYMENT_COUNT,
+    o.C_TIME,
+    ag.AG_UNIQ_NUM,
+    plat.platform_name,
+    to_char(o_payment_detail.plan_pay_time, 'yyyy-mm') rmonth,
+    o_payment_detail.Payment_status,
+    o_payment_detail.plan_num,
+    o_payment_detail.pay_amount,
+    o_payment_detail.order_id,
+    o_payment_detail.src_id,
+    ra.AG_NAME,
+    ra.id,
+    ra.AG_ID,
+    ra.BUS_PLATFORM,
+    ra.BUS_NUM,
+    ra.RAMOUNT,
+    ra.REAL_RAMOUNT,
+    ra.PAY_METHOD,
+    nvl( d.amount,0) as amount
+    from O_PAYMENT_DETAIL
+    left join O_PAYMENT op
+    on O_PAYMENT_DETAIL.PAYMENT_ID = op.id
+    left join o_order o
+    on o.id = o_payment_detail.order_id
+    left join o_pay_detail d
+    on d.arr_id = o_payment_detail.id
+    left join O_REMOVE_ACCOUNT ra
+    on d.src_id = ra.id
+    left join a_agent ag
+    on ag.id = ra.ag_id
+    left join a_platform plat
+    ON plat.platform_num = ra.bus_platform
+    where o_payment_detail.Payment_status in (2, 4, 6)
+    and d.bus_stat = '1'
+    and d.status = '1'
+    <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
+    <include refid="PAGING_END" />
+  </select>
+
+
+  <select id="orderDetailCountNew" parameterType="java.util.Map" resultType="int">
+    select count(1)
+    from O_PAYMENT_DETAIL
+    left join O_PAYMENT op
+    on O_PAYMENT_DETAIL.PAYMENT_ID = op.id
+    left join o_order o
+    on o.id = o_payment_detail.order_id
+    left join o_pay_detail d
+    on d.arr_id = o_payment_detail.id
+    left join O_REMOVE_ACCOUNT ra
+    on d.src_id = ra.id
+    left join a_agent ag
+    on ag.id = ra.ag_id
+    left join a_platform plat
+    ON plat.platform_num = ra.bus_platform
+    where o_payment_detail.Payment_status in (2, 4, 6)
+    and d.bus_stat = '1'
+    and d.status = '1'
     <include refid="RACCOUNTDETAIL_WHERE_SQL"/>
   </select>
 

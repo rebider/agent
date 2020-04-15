@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfoExample;
 import com.ryx.credit.pojo.admin.vo.BusinessOutVo;
 import org.apache.ibatis.annotations.Param;
+import org.apache.kafka.common.protocol.types.Field;
 
 import java.util.List;
 import java.util.Map;
@@ -120,4 +121,13 @@ public interface AgentBusInfoMapper {
     int queryBusinfoTopMenuCount(@Param("reqMap") Map<String,Object> reqMap);
     // 返回字典对应 业务数据
     List<Map<String,Object>> queryTreeByBusInfoAndDict(Map<String,Object> reqMap);
+
+
+    List<Map<String, Object>> queyrBusInfoByBusNumAndPlatformType(Map<String,Object> reqMap);
+    List<Map<String, Object>> queyrBusInfoByBusNumAndPlatformTypePage(Map<String,Object> reqMap);
+    Integer queyrBusInfoByBusNumAndPlatformTypePageCount(Map<String,Object> reqMap);
+    List<Map<String, Object>> queryByBusInfo(Map<String, Object> map);
+
+    List<String> selectBusNumByBusProCode(Map<String, Object> reqMap);
+    List<Map<String, Object>> queryRegionByAccount(Map<String,Object> map);
 }

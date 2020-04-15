@@ -1073,8 +1073,31 @@ public class OLogisticServiceImpl implements OLogisticsService {
             throw new MessageException("排单信息未找到！");
         }
 
+        OLogisticsDetailExample oLogisticsDetailExample2 = new OLogisticsDetailExample();
+        OLogisticsDetailExample.Criteria criteria2 = oLogisticsDetailExample2.createCriteria();
+        criteria2.andLogisticsIdEqualTo(oLogistics.getId())
+                .andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_LOC.code)
+                .andOptTypeEqualTo("ORDER");
+        List<OLogisticsDetail> checkOLogistics = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample2);
+        if (checkOLogistics.size() >= 1){
+            throw new MessageException("有处于锁定状态的SN，解锁后方可操作物流！");
+        }
+
+        //查询当前物流明细是否存在锁定状态的物流明细数量是否相等
+        OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+        OLogisticsDetailExample.Criteria criteria = oLogisticsDetailExample.createCriteria();
+        criteria.andLogisticsIdEqualTo(oLogistics.getId())
+                .andRecordStatusIn(Arrays.asList(OLogisticsDetailStatus.RECORD_STATUS_VAL.code, OLogisticsDetailStatus.RECORD_STATUS_HIS.code))
+                .andOptTypeEqualTo("ORDER");
+        List<OLogisticsDetail> oLogisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+        if (oLogistics.getSendNum().intValue() != oLogisticsDetails.size()){
+            throw new MessageException("物流明细异常！");
+        }
+
         //删除物流明细
-        oLogisticsDetailMapper.deleteDetailByLogisicalId(oLogistics.getId());
+        if (oLogistics.getSendNum().intValue() != oLogisticsDetailMapper.deleteByExample(oLogisticsDetailExample)) {
+            throw new MessageException("删除失败，请刷新后重试！");
+        }
 
         //更新物流
         OLogistics updateLogistics = new OLogistics();

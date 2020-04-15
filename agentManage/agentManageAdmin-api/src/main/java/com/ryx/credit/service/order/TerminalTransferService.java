@@ -8,6 +8,7 @@ import com.ryx.credit.pojo.admin.order.AgentVoTerminalTransferDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransfer;
 import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,34 +25,47 @@ public interface TerminalTransferService {
 
     AgentResult startTerminalTransferActivity(String id, String cuser, String agentId, Boolean isSave) throws Exception;
 
-    AgentResult compressTerminalTransferActivity(String proIns, BigDecimal agStatus)throws Exception;
+    AgentResult compressTerminalTransferActivity(String proIns, BigDecimal agStatus) throws Exception;
 
     String judgeStartsWithSUtil(String param, TerminalTransferDetail terminalTransferDetail) throws MessageException;
 
-    AgentResult saveTerminalTransfer(TerminalTransfer terminalTransfer, List<TerminalTransferDetail> terminalTransferDetailList, String cuser, String agentId, String saveFlag)throws Exception;
+    AgentResult saveTerminalTransfer(TerminalTransfer terminalTransfer, List<TerminalTransferDetail> terminalTransferDetailList, String cuser, String agentId, String saveFlag) throws Exception;
 
     TerminalTransfer queryTerminalTransfer(String terminalTransferId);
 
     List<TerminalTransferDetail> queryDetailByTerminalId(String terminalTransferId);
 
-    AgentResult importTerminal(List<List<Object>> excelList, String cUser)throws Exception;
+    AgentResult importTerminal(List<List<Object>> excelList, String cUser) throws Exception;
 
     List<TerminalTransferDetail> queryImprotMsgList(String terminalTransferId);
 
-    AgentResult delTerminalTransfer(String terminalTransferId, String cUser)throws Exception;
+    AgentResult delTerminalTransfer(String terminalTransferId, String cUser) throws Exception;
 
-    AgentResult editTerminalTransfer(TerminalTransfer terminalTransfer, List<TerminalTransferDetail> terminalTransferDetailList, String cuser, String agentId)throws Exception;
+    AgentResult editTerminalTransfer(TerminalTransfer terminalTransfer, List<TerminalTransferDetail> terminalTransferDetailList, String cuser, String agentId) throws Exception;
 
-    void appTerminalTransfer()throws Exception;
+    void appTerminalTransfer() throws Exception;
 
-    Map<String, Object>  getAgentType(String orgId);
+    Map<String, Object> getAgentType(String orgId);
 
-    void  queryTerminalTransferResult() throws Exception;
+    void queryTerminalTransferResult() throws Exception;
+
     PageInfo terminalTransferDetailListExport(AgentVoTerminalTransferDetail terminalTransferDetail);
 
-     Map<String, Object> disposeSN(String snBeginNum, String snEndNum) throws MessageException;
+    Map<String, Object> disposeSN(String snBeginNum, String snEndNum) throws MessageException;
 
-    public  Map<String, Object>  queryPlatFrom(String plat);
-    public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId,boolean tf) throws Exception;
+    Map<String, Object> queryPlatFrom(String plat);
+
+    AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId, boolean tf) throws Exception;
+
+    List<Map<String, Object>> queryToolsFloor(Map<String, String> param);
+
+    List<Map<String, Object>> querySubBusNumTopAgentAll(String bus_num);
+
+    /**
+     * 根据平台码查询代理商基础配置
+     * @param BUS_NUM 平台码
+     * @return
+     */
+    Map<String, Object> agentBase(@Param("BUS_NUM") String BUS_NUM);
 
 }

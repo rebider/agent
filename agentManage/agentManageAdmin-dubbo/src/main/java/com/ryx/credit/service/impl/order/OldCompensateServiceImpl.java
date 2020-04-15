@@ -27,10 +27,7 @@ import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
-import com.ryx.credit.service.order.OCashReceivablesService;
-import com.ryx.credit.service.order.OldCompensateService;
-import com.ryx.credit.service.order.OrderActivityService;
-import com.ryx.credit.service.order.ProductService;
+import com.ryx.credit.service.order.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +98,10 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     private ImsTermMachineService imsTermMachineService;
     @Autowired
     private OActivityVisibleMapper activityVisibleMapper;
+    @Autowired
+    private OsnOperateService osnOperateService;
+    @Autowired
+    private OrderOffsetService orderOffsetService;
 
     /**
      * 解析提交过来的sn,
@@ -322,6 +323,9 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 log.info("活动调整保存打款记录失败1");
                 throw new MessageException("保存打款记录失败");
             }
+
+            Set<String> setOldOrgId = new HashSet<>();
+            Set<String> setPlatform = new HashSet<>();
             for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
 
                 if(StringUtils.isBlank(refundPriceDiffDetail.getOldOrgId())){
@@ -342,23 +346,11 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     throw new MessageException("结束SN为空");
                 }
 
-                //TODO 校验是否有审批中的活动变更
-                ORefundPriceDiffDetailExample example = new ORefundPriceDiffDetailExample();
-                example.or()
-                        .andBeginSnBetween(refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn())
-                        .andStatusEqualTo(Status.STATUS_1.status);
-                example.or() .andEndSnBetween(refundPriceDiffDetail.getBeginSn(),refundPriceDiffDetail.getEndSn())
-                        .andStatusEqualTo(Status.STATUS_1.status);
-                List<ORefundPriceDiffDetail> listDetail = refundPriceDiffDetailMapper.selectByExample(example);
-
-                if(listDetail.size()>0){
-                    for (ORefundPriceDiffDetail detail : listDetail) {
-                        ORefundPriceDiff diff = refundPriceDiffMapper.selectByPrimaryKey(detail.getRefundPriceDiffId());
-                        if(AgStatus.Approving.status.compareTo(diff.getReviewStatus())==0){
-                            throw new MessageException(detail.getBeginSn()+"-"+detail.getEndSn()+"活动调整正在审批中");
-                        }
-                    }
-                }
+                //检查sn是否在划拨，换活动，退货审批中
+                FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                        .fastMap("beginSN", refundPriceDiffDetail.getBeginSn())
+                        .putKeyV("endSN", refundPriceDiffDetail.getEndSn()));
+                if (!FastMap.isSuc(fastMap)) throw new ProcessException(fastMap.get("msg").toString());
 
                 OActivity oldActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityFrontId());
                 if(oldActivity==null){
@@ -420,6 +412,23 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
                 refundPriceDiffDetail.setOrderType(OrderType.OLD.getValue());
                 refundPriceDiffDetail.setSendStatus(Status.STATUS_0.status);
+
+                //特殊平台增加个校验（智慧POS，智能POS）
+                if (PlatformType.ZHPOS.code.equals(platForm.getPlatformType()) || PlatformType.ZPOS.code.equals(platForm.getPlatformType())) {
+                    List<AgentBusInfo> oldList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("posPlatCode", refundPriceDiffDetail.getOldOrgId()));
+                    if (oldList.size() == 1 && null != oldList.get(0).getBusNum()) {
+                        refundPriceDiffDetail.setOldOrgId(String.valueOf(oldList.get(0).getBusNum()));
+                    } else {
+                        throw new ProcessException("原机构S码有误，未找到业务平台编码！");
+                    }
+                    List<AgentBusInfo> newList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("posPlatCode", refundPriceDiffDetail.getNewOrgId()));
+                    if (newList.size() == 1 && null != newList.get(0).getBusNum()) {
+                        refundPriceDiffDetail.setNewOrgId(String.valueOf(newList.get(0).getBusNum()));
+                    } else {
+                        throw new ProcessException("目标机构S码有误，未找到业务平台编码！");
+                    }
+                }
+
                 Map<String,String> par = new HashedMap();
                 par.put("oldMerid",refundPriceDiffDetail.getOldMachineId());
                 par.put("newMerId",refundPriceDiffDetail.getNewMachineId());
@@ -431,6 +440,18 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     log.info("插入补退差价详情表异常");
                     throw new MessageException("保存失败");
                 }
+                setPlatform.add(refundPriceDiffDetail.getPlatformType());
+                setOldOrgId.add(refundPriceDiffDetail.getOldOrgId());
+            }
+
+            if(setPlatform.size()>1){
+                log.info("申请sn所属平台必须一致：{}", setPlatform);
+                throw new ProcessException("申请sn所属平台必须一致");
+            }
+
+            if(setOldOrgId.size() > 1){
+                log.info("仅支持单品牌的活动调整申请：{}", setOldOrgId);
+                throw new ProcessException("仅支持单品牌的活动调整申请。");
             }
 
             //校验是否可以调整
@@ -448,7 +469,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             }
 
             String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
-            if(PlatformType.POS.getValue().equals(platformType)){
+            if (PlatformType.whetherPOS(platformType)) {
                 JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
                 List<Map<String,Object>> resultList = (List<Map<String,Object>>)resData.get("resultList");
                 for (Map<String, Object> stringObjectMap : resultList) {
@@ -751,6 +772,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
         //审批拒绝处理缴款信息
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
             agentResult = cashReceivablesService.refuseProcing(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getcUser());
+            //取消抵扣
+            agentResult = orderOffsetService.OffsetArrearsCancle(oRefundPriceDiff.getMachOweAmt(), OffsetPaytype.DDMD.code, oRefundPriceDiff.getId());
+            if (!agentResult.isOK()){
+                log.error("换活动抵扣欠款取消失败!id"+oRefundPriceDiff.getId());
+                throw new MessageException("换活动抵扣欠款取消失败!id"+oRefundPriceDiff.getId());
+            }
         }
         //审批通过处理缴款信息
         if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
@@ -786,6 +813,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     throw new ProcessException("处理失败");
                 }
             });
+            //提交抵扣
+            agentResult = orderOffsetService.OffsetArrearsCommit(oRefundPriceDiff.getMachOweAmt(), OffsetPaytype.DDMD.code, oRefundPriceDiff.getId());
+            if (!agentResult.isOK()){
+                log.error("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId());
+                throw new MessageException("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId()+","+agentResult.getMsg());
+            }
             //调用接口调整
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust");
             if(!synOrVerifyResult.isOK()){

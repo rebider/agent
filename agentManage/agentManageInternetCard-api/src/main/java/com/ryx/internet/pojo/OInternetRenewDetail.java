@@ -67,6 +67,14 @@ public class OInternetRenewDetail implements Serializable {
 
     private String busContactPerson;
 
+    private String openAccountTimeBeginStr;
+
+    private String openAccountTimeEndStr;
+
+    private String expireTimeBeginStr;
+
+    private String expireTimeEndStr;
+
     public String getBusNum() {
         return busNum;
     }
@@ -315,6 +323,38 @@ public class OInternetRenewDetail implements Serializable {
         this.version = version;
     }
 
+    public String getOpenAccountTimeBeginStr() {
+        return openAccountTimeBeginStr;
+    }
+
+    public void setOpenAccountTimeBeginStr(String openAccountTimeBeginStr) {
+        this.openAccountTimeBeginStr = openAccountTimeBeginStr;
+    }
+
+    public String getOpenAccountTimeEndStr() {
+        return openAccountTimeEndStr;
+    }
+
+    public void setOpenAccountTimeEndStr(String openAccountTimeEndStr) {
+        this.openAccountTimeEndStr = openAccountTimeEndStr;
+    }
+
+    public String getExpireTimeBeginStr() {
+        return expireTimeBeginStr;
+    }
+
+    public void setExpireTimeBeginStr(String expireTimeBeginStr) {
+        this.expireTimeBeginStr = expireTimeBeginStr;
+    }
+
+    public String getExpireTimeEndStr() {
+        return expireTimeEndStr;
+    }
+
+    public void setExpireTimeEndStr(String expireTimeEndStr) {
+        this.expireTimeEndStr = expireTimeEndStr;
+    }
+
     @Override
     public String toString() {
         return "OInternetRenewDetail{" +
@@ -343,6 +383,10 @@ public class OInternetRenewDetail implements Serializable {
                 ", uUser='" + uUser + '\'' +
                 ", version=" + version +
                 ", renewWayName='" + renewWayName + '\'' +
+                ", openAccountTimeBeginStr='" + openAccountTimeBeginStr + '\'' +
+                ", openAccountTimeEndStr='" + openAccountTimeEndStr + '\'' +
+                ", expireTimeBeginStr='" + expireTimeBeginStr + '\'' +
+                ", expireTimeEndStr='" + expireTimeEndStr + '\'' +
                 ", theRealityAmt=" + theRealityAmt +
                 '}';
     }

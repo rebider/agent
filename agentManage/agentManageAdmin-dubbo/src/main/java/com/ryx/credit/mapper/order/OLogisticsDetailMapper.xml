@@ -724,13 +724,6 @@
         where LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR}
     </update>
 
-    <delete id="deleteDetailByLogisicalId" parameterType="string">
-        delete from
-            O_LOGISTICS_DETAIL
-        where
-            LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR}
-    </delete>
-
     <!-- 查询物流对应的物流状态 -->
     <select id="selectSendStatusByMap" parameterType="java.util.Map" resultType="decimal">
         SELECT

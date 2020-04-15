@@ -1,6 +1,8 @@
 package com.ryx.credit.common.enumc;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 代理商状态
@@ -8,11 +10,13 @@ import java.math.BigDecimal;
  */
 public enum BusinessStatus {
 
-    pause(0,"注销"),
+    pause(0,"未启用"),
     Enabled(1,"启用"),
     inactive(2,"未激活"),
     lock(3,"锁定"),
-    quit(4,"退出");
+    quit(4,"退出"),
+    quitzq(5,"退出直签"),
+    move(6,"业务已迁移");
 
     public BigDecimal status;
 
@@ -21,5 +25,12 @@ public enum BusinessStatus {
     BusinessStatus(int status,String s){
         this.status = new BigDecimal(status);
         msg = s;
+    }
+
+    public static List<BigDecimal> getNotUse(){
+        return Arrays.asList(BusinessStatus.move.status,
+                BusinessStatus.quit.status,
+                BusinessStatus.quitzq.status,
+                BusinessStatus.pause.status);
     }
 }

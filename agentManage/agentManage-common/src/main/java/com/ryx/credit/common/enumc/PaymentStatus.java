@@ -1,6 +1,9 @@
 package com.ryx.credit.common.enumc;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by RYX on 2018/7/20.
@@ -22,5 +25,12 @@ public enum PaymentStatus {
     PaymentStatus(String c, String m){
         this.code=new BigDecimal(c);
         this.msg =m;
+    }
+
+    public static List<String> getEnableBkCodes(){
+        List<String> status = Stream.of(String.valueOf(PaymentStatus.DF.code),
+                String.valueOf(PaymentStatus.YQ.code),
+                String.valueOf(PaymentStatus.BF.code)).collect(Collectors.toList());
+        return status;
     }
 }

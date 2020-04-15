@@ -1,8 +1,10 @@
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.OrderRepairService;
+import com.ryx.credit.service.order.OrderService;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,8 @@ public class OrderServiceTest  extends BaseSpringTest  {
     private OrderRepairService orderRepairService;
     @Autowired
     private IPaymentDetailService iPaymentDetailService;
+    @Autowired
+    private OrderService orderService;
 
     @Test
     public void testIdSn(){
@@ -54,5 +58,16 @@ public class OrderServiceTest  extends BaseSpringTest  {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void test1(){
+        try {
+            AgentResult agentResult = orderService.enableOrderAdjFinish("AD20200310000000000000709");
+            System.out.println(agentResult);
+        }catch (Exception e){
+            e.toString();
+        }
+
     }
 }

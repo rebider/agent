@@ -483,10 +483,24 @@ public class DateUtil {
         Calendar now = Calendar.getInstance();
         now.setTime(d);
         now.set(Calendar.YEAR, now.get(Calendar.YEAR)+1);//+后 -前
-        now.set(Calendar.DAY_OF_MONTH,0);
+        now.set(Calendar.DAY_OF_MONTH, 0);
         return now.getTime();
     }
 
+    /**
+     * 获取一年以后的今天
+     * @param d
+     * @return
+     */
+    public static Date getOneYearLaterNow(Date d) {
+        Calendar now = Calendar.getInstance();
+        now.setTime(d);
+        now.set(Calendar.MONTH, now.get(Calendar.MONTH));//+后 -前
+        now.set(Calendar.DAY_OF_MONTH, 1);
+        now.set(Calendar.YEAR, now.get(Calendar.YEAR)+1);//+后 -前
+        now.roll(Calendar.DATE, -1);
+        return now.getTime();
+    }
 
     /**
      * 获取几个月后
@@ -608,5 +622,33 @@ public class DateUtil {
        Date zero = calendar.getTime();
        return format(zero);
    }
+
+    /**
+     * 当前时间+多少秒
+     * @return
+     */
+    public static Date dateAddMinute(Date date,int minute){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MINUTE, minute);
+        return calendar.getTime();
+    }
+
+
+    /**
+     * 距离下一天还有多少秒
+     * @return
+     */
+    public static long bwtenNextDay(){
+        Calendar calendar = Calendar.getInstance();
+        long mills = calendar.getTimeInMillis();
+        calendar.add(Calendar.DAY_OF_MONTH,1);
+        calendar.set(Calendar.HOUR_OF_DAY,0);
+        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.SECOND,0);
+        calendar.set(Calendar.MILLISECOND,0);
+        long millisecond = calendar.getTimeInMillis();
+        return millisecond - mills;
+    }
 
 }

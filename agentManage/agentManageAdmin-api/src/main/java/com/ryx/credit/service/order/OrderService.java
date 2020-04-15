@@ -73,6 +73,14 @@ public interface OrderService {
      */
     public OPayment initPayment(OrderFormVo agentVo) throws MessageException;
 
+    /**
+     * 初始化分期明细
+     * @param agentVo
+     * @return
+     * @throws MessageException
+     */
+    public boolean initPaymentDetail(String paymentId,String paymentMethod,List<String> data) throws MessageException;
+
 
     public AgentResult checkDownPaymentDate(Date date);
 
@@ -345,4 +353,11 @@ public interface OrderService {
      * 执行订单调整计划
      */
     AgentResult adjustDoPayPlan(String adjId,OrderAdj orderAdj)throws Exception;
+
+    /**
+     * 查询是否可终止订单调整审批流
+     * @param orderAdjId
+     * @return
+     */
+    AgentResult enableOrderAdjFinish(String orderAdjId)throws Exception;
 }

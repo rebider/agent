@@ -236,13 +236,13 @@
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION +1,
       </if>
       <if test="receiptProStatus != null">
         RECEIPT_PRO_STATUS = #{receiptProStatus,jdbcType=DECIMAL},
       </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OReceiptPro">
     update O_RECEIPT_PRO
@@ -258,9 +258,9 @@
     U_USER = #{uUser,jdbcType=VARCHAR},
     U_TIME = #{uTime,jdbcType=TIMESTAMP},
     STATUS = #{status,jdbcType=DECIMAL},
-    VERSION = #{version,jdbcType=DECIMAL},
+    VERSION = VERSION + 1,
     RECEIPT_PRO_STATUS = #{receiptProStatus,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">

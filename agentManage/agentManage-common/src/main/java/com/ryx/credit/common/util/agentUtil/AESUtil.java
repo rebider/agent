@@ -12,6 +12,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 
 public class AESUtil {
@@ -80,4 +81,17 @@ public class AESUtil {
 		}
 	}
 
+
+	public static void main(String[] args)throws Exception{
+
+		String keyStr ="uudg41Ro2OxIJVy8";
+		String charset = "UTF-8";
+		byte[] plainBytes = "Test123$".getBytes(charset);
+		byte[] keyBytes = keyStr.getBytes(charset);
+		String aes = new String(Base64.encodeBase64(encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null)));
+		System.out.println(aes);
+		String aa = new String(decrypt(Base64.decodeBase64(aes.getBytes(charset)), keyBytes, "AES", "AES/ECB/PKCS5Padding", null));
+		System.out.println(aa);
+
+	}
 }

@@ -21,4 +21,11 @@ public interface LmsUserService {
      * @return
      */
     LmsUser queryByLogin(String loginName);
+
+    /**
+     * 查询O码对应的大区经理账号
+     * @param busNum
+     * @return
+     */
+    List<String> queryByBusNum(String busNum);
 }

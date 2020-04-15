@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.BeanUtils;
+import com.ryx.credit.commons.utils.DigestUtils;
 import com.ryx.credit.commons.utils.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.CUserMapper;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -218,4 +218,40 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         userVo.setLoginName(userVo.getLoginName()+"1");
         insertByVo(userVo,new HashMap<>());
     }
+
+    @Override
+    public UserVo selectByLogin(UserVo userVo) {
+
+        UserVo query = new UserVo();
+        query.setLoginName(userVo.getLoginName());
+        List<CUser> list = selectByLoginName(query);
+        // 账号不存在
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        CUser db_User = list.get(0);
+        // 账号未启用
+        if (db_User.getStatus() == 1) {
+            return null;
+        }
+        if (db_User != null && db_User.getPassword()!=null) {
+            //传递密码进行加密
+            String slt = db_User.getSalt();
+            String pas = DigestUtils.hashByShiro("md5", userVo.getPassword(), db_User.getSalt(), 1);
+            //密码校验
+            if (db_User.getPassword().equals(pas)) {
+                UserVo uv = new UserVo();
+                uv.setLoginName(db_User.getLoginName());
+                uv.setId(db_User.getId());
+                uv.setName(db_User.getName());
+                uv.setPassword(pas);
+                return uv;
+            }else{
+                return null;
+            }
+        }
+        return null;
+    }
+
+
 }

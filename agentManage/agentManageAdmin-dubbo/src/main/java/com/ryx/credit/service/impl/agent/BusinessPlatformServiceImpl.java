@@ -1,13 +1,18 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
+import com.ryx.credit.common.util.agentUtil.AESUtil;
+import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.CBranchInnerMapper;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.machine.service.LmsUserService;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
@@ -17,6 +22,7 @@ import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +30,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import sun.management.resources.agent;
 
 import java.math.BigDecimal;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -89,7 +96,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private COrganizationMapper organizationMapper;
     @Autowired
     private AgentNetInNotityService agentNetInNotityService;
-
+    @Autowired
+    private LmsUserService lmsUserService;
+    @Autowired
+    private CBranchInnerMapper branchInnerMapper;
 
     @Override
     public PageInfo queryBusinessPlatformList(Map map, Agent agent, Page page, Long userId) {
@@ -226,8 +236,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if ( StringUtils.isNotBlank((String)map.get("approveTimeEnd"))) {
             reqMap.put("approveTimeEnd", (String)map.get("approveTimeEnd"));
         }
-        if ((String)map.get("busStatus") != null) {
-            reqMap.put("busStatus", new BigDecimal((String)map.get("busStatus")));
+        if (StringUtils.isNotBlank((String)map.get("busStatus"))) {
+            reqMap.put("busStatus", (String)map.get("busStatus"));
         }
         reqMap.put("status", Status.STATUS_1.status);
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm((Long)map.get("userId"));
@@ -518,6 +528,103 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
     }
 
+    //业务类型更改限制
+    @Override
+    public void verifyBusinfoType(AgentBusInfo preBusInfoVo, AgentBusInfoVo newBusInfoVo) throws Exception {
+        if (StringUtils.isNotBlank(preBusInfoVo.getBusType())) {
+            AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(newBusInfoVo.getBusParent());//上级代理商
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andBusParentEqualTo(newBusInfoVo.getId());
+            criteria.andBusStatusNotIn(Arrays.asList(BusStatus.YWTC.status, BusStatus.TZQ.status, BusStatus.YWQY.status));
+            List<AgentBusInfo> busInfoLowerList = agentBusInfoMapper.selectByExample(agentBusInfoExample);//下级代理商
+            List<String> stringList = new ArrayList<String>();
+            for (AgentBusInfo busInfoLower : busInfoLowerList) {
+                String busTypeLower = busInfoLower.getBusType();
+                stringList.add(busTypeLower);
+            }
+            if (preBusInfoVo.getBusType().equals(BusType.ZQBZF.key)) {
+                if (!newBusInfoVo.getBusType().equals(BusType.ZQBZF.key)) {
+                    throw new MessageException("直签不直发类型不允许更改！");
+                }
+            } else if (preBusInfoVo.getBusType().equals(BusType.JG.key) || preBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
+                if (newBusInfoVo.getBusType().equals(BusType.JG.key)!=preBusInfoVo.getBusType().equals(BusType.JG.key)
+                        && newBusInfoVo.getBusType().equals(BusType.BZYD.key)!=preBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
+                    throw new MessageException("机构/标准一代类型不允许修改！");
+                }
+            } else if (newBusInfoVo.getBusType().equals(BusType.JG.key)  || newBusInfoVo.getBusType().equals(BusType.BZYD.key)) {
+                if (preBusInfoVo.getBusType().equals(BusType.ZQZF.key) || preBusInfoVo.getBusType().equals(BusType.YDX.key)
+                        || preBusInfoVo.getBusType().equals(BusType.JGYD.key)) {
+                    throw new MessageException("直签代理商类型不允许修改为机构或标准一代！");
+                }
+            } else if (newBusInfoVo.getBusType().equals(BusType.YDX.key)) {
+                if (preBusInfoVo.getBusType().equals(BusType.JGYD.key)) {
+                    if (stringList.size()>0 && stringList!=null) {
+                        for (String strType : stringList) {
+                            if (strType.equals(BusType.YDX.key)) {
+                                throw new MessageException("下级中有一代X类型，不能更改！");
+                            }
+                        }
+                    }
+                } else if (preBusInfoVo.getBusType().equals(BusType.ZQZF.key)) {
+                    if (StringUtils.isNotBlank(busInfoParent.getBusType())) {
+                        if (!busInfoParent.getBusType().equals(BusType.JG.key) && !busInfoParent.getBusType().equals(BusType.JGYD.key)
+                                && !busInfoParent.getBusType().equals(BusType.BZYD.key)) {
+                            String busTypeByValue = BusType.getContentByValue(busInfoParent.getBusType());
+                            throw new MessageException("上级代理商类型为["+busTypeByValue+"]，不允许修改！");
+                        }
+                    }
+                }
+            } else if (newBusInfoVo.getBusType().equals(BusType.ZQZF.key)) {
+                if (preBusInfoVo.getBusType().equals(BusType.JGYD.key) || preBusInfoVo.getBusType().equals(BusType.YDX.key)) {
+                    if (stringList.size()>0 && stringList!=null) {
+                        throw new MessageException("有下级不能修改！");
+                    }
+                }
+            } else if (newBusInfoVo.getBusType().equals(BusType.JGYD.key)) {
+                if (preBusInfoVo.getBusType().equals(BusType.ZQZF.key) || preBusInfoVo.getBusType().equals(BusType.YDX.key)) {
+                    if (StringUtils.isNotBlank(busInfoParent.getBusType())) {
+                        if (!busInfoParent.getBusType().equals(BusType.JG.key)) {
+                            throw new MessageException("修改为机构一代上级必须是机构！");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     *【业务平台编号】【平台登陆账号】是否为空校验，入网及新增业务平台限制
+     * @param agentVo
+     * @throws Exception
+     */
+    @Override
+    public void verifyAgentBusinfo(AgentVo agentVo) throws Exception {
+        if (agentVo.getBusInfoVoList() != null) {
+            for (AgentBusInfo item : agentVo.getBusInfoVoList()) {
+                PlatformType platformType = platFormService.byPlatformCode(item.getBusPlatform());
+                if (platformType != null) {
+                    //智慧POS、智慧plus、瑞+（条码前置）、实时POS品牌
+                    if (platformType.code.equals(PlatformType.ZHPOS.code) || platformType.code.equals(PlatformType.RJQZ.code) || platformType.code.equals(PlatformType.SSPOS.code)) {
+                        if (StringUtils.isNotBlank(item.getBusNum()) || StringUtils.isNotBlank(item.getBusLoginNum())) {
+                            logger.info("当前平台不允许升级");
+                            throw new MessageException("当前平台不允许升级");
+                        }
+                    }
+                    //POS平台、瑞+、智能POS
+                    if (platformType.code.equals(PlatformType.POS.code) || platformType.code.equals(PlatformType.RJPOS.code) || platformType.code.equals(PlatformType.ZPOS.code)) {
+                        if (StringUtils.isBlank(item.getBusNum()) && StringUtils.isNotBlank(item.getBusLoginNum())
+                                || StringUtils.isNotBlank(item.getBusNum()) && StringUtils.isBlank(item.getBusLoginNum())) {
+                            logger.info("[业务平台编号][平台登录账号]不一致，如升级，则需要同时输入；如新签，则均不允许填写");
+                            throw new MessageException("[业务平台编号][平台登录账号]不一致，如升级，则需要同时输入；如新签，则均不允许填写");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public void updateBusinfoData(List<AgentBusInfoVo> busInfoVoList) throws Exception {
@@ -528,9 +635,19 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             throw new MessageException("信息错误");
         }
         try{
+            String oldAgDocPro;
             AgentBusInfo agentBusInfo = null;
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                oldAgDocPro = agentBusInfo.getAgDocPro();
+                if (StringUtils.isBlank(agentBusInfoVo.getBusParent())) {
+                    agentBusInfoVo.setBusParent(agentBusInfo.getBusParent());
+                }
+                if (StringUtils.isBlank(agentBusInfoVo.getBusType())) {
+                    agentBusInfoVo.setBusType(agentBusInfo.getBusType());
+                }
+                //校验代理商类型更改规则
+                verifyBusinfoType(agentBusInfo, agentBusInfoVo);
                 //校验业务编码是否存在
                 if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())) {
                     AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
@@ -597,7 +714,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                                 busInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
                                 busInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
                                 busInfo.setVersion(busInfo.getVersion());
-                                if(1!=agentBusInfoMapper.updateByPrimaryKey(busInfo)){
+                                if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(busInfo)){
                                     logger.info("业务修改大区省区更新失败");
                                     throw new MessageException("业务修改大区省区更新失败");
                                 }
@@ -638,6 +755,52 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                             logger.info("代理商数据-更新失败");
                             throw new MessageException("更新失败");
                         }
+                    }
+                }
+
+                //修改代理商在总管下的所属账号
+                if (PlatformType.whetherPOS(platformType.getValue()) || PlatformType.SSPOS.code.equals(platformType.getValue())) {
+                    AgentBusInfo agentInner = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+
+                    //查询业务表（审批通过的，业务码不是空的，省区不是空的，省区和原来不一样的）
+                    boolean b = (null != agentInner
+                            && null != agentInner.getBusNum()
+                            && null != oldAgDocPro
+                            && !oldAgDocPro.equals(agentBusInfoVo.getAgDocPro())
+                            && (agentInner.getStatus().compareTo(new BigDecimal("1")) == 0)
+                            && (agentInner.getBusStatus().compareTo(new BigDecimal("1")) == 0)
+                            && (agentInner.getCloReviewStatus().compareTo(new BigDecimal("3")) == 0)
+                    );
+
+                    if (b) {
+                        //查询代理商业务O码，对应的大区经理账号
+                        List<String> oldAccounts = lmsUserService.queryByBusNum(agentInner.getBusNum());
+                        //查询新省区，对应的大区经理账号
+                        if (StringUtils.isNotBlank(agentBusInfoVo.getAgDocPro())) {
+                            List<String> newAccounts = branchInnerMapper.selectInnerLoginByBranch(agentBusInfoVo.getAgDocPro());
+                            if (newAccounts.size() > 0) {
+                                JSONObject data = new JSONObject();
+                                data.put("addAccounts", String.join(",", newAccounts));
+                                data.put("delAccounts", String.join(",", oldAccounts));
+                                data.put("orgId", agentInner.getBusNum());
+                                try {
+                                    AgentResult agentResult = request("ORG021", data);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            } else if (newAccounts.size() <= 0 && oldAccounts.size() > 0) {
+                                JSONObject data = new JSONObject();
+                                data.put("loginname", String.join(",", oldAccounts));
+                                data.put("dType", "1");
+                                data.put("delOrgIds", agentInner.getBusNum());
+                                try {
+                                    AgentResult agentResult = request("ORG020", data);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
                     }
                 }
             }
@@ -1397,5 +1560,79 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         pageInfo.setRows(agentBusInfoList);
         pageInfo.setTotal(agentBusInfoMapper.queryBusinfoTopMenuCount(reqMap));
         return pageInfo;
+    }
+
+    private AgentResult request(String tranCode, JSONObject data) throws Exception {
+        try {
+            logger.info("POS省总账号联动请求参数明文:{}", data);
+            PrivateKey rsaPrivateKey = RSAUtil.getRSAPrivateKey(AppConfig.getProperty("industryAuth_local_private_key"), "pem", null, "RSA");
+            PublicKey rsaPublicKey = RSAUtil.getRSAPublicKey(AppConfig.getProperty("industryAuth_cooper_public_key"), "pem", "RSA");
+            String cooperator = AppConfig.getProperty("industryAuth_cooperator");
+            String charset = "UTF-8"; // 字符集
+            String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
+            String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
+
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put("version", "1.0.0");
+            jsonParams.put("msgType", "01");
+            jsonParams.put("reqDate", reqDate);
+            jsonParams.put("data", data);
+            String plainXML = jsonParams.toString();
+            logger.info("POS省总账号联动请求参数:{}", plainXML);
+            // 请求报文加密开始
+            String keyStr = AESUtil.getAESKey();
+            byte[] plainBytes = plainXML.getBytes(charset);
+            byte[] keyBytes = keyStr.getBytes(charset);
+            String encryptData = new String(org.apache.commons.codec.binary.Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
+            String signData = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, rsaPrivateKey, "SHA1WithRSA")), charset);
+            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, rsaPublicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
+            // 请求报文加密结束
+
+            Map<String, String> map = new HashMap<>();
+            map.put("encryptData", encryptData);
+            map.put("encryptKey", encrtptKey);
+            map.put("cooperator", cooperator);
+            map.put("signData", signData);
+            map.put("tranCode", tranCode);
+            map.put("reqMsgId", reqMsgId);
+            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("industryAuth_url"), map);
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
+                logger.info("POS省总账号联动请求异常" + httpResult);
+                return AgentResult.fail("POS省总账号联动接口调用失败");
+            } else {
+                String resEncryptData = jsonObject.getString("encryptData");
+                String resEncryptKey = jsonObject.getString("encryptKey");
+                byte[] decodeBase64KeyBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resEncryptKey.getBytes(charset));
+                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, rsaPrivateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+                byte[] decodeBase64DataBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resEncryptData.getBytes(charset));
+                byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
+                String respXML = new String(merchantXmlDataBytes, charset);
+                logger.info("POS省总账号联动返回参数：{}", respXML);
+
+                // 报文验签
+                String resSignData = jsonObject.getString("signData");
+                byte[] signBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resSignData);
+                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, rsaPublicKey, "SHA1WithRSA")) {
+                    logger.info("POS省总账号联动签名验证失败");
+                } else {
+                    logger.info("POS省总账号联动返回参数:{}", respXML);
+                    JSONObject respXMLObj = JSONObject.parseObject(respXML);
+                    String respCode = String.valueOf(respXMLObj.get("respCode"));
+                    if (respCode.equals("000000")) {
+                        return AgentResult.ok();
+                    } else {
+                        if (null != respXMLObj.get("data") && null != JSONObject.parseObject(String.valueOf(respXMLObj.get("data"))).get("result_msg")) {
+                            return AgentResult.fail(JSONObject.parseObject(String.valueOf(respXMLObj.get("data"))).get("result_msg").toString());
+                        }
+                        return AgentResult.fail("业务系统删除失败！");
+                    }
+                }
+                return AgentResult.fail("POS省总账号联动请求异常");
+            }
+        } catch (Exception e) {
+            logger.info("POS省总账号联动通知失败:{}", e.getMessage());
+            throw e;
+        }
     }
 }

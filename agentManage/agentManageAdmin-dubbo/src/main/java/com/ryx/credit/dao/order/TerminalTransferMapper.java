@@ -39,12 +39,28 @@ public interface TerminalTransferMapper {
 
     Map<String, Object> querySubBusNumAgent(String bus_num);
 
-    List<Map<String, Object>> getSN();
+    List<Map<String, Object>> getSN(@Param("common") String common);
 
     List<Map<String, Object>> querySubBusNum(String AGENT_ID);
 
     Map<String, Object> queryPlatFrom(String PLATFORM_NUM);
 
     List<Map<String, Object>> queryBusInfo(Map<String,String> param);
+
+    int checkSnIsTransfer(Map map);
+
+    /**
+     * 查询划拨配置
+     * @param param
+     * @return
+     */
+    List<Map<String, Object>> queryToolsFloor(Map<String,String> param);
+
+    /**
+     * 根据平台码查询代理商基础配置
+     * @param BUS_NUM 平台码
+     * @return
+     */
+    Map<String, Object> agentBase(@Param("BUS_NUM") String BUS_NUM);
 
 }

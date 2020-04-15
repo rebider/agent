@@ -1587,6 +1587,76 @@ public class ORefundPriceDiffExample {
             addCriterion("APP_TIME not between", value1, value2, "appTime");
             return (Criteria) this;
         }
+
+        public Criteria andLogicalVersionIsNull() {
+            addCriterion("LOGICAL_VERSION is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionIsNotNull() {
+            addCriterion("LOGICAL_VERSION is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionEqualTo(String value) {
+            addCriterion("LOGICAL_VERSION =", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionNotEqualTo(String value) {
+            addCriterion("LOGICAL_VERSION <>", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionGreaterThan(String value) {
+            addCriterion("LOGICAL_VERSION >", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionGreaterThanOrEqualTo(String value) {
+            addCriterion("LOGICAL_VERSION >=", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionLessThan(String value) {
+            addCriterion("LOGICAL_VERSION <", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionLessThanOrEqualTo(String value) {
+            addCriterion("LOGICAL_VERSION <=", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionLike(String value) {
+            addCriterion("LOGICAL_VERSION like", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionNotLike(String value) {
+            addCriterion("LOGICAL_VERSION not like", value, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionIn(List<String> values) {
+            addCriterion("LOGICAL_VERSION in", values, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionNotIn(List<String> values) {
+            addCriterion("LOGICAL_VERSION not in", values, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionBetween(String value1, String value2) {
+            addCriterion("LOGICAL_VERSION between", value1, value2, "logicalVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andLogicalVersionNotBetween(String value1, String value2) {
+            addCriterion("LOGICAL_VERSION not between", value1, value2, "logicalVersion");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

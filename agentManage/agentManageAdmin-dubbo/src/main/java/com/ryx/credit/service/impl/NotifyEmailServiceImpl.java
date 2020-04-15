@@ -59,7 +59,7 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
     private AgentMapper agentMapper;
 
 
-    public void notifyEmail(String groupId,String executionId,String eventName){
+    public void notifyEmail(String groupId,String processInstanceId,String eventName){
         ThreadPool.putThreadPool(() -> {
             if ("create".endsWith(eventName)) {
                 try {
@@ -68,9 +68,9 @@ public class NotifyEmailServiceImpl implements NotifyEmailService {
                     log.error("待办任务通知:Thread error");
                 }
                 Set<String> notityEmail = new ConcurrentHashSet<>();
-                BusActRel busActRel = busActRelService.findById(executionId);
+                BusActRel busActRel = busActRelService.findById(processInstanceId);
                 if(busActRel==null){
-                    log.info("待办任务通知:未找到关联关系表,executionId:{}",executionId);
+                    log.info("待办任务通知:未找到关联关系表,executionId:{}",processInstanceId);
                     return;
                 }
                 if(groupId.equals("agent")){

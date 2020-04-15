@@ -2,7 +2,6 @@ package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
-import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
@@ -13,10 +12,7 @@ import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
-import com.ryx.credit.dao.order.OOrderMapper;
-import com.ryx.credit.dao.order.OPaymentDetailMapper;
-import com.ryx.credit.dao.order.OPaymentMapper;
-import com.ryx.credit.dao.order.OSupplementMapper;
+import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -30,7 +26,7 @@ import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OSupplementService;
-import com.sun.corba.se.spi.ior.ObjectKey;
+import com.ryx.credit.service.order.OrderOffsetService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +35,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.ryx.credit.common.enumc.OffsetPaytype.DDBK;
 
 @Service("oSupplementService")
 public class OSupplementServiceImpl implements OSupplementService {
@@ -75,6 +76,8 @@ public class OSupplementServiceImpl implements OSupplementService {
     private OOrderMapper oOrderMapper;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private OrderOffsetService orderOffsetService;
 
 
     @Override
@@ -193,8 +196,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         criteria.andSrcIdEqualTo(srcId);
         criteria.andPkTypeEqualTo(pkType);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andReviewStatusIn(Arrays.asList(AgStatus.Create.status, AgStatus.Approving.status
-                , AgStatus.Approved.status, AgStatus.Reject.status));
+        criteria.andReviewStatusIn(Arrays.asList(AgStatus.Create.status, AgStatus.Approving.status));
         List<OSupplement> oSupplements = oSupplementMapper.selectByExample(oSupplementExample);
         if (null != oSupplements && oSupplements.size() > 0) {
             logger.info("补款添加:{}", "已在补款中");
@@ -216,16 +218,28 @@ public class OSupplementServiceImpl implements OSupplementService {
 
 
         //再查询是否是最后一期的补款 不可多补或者少补
-        List<OPaymentDetail> notCountMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
+        List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
         //去查询还剩几期待付款
-        BigDecimal count = new BigDecimal(notCountMap.size());
+        BigDecimal count = new BigDecimal(oPaymentDetailList.size());
         if (count.compareTo(new BigDecimal(1)) == 0) {
             //如果就剩本条待付款  则需全部结清
-            BigDecimal amount = oPaymentDetail.getPayAmount();//这个是订单需补款金额
-            if (oSupplement.getPayAmount().compareTo(amount) == -1 || oSupplement.getPayAmount().compareTo(amount) == 1) {
-                logger.info("应补款金额为{}，请重新补款", amount);
-                throw new MessageException("应补款金额为" + amount + "，请重新补款");
+            OPaymentDetail oPayment_detail = oPaymentDetailList.get(0);
+            if(oPayment_detail.getPaymentStatus().compareTo(new BigDecimal(1))==0 || oPayment_detail.getPaymentStatus().compareTo(new BigDecimal(3))==0 ){
+                //如果是待付款 或者 逾期
+                BigDecimal amount = oPaymentDetail.getPayAmount();//这个是订单需补款金额
+                if (oSupplement.getPayAmount().compareTo(amount) == -1 || oSupplement.getPayAmount().compareTo(amount) == 1) {
+                    logger.info("应补款金额为{}，请重新补款", amount);
+                    throw new MessageException("应补款金额为" + amount + "，请重新补款");
+                }
+            }else if(oPayment_detail.getPaymentStatus().compareTo(new BigDecimal(2))==0){
+                //否则是部分付款
+                BigDecimal amount = oPaymentDetail.getPayAmount().subtract(oPaymentDetail.getRealPayAmount());
+                if (oSupplement.getPayAmount().compareTo(amount) == -1 || oSupplement.getPayAmount().compareTo(amount) == 1) {
+                    logger.info("应补款金额为{}，请重新补款", amount);
+                    throw new MessageException("应补款金额为" + amount + "，请重新补款");
+                }
             }
+
         }
 
         Date date = Calendar.getInstance().getTime();
@@ -235,6 +249,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         oSupplement.setSchstatus(SchStatus.ONE.getValue());//补款状态
         oSupplement.setStatus(Status.STATUS_1.status);
         oSupplement.setVersion(Status.STATUS_1.status);
+        oSupplement.setLogicalVersion(LogicalVersion.ONE.code);
         AgentResult result = oCashReceivablesService.addOCashReceivables(osupplementVo.getoCashReceivablesVos(), String.valueOf(oSupplement.getcUser()), osupplementVo.getSupplement().getAgentId(), CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code), osupplementVo.getSupplement().getId());
         if (result.getMapData() != null) {
             Map<String, Object> resMapCash = result.getMapData();
@@ -264,6 +279,16 @@ public class OSupplementServiceImpl implements OSupplementService {
                         throw new MessageException("上传打款截图失败");
                     }
                 }
+            }
+            AgentResult agentResult= orderOffsetService.OffsetArrears(oPaymentDetailList, oSupplement.getPayAmount(), DDBK.code, oSupplement.getId());
+            if (agentResult.getMapData() != null) {
+                Map<String, Object> resMapCash = agentResult.getMapData();
+                BigDecimal residueAmt = new BigDecimal(resMapCash.get("residueAmt").toString());
+                if (residueAmt.compareTo(new BigDecimal(BigInteger.ZERO))==-1 || residueAmt.compareTo(new BigDecimal(BigInteger.ZERO))==1) {
+                    logger.info("补款失败:{}", "抵扣金额大于或小于欠款金额"+residueAmt);
+                    throw new MessageException("抵扣金额大于或小于欠款金额"+residueAmt);
+                }
+                List<OPaymentDetail> offsetPaymentDetails=(ArrayList)resMapCash.get("offsetPaymentDetails");
             }
             startSuppActivity(osupplementVo.getSupplement().getId(), oSupplement.getcUser() + "");
             logger.info("补款添加:成功");
@@ -301,7 +326,8 @@ public class OSupplementServiceImpl implements OSupplementService {
             orderId = oPaymentDetail.getOrderId();
 
             BigDecimal paymentStatus = oPaymentDetail.getPaymentStatus();
-            if (!paymentStatus.equals(PaymentStatus.DF.code)) {
+            List<String> status =  Stream.of(String.valueOf(PaymentStatus.DF.code),String.valueOf(PaymentStatus.YQ.code),String.valueOf(PaymentStatus.BF.code)).collect(Collectors.toList());
+            if (!status.contains(String.valueOf(paymentStatus))){
                 logger.info("补款信息状态异常{}:{}", id, userId);
                 throw new MessageException("补款信息状态异常");
             }
@@ -463,7 +489,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             } catch (Exception e) {
                 throw new MessageException("审批通过失败");
             }
-            OSupplement supplement = selectOSupplement(oSupplement.getId());
+           /* OSupplement supplement = selectOSupplement(oSupplement.getId());
             if (supplement.getPkType().equals(PkType.FQBK.code)) {
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(supplement.getSrcId());
                 oPaymentDetail.setPaymentStatus(PaymentStatus.DF.code);
@@ -474,6 +500,12 @@ public class OSupplementServiceImpl implements OSupplementService {
                 logger.info("补款审批拒绝更新记录为待付款状态成功{}{}:", busActRel.getActivId(), oSupplement.getId());
             } else {
                 logger.info("补款审批拒绝pktype不匹配{}{}:", busActRel.getActivId(), oSupplement.getId());
+            }
+*/
+            AgentResult agentResult = orderOffsetService.OffsetArrearsCancle(oSupplement.getPayAmount(), OffsetPaytype.DDBK.code, oSupplement.getId());
+            if (!agentResult.isOK()){
+                logger.error("补款拒绝失败");
+                throw new MessageException("补款拒绝失败！");
             }
         } else if ("finish_end".equals(activityName)) {//审批同意
             logger.info("补款审批同意{}{}:", busActRel.getActivId(), oSupplement.getId());
@@ -494,9 +526,13 @@ public class OSupplementServiceImpl implements OSupplementService {
             } catch (Exception e) {
                 throw new MessageException("拒绝审批失败");
             }
-
-
-            //修改订单明细付款状态
+            OSupplement osupplement = oSupplementMapper.selectByPrimaryKey(oSupplement.getId());
+            AgentResult agentResult = orderOffsetService.OffsetArrearsCommit(osupplement.getPayAmount(), OffsetPaytype.DDBK.code, osupplement.getId());
+            if (!agentResult.isOK()){
+                logger.info(agentResult.getMsg());
+                throw new MessageException("补款更新异常！");
+            }
+         /*   //修改订单明细付款状态
             OSupplement supplement = selectOSupplement(oSupplement.getId());
             if (supplement.getPkType().equals(PkType.FQBK.code)) {
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(supplement.getSrcId());
@@ -578,9 +614,9 @@ public class OSupplementServiceImpl implements OSupplementService {
                     BigDecimal residue = new BigDecimal(0);
                     //剩余未结清的金额
                     residue = payAmount.subtract(realPayAmount);
-                /*if (residue.compareTo(oPayMent.getOutstandingAmount()) == 0) {
+                *//*if (residue.compareTo(oPayMent.getOutstandingAmount()) == 0) {
                     return ResultVO.success(null);
-                }*/
+                }*//*
                     List<OPaymentDetail> notCountMap = oPaymentDetailMapper.selectCount(oPaymentDetail.getOrderId(), PamentIdType.ORDER_FKD.code, PaymentStatus.DF.code);
                     //去查询还剩几期待付款
                     BigDecimal count = new BigDecimal(notCountMap.size());
@@ -628,7 +664,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                         }
                     }
                 }
-            }
+            }*/
         }
         return ResultVO.success(null);
     }
@@ -652,7 +688,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         }
         OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
         if (null != oPaymentDetail.getPaymentStatus()) {
-            if (oPaymentDetail.getPaymentStatus().equals(PaymentStatus.DF.code)) {
+            if (oPaymentDetail.getPaymentStatus().equals(PaymentStatus.DF.code) || oPaymentDetail.getPaymentStatus().equals(PaymentStatus.BF.code )|| oPaymentDetail.getPaymentStatus().equals(PaymentStatus.YQ.code)) {
                 return res.success("");
             }
         }
@@ -689,8 +725,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("请填写核款时间");
             throw new MessageException("请填写核款时间");
         }
-        OSupplement oSupplement = new OSupplement();
-        oSupplement.setId(agentVo.getSupplementId());
+        OSupplement oSupplement = selectOSupplement(agentVo.getSupplementId());
         oSupplement.setRealPayAmount(agentVo.getRealPayAmount());
         oSupplement.setCheckTime(agentVo.getCheckTime());
         oSupplement.setCheckPeople(String.valueOf(userId));
@@ -727,6 +762,23 @@ public class OSupplementServiceImpl implements OSupplementService {
             return new OPayment();
         }
         return oPayments.get(0);
+    }
+
+    @Override
+    public List<OPaymentDetail> selectCount(String orderId, String code) {
+      return   oPaymentDetailMapper.selectCount(orderId,code, null);
+    }
+
+    @Override
+    public List<OPayDetail> selectOpayDetail(OPaymentDetail oPaymentDetail) {
+        if(null!=oPaymentDetail){
+            if (oPaymentDetail.getPayType().equals(PaymentType.TK.code) || oPaymentDetail.getPayType().equals(PaymentType.GZ.code)){
+                return  orderOffsetService.OffsetArrearsQuery(QueryType.SRCID.code,oPaymentDetail.getSrcId());
+            }else if (oPaymentDetail.getPayAmount().compareTo(BigDecimal.ZERO)>0){
+                return  orderOffsetService.OffsetArrearsQuery(QueryType.ARRID.code,oPaymentDetail.getId());
+            }
+        }
+        return new ArrayList<>();
     }
 
 }

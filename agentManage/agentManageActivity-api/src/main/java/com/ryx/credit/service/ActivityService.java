@@ -1,6 +1,7 @@
 package com.ryx.credit.service;
 
 import com.ryx.credit.common.exception.ProcessException;
+import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 
@@ -19,6 +20,8 @@ import java.util.Map;
 
 public interface ActivityService {
     void createTable();
+
+    ProcessEngine getProcessEngine();
 
     String createDeloyFlow(String deployName, String workId, String activity_path, String activity_image_path,Map<String,Object> map)throws ProcessException;
 

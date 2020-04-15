@@ -797,7 +797,7 @@
     <if test="reqMap.approveTimeEnd != null and reqMap.approveTimeEnd != '' " >
       and to_char(b.approve_time,'yyyy-MM-dd') &lt;= #{reqMap.approveTimeEnd}
     </if>
-    <if test="reqMap.busStatus != null" >
+    <if test="reqMap.busStatus != null and reqMap.busStatus != '' " >
       and b.bus_status = #{reqMap.busStatus}
     </if>
     and b.status = #{reqMap.status}
@@ -1276,6 +1276,9 @@ union
           <if test="map.posPlatCode !=null and map.posPlatCode != ''">
             and POS_PLAT_CODE = #{map.posPlatCode}
           </if>
+          <if test="map.busNum !=null and map.busNum != ''">
+            and BUS_NUM = #{map.busNum}
+          </if>
   </select>
 
 
@@ -1325,6 +1328,117 @@ union
     <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0"> and 1=-1 </if>
     order by b.c_time desc
   </sql>
+
+
+  <select id="queyrBusInfoByBusNumAndPlatformType" parameterType="map" resultType="map">
+    select
+      B.AGENT_ID,
+      A.AG_NAME,
+      B.BUS_NUM,
+      B.BUS_PLATFORM,
+      C.PLATFORM_TYPE,
+      c.BUSPLATFORM,
+      o1.NAME as DISTRICT,
+      o2.NAME as PRO
+    from a_agent_businfo b
+    left join a_agent a on  a.id=b.agent_id and a.status=1
+    left join a_platform c on c.platform_num=b.bus_platform and c.status=1
+    left join C_ORGANIZATION o1 on o1.id = b.AG_DOC_DISTRICT
+    left join C_ORGANIZATION o2 on o2.id = b.AG_DOC_PRO
+    where a.status=1
+      and a.ag_status='Approved'
+      and b.status=1 and
+      b.clo_review_status=3
+      and b.bus_status in (0,1,2,3)
+      and c.platform_type=#{platformType}
+      and b.bus_num is not NULL
+      <if test="busNum!=null and busNum!=''">and b.bus_num=#{busNum}</if>
+  </select>
+  <!--为业务系统提供批量查询接口-->
+  <select id="queyrBusInfoByBusNumAndPlatformTypePage" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+      select
+      B.AGENT_ID,
+      A.AG_NAME,
+      B.BUS_NUM,
+      B.BUS_PLATFORM,
+      C.PLATFORM_TYPE,
+      c.BUSPLATFORM,
+      o1.NAME as DISTRICT,
+      o2.NAME as PRO
+      from a_agent_businfo b
+      left join a_agent a on  a.id=b.agent_id and a.status=1
+      left join a_platform c on c.platform_num=b.bus_platform and c.status=1
+      where a.status=1 and a.ag_status='Approved' and b.status=1 and b.clo_review_status=3 and b.bus_status in (0,1,2,3)
+      left join C_ORGANIZATION o1 on o1.id = b.AG_DOC_DISTRICT
+      left join C_ORGANIZATION o2 on o2.id = b.AG_DOC_PRO
+      and c.platform_type=#{platformType} and b.bus_num is not NULL
+      <if test="busNum!=null and busNum!=''">and b.bus_num=#{busNum}</if>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+  <!--为业务系统提供批量查询接口-->
+  <select id="queyrBusInfoByBusNumAndPlatformTypePageCount" parameterType="map" resultType="int">
+    select
+    count(b.id)
+    from a_agent_businfo b
+    left join a_agent a on  a.id=b.agent_id and a.status=1
+    left join a_platform c on c.platform_num=b.bus_platform and c.status=1
+    where a.status=1 and a.ag_status='Approved' and b.status=1 and b.clo_review_status=3 and b.bus_status in (0,1,2,3)
+    and c.platform_type=#{platformType} and b.bus_num is not NULL
+    <if test="busNum!=null and busNum!=''">and b.bus_num=#{busNum}</if>
+  </select>
+
+  <select id="queryByBusInfo" parameterType="map" resultType="map">
+    select
+      b.id,
+      b.agent_id,
+      a.ag_name,
+      b.bus_num,
+      b.bus_login_num,
+      p.platform_name,
+      p.busplatform
+    from a_agent_businfo b
+      left join a_agent a on a.id=b.agent_id and a.status=1
+      left join a_platform p on p.platform_num=b.bus_platform and p.status=1
+    where
+      b.status=1 and a.status=1 and b.clo_review_status=3 and a.ag_status='Approved'
+      and b.bus_status in ('0','1','2')
+      and b.agent_id=#{agentId}
+      and b.bus_num is not null
+      and b.bus_login_num is not null
+      <if test="platformTypes == null">and 1=-1</if>
+      and p.platform_type in
+      <foreach collection="platformTypes" open="(" separator="," close=")" item="platformType">
+           #{platformType}
+      </foreach>
+  </select>
+
+  <select id="selectBusNumByBusProCode" parameterType="map" resultType="string" >
+    SELECT
+      b.bus_num as busNum
+    FROM
+      a_agent_businfo b
+      LEFT JOIN a_platform p ON b.bus_platform = p.platform_num
+      LEFT JOIN c_BRANCH_INNER bi ON bi.branch_login = b.ag_doc_pro
+      WHERE 1=1
+      AND b.status=1
+      AND b.bus_status = '1'
+      AND b.CLO_REVIEW_STATUS = '3'
+      AND b.ag_doc_pro IS NOT NULL
+      AND b.bus_num IS NOT NULL
+      AND bi.branch_login = #{branchLogin}
+      AND p.platform_type IN
+      <foreach collection="platformTypes" open="(" separator="," close=")" item="platformType">
+        #{platformType}
+      </foreach>
+      GROUP BY b.bus_num
+  </select>
+    <select id="queryRegionByAccount" resultType="map" parameterType="map">
+        SELECT cbi.INNER_LOGIN,c.NAME as department,c.ADDRESS as region
+        FROM C_BRANCH_INNER CBI
+                 left join c_organization c on c.id = CBI.BRANCH_LOGIN
+        WHERE CBI.STATUS = 1 and INNER_LOGIN = #{account}
+    </select>
   <select id="queryTreeByBusInfoAndDict" parameterType="map" resultType="map">
     select
     A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,A.AG_DOC_PRO,

@@ -440,14 +440,17 @@
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
     org.ORG_NICK,
+    d.CUSTOM_STAGING,
+    nvl((select sum(o_payment_detail.pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id
+    and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1, 3) and o_payment_detail.status = '1'), 0)
+    +  nvl((select sum(o_payment_detail.pay_amount-o_payment_detail.real_pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
+    and o_payment_detail.payment_status in (2) and o_payment_detail.status = '1'),0) as qk,
     nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3) and o_payment_detail.status = '1' ),0) as qk,
-    nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm') and o_payment_detail.status = '1'),0) as byqk,
+    FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1, 3, 5)
+    and to_char(plan_pay_time, 'mm') = to_char(sysdate, 'mm') and o_payment_detail.status = '1'), 0)
+    + nvl((select sum(o_payment_detail.pay_amount-o_payment_detail.real_pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id
+    and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (2)
+    and to_char(plan_pay_time, 'mm') = to_char(sysdate, 'mm') and o_payment_detail.status = '1'),0) as byqk,
     (
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
@@ -559,14 +562,17 @@
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
     org.ORG_NICK,
+    d.CUSTOM_STAGING,
+    nvl((select sum(o_payment_detail.pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id
+    and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1, 3) and o_payment_detail.status = '1'), 0)
+    +  nvl((select sum(o_payment_detail.pay_amount-o_payment_detail.real_pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
+    and o_payment_detail.payment_status in (2) and o_payment_detail.status = '1'),0) as qk,
     nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3) and o_payment_detail.status = '1' ),0) as qk,
-    nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm') and o_payment_detail.status = '1'),0) as byqk,
+    FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1, 3, 5)
+    and to_char(plan_pay_time, 'mm') = to_char(sysdate, 'mm') and o_payment_detail.status = '1'), 0)
+    + nvl((select sum(o_payment_detail.pay_amount-o_payment_detail.real_pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id
+    and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (2)
+    and to_char(plan_pay_time, 'mm') = to_char(sysdate, 'mm') and o_payment_detail.status = '1'),0) as byqk,
     (
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
@@ -685,14 +691,16 @@
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
+    nvl((select sum(o_payment_detail.pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id
+    and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1, 3) and o_payment_detail.status = '1'), 0)
+    +  nvl((select sum(o_payment_detail.pay_amount-o_payment_detail.real_pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
+    and o_payment_detail.payment_status in (2) and o_payment_detail.status = '1'),0) as qk,
     nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3) and o_payment_detail.status = '1' ),0) as qk,
-    nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm') and o_payment_detail.status = '1'),0) as byqk,
+    FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1, 3, 5)
+    and to_char(plan_pay_time, 'mm') = to_char(sysdate, 'mm') and o_payment_detail.status = '1'), 0)
+    + nvl((select sum(o_payment_detail.pay_amount-o_payment_detail.real_pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id
+    and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (2)
+    and to_char(plan_pay_time, 'mm') = to_char(sysdate, 'mm') and o_payment_detail.status = '1'),0) as byqk,
     (
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
@@ -741,6 +749,7 @@
         where os.order_id = o.id and soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
+      <if test="platformType!=null and platformType!=''"> and c.platform_type = #{platformType} </if>
       <if test="platfromPerm!=null and platfromPerm.size>0">
         and o.order_platform in
         <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
@@ -782,14 +791,16 @@
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
     o.user_id as user_id,
+    nvl((select sum(o_payment_detail.pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id
+    and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1, 3) and o_payment_detail.status = '1'), 0)
+    +  nvl((select sum(o_payment_detail.pay_amount-o_payment_detail.real_pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
+    and o_payment_detail.payment_status in (2) and o_payment_detail.status = '1'),0) as qk,
     nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3) and o_payment_detail.status = '1' ),0) as qk,
-    nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm') and o_payment_detail.status = '1'),0) as byqk,
+    FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1, 3, 5)
+    and to_char(plan_pay_time, 'mm') = to_char(sysdate, 'mm') and o_payment_detail.status = '1'), 0)
+    + nvl((select sum(o_payment_detail.pay_amount-o_payment_detail.real_pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id
+    and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (2)
+    and to_char(plan_pay_time, 'mm') = to_char(sysdate, 'mm') and o_payment_detail.status = '1'),0) as byqk,
     (
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
@@ -859,6 +870,7 @@
   <select id="queryAllOrderListView" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
     select
+    dict.D_ITEMNAME,
     d.PAY_METHOD,
     o.O_INURETIME,
     o.id,
@@ -889,14 +901,17 @@
     f.name as ag_doc_district_name,
     g.name as ag_doc_pro_name,
     org.ORG_NICK,
+    d.CUSTOM_STAGING,
+    nvl((select sum(o_payment_detail.pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id
+    and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1, 3) and o_payment_detail.status = '1'), 0)
+    +  nvl((select sum(o_payment_detail.pay_amount-o_payment_detail.real_pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
+    and o_payment_detail.payment_status in (2) and o_payment_detail.status = '1'),0) as qk,
     nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.payment_status in (1,3) and o_payment_detail.status = '1' ),0) as qk,
-    nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm') and o_payment_detail.status = '1'),0) as byqk,
+    FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1, 3, 5)
+    and to_char(plan_pay_time, 'mm') = to_char(sysdate, 'mm') and o_payment_detail.status = '1'), 0)
+    + nvl((select sum(o_payment_detail.pay_amount-o_payment_detail.real_pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id
+    and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (2)
+    and to_char(plan_pay_time, 'mm') = to_char(sysdate, 'mm') and o_payment_detail.status = '1'),0) as byqk,
     (nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
@@ -923,6 +938,7 @@
     left join c_organization f on f.id = e.ag_doc_district
     left join c_organization g on g.id = e.ag_doc_pro
     left join o_organization org on e.ORGAN_NUM = org.ORG_ID
+    left join d_dict dict on dict.d_itemvalue = c.platform_type AND dict.d_group = 'ORDER' AND dict.d_artifact = 'PLATFROM_TYPE' AND dict.d_status=1
  <where>
       <if test="1==1"> and  o.status = 1 and  b.STATUS=1 and e.STATUS=1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
@@ -933,6 +949,7 @@
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
+      <if test="platformType!=null and platformType!=''"> and c.platform_type = #{platformType} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
       <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformList!=null and platformList.size > 0">
@@ -1025,14 +1042,16 @@
     o.user_id as user_id,
     f.name as ag_doc_district_name,
     g.name as ag_doc_pro_name,
+    nvl((select sum(o_payment_detail.pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id
+    and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1, 3) and o_payment_detail.status = '1'), 0)
+    +  nvl((select sum(o_payment_detail.pay_amount-o_payment_detail.real_pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
+    and o_payment_detail.payment_status in (2) and o_payment_detail.status = '1'),0) as qk,
     nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.payment_status in (1,3) and o_payment_detail.status = '1' ),0) as qk,
-    nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id
-    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm') and o_payment_detail.status = '1'),0) as byqk,
+    FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (1, 3, 5)
+    and to_char(plan_pay_time, 'mm') = to_char(sysdate, 'mm') and o_payment_detail.status = '1'), 0)
+    + nvl((select sum(o_payment_detail.pay_amount-o_payment_detail.real_pay_amount) FROM o_payment_detail WHERE o_payment_detail.payment_id = d.id
+    and o_payment_detail.order_id = o.id and o_payment_detail.payment_status in (2)
+    and to_char(plan_pay_time, 'mm') = to_char(sysdate, 'mm') and o_payment_detail.status = '1'),0) as byqk,
     (nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
@@ -1069,6 +1088,7 @@
       <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
       <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
+      <if test="platformType!=null and platformType!=''"> and c.platform_type = #{platformType} </if>
       <if test="platformList!=null and platformList.size > 0">
         and c.PLATFORM_NUM
         <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
@@ -1197,12 +1217,14 @@
   <select id="excelOrder" parameterType="map" resultMap="OrderoutVo">
     (
     select
+    dict.D_ITEMNAME as platformType,
     o.c_time as apytime,
     o.o_num as num,o.O_INURETIME,
     b.ag_uniq_num,
     aab.bus_num,
     c.platform_name,
     b.ag_name,
+    oorganization.ORG_NICK as orgName,
     nvl((
       select LISTAGG(o_sub_order.pro_code,',') WITHIN GROUP (ORDER BY o_sub_order.order_id)
       from o_sub_order
@@ -1336,6 +1358,7 @@
     nvl((
       select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
+    nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num)from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as toPlanNum,
     o.review_status,
     to_char(o.o_inuretime,'yyyy-MM-dd hh24:mi:ss') as oinuretime,
     orging.name as ag_doc_district,
@@ -1355,6 +1378,8 @@
     left join o_payment d on d.order_id = o.id and d.status=1
     left join c_organization org on org.id = aab.ag_doc_pro
     left join c_organization orging on orging.id = aab.ag_doc_district
+    left join o_organization oorganization on aab.ORGAN_NUM = oorganization.ORG_ID
+    left join d_dict dict on dict.d_itemvalue = c.platform_type AND dict.d_group = 'ORDER' AND dict.d_artifact = 'PLATFROM_TYPE' AND dict.d_status=1
     <where>
       <if test="1==1"> and o.status = 1 and b.status = 1 and aab.status = 1 </if>
       <if test="nuclearUser!=null and nuclearUser!=''"> and d.nuclear_user = #{nuclearUser} </if>
@@ -1367,6 +1392,7 @@
       <if test="agName!=null and agName!=''"> and b.ag_name like CONCAT(CONCAT('%',#{agName}),'%')  </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
       <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
+      <if test="platformType!=null and platformType!=''"> and c.platform_type = #{platformType} </if>
       <if test="platformList!=null and platformList.size > 0">
         and c.PLATFORM_NUM
         <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
@@ -1888,14 +1914,17 @@
      select count(1) from
     (
     select
-    to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as tm,businfo.agent_id,businfo.bus_platform,sum(o_payment_detail.pay_amount) as jjqk
-    ,businfo.bus_num
+    to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as tm,businfo.agent_id,businfo.bus_platform,
+    sum(case when o_payment_detail.payment_status in(1,3) then o_payment_detail.pay_amount else 0 end)+
+    sum(case when o_payment_detail.payment_status =2 then o_payment_detail.pay_amount-o_payment_detail.real_pay_amount else 0 end)
+    jjqk,businfo.bus_num
     from o_payment_detail o_payment_detail
     left join o_payment op on o_payment_detail.payment_id=op.id
     left join o_order o on o.id=op.order_id
     left join a_agent_businfo businfo on businfo.id=o.bus_id
-    where o_payment_detail.status=1 and o.status=1 and op.status=1
-    and  o_payment_detail.payment_status in (1,3) and  businfo.agent_id is not null
+    where o_payment_detail.status=1 and o.status=1 and op.status=1   and  o_payment_detail.payment_status in (1,2,3)
+    and  businfo.agent_id is not null
+    and order_status=2 and review_status=3
     and payment_type = 'ORDER_FKD'
     <include refid="ARREARAGE_WHERE_SQL"/>
     group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),businfo.agent_id,businfo.bus_platform ,businfo.bus_num
@@ -1910,14 +1939,17 @@
     select a.*,a_platform.platform_name,agent.ag_name,agent.AG_UNIQ_NUM from
     (
     select
-    to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as tm,businfo.agent_id,businfo.bus_platform,sum(o_payment_detail.pay_amount) as jjqk
-    ,businfo.bus_num
+    to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as tm,businfo.agent_id,businfo.bus_platform,
+    sum(case when o_payment_detail.payment_status in(1,3) then o_payment_detail.pay_amount else 0 end)+
+    sum(case when o_payment_detail.payment_status =2 then o_payment_detail.pay_amount-o_payment_detail.real_pay_amount else 0 end)
+    jjqk,
+    businfo.bus_num
     from o_payment_detail o_payment_detail
     left join o_payment op on o_payment_detail.payment_id=op.id
     left join o_order o on o.id=op.order_id
     left join a_agent_businfo businfo on businfo.id=o.bus_id
-    where o_payment_detail.status=1 and o.status=1 and op.status=1
-     and  o_payment_detail.payment_status in (1,3) and  businfo.agent_id is not null
+    where 1=1 and o_payment_detail.status=1 and o.status=1 and op.status=1   and  o_payment_detail.payment_status in (1,2,3)
+    and  businfo.agent_id is not null and order_status=2 and review_status=3
      and payment_type = 'ORDER_FKD'
     <include refid="ARREARAGE_WHERE_SQL"/>
     group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),businfo.agent_id,businfo.bus_platform ,businfo.bus_num
@@ -1953,22 +1985,24 @@
         select
         to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as omonth,
         o_payment_detail.order_id as oId,
-        sum(o_payment_detail.pay_amount) as qiankuan
+        sum(case when o_payment_detail.payment_status in(1,3) then o_payment_detail.pay_amount else 0 end)+
+        sum(case when o_payment_detail.payment_status =2 then o_payment_detail.pay_amount-o_payment_detail.real_pay_amount else 0 end)
+        qiankuan
         from
         o_payment_detail
-        where 1=1
+        where 1=1 and o_payment_detail.status=1
          <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
-        and  o_payment_detail.payment_status in (1,3)
+        and  o_payment_detail.payment_status in (1,2,3)
         group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id
       ) a
       left join o_order on o_order.id=a.oId
       left join o_payment on o_payment.order_id=a.oId
       left join a_agent_businfo on o_order.bus_id=a_agent_businfo.id
       left join a_platform on a_agent_businfo.bus_platform=a_platform.platform_num
-      where 1=1
+      where a_agent_businfo.status=1 and o_order.status=1 and o_order.order_status=2 and o_order.review_status=3 and o_payment.status=1
       <if test="busPlatform!=null and busPlatform!=''"> and a_agent_businfo.bus_platform=#{busPlatform} </if>
       <if test="agentId !=null and agentId !='' ">
-        and  a_agent_businfo.agent_id =#{agentId}
+        and  o_order.agent_id =#{agentId}
       </if>
       <if test="busNum !=null and busNum !='' ">
        and  a_agent_businfo.bus_num =#{busNum}
@@ -1983,19 +2017,24 @@
     select
     to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as omonth,
     o_payment_detail.order_id as oId,
-    sum(o_payment_detail.pay_amount) as qiankuan
+    o_payment_detail.payment_status,
+    sum(case when o_payment_detail.payment_status in(1,2,3) then o_payment_detail.pay_amount else 0 end)
+    qiankuan,
+    nvl( sum(case when o_payment_detail.payment_status in(1,2,3) then o_payment_detail.REAL_PAY_AMOUNT else 0 end),0)realPayAmount,
+    nvl(sum(case when o_payment_detail.payment_status in(1,2,3) then o_payment_detail.pay_amount else 0 end)
+    -sum(o_payment_detail.REAL_PAY_AMOUNT),0)repay
     from
     o_payment_detail
     where 1=1
     <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
-    and  o_payment_detail.payment_status in (1,3)
-    group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id
+    and  o_payment_detail.payment_status in (1,2,3) and o_payment_detail.status=1
+    group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id,o_payment_detail.payment_status
     ) a
     left join o_order on o_order.id=a.oId
     left join o_payment on o_payment.order_id=a.oId
     left join a_agent_businfo on o_order.bus_id=a_agent_businfo.id
     left join a_platform on a_agent_businfo.bus_platform=a_platform.platform_num
-    where 1=1
+    where 1=1  and o_order.status=1 and o_payment.status=1 and o_order.REVIEW_STATUS=3
     <if test="busPlatform!=null and busPlatform!=''"> and a_agent_businfo.bus_platform=#{busPlatform} </if>
     <if test="agentId !=null and agentId !='' ">
       and  a_agent_businfo.agent_id =#{agentId}
@@ -2010,25 +2049,30 @@
     <include refid="PAGING_START" />
     select
     a.omonth,a_agent_businfo.agent_id,o_order.id as oid,a_agent_businfo.bus_num,a_agent_businfo.bus_platform,o_payment.pay_amount,o_payment.real_amount,o_payment.outstanding_amount,
-    o_payment.down_payment,a.qiankuan,o_payment.pay_method,
+    o_payment.down_payment,a.qiankuan,o_payment.pay_method, o_order.order_status,a.payment_status,a.realPayAmount,a.repay,
     a_platform.platform_name from
     (
     select
     to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as omonth,
     o_payment_detail.order_id as oId,
-    sum(o_payment_detail.pay_amount) as qiankuan
+    o_payment_detail.payment_status,
+    sum(case when o_payment_detail.payment_status in(1,2,3) then o_payment_detail.pay_amount else 0 end)
+    qiankuan,
+    nvl( sum(case when o_payment_detail.payment_status in(1,2,3) then o_payment_detail.REAL_PAY_AMOUNT else 0 end),0)realPayAmount,
+    nvl(sum(case when o_payment_detail.payment_status in(1,2,3) then o_payment_detail.pay_amount else 0 end)
+    -sum(o_payment_detail.REAL_PAY_AMOUNT),0)repay
     from
     o_payment_detail
     where 1=1
     <if test="time!=null and time!=''"> and to_char(o_payment_detail.plan_pay_time,'yyyy-mm')=#{time} </if>
-    and  o_payment_detail.payment_status in (1,3)
-    group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id
+    and  o_payment_detail.payment_status in (1,2,3) and o_payment_detail.status=1
+    group by to_char(o_payment_detail.plan_pay_time,'yyyy-mm'),o_payment_detail.order_id ,o_payment_detail.payment_status
     ) a
     left join o_order on o_order.id=a.oId
     left join o_payment on o_payment.order_id=a.oId
     left join a_agent_businfo on o_order.bus_id=a_agent_businfo.id
     left join a_platform on a_agent_businfo.bus_platform=a_platform.platform_num
-    where 1=1
+    where 1=1 and o_order.status=1 and o_payment.status=1 and o_order.REVIEW_STATUS=3
     <if test="busPlatform!=null and busPlatform!=''"> and a_agent_businfo.bus_platform=#{busPlatform} </if>
     <if test="agentId !=null and agentId !='' ">
       and  a_agent_businfo.agent_id =#{agentId}
