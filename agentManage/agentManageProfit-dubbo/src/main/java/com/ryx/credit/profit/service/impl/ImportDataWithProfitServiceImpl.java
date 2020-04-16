@@ -129,6 +129,9 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
             return "数据导入失败,请确认导入数据的完整性";
         }
 
+
+        importDataWithProfitMapper.deleteProfitDataByBatchCode(batchCode);//插入数据之前先删除已存在的数据
+
         //插入数据
         int numOfSheets = data.getNumberOfSheets();
         Executor executor = new ThreadPoolExecutor(numOfSheets, numOfSheets,
@@ -518,7 +521,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
                         data.put("agentName",value);
                         break;
                     case 2:
-                        data.put("month",value);
+                        data.put("month",log.getMonth());
                         break;
                     case 3:
                         data.put("brandCode",value);
