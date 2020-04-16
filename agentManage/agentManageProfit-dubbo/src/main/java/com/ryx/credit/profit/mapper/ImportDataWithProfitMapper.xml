@@ -887,40 +887,40 @@
 
 
 
-  <insert id="insertProfitData" parameterType="java.util.Map" >
+  <insert id="insertProfitData" parameterType="java.util.List" >
     insert into P_IMPORT_DATA_WITH_PROFIT  (
       <include refid="Base_Column_List"/>
     )
     <foreach collection="profitDatas" item="item" index="index" separator="UNION ALL">
-      SELECT #{item.id},
-             #{item.agentId},
-             #{item.agentName},
-             #{item.month},
-             #{item.busNum},
-             #{item.busCode},
-             #{item.brandCode},
-             #{item.importType},
-             #{item.sheetName},
-             #{item.sheetColumn},
-             #{item.uploadUser},
-             #{item.uploadTime},
-             #{item.sheetOrder},
-             #{item.rowOrder},
-             #{item.f7},
-      #{item.f8}, #{item.f9}, #{item.f10}, #{item.f11},
-      #{item.f12}, #{item.f13}, #{item.f14}, #{item.f15},
-      #{item.f16}, #{item.f17}, #{item.f18}, #{item.f19},
-      #{item.f20}, #{item.f21}, #{item.f22}, #{item.f23},
-      #{item.f24}, #{item.f25}, #{item.f26}, #{item.f27},
-      #{item.f28}, #{item.f29}, #{item.f30}, #{item.f31},
-      #{item.f32}, #{item.f33}, #{item.f34}, #{item.f35},
-      #{item.f36}, #{item.f37}, #{item.f38}, #{item.f39},
-      #{item.f40}, #{item.f41}, #{item.f42}, #{item.f43},
-      #{item.f44}, #{item.f45}, #{item.f46}, #{item.f47},
-      #{item.f48}, #{item.f49}, #{item.f50}, #{item.f51},
-      #{item.f52}, #{item.f53}, #{item.f54}, #{item.f55},
-      #{item.f56}, #{item.f57}, #{item.f58}, #{item.f59},
-      #{item.f60}
+      SELECT #{item.id,jdbcType=VARCHAR},
+             #{item.month,jdbcType=VARCHAR},
+             #{item.agentId,jdbcType=VARCHAR},
+             #{item.agentName,jdbcType=VARCHAR},
+             #{item.busNum,jdbcType=VARCHAR},
+             #{item.busCode,jdbcType=VARCHAR},
+             #{item.brandCode,jdbcType=VARCHAR},
+             #{item.importType,jdbcType=VARCHAR},
+             #{item.sheetName,jdbcType=VARCHAR},
+             #{item.sheetColumn,jdbcType=DECIMAL},
+             #{item.uploadUser,jdbcType=VARCHAR},
+             #{item.uploadTime,jdbcType=VARCHAR},
+             #{item.sheetOrder,jdbcType=DECIMAL},
+             #{item.rowOrder,jdbcType=DECIMAL},
+             #{item.f7,jdbcType=VARCHAR},
+      #{item.f8,jdbcType=VARCHAR}, #{item.f9,jdbcType=VARCHAR}, #{item.f10,jdbcType=VARCHAR}, #{item.f11,jdbcType=VARCHAR},
+      #{item.f12,jdbcType=VARCHAR}, #{item.f13,jdbcType=VARCHAR}, #{item.f14,jdbcType=VARCHAR}, #{item.f15,jdbcType=VARCHAR},
+      #{item.f16,jdbcType=VARCHAR}, #{item.f17,jdbcType=VARCHAR}, #{item.f18,jdbcType=VARCHAR}, #{item.f19,jdbcType=VARCHAR},
+      #{item.f20,jdbcType=VARCHAR}, #{item.f21,jdbcType=VARCHAR}, #{item.f22,jdbcType=VARCHAR}, #{item.f23,jdbcType=VARCHAR},
+      #{item.f24,jdbcType=VARCHAR}, #{item.f25,jdbcType=VARCHAR}, #{item.f26,jdbcType=VARCHAR}, #{item.f27,jdbcType=VARCHAR},
+      #{item.f28,jdbcType=VARCHAR}, #{item.f29,jdbcType=VARCHAR}, #{item.f30,jdbcType=VARCHAR}, #{item.f31,jdbcType=VARCHAR},
+      #{item.f32,jdbcType=VARCHAR}, #{item.f33,jdbcType=VARCHAR}, #{item.f34,jdbcType=VARCHAR}, #{item.f35,jdbcType=VARCHAR},
+      #{item.f36,jdbcType=VARCHAR}, #{item.f37,jdbcType=VARCHAR}, #{item.f38,jdbcType=VARCHAR}, #{item.f39,jdbcType=VARCHAR},
+      #{item.f40,jdbcType=VARCHAR}, #{item.f41,jdbcType=VARCHAR}, #{item.f42,jdbcType=VARCHAR}, #{item.f43,jdbcType=VARCHAR},
+      #{item.f44,jdbcType=VARCHAR}, #{item.f45,jdbcType=VARCHAR}, #{item.f46,jdbcType=VARCHAR}, #{item.f47,jdbcType=VARCHAR},
+      #{item.f48,jdbcType=VARCHAR}, #{item.f49,jdbcType=VARCHAR}, #{item.f50,jdbcType=VARCHAR}, #{item.f51,jdbcType=VARCHAR},
+      #{item.f52,jdbcType=VARCHAR}, #{item.f53,jdbcType=VARCHAR}, #{item.f54,jdbcType=VARCHAR}, #{item.f55,jdbcType=VARCHAR},
+      #{item.f56,jdbcType=VARCHAR}, #{item.f57,jdbcType=VARCHAR}, #{item.f58,jdbcType=VARCHAR}, #{item.f59,jdbcType=VARCHAR},
+      #{item.f60,jdbcType=VARCHAR}
       FROM dual
     </foreach>
   </insert>
@@ -935,7 +935,7 @@
                 )
   </delete>
 
-  <select id="checkDataAll" parameterType="java.util.Map" resultType="java.util.Map">
+  <select id="checkDataAll" parameterType="java.util.List" resultType="java.util.Map">
     select * from (
       <foreach collection="datas" item="item" index="index" separator="UNION ALL">
         SELECT  #{item.agentId} as AGENT_ID,#{item.busCode} as BUS_PLATFORM,#{item.rowNum} as ROW_NUM,#{item.sheetName} as SHEET_NAME
@@ -951,7 +951,7 @@
                     FROM dual
                  </foreach>)
             MINUS
-            select AGENT_ID,,BUS_PLATFORM
+            select AGENT_ID,BUS_PLATFORM
             from A_AGENT_BUSINFO
            )bb
     where aa.AGENT_ID=bb.AGENT_ID and aa.BUS_PLATFORM=bb.BUS_PLATFORM)

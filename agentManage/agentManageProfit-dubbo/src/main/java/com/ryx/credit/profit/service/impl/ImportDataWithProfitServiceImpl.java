@@ -4,7 +4,6 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ImportDataWithProfitLogMapper;
 import com.ryx.credit.profit.dao.ImportDataWithProfitMapper;
-import com.ryx.credit.profit.pojo.ImportDataWithProfit;
 import com.ryx.credit.profit.pojo.ImportDataWithProfitExample;
 import com.ryx.credit.profit.pojo.ImportDataWithProfitLog;
 import com.ryx.credit.profit.pojo.ImportDataWithProfitLogExample;
@@ -13,7 +12,6 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,14 +119,14 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
         if ("Error".equals(resultMap.get("resultCode"))){    //存在异常数据，生成备注更新导入结果
             String errMsg = resultMap.get("errMsg");
             importDataWithProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1",errMsg);
-            return "数据导入失败";
+            return "数据导入失败,请检查导入文件";
         }
         //2.校验代理商信息
         resultMap = checkAgentData(data,log.getMonth());
         if ("Error".equals(resultMap.get("resultCode"))){    //存在异常数据，生成备注更新导入结果
             String errMsg = resultMap.get("errMsg");
             importDataWithProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1",errMsg);
-            return "数据导入失败";
+            return "数据导入失败,请确认导入数据的完整性";
         }
 
         //插入数据
@@ -191,7 +189,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
         //数据导入成功
         importDataWithProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"0","");
 
-        return null;
+        return "数据导入成功";
     }
 
 
@@ -231,6 +229,12 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
 
             //1.判断表头
             Row title = sheet.getRow(0);//表头
+
+            if (title == null){
+                errMsg.append(sheetName+"页为空sheet页！\n");
+                continue;
+            }
+
             if (title.getLastCellNum()!=title.getPhysicalNumberOfCells()){  //表头有空单元格
                 errMsg.append(sheetName+"页表头有空格！\n");
             }
@@ -311,7 +315,10 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
 
         int sheetsNum = data.getNumberOfSheets();
         List<Map<String, String>> errorDatas = new ArrayList<Map<String, String>>(); //问题数据
+        boolean isTooLong = false;
         for (int i = 0; i < sheetsNum; i++) {
+            if (isTooLong)
+                break;
             Sheet sheet = data.getSheetAt(i);
             String sheetName = sheet.getSheetName();
             List<Map<String,String>> mapList= new ArrayList<Map<String, String>>();//单sheet页数据
@@ -320,6 +327,8 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
             List<Map<String, String>> errorSheetData;
 
             for (int rowNum = 1; rowNum < rowsNum; rowNum++) {
+                if (isTooLong)
+                    break;
                 /*Row firstRow = sheet.getRow(0);
                 int cellsNum = firstRow.getPhysicalNumberOfCells();//列数*/
                 Row row = sheet.getRow(rowNum);
@@ -327,7 +336,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
                 String agentId = getCellValue(agentIdCell);
                 Cell brandCell = row.getCell(3);//品牌码
                 String busCode = getCellValue(brandCell);
-                Cell monthCell = row.getCell(3);//月份
+                Cell monthCell = row.getCell(2);//月份
                 String month = getCellValue(monthCell);
                 if (!month.equals(logMonth)){
                     errMsg.append(sheetName+"页,第"+(rowNum+1)+"行的月份与上传月份不匹配。\n");
@@ -341,6 +350,10 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
                 map.put("sheetName",sheetName);
 
                 mapList.add(map);
+
+                if (errMsg.length()>1200)
+                    isTooLong = true;
+
             }
 
             errorSheetData = checkDataAll(mapList);
@@ -350,7 +363,8 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
         if (errorDatas.size()>0){
 
             for (int i = 0; i < errorDatas.size(); i++) {
-
+                if (isTooLong)
+                    break;
                 Map<String, String> errData = errorDatas.get(i);
                 String agentId = errData.get("AGENT_ID");
                 String busPlatform = errData.get("BUS_PLATFORM");

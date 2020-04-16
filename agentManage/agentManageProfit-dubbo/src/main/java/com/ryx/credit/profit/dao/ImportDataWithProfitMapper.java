@@ -25,11 +25,11 @@ public interface ImportDataWithProfitMapper {
 
     int updateByPrimaryKey(ImportDataWithProfit record);
 
-    int insertProfitData(List<Map<String, Object>> profitDatas);
+    int insertProfitData(@Param("profitDatas")List<Map<String, Object>> profitDatas);
 
     int deleteProfitDataByBatchCode(String batchCode);
 
-    List<Map<String,String>> checkDataAll(List<Map<String,String>> datas);
+    List<Map<String,String>> checkDataAll(@Param("datas") List<Map<String,String>> datas);
 
     List<Map<String,Object>> getDistinctDayBackList(@Param("param") Map<String,Object> param, @Param("page")Page page);
 
