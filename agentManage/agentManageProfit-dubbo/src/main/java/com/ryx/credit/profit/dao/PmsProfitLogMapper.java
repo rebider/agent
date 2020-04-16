@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.dao;
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.profit.pojo.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -27,5 +28,9 @@ public interface PmsProfitLogMapper {
 
     Map<String,Object> getLoginName(@Param("userId")  String userId );
     int  save(PmsProfit record);
+
+    List<Map<String,Object>> selectByMap(@Param("param")Map<String,String>param,@Param("page") Page page);
+
+    long getCountByMap(@Param("param")Map<String,String>param);
 
 }

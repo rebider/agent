@@ -1004,15 +1004,13 @@
         select a.SHEET_ORDER from P_IMPORT_DATA_WITH_PROFIT  a
         left join A_AGENT_BUSINFO ab on a.AGENT_ID = ab.AGENT_ID
         where 1=1
-        <choose>
-          <when test="param.agentId != '' and param.agentId != null">
-            and a.AGENT_ID = #{param.agentId}
-          </when>
-          <when test="param.agDoc != '' and param.agDoc != null">
-             and (ab.AG_DOC_PRO in ( select id from C_ORGANIZATION where PID = #{param.agDoc} )
-            or ab.AG_DOC_PRO = #{param.agDoc})
-          </when>
-        </choose>
+        <if test="param.agentId != '' and param.agentId != null">
+          and a.AGENT_ID = #{param.agentId}
+        </if>
+      <if test="param.agDoc != '' and param.agDoc != null">
+        and (ab.AG_DOC_PRO in ( select id from C_ORGANIZATION where PID = #{param.agDoc} )
+        or ab.AG_DOC_PRO = #{param.agDoc})
+      </if>
         <if test="param.agentName != '' and param.agentName != null">
           and a.AGENT_NAME = #{param.agentName}
         </if>
