@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -295,58 +296,59 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
      */
     @Override
     public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws Exception {
-
-        //封装参数
-        String currentAgencyId = refundPriceDiffDetailList.get(0).getAgentId();
+        //String retString = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.checkActivity"), httpString);
         String taskId = refundPriceDiffDetailList.get(0).getRefundPriceDiffId();
         List<Map<String, Object>> reqList = new ArrayList<>();
         for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
 
             //判断机构编不能为空
-            if (null == refundPriceDiffDetail.getOldOrgId() || "".equals(refundPriceDiffDetail.getOldOrgId())) return AgentResult.fail("请输入正确的机构编码");
-            if (null == refundPriceDiffDetail.getNewOrgId() || "".equals(refundPriceDiffDetail.getNewOrgId())) return AgentResult.fail("请输入正确的机构编码");
+            if (null == refundPriceDiffDetail.getOldOrgId() || "".equals(refundPriceDiffDetail.getOldOrgId()))
+                return AgentResult.fail("请输入正确的机构编码");
+            if (null == refundPriceDiffDetail.getNewOrgId() || "".equals(refundPriceDiffDetail.getNewOrgId()))
+                return AgentResult.fail("请输入正确的机构编码");
+            if (!refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId()))
+                return AgentResult.fail("瑞大宝平台暂不支持跨机构换活动，请输入相同的机构编码！");
 
-            Map<String, Object> reqMap = new HashMap<>();
             //查询，新旧活动代码
             OActivity oldActivity = orderActivityService.findById(refundPriceDiffDetail.getActivityFrontId());
             OActivity newActivity = orderActivityService.findById(refundPriceDiffDetail.getActivityRealId());
-            //增加判断品牌是不是同一个
-            /*if (!(newActivity.getBusProCode().substring(0, newActivity.getBusProCode().indexOf("-")).equals(oldActivity.getBusProCode().substring(0, oldActivity.getBusProCode().indexOf("-"))))) {
-                return AgentResult.fail("品牌不同不能更换活动，请选择相同品牌的活动！");
-            }*/
-            reqMap.put("terminalNoStart", refundPriceDiffDetail.getBeginSn());
-            reqMap.put("terminalNoEnd", refundPriceDiffDetail.getEndSn());
-            reqMap.put("terminalPolicyId", newActivity.getBusProCode());
-            reqMap.put("oldTerminalPolicyId", oldActivity.getBusProCode());
-            reqMap.put("currentBranchId", refundPriceDiffDetail.getOldOrgId().substring(refundPriceDiffDetail.getOldOrgId().length()-8));
-            reqMap.put("currentAgencyId", refundPriceDiffDetail.getOldOrgId());
+            Map<String, Object> reqMap = new HashMap<>();
+            reqMap.put("newOrgId", refundPriceDiffDetail.getNewOrgId());
+            reqMap.put("posSnBegin", refundPriceDiffDetail.getBeginSn());
+            reqMap.put("posSnEnd", refundPriceDiffDetail.getEndSn());
+            reqMap.put("serialNumber", refundPriceDiffDetail.getId());
+            reqMap.put("oldOrgId", refundPriceDiffDetail.getOldOrgId());
+            reqMap.put("newMachineId", newActivity.getBusProCode());
+            reqMap.put("oldMachineId", oldActivity.getBusProCode());
+            reqMap.put("branchId", refundPriceDiffDetail.getOldOrgId().substring(refundPriceDiffDetail.getOldOrgId().length()-8));
+            reqMap.put("inBoundDate", DateUtil.format(refundPriceDiffDetail.getsTime(),"yyyyMMdd"));
             reqList.add(reqMap);
         }
 
         try {
             String httpString = JSONObject.toJSONString(FastMap.fastMap("taskId", taskId)
-                    .putKeyV("needCheck", !"adjust".equals(operation))//如果是调整不传递true
-                    .putKeyV("terminalNos", reqList));
-            logger.info("RDB换活动查询参数:{}", httpString);
+                    .putKeyV("operation", operation)
+                    .putKeyV("snList", reqList)
+                    .putKeyV("isFreeze", isFreeze));
 
-            //查询是否可以更换活动
-            String retString = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.checkActivity"), httpString);
-            logger.info("RDB换活动查询返回值:{}", retString);
+            logger.info("瑞大宝换活动查询参数:{},{}", AppConfig.getProperty("rdbpos.batchModifyTermPolicy"), httpString);
+            String retString = HttpClientUtil.doPostJson(AppConfig.getProperty("rdbpos.batchModifyTermPolicy"), httpString);
+            logger.info("瑞大宝换活动查询返回值:{}", retString);
 
             //验证返回值
-            if (!StringUtils.isNotBlank(retString)) return AgentResult.fail("RDB查询换活动接口，返回值为空。");
+            if (!StringUtils.isNotBlank(retString)) return AgentResult.fail("瑞大宝查询换活动接口，返回值为空。");
             JSONObject resJson = JSONObject.parseObject(retString);
 
             //返回最终查询结果
             if (null != resJson.getString("code") && resJson.getString("code").equals("0000")) {
                 //可以更换活动，封装参参数返回
-                return  AgentResult.ok(resJson.get("result"));
+                return AgentResult.ok(resJson.get("result"));
             } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
                 //不可以更换活动
                 return AgentResult.fail(resJson.getString("msg") + "，不可以更换活动！");
             } else {
                 //异常结果
-                return AgentResult.fail("查询RDB换活动返回值异常！");
+                return AgentResult.fail("查询瑞大宝换活动返回值异常！");
             }
         } catch (Exception e) {
             e.printStackTrace();

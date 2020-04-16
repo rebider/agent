@@ -460,7 +460,7 @@ public class CompensateServiceImpl implements CompensateService {
     }
 
     /**
-     * 活动更换保存退补差价明细
+     * 活动调整保存退补差价明细
      * @param oRefundPriceDiff
      * @param refundPriceDiffDetailList
      * @param cUser
@@ -757,7 +757,13 @@ public class CompensateServiceImpl implements CompensateService {
                 if(!synOrVerifyResult.isOK()){
                     throw new ProcessException(synOrVerifyResult.getMsg());
                 }
-
+            }catch (Exception e) {
+                log.info("换活动冻结异常:{}", e.getMessage());
+                e.printStackTrace();
+                throw new ProcessException(e.getMessage());
+            }
+            //业务系统锁定完成，后续异常问题需解锁业务系统锁定的SN
+            try {
                 String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
                 if (PlatformType.whetherPOS(platformType)) {
                     JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
@@ -923,7 +929,7 @@ public class CompensateServiceImpl implements CompensateService {
 
             }catch (Exception e) {
                 termMachineService.unFreezeCompensate(FastMap.fastMap("taskId", refundPriceDiffDetailList.get(0).getRefundPriceDiffId()), refundPriceDiffDetailList.get(0).getPlatformType());
-                log.info("换活动冻结异常:{}", e.getMessage());
+                log.info("换活动解冻异常:{}", e.getMessage());
                 e.printStackTrace();
                 throw new ProcessException(e.getMessage());
             }
@@ -1487,7 +1493,7 @@ public class CompensateServiceImpl implements CompensateService {
     }*/
 
     /**
-     * 手动处理
+     * 手动处理联动失败的补差价明细
      * @param id
      * @throws Exception
      */

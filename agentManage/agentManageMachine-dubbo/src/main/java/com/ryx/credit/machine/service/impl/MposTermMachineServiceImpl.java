@@ -280,7 +280,6 @@ public class MposTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws Exception {
-        //封装参数
         String taskId = refundPriceDiffDetailList.get(0).getRefundPriceDiffId();
         List<Map<String, Object>> reqList = new ArrayList<>();
         for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
@@ -318,7 +317,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
 
         try {
             String httpString = JSONObject.toJSONString(FastMap.fastMap("taskId", taskId)
-                    .putKeyV("operation", operation)//如果是调整不传递true
+                    .putKeyV("operation", operation)
                     .putKeyV("snList", reqList)
                     .putKeyV("isFreeze", isFreeze));
 
