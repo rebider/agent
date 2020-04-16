@@ -618,4 +618,9 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
         return AgentResult.ok();
     }
+
+    @Override
+    public AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        return AgentResult.fail("实时POS未实现！");
+    }
 }

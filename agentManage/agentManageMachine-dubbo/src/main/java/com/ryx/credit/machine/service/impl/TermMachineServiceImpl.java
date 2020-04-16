@@ -313,4 +313,20 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return AgentResult.ok();
         }
     }
+
+    @Override
+    public AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        logger.info("活动调整，重新发送失败的SN：{},{}", pamMap, platformType);
+        if (PlatformType.whetherPOS(platformType)) {
+            return posTermMachineServiceImpl.resendFailedCompensate(pamMap, platformType);
+        } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
+            return sPosTermMachineServiceImpl.resendFailedCompensate(pamMap, platformType);
+        } else if (PlatformType.MPOS.getValue().equals(platformType)) {
+            return mposTermMachineServiceImpl.resendFailedCompensate(pamMap, platformType);
+        } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
+            return rdbTermMachineServiceImpl.resendFailedCompensate(pamMap, platformType);
+        } else {
+            return AgentResult.fail("平台有误，请再次发送！");
+        }
+    }
 }
