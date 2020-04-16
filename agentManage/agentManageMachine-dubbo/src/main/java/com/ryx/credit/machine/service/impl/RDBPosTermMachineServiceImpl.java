@@ -503,7 +503,31 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
-        return AgentResult.ok();
+        try {
+            String httpString = JSONObject.toJSONString(pamMap);
+            logger.info("瑞大宝换活动解锁参数:{},{}", AppConfig.getProperty("mpos.termUnlock"), httpString);
+            String retString = HttpClientUtil.doPostJson(AppConfig.getProperty("mpos.termUnlock"), httpString);
+            logger.info("瑞大宝换活动解锁返回值:{}", retString);
+
+            //验证返回值
+            if (!StringUtils.isNotBlank(retString)) return AgentResult.fail("瑞大宝解锁换活动接口，返回值为空。");
+            JSONObject resJson = JSONObject.parseObject(retString);
+
+            //返回最终查询结果
+            if (null != resJson.getString("code") && resJson.getString("code").equals("0000")) {
+                //可以更换活动，封装参参数返回
+                return AgentResult.ok(resJson.get("result"));
+            } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
+                //不可以更换活动
+                return AgentResult.fail(resJson.getString("msg") + "，解锁失败");
+            } else {
+                //异常结果
+                return AgentResult.fail("瑞大宝手刷换活动返回值异常！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
