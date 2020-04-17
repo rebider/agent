@@ -296,15 +296,17 @@ select aa.ID,aa.AG_NAME,bb.BUS_PLATFORM,cc.PLATFORM_NAME  from A_AGENT aa,A_AGEN
 
   <select id="selectByMap" resultType="java.util.Map">
     <include refid="OracleDialectPrefix"/>
-    <include refid="selectRedord_unionSql"/>
+    <include refid="selectRecord_unionSql"/>
     <include refid="OracleDialectSuffix"/>
   </select>
 
-  <sql id="selectRedord_unionSql">
+  <sql id="selectRecord_unionSql">
     select * from (
       select
       pr.BATCH_NO BATCH_NO,pr.UPLOAD_PATH UPLOAD_PATH,pr.UPLOAD_NAME UPLOAD_NAME,pr.UPLOAD_TIME UPLOAD_TIME,
-      pr.STATUS STATUS,pr.NOTE NOTE,pr.MONTH AMT_MONTH,cu.NAME USER_NAME ,'00' as IMPORT_TYPE
+      pr.STATUS STATUS,pr.NOTE NOTE,pr.MONTH AMT_MONTH,cu.NAME USER_NAME ,
+      case when pr.IMPORT_TYPE is null  then '00'
+      else pr.IMPORT_TYPE end as IMPORT_TYPE
       from PMS_PROFIT_LOG pr
       left join C_USER cu on pr.UPLOAD_USER=cu.ID
       where 1 = 1
@@ -356,7 +358,7 @@ select aa.ID,aa.AG_NAME,bb.BUS_PLATFORM,cc.PLATFORM_NAME  from A_AGENT aa,A_AGEN
 
   <select id="getCountByMap" resultType="java.lang.Long">
     select count(1) from(
-    <include refid="selectRedord_unionSql"/>
+    <include refid="selectRecord_unionSql"/>
     )
   </select>
 
