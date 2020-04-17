@@ -34,6 +34,7 @@ public class RefundTaskExecutionListener  extends BaseTaskListener implements Ta
 
     @Override
     public void notify(DelegateExecution delegateExecution) throws Exception {
+        logger.info("线上订单退货监听执行，{}，{}，{}", delegateExecution.getProcessInstanceId(),delegateExecution.getEventName(),delegateExecution.getId());
         String eventName = delegateExecution.getEventName();
         if ("start".equals(eventName)) {
             logger.info("start=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
