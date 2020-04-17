@@ -1,5 +1,6 @@
 package com.ryx.credit.pojo.admin.vo;
 
+import com.ryx.credit.pojo.admin.agent.Attachment;
 import com.ryx.credit.pojo.admin.order.OrderAdjAccount;
 
 import java.io.Serializable;
@@ -8,13 +9,23 @@ import java.util.Date;
 import java.util.List;
 
 public class OrderAdjAccountVo extends OrderAdjAccount implements Serializable {
-    private List<String> accountFile;
+    private String accountFile;
 
-    public List<String> getAccountFile() {
+    private List<Attachment> attachments;
+
+    public String getAccountFile() {
         return accountFile;
     }
 
-    public void setAccountFile(List<String> accountFile) {
+    public void setAccountFile(String accountFile) {
         this.accountFile = accountFile;
+    }
+
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
     }
 }

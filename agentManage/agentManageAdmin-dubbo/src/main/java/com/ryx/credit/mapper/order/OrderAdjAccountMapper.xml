@@ -32,6 +32,7 @@
     <result column="REFUND_STAT" jdbcType="DECIMAL" property="refundStat" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="ACCOUNTFILE" jdbcType="VARCHAR" property="accountFile"/>
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -275,20 +276,53 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-  <select id="selectListByExample" resultMap="BaseResultVoMap">
-    <include refid="OracleDialectPrefix" />
+  <select id="selectListByExample" resultMap="BaseResultVoMap" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjAccount">
     select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from O_ORDER_ADJ_ACCOUNT
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
-    <include refid="OracleDialectSuffix" />
+    ac.* ,
+    (select  LISTAGG(ar.src_id,',') WITHIN GROUP(ORDER BY ar.src_id)
+    from A_ATTACHMENT_REL ar where ar.SRC_ID = ac.ID )  as accountFile
+    from O_ORDER_ADJ_ACCOUNT ac left join A_ATTACHMENT_REL ar on ar.SRC_ID = ac.ID
+    <where>
+      <if test="adjId != null">
+       and ac.ADJ_ID = #{adjId,jdbcType=VARCHAR}
+      </if>
+      <if test="orderId != null">
+        and ac.ORDER_ID = #{orderId,jdbcType=VARCHAR}
+      </if>
+      <if test="type != null">
+        and ac.TYPE = #{type,jdbcType=DECIMAL}
+      </if>
+      <if test="refundAccount != null">
+        and ac.REFUND_ACCOUNT = #{refundAccount,jdbcType=VARCHAR}
+      </if>
+      <if test="accountName != null">
+        and ac.ACCOUNT_NAME = #{accountName,jdbcType=VARCHAR}
+      </if>
+      <if test="accountBank != null">
+        and ac.ACCOUNT_BANK = #{accountBank,jdbcType=VARCHAR}
+      </if>
+      <if test="branchLineNum != null">
+        and ac.BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR}
+      </if>
+      <if test="allLineNum != null">
+        and ac.ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR}
+      </if>
+      <if test="refundAmo != null">
+        and ac.REFUND_AMO = #{refundAmo,jdbcType=DECIMAL}
+      </if>
+      <if test="refundTm != null">
+        and ac.REFUND_TM = #{refundTm,jdbcType=TIMESTAMP}
+      </if>
+      <if test="refundStat != null">
+        and ac.REFUND_STAT = #{refundStat,jdbcType=DECIMAL}
+      </if>
+      <if test="status != null">
+        and ac.STATUS = #{status,jdbcType=DECIMAL}
+      </if>
+      <if test="version != null">
+        and VERSION = #{version,jdbcType=DECIMAL}
+      </if>
+    </where>
+    order by ac.id desc
   </select>
 </mapper>

@@ -23,5 +23,5 @@ public interface OrderAdjAccountMapper {
 
     int updateByPrimaryKey(OrderAdjAccount record);
 
-    List<OrderAdjAccountVo> selectListByExample(OrderAdjAccountExample example);
+    List<OrderAdjAccountVo> selectListByExample(OrderAdjAccount record);
 }
