@@ -2,6 +2,7 @@ package com.ryx.credit.dao.order;
 
 import com.ryx.credit.pojo.admin.order.OrderAdjAccount;
 import com.ryx.credit.pojo.admin.order.OrderAdjAccountExample;
+import com.ryx.credit.pojo.admin.vo.OrderAdjAccountVo;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface OrderAdjAccountMapper {
     int updateByPrimaryKeySelective(OrderAdjAccount record);
 
     int updateByPrimaryKey(OrderAdjAccount record);
+
+    List<OrderAdjAccountVo> selectListByExample(OrderAdjAccountExample example);
 }

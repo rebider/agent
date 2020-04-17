@@ -17,6 +17,22 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
   </resultMap>
+  <resultMap id="BaseResultVoMap" type="com.ryx.credit.pojo.admin.vo.OrderAdjAccountVo">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="ADJ_ID" jdbcType="VARCHAR" property="adjId" />
+    <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+    <result column="TYPE" jdbcType="DECIMAL" property="type" />
+    <result column="REFUND_ACCOUNT" jdbcType="VARCHAR" property="refundAccount" />
+    <result column="ACCOUNT_NAME" jdbcType="VARCHAR" property="accountName" />
+    <result column="ACCOUNT_BANK" jdbcType="VARCHAR" property="accountBank" />
+    <result column="BRANCH_LINE_NUM" jdbcType="VARCHAR" property="branchLineNum" />
+    <result column="ALL_LINE_NUM" jdbcType="VARCHAR" property="allLineNum" />
+    <result column="REFUND_AMO" jdbcType="DECIMAL" property="refundAmo" />
+    <result column="REFUND_TM" jdbcType="TIMESTAMP" property="refundTm" />
+    <result column="REFUND_STAT" jdbcType="DECIMAL" property="refundStat" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+  </resultMap>
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -187,7 +203,7 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjAccount">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjAccount">
     update O_ORDER_ADJ_ACCOUNT
     <set>
       <if test="adjId != null">
@@ -259,4 +275,20 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="selectListByExample" resultMap="BaseResultVoMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_ORDER_ADJ_ACCOUNT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
 </mapper>

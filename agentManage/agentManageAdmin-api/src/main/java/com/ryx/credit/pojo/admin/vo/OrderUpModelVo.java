@@ -43,7 +43,7 @@ public class OrderUpModelVo implements Serializable {
     private String settleAmount;
     private List<String> customStagingUser;//自定义分期数据
     private String customStaging;
-    private List<OrderAdjAccount> accounts;
+    private List<OrderAdjAccountVo> accounts;
 
     public String getSid() {
         return sid;
@@ -243,11 +243,11 @@ public class OrderUpModelVo implements Serializable {
         this.customStaging = customStaging;
     }
 
-    public List<OrderAdjAccount> getAccounts() {
+    public List<OrderAdjAccountVo> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(List<OrderAdjAccount> accounts) {
+    public void setAccounts(List<OrderAdjAccountVo> accounts) {
         this.accounts = accounts;
     }
 }

@@ -106,6 +106,8 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
     private OrderOffsetService orderOffsetService;
     @Autowired
     private OrderAdjAccountMapper orderAdjAccountMapper;
+    @Autowired
+    private AgentQueryService agentQueryService;
 
     @Override
     public AgentResult refreshPaymentDetail(String orderId) {
@@ -260,36 +262,49 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 }
             });
         }
-        List<String> accountFiles = orderUpModelVo.getFiles();
-        AttachmentRel recordAccountAtt = new AttachmentRel();
-        if (accountFiles.size()>0){
-            attFiles.forEach(attfile->{
-                recordAccountAtt.setAttId(attfile);
-                recordAccountAtt.setSrcId(orderAdj.getId());
+
+        for (OrderAdjAccountVo adjAccount:orderUpModelVo.getAccounts()){
+            OrderAdjAccount account = new OrderAdjAccount();
+            account.setId(idService.genId(TabId.O_ORDER_ADJ_ACCOUNT));
+            account.setAdjId(orderAdj.getId());
+            account.setOrderId(orderAdj.getOrderId());
+            account.setType(adjAccount.getType());
+            account.setRefundAccount(adjAccount.getRefundAccount());
+            account.setAccountName(adjAccount.getAccountName());
+            account.setAccountBank(adjAccount.getAccountBank());
+            account.setBranchLineNum(adjAccount.getBranchLineNum());
+            account.setAllLineNum(adjAccount.getAllLineNum());
+            account.setRefundAmo(BigDecimal.ZERO);
+            account.setRefundStat(RefundStat.UNREFUND.key);
+            account.setStatus(Status.STATUS_1.status);
+            account.setVersion(Status.STATUS_1.status);
+            if (1 !=orderAdjAccountMapper.insert(account) ){
+                logger.info("订单调整:{}", "保存账户信息失败");
+                throw new ProcessException("保存账户信息失败");
+            }
+
+            List<String> accountFile = adjAccount.getAccountFile();
+            for (String str:accountFile){
+                AttachmentRel recordAccountAtt = new AttachmentRel();
+                recordAccountAtt.setAttId(str);
+                recordAccountAtt.setSrcId(account.getId());
                 recordAccountAtt.setcUser(orderAdj.getAdjUserId());
                 recordAccountAtt.setcTime(orderAdj.getAdjTm());
                 recordAccountAtt.setStatus(Status.STATUS_1.status);
                 recordAccountAtt.setBusType(AttachmentRelType.orderAdjustDk.name());
                 recordAccountAtt.setId(idService.genId(TabId.a_attachment_rel));
-                logger.info("添加订单调整附件关系,订单调整ID{},打款附件ID{}",orderAdj.getId(),attfile);
+                logger.info("添加订单调整附件关系,订单调整ID{},打款附件ID{}",orderAdj.getId(),str);
                 if (1 != attachmentRelMapper.insertSelective(recordAccountAtt)) {
                     logger.info("订单调整:{}", "添加订单调整打款附件关系失败");
                     throw new ProcessException("添加订单调整打款附件关系失败");
                 }
-            });
+            }
+
         }
 
-        for (OrderAdjAccount adjAccount:orderUpModelVo.getAccounts()){
-            OrderAdjAccount account = new OrderAdjAccount();
-            account.setId(idService.genId(TabId.O_ORDER_ADJ_ACCOUNT));
-            account.setAdjId(orderUpModelVo.getId());
-            account.setOrderId(orderUpModelVo.getOrderId());
-            account.setType(adjAccount.getType());
-            account.setAccountName(adjAccount.getAccountName());
-            account.setAccountBank(adjAccount.getAccountBank());
-            account.setBranchLineNum(adjAccount.getBranchLineNum());
-//            orderAdjAccountMapper.insert();
-        }
+        List<OrderAdjAccountVo> orderAdjAccountVos = orderUpModelVo.getAccounts();
+
+
 
         List<String> data = orderUpModelVo.getCustomStagingUser();
 
@@ -571,8 +586,14 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 Arrears = Arrears.add(oPaymentDetail.getPayAmount());
             }
             res.putKeyV("arrears",Arrears);
+            //查找账户信息
+            OrderAdjAccountExample orderAdjAccountExample = new OrderAdjAccountExample();
+            orderAdjAccountExample.or().andAdjIdEqualTo(orderAdj.getId())
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andOrderIdEqualTo(orderAdj.getOrderId());
 
-
+            List<OrderAdjAccount> orderAdjAccounts = orderAdjAccountMapper.selectByExample(orderAdjAccountExample);
+            res.putKeyV("accounts",orderAdjAccounts);
 
             OPaymentExample oPaymentExample = new OPaymentExample();
             oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdEqualTo(orderAdj.getOrderId());
