@@ -19,6 +19,8 @@ public interface IdService {
 
     public String genOrganizationId(TabId tablename,Integer userid);
 
+    public String genJoKeyManageId(TabId tablename,Integer userid);
+
     String genInternetOffset();
 
 }

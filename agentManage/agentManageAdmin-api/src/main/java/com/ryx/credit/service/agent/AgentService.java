@@ -65,6 +65,8 @@ public interface AgentService {
 
     PageInfo queryAgentTierList(Page page, Agent agent, Long userId,String dataType);
 
+    PageInfo queryAgentTierList(Page page, Agent agent, Long userId,String dataType,Map otherMap);
+
     /**
      * 代理商解冻
      * @param agentId

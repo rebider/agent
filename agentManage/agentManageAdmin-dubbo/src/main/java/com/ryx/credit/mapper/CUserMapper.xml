@@ -114,7 +114,15 @@
     </sql>
 
 	<select id="selectbyName" resultType="com.ryx.credit.pojo.admin.vo.UserVo" parameterType="java.lang.String">
-		select * from C_USER where name = #{name} and rownum = 1
+		select
+		    id,
+		    login_name as loginName,
+		    name, password, salt, sex, age, phone,
+		    user_type as userType,  status,
+		    organization_id as organizationId,
+		    create_time as createTime,
+		    user_email as userEmail
+		from C_USER where name = #{name} and rownum = 1
 	</select>
 
     <select id="selectOrganizationCodeById" resultType="map" parameterType="java.lang.Long">
