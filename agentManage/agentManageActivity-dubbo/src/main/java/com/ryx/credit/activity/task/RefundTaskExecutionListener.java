@@ -44,12 +44,12 @@ public class RefundTaskExecutionListener  extends BaseTaskListener implements Ta
             IOrderReturnService orderReturnService = (IOrderReturnService) MySpringContextHandler.applicationContext.getBean("orderReturnService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
-                logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName);
+                logger.info("=========RefundTaskExecutionListener 流程 {} eventName {} res {}", delegateExecution.getProcessInstanceId(), eventName);
                 orderReturnService.approvalReject(delegateExecution.getProcessInstanceId(),activityName);
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-                logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName);
+                logger.info("=========RefundTaskExecutionListener 流程 {} eventName {} res {}", delegateExecution.getProcessInstanceId(), eventName);
                 orderReturnService.approvalFinish(delegateExecution.getProcessInstanceId(),activityName);
             }
         } else if ("take".equals(eventName)) {
