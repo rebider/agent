@@ -747,9 +747,13 @@ public class CompensateServiceImpl implements CompensateService {
                 setOldOrgId.add(refundPriceDiffDetail.getOldOrgId());
             });
 
-            if(setPlatform.size()>1){
-                log.info("申请sn所属平台必须一致：{}", setPlatform);
-                throw new ProcessException("申请sn所属平台必须一致");
+            if (setPlatform.size() > 1) {
+                setPlatform.forEach(setPlatformType->{
+                    if (!(PlatformType.whetherPOS(setPlatformType) || setPlatformType.equals(PlatformType.SSPOS.code))) {
+                        log.info("申请sn所属平台必须一致：{}", setPlatform);
+                        throw new ProcessException("申请sn所属平台必须一致");
+                    }
+                });
             }
 
             if(setOldOrgId.size() > 1){
