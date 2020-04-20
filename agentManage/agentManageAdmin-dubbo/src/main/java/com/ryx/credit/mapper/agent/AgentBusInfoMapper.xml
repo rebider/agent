@@ -1463,4 +1463,14 @@ union
       and a.clo_review_status IN (2,3)
     </where>
   </select>
+
+
+  <select id="queryBusInfoType" parameterType="map" resultType="map">
+    select
+    ab.id, ab.agent_id, ab.bus_num, ab.bus_platform, ab.bus_type
+    from a_agent_businfo ab
+    left join a_platform p on p.platform_num = ab.bus_platform
+    where p.status = '1' and ab.status = '1' and ab.clo_review_status = '3' and ab.bus_status = '1'
+    and ab.bus_num = #{busNum} and p.platform_type = #{platformType}
+  </select>
 </mapper>

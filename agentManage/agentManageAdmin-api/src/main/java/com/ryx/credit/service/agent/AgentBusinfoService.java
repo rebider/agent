@@ -98,6 +98,8 @@ public interface AgentBusinfoService {
 
     AgentBusInfo selectBusInfo(String busNum);
 
+    Map<String, Object> queryBusInfoType(String busNum, String platformType);
+
     List<AgentBusInfo> selectExistsById(String id);
 
     /**
