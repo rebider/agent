@@ -233,7 +233,11 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
         try {
             templateRecode.setAgentId(map1.get("agentId"));
             templateRecode.setAgentName(map1.get("agentName"));
-            templateRecode.setBusPlatform(map1.get("busPlatform"));
+            if(map1.get("busPlatform")==null||"".equals(String.valueOf(map1.get("busPlatform")))){
+                throw new MessageException("业务平台获取为空请刷新页面另关闭多余页面重试一下");
+            }else {
+                templateRecode.setBusPlatform(map1.get("busPlatform"));
+            }
             templateRecode.setBusNum(map1.get("orgId"));
             templateRecode.setCreateUser(map1.get("userId"));
             templateRecode.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
@@ -465,6 +469,7 @@ public class TemplateRecordServiceImpl implements ITemplateRecodeService {
     public Map<String, Object> getTemplateApplyDetail(String recordId) throws MessageException {
         JSONObject map = new JSONObject();
         map.put("applyId", recordId);
+        map.put("viewType", '2');//撤销的的详情查看
         String result = null;
         try {
             result = HttpClientUtil.doPostJson(TEMPLATE_APPLY_DETAIL, map.toJSONString());
