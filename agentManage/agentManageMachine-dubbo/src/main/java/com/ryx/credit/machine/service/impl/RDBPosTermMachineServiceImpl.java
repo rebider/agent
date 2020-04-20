@@ -296,7 +296,6 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
      */
     @Override
     public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws Exception {
-        //String retString = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.checkActivity"), httpString);
         String taskId = refundPriceDiffDetailList.get(0).getRefundPriceDiffId();
         List<Map<String, Object>> reqList = new ArrayList<>();
         for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
@@ -320,7 +319,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
             reqMap.put("oldOrgId", refundPriceDiffDetail.getOldOrgId());
             reqMap.put("newMachineId", newActivity.getBusProCode());
             reqMap.put("oldMachineId", oldActivity.getBusProCode());
-            reqMap.put("branchId", refundPriceDiffDetail.getOldOrgId().substring(refundPriceDiffDetail.getOldOrgId().length()-8));
+            reqMap.put("branchId", refundPriceDiffDetail.getOldOrgId().substring(refundPriceDiffDetail.getOldOrgId().length() - 8));
             reqMap.put("inBoundDate", DateUtil.format(refundPriceDiffDetail.getsTime(),"yyyyMMdd"));
             reqList.add(reqMap);
         }
@@ -345,7 +344,11 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
                 return AgentResult.ok(resJson.get("result"));
             } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
                 //不可以更换活动
-                return AgentResult.fail(resJson.getString("msg") + "，不可以更换活动！");
+                JSONArray resultArr = resJson.getJSONArray("result");
+                String reason = resultArr.getJSONObject(0).getString("reason");
+                String snBegin = resultArr.getJSONObject(0).getString("posSnBegin");
+                String sEnd = resultArr.getJSONObject(0).getString("posSnEnd");
+                return AgentResult.fail(snBegin + "-" + sEnd + ":" + reason + "，不可以更换活动！");
             } else {
                 //异常结果
                 return AgentResult.fail("查询瑞大宝换活动返回值异常！");
@@ -505,8 +508,8 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
         try {
             String httpString = JSONObject.toJSONString(pamMap);
-            logger.info("瑞大宝换活动解锁参数:{},{}", AppConfig.getProperty("mpos.termUnlock"), httpString);
-            String retString = HttpClientUtil.doPostJson(AppConfig.getProperty("mpos.termUnlock"), httpString);
+            logger.info("瑞大宝换活动解锁参数:{},{}", AppConfig.getProperty("rdbpos.unLockTerm"), httpString);
+            String retString = HttpClientUtil.doPostJson(AppConfig.getProperty("rdbpos.unLockTerm"), httpString);
             logger.info("瑞大宝换活动解锁返回值:{}", retString);
 
             //验证返回值
