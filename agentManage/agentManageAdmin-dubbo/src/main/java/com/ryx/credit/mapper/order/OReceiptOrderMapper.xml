@@ -480,7 +480,7 @@
       select LISTAGG(re.approval_opinion,';') WITHIN GROUP(ORDER BY rel.activ_id)
       from a_bus_act_rel rel
       left join a_approval_flow_record re on re.execution_id = rel.activ_id and rel.status = '1' and re.status = '1'
-      where rel.bus_id = R.ORDER_ID and rel.bus_type = 'ORDER' and re.status = '1' and rel.status = '1'
+      where rel.bus_id = ro.order_id and rel.bus_type = 'ORDER' and re.status = '1' and rel.status = '1'
       <if test="par.approvalOpinion!=null and par.approvalOpinion.size>0">
         and re.approval_person in
         <foreach collection="par.approvalOpinion" item="approvalOpinionItem" open="(" separator="," close=")">
