@@ -226,7 +226,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     try {
                         Map<String, Object> mapSn = disposeSN(Interval.get("SN_BEGIN_NUM").toString(), Interval.get("SN_END_NUM").toString());
                         if (snStart.equals(mapSn.get("sb"))) {
-                            if ((Integer.valueOf(String.valueOf(querySame))>=(Integer.valueOf((String) mapSn.get("snBeginNum1")))) && (Integer.valueOf(String.valueOf(querySame))<=(Integer.valueOf((String) mapSn.get("snEndNum1"))))) {
+                            if ((Integer.valueOf(String.valueOf(querySame)) >= (Integer.valueOf((String) mapSn.get("snBeginNum1")))) && (Integer.valueOf(String.valueOf(querySame)) <= (Integer.valueOf((String) mapSn.get("snEndNum1"))))) {
                                 stringList.add(String.valueOf(Interval.get("ID")));
                             }
                         }
@@ -237,7 +237,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
             }
             if (stringList.size() > 0) {
-                log.info("本次查询的SN集合区间集合为："+stringList);
+                log.info("本次查询的SN集合区间集合为：" + stringList);
                 reqMap.put("intervalList", stringList);
             }
         }
@@ -350,6 +350,22 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             if (StringUtils.isBlank(terminalTransfer.getPlatformType())) {
                 throw new MessageException("终端划拨，平台类型不能为空");
             }
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(terminalTransfer.getPlatformType());
+            if (agentBusInfo == null) {
+                throw new MessageException("审批流启动失败:业务信息不存在");
+            }
+            if (agentBusInfo.getAgDocPro() == null||"".equals(agentBusInfo.getAgDocPro())) {
+                throw new MessageException("终端划拨，审批流向不完整，缺少大区省区");
+            }
+            if (agentBusInfo.getAgDocDistrict() == null||"".equals(agentBusInfo.getAgDocDistrict())) {
+                throw new MessageException("终端划拨，审批流向不完整，缺少大区省区");
+            }
+            if (agentBusInfo.getBusNum() == null||"".equals(agentBusInfo.getBusNum())) {
+                throw new MessageException("终端划拨，审批流向不完整，缺少平台码");
+            }
+            if (agentBusInfo.getBusPlatform() == null||"".equals(agentBusInfo.getBusPlatform())) {
+                throw new MessageException("终端划拨，审批流向不完整，平台为空");
+            }
 
             //业务编码智慧pos业务码的处理
             terminalTransferDetailList = judgeStartsWithS(terminalTransferDetailList);
@@ -358,6 +374,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
             //判断sn是否重复提交
             repetitionSN(terminalTransferDetailList);
+
 
             terminalTransfer.setReviewStatus(AgStatus.Create.status);
             String terminalTransferId = idService.genId(TabId.O_TERMINAL_TRANSFER);
@@ -510,73 +527,93 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult startTerminalTransferActivity(String id, String cuser, String agentId, Boolean isSave) throws Exception {
-        TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(id);
-        if (terminalTransfer.getStatus().compareTo(new BigDecimal("1")) != 0) {
-            throw new MessageException("本次提交审批信息已经删除");
-        }
-        if (AgStatus.Create.status.compareTo(terminalTransfer.getReviewStatus()) != 0) {
-            throw new MessageException("本次提交审批信息已经提交不需要多次提交");
-        }
-        TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
-        TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
-        criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
-        criteria.andStatusEqualTo(AdjustStatus.WTZ.getValue());
-        List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
-        for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
-            //判断代理商名称
-            Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
-        }
-        //判断上下级
-        judgeSubSup(terminalTransferDetails, agentId);
-
-        //判断sn是否重复提交
-        repetitionSN(terminalTransferDetails);
-        //判断平台是否属于提交平台
-        platformSame(terminalTransferDetails, SaveFlag.TJSP.getValue());
-        if (terminalTransfer == null) {
-            throw new MessageException("提交审批信息有误");
-        }
-        if (!isSave) {
-            terminalTransfer.setuUser(cuser);
-            terminalTransfer.setuTime(new Date());
-            terminalTransfer.setReviewStatus(AgStatus.Approving.status);
-            int i = terminalTransferMapper.updateByPrimaryKeySelective(terminalTransfer);
-            if (i != 1) {
-                throw new MessageException("提交审批处理失败");
+        log.info("终端划拨流提交审批,proIns:{},agStatus:{}", cuser, agentId + "");
+        String retIdentifier = "";
+        try {
+            retIdentifier = redisService.lockWithTimeout(RedisCachKey.TERMINAL_TRANSFER.code + cuser, RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
+            if (StringUtils.isBlank(retIdentifier)) {
+                log.info("已经联动划拨，请勿重复提交,proIns:{}", cuser);
+                throw new MessageException("已经联动划拨，请勿重复提交");
+            }
+            TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(id);
+            if (terminalTransfer.getStatus().compareTo(new BigDecimal("1")) != 0) {
+                throw new MessageException("本次提交审批信息已经删除");
+            }
+            if (AgStatus.Create.status.compareTo(terminalTransfer.getReviewStatus()) != 0) {
+                throw new MessageException("本次提交审批信息已经提交不需要多次提交");
+            }
+            TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
+            TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
+            criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
+            criteria.andStatusEqualTo(AdjustStatus.WTZ.getValue());
+            List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
+            for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
+                //判断代理商名称
+                Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
+            }
+            //判断平台是否属于提交平台
+            platformSame(terminalTransferDetails, SaveFlag.TJSP.getValue());
+            if (terminalTransfer == null) {
+                throw new MessageException("提交审批信息有误");
+            }
+            if (!isSave) {
+                terminalTransfer.setuUser(cuser);
+                terminalTransfer.setuTime(new Date());
+                terminalTransfer.setReviewStatus(AgStatus.Approving.status);
+                int i = terminalTransferMapper.updateByPrimaryKeySelective(terminalTransfer);
+                if (i != 1) {
+                    throw new MessageException("提交审批处理失败");
+                }
+            }
+            //启动审批
+            String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("agentTerminal"), null, null, null);
+            if (proce == null) {
+                log.info("终端划拨提交审批，审批流启动失败{}:{}", id, cuser);
+                throw new MessageException("审批流启动失败!");
+            }
+            //代理商业务和工作流关系
+            BusActRel record = new BusActRel();
+            record.setBusId(id);
+            record.setActivId(proce);
+            record.setcTime(Calendar.getInstance().getTime());
+            record.setcUser(cuser);
+            record.setStatus(Status.STATUS_1.status);
+            record.setBusType(BusActRelBusType.agentTerminal.name());
+            record.setActivStatus(AgStatus.Approving.name());
+            record.setAgentId(agentId);
+            record.setDataShiro(BusActRelBusType.agentTerminal.key);
+            Agent agent = agentMapper.selectByPrimaryKey(agentId);
+            if (null != agent) {
+                record.setAgentName(agent.getAgName());
+            }
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(terminalTransfer.getPlatformType());
+            if (agentBusInfo == null) {
+                throw new MessageException("审批流启动失败:业务信息不存在");
+            }
+            if (agentBusInfo.getAgDocPro() == null || "".equals(agentBusInfo.getAgDocPro())) {
+                throw new MessageException("终端划拨，审批流向不完整，缺少大区省区");
+            }
+            if (agentBusInfo.getAgDocDistrict() == null || "".equals(agentBusInfo.getAgDocDistrict())) {
+                throw new MessageException("终端划拨，审批流向不完整，缺少大区省区");
+            }
+            if (agentBusInfo.getBusNum() == null || "".equals(agentBusInfo.getBusNum())) {
+                throw new MessageException("终端划拨，审批流向不完整，缺少平台码");
+            }
+            if (agentBusInfo.getBusPlatform() == null || "".equals(agentBusInfo.getBusPlatform())) {
+                throw new MessageException("终端划拨，审批流向不完整，平台为空");
+            }
+            record.setAgDocPro(agentBusInfo.getAgDocPro());
+            record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
+            if (1 != busActRelMapper.insertSelective(record)) {
+                log.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
+                throw new MessageException("审批流启动失败:添加审批关系失败");
+            }
+            return AgentResult.ok();
+        } finally {
+            if (StringUtils.isNotBlank(retIdentifier)) {
+                redisService.releaseLock(RedisCachKey.TERMINAL_TRANSFER.code + cuser, retIdentifier);
             }
         }
-        //启动审批
-        String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("agentTerminal"), null, null, null);
-        if (proce == null) {
-            log.info("终端划拨提交审批，审批流启动失败{}:{}", id, cuser);
-            throw new MessageException("审批流启动失败!");
-        }
-        //代理商业务和工作流关系
-        BusActRel record = new BusActRel();
-        record.setBusId(id);
-        record.setActivId(proce);
-        record.setcTime(Calendar.getInstance().getTime());
-        record.setcUser(cuser);
-        record.setStatus(Status.STATUS_1.status);
-        record.setBusType(BusActRelBusType.agentTerminal.name());
-        record.setActivStatus(AgStatus.Approving.name());
-        record.setAgentId(agentId);
-        record.setDataShiro(BusActRelBusType.agentTerminal.key);
-        Agent agent = agentMapper.selectByPrimaryKey(agentId);
-        if (null != agent) {
-            record.setAgentName(agent.getAgName());
-        }
-        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(terminalTransfer.getPlatformType());
-        if (agentBusInfo == null) {
-            throw new MessageException("审批流启动失败:业务信息不存在");
-        }
-        record.setAgDocPro(agentBusInfo.getAgDocPro());
-        record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
-        if (1 != busActRelMapper.insertSelective(record)) {
-            log.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
-            throw new MessageException("审批流启动失败:添加审批关系失败");
-        }
-        return AgentResult.ok();
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
@@ -630,6 +667,11 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         return terminalTransferMapper.agentBase(BUS_NUM);
     }
 
+    @Override
+    public List<Map<String, Object>> queryLowerAgentAll(String bus_num) {
+        return terminalTransferMapper.queryLowerAgentAll(bus_num);
+    }
+
 
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
@@ -637,7 +679,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         log.info("终端划拨流程结束,proIns:{},agStatus:{}", proIns, agStatus + "");
         String retIdentifier = "";
         try {
-            retIdentifier = redisService.lockWithTimeout(RedisCachKey.RENEW_CARD.code + proIns, RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
+            retIdentifier = redisService.lockWithTimeout(RedisCachKey.TERMINAL_TRANSFER.code + proIns, RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
             if (StringUtils.isBlank(retIdentifier)) {
                 log.info("已经联动划拨，请勿重复提交,proIns:{}", proIns);
                 throw new MessageException("已经联动划拨，请勿重复提交");
@@ -685,7 +727,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             return AgentResult.ok();
         } finally {
             if (StringUtils.isNotBlank(retIdentifier)) {
-                redisService.releaseLock(RedisCachKey.RENEW_CARD.code + proIns, retIdentifier);
+                redisService.releaseLock(RedisCachKey.TERMINAL_TRANSFER.code + proIns, retIdentifier);
             }
         }
     }
@@ -779,53 +821,54 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             AgentResult agentResult = null;
             //pos划拨开始查询
             if (terminalTransferDetail.getPlatformType().compareTo(TerminalPlatformType.POS.getValue()) == 0 || terminalTransferDetail.getPlatformType().compareTo(TerminalPlatformType.ZHPOS.getValue()) == 0) {
-                log.info("pos划拨开始查询");
                 try {
+                    log.info("pos划拨开始查询:" + terminalTransferDetail.getId());
                         agentResult = termMachineService.queryTerminalTransferResult(terminalTransferDetail.getId(), terminalTransferDetail.getPlatformType().toString());
                         log.info("POS划拨返回："+JSONObject.toJSONString(agentResult));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    log.info("POS调用远程接口时异常==================："+JSONObject.toJSONString(terminalTransferDetail));
+                    log.info("POS调用远程接口时异常==================：" + JSONObject.toJSONString(terminalTransferDetail));
                     agentResult = AgentResult.fail();
                 }
                 try {
-
-                    if (agentResult.isOK()) {
-                        JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
-                        JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
-                        String result_code = String.valueOf(data.get("result_code"));
-                        String resMsg = String.valueOf(data.get("resMsg"));
-                        if ("000000".equals(result_code)) {
-                            String transferStatus = String.valueOf(data.get("transferStatus"));
-                            if ("00".equals(transferStatus)) {
-                                log.info("POS划拨成功请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                                terminalTransferDetail.setAdjustStatus(AdjustStatus.YTZ.getValue());
+                    if (agentResult != null) {
+                        if (agentResult.isOK()) {
+                            JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
+                            JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
+                            String result_code = String.valueOf(data.get("result_code"));
+                            String resMsg = String.valueOf(data.get("resMsg"));
+                            if ("000000".equals(result_code)) {
+                                String transferStatus = String.valueOf(data.get("transferStatus"));
+                                if ("00".equals(transferStatus)) {
+                                    log.info("POS划拨成功请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                                    terminalTransferDetail.setAdjustStatus(AdjustStatus.YTZ.getValue());
+                                    terminalTransferDetail.setRemark(resMsg);
+                                } else if ("01".equals(transferStatus)) {
+                                    log.info("POS划拨中请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                                    log.info("POS划拨中请求结果：{}", JSONObject.toJSON(agentResult));
+                                    continue;
+                                } else if ("02".equals(transferStatus)) {
+                                    log.info("POS划拨失败请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                                    log.info("POS划拨失败请求结果：{}", JSONObject.toJSON(agentResult));
+                                    terminalTransferDetail.setRemark(resMsg);
+                                    terminalTransferDetail.setAdjustStatus(AdjustStatus.TZSB.getValue());
+                                }
+                            } else {
+                                log.info("POS未查到划拨结果请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                                log.info("POS未查到划拨结果请求结果：{}", JSONObject.toJSON(agentResult));
                                 terminalTransferDetail.setRemark(resMsg);
-                            } else if ("01".equals(transferStatus)) {
-                                log.info("POS划拨中请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                                log.info("POS划拨中请求结果：{}", JSONObject.toJSON(agentResult));
-                                continue;
-                            } else if ("02".equals(transferStatus)) {
-                                log.info("POS划拨失败请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                                log.info("POS划拨失败请求结果：{}", JSONObject.toJSON(agentResult));
-                                terminalTransferDetail.setRemark(resMsg);
-                                terminalTransferDetail.setAdjustStatus(AdjustStatus.TZSB.getValue());
+                                terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
                             }
+
                         } else {
-                            log.info("POS未查到划拨结果请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                            log.info("POS未查到划拨结果请求结果：{}", JSONObject.toJSON(agentResult));
-                            terminalTransferDetail.setRemark(resMsg);
+                            log.info("POS未连通查询请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                            log.info("POS未连通查询请求结果：{}", JSONObject.toJSON(agentResult));
+                            terminalTransferDetail.setRemark("POS未联动调整需线下处理");
                             terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
                         }
-
-                    } else {
-                        log.info("POS未连通查询请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                        log.info("POS未连通查询请求结果：{}", JSONObject.toJSON(agentResult));
-                        terminalTransferDetail.setRemark("POS未联动调整需线下处理");
-                        terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
+                        terminalTransferDetail.setAdjustTime(new Date());
+                        terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                     }
-                    terminalTransferDetail.setAdjustTime(new Date());
-                    terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 } catch (Exception e) {
                     e.printStackTrace();
                     log.error("POS更新数据库状态失败");
@@ -833,44 +876,46 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
             //手刷划拨开始查询
             if (terminalTransferDetail.getPlatformType().compareTo(TerminalPlatformType.MPOS.getValue()) == 0) {
-                log.info("手刷划拨开始查询");
                 try {
+                    log.info("手刷划拨开始查询" + terminalTransferDetail.getId());
                     agentResult = termMachineService.queryTerminalTransferResult(terminalTransferDetail.getId(), terminalTransferDetail.getPlatformType().toString());
-                    log.info("手刷划拨返回："+JSONObject.toJSONString(agentResult));
+                    log.info("手刷划拨返回：" + JSONObject.toJSONString(agentResult));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    log.info("MPOS调用远程接口时异常==================："+JSONObject.toJSONString(terminalTransferDetail));
+                    log.info("MPOS调用远程接口时异常==================：" + JSONObject.toJSONString(terminalTransferDetail));
                     agentResult = AgentResult.fail();
                 }
 
                 try {
-                    if (agentResult.isOK()) {
-                        JSONObject jsonObject = JSONObject.parseObject(agentResult.getData().toString());
-                        List<Map<String, Object>> result = (List<Map<String, Object>>) jsonObject.get("result");
-                        if (result == null || result.size() == 0) {
-                            continue;
-                        }
-                        for (Map map : result) {
-                            if ("code6".equals(map.get("code").toString())) {
-                                log.info("MPOS划拨成功请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                                log.info("MPOS划拨成功请求结果：{}", JSONObject.toJSON(agentResult));
-                                terminalTransferDetail.setAdjustStatus(AdjustStatus.YTZ.getValue());
-                                terminalTransferDetail.setRemark(map.get("message").toString());
-                            } else {
-                                log.info("MPOS划拨失败请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                                log.info("MPOS划拨失败请求结果：{}", JSONObject.toJSON(agentResult));
-                                terminalTransferDetail.setRemark(map.get("message").toString());
-                                terminalTransferDetail.setAdjustStatus(AdjustStatus.TZSB.getValue());
+                    if (agentResult != null) {
+                        if (agentResult.isOK()) {
+                            JSONObject jsonObject = JSONObject.parseObject(agentResult.getData().toString());
+                            List<Map<String, Object>> result = (List<Map<String, Object>>) jsonObject.get("result");
+                            if (result == null || result.size() == 0) {
+                                continue;
                             }
+                            for (Map map : result) {
+                                if ("code6".equals(map.get("code").toString())) {
+                                    log.info("MPOS划拨成功请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                                    log.info("MPOS划拨成功请求结果：{}", JSONObject.toJSON(agentResult));
+                                    terminalTransferDetail.setAdjustStatus(AdjustStatus.YTZ.getValue());
+                                    terminalTransferDetail.setRemark(map.get("message").toString());
+                                } else {
+                                    log.info("MPOS划拨失败请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                                    log.info("MPOS划拨失败请求结果：{}", JSONObject.toJSON(agentResult));
+                                    terminalTransferDetail.setRemark(map.get("message").toString());
+                                    terminalTransferDetail.setAdjustStatus(AdjustStatus.TZSB.getValue());
+                                }
+                            }
+                        } else {
+                            log.info("MPOS手刷划拨未联动请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
+                            log.info("MPOS手刷划拨未联动返回参数：{}", JSONObject.toJSON(agentResult));
+                            terminalTransferDetail.setRemark("MPOS手刷未联动调整需线下处理");
+                            terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
                         }
-                    } else {
-                        log.info("MPOS手刷划拨未联动请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
-                        log.info("MPOS手刷划拨未联动返回参数：{}", JSONObject.toJSON(agentResult));
-                        terminalTransferDetail.setRemark("MPOS手刷未联动调整需线下处理");
-                        terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
+                        terminalTransferDetail.setAdjustTime(new Date());
+                        terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                     }
-                    terminalTransferDetail.setAdjustTime(new Date());
-                    terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 } catch (Exception e) {
                     e.printStackTrace();
                     log.error("MPOS更新数据库状态失败");
@@ -892,7 +937,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setAdjustStatus(AdjustStatus.WCDJG.getValue());
                     terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 log.error("划拨超时更新数据库失败");
                 e.printStackTrace();
                 continue;
@@ -1389,7 +1434,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 String goalOrgId = terminalTransferDetail.getGoalOrgId().trim();
                 Map<String, Object> map1 = getAgentType(originalOrgId);
                 Map<String, Object> platFromMap = terminalTransferMapper.queryPlatFrom(map1.get("BUS_PLATFORM").toString());
-                if (!(platFromMap.get("PLATFORM_TYPE").toString().equals("POS") || platFromMap.get("PLATFORM_TYPE").toString().equals("ZPOS") || platFromMap.get("PLATFORM_TYPE").toString().equals("ZHPOS"))) {
+                if (!(platFromMap.get("PLATFORM_TYPE").toString().equals(PlatformType.POS.getValue()) || platFromMap.get("PLATFORM_TYPE").toString().equals(PlatformType.ZPOS.getValue()) || platFromMap.get("PLATFORM_TYPE").toString().equals(PlatformType.ZHPOS.getValue())|| platFromMap.get("PLATFORM_TYPE").toString().equals(PlatformType.SSPOS.getValue()))) {
                     log.info("您的机构码不属于pos平台请选择：原：" + originalOrgId + "目标：" + goalOrgId);
                     throw new MessageException("您的机构码不属于pos平台请选择：原：" + originalOrgId + "目标：" + goalOrgId);
                 }
@@ -1450,8 +1495,19 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
                     JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
                     String result_msg = String.valueOf(data.get("result_msg"));
+                    if (result_msg.indexOf("TTD") != -1) {
+                        String ttd = result_msg.substring(result_msg.indexOf("TTD"), Integer.valueOf(result_msg.indexOf("TTD")) + 26);
+                        TerminalTransferDetail terminalTransferDetail = terminalTransferDetailMapper.selectByPrimaryKey(ttd);
+                        if (terminalTransferDetail != null) {
+                            log.info("POS未连通查询检测接口" + terminalTransferDetail.getSnBeginNum() + "--------" + terminalTransferDetail.getSnEndNum());
+                            throw new MessageException("在区间" + terminalTransferDetail.getSnBeginNum() + "--------" + terminalTransferDetail.getSnEndNum() + "   " + result_msg);
+                        } else {
+                            log.info("POS未连通查询检测接口" + result_msg);
+                            throw new MessageException(result_msg);
+                        }
+                    }
                     log.info("POS未连通查询检测接口" + result_msg);
-                    throw new MessageException("POS未连通查询检测接口"+result_msg);
+                    throw new MessageException(result_msg);
                 }
             }
             if (terminalTransferDetailListsMpos != null && terminalTransferDetailListsMpos.size() > 0) {
@@ -1474,8 +1530,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 if (agentResult.isOK()) {
                     List<Map<String, Object>> mapList = (List<Map<String, Object>>) agentResult.getData();
                     if (mapList == null || mapList.size() == 0) {
-                        log.info("调用MPOS接口查询验证接口返回异常，返回结果为："+mapList);
-                        throw new MessageException("调用MPOS接口查询验证接口返回异常，返回结果为："+mapList);
+                        log.info("调用MPOS接口查询验证接口返回异常，返回结果为：" + mapList);
+                        throw new MessageException("调用MPOS接口查询验证接口返回异常，返回结果为：" + mapList);
                     }
                     for (Map<String, Object> map : mapList) {
                         if ("code6".equals(map.get("code").toString())) {

@@ -1,81 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.dao.order.TerminalTransferMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.TerminalTransfer">
-    <id column="ID" jdbcType="VARCHAR" property="id" />
-    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
-    <result column="REVIEW_STATUS" jdbcType="DECIMAL" property="reviewStatus" />
-    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
-    <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
-    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
-    <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
-    <result column="STATUS" jdbcType="DECIMAL" property="status" />
-    <result column="VERSION" jdbcType="DECIMAL" property="version" />
-    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
-    <result column="PLATFORM_TYPE" jdbcType="VARCHAR" property="platformType" />
-  </resultMap>
-  <sql id="Example_Where_Clause">
-    <where>
-      <foreach collection="oredCriteria" item="criteria" separator="or">
-        <if test="criteria.valid">
-          <trim prefix="(" prefixOverrides="and" suffix=")">
-            <foreach collection="criteria.criteria" item="criterion">
-              <choose>
-                <when test="criterion.noValue">
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue">
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue">
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue">
-                  and ${criterion.condition}
-                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
+    <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.TerminalTransfer">
+        <id column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="REMARK" jdbcType="VARCHAR" property="remark"/>
+        <result column="REVIEW_STATUS" jdbcType="DECIMAL" property="reviewStatus"/>
+        <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime"/>
+        <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime"/>
+        <result column="C_USER" jdbcType="VARCHAR" property="cUser"/>
+        <result column="U_USER" jdbcType="VARCHAR" property="uUser"/>
+        <result column="STATUS" jdbcType="DECIMAL" property="status"/>
+        <result column="VERSION" jdbcType="DECIMAL" property="version"/>
+        <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId"/>
+        <result column="PLATFORM_TYPE" jdbcType="VARCHAR" property="platformType"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
             </foreach>
-          </trim>
-        </if>
-      </foreach>
-    </where>
-  </sql>
-  <sql id="Base_Column_List">
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
     ID, REMARK, REVIEW_STATUS, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, AGENT_ID,
     PLATFORM_TYPE
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferExample" resultMap="BaseResultMap">
-    <include refid="OracleDialectPrefix" />
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from O_TERMINAL_TRANSFER
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
-    <include refid="OracleDialectSuffix" />
-  </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from O_TERMINAL_TRANSFER
-    where ID = #{id,jdbcType=VARCHAR}
-  </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferExample">
-    delete from O_TERMINAL_TRANSFER
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </delete>
-  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransfer">
+    <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferExample"
+            resultMap="BaseResultMap">
+        <include refid="OracleDialectPrefix"/>
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from O_TERMINAL_TRANSFER
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <include refid="OracleDialectSuffix"/>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from O_TERMINAL_TRANSFER
+        where ID = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferExample">
+        delete from O_TERMINAL_TRANSFER
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransfer">
     insert into O_TERMINAL_TRANSFER (ID, REMARK, REVIEW_STATUS,
     C_TIME, U_TIME, C_USER,
     U_USER, STATUS, VERSION,
@@ -85,122 +87,123 @@
     #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
     #{agentId,jdbcType=VARCHAR}, #{platformType,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransfer">
-    insert into O_TERMINAL_TRANSFER
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        ID,
-      </if>
-      <if test="remark != null">
-        REMARK,
-      </if>
-      <if test="reviewStatus != null">
-        REVIEW_STATUS,
-      </if>
-      <if test="cTime != null">
-        C_TIME,
-      </if>
-      <if test="uTime != null">
-        U_TIME,
-      </if>
-      <if test="cUser != null">
-        C_USER,
-      </if>
-      <if test="uUser != null">
-        U_USER,
-      </if>
-      <if test="status != null">
-        STATUS,
-      </if>
-      <if test="version != null">
-        VERSION,
-      </if>
-      <if test="agentId != null">
-        AGENT_ID,
-      </if>
-      <if test="platformType != null">
-        PLATFORM_TYPE,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=VARCHAR},
-      </if>
-      <if test="remark != null">
-        #{remark,jdbcType=VARCHAR},
-      </if>
-      <if test="reviewStatus != null">
-        #{reviewStatus,jdbcType=DECIMAL},
-      </if>
-      <if test="cTime != null">
-        #{cTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="uTime != null">
-        #{uTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="cUser != null">
-        #{cUser,jdbcType=VARCHAR},
-      </if>
-      <if test="uUser != null">
-        #{uUser,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null">
-        #{status,jdbcType=DECIMAL},
-      </if>
-      <if test="version != null">
-        #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="agentId != null">
-        #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="platformType != null">
-        #{platformType,jdbcType=VARCHAR},
-      </if>
-    </trim>
-  </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferExample" resultType="java.lang.Long">
-    select count(*) from O_TERMINAL_TRANSFER
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransfer">
-    update O_TERMINAL_TRANSFER
-    <set>
-      <if test="remark != null">
-        REMARK = #{remark,jdbcType=VARCHAR},
-      </if>
-      <if test="reviewStatus != null">
-        REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
-      </if>
-      <if test="cTime != null">
-        C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="uTime != null">
-        U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="cUser != null">
-        C_USER = #{cUser,jdbcType=VARCHAR},
-      </if>
-      <if test="uUser != null">
-        U_USER = #{uUser,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null">
-        STATUS = #{status,jdbcType=DECIMAL},
-      </if>
-      <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="agentId != null">
-        AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="platformType != null">
-        PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
-      </if>
-    </set>
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransfer">
+    <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransfer">
+        insert into O_TERMINAL_TRANSFER
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="remark != null">
+                REMARK,
+            </if>
+            <if test="reviewStatus != null">
+                REVIEW_STATUS,
+            </if>
+            <if test="cTime != null">
+                C_TIME,
+            </if>
+            <if test="uTime != null">
+                U_TIME,
+            </if>
+            <if test="cUser != null">
+                C_USER,
+            </if>
+            <if test="uUser != null">
+                U_USER,
+            </if>
+            <if test="status != null">
+                STATUS,
+            </if>
+            <if test="version != null">
+                VERSION,
+            </if>
+            <if test="agentId != null">
+                AGENT_ID,
+            </if>
+            <if test="platformType != null">
+                PLATFORM_TYPE,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="reviewStatus != null">
+                #{reviewStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="cTime != null">
+                #{cTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="uTime != null">
+                #{uTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cUser != null">
+                #{cUser,jdbcType=VARCHAR},
+            </if>
+            <if test="uUser != null">
+                #{uUser,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=DECIMAL},
+            </if>
+            <if test="version != null">
+                #{version,jdbcType=DECIMAL},
+            </if>
+            <if test="agentId != null">
+                #{agentId,jdbcType=VARCHAR},
+            </if>
+            <if test="platformType != null">
+                #{platformType,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferExample"
+            resultType="java.lang.Long">
+        select count(*) from O_TERMINAL_TRANSFER
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransfer">
+        update O_TERMINAL_TRANSFER
+        <set>
+            <if test="remark != null">
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="reviewStatus != null">
+                REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="cTime != null">
+                C_TIME = #{cTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="uTime != null">
+                U_TIME = #{uTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cUser != null">
+                C_USER = #{cUser,jdbcType=VARCHAR},
+            </if>
+            <if test="uUser != null">
+                U_USER = #{uUser,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                STATUS = #{status,jdbcType=DECIMAL},
+            </if>
+            <if test="version != null">
+                VERSION = #{version,jdbcType=DECIMAL},
+            </if>
+            <if test="agentId != null">
+                AGENT_ID = #{agentId,jdbcType=VARCHAR},
+            </if>
+            <if test="platformType != null">
+                PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransfer">
     update O_TERMINAL_TRANSFER
     set REMARK = #{remark,jdbcType=VARCHAR},
     REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
@@ -214,58 +217,58 @@
     PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-  <sql id="OracleDialectPrefix">
-    <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from (
-    </if>
-  </sql>
-  <sql id="OracleDialectSuffix">
-    <if test="page != null">
-      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
-    </if>
-  </sql>
+    <sql id="OracleDialectPrefix">
+        <if test="page != null">
+            select * from ( select row_.*, rownum rownum_ from (
+        </if>
+    </sql>
+    <sql id="OracleDialectSuffix">
+        <if test="page != null">
+            <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+        </if>
+    </sql>
 
-  <select id="selectTerminalTransferList" parameterType="map" resultType="map">
-    <include refid="OracleDialectPrefix" />
-    <include refid="TerminalTransferListSql" />
-    <include refid="OracleDialectSuffix" />
-  </select>
-  <select id="selectTerminalTransferCount" parameterType="map" resultType="java.lang.Integer">
-    select count(*) from(
-    <include refid="TerminalTransferListSql" />
-    )
-  </select>
-  <sql id="TerminalTransferListSql">
-    select
-    t.*,a.ag_name,cu.name as C_USER_NAME,uu.name as U_USER_NAME
-    from o_terminal_transfer t
-    left join a_agent a on t.agent_id = a.id
-    left join c_user cu on t.c_user = cu.id
-    left join c_user uu on t.u_user = uu.id
-    left join a_agent_businfo b on t.platform_type = b.id
-    left join C_ORGANIZATION oa on oa.id=b.ag_doc_pro
-    left join C_ORGANIZATION ob on ob.id=b.AG_DOC_DISTRICT
-    <where>
-      t.status = #{map.status} and a.status = #{map.status}
-      <if test="map.agentId != null">
-        and t.agent_Id = #{map.agentId}
-      </if>
-      <if test="map.agName != null">
-        and a.ag_Name = #{map.agName}
-      </if>
-      <if test="map.id != null">
-        and t.id = #{map.id}
-      </if>
-      <if test="map.reviewStatus != null">
-        and t.review_status = #{map.reviewStatus}
-      </if>
-      <if test="map.orgCode!=null and map.orgCode!=''">
-        and (oa.CODE like concat(#{map.orgCode},'%') or ob.CODE like concat(#{map.orgCode},'%') )
-      </if>
-    </where>
-    order by t.c_time desc
-  </sql>
-  <select id="appTerminalTransfer" resultType="java.lang.String">
+    <select id="selectTerminalTransferList" parameterType="map" resultType="map">
+        <include refid="OracleDialectPrefix"/>
+        <include refid="TerminalTransferListSql"/>
+        <include refid="OracleDialectSuffix"/>
+    </select>
+    <select id="selectTerminalTransferCount" parameterType="map" resultType="java.lang.Integer">
+        select count(*) from(
+        <include refid="TerminalTransferListSql"/>
+        )
+    </select>
+    <sql id="TerminalTransferListSql">
+        select
+        t.*,a.ag_name,cu.name as C_USER_NAME,uu.name as U_USER_NAME
+        from o_terminal_transfer t
+        left join a_agent a on t.agent_id = a.id
+        left join c_user cu on t.c_user = cu.id
+        left join c_user uu on t.u_user = uu.id
+        left join a_agent_businfo b on t.platform_type = b.id
+        left join C_ORGANIZATION oa on oa.id=b.ag_doc_pro
+        left join C_ORGANIZATION ob on ob.id=b.AG_DOC_DISTRICT
+        <where>
+            t.status = #{map.status} and a.status = #{map.status}
+            <if test="map.agentId != null">
+                and t.agent_Id = #{map.agentId}
+            </if>
+            <if test="map.agName != null">
+                and a.ag_Name = #{map.agName}
+            </if>
+            <if test="map.id != null">
+                and t.id = #{map.id}
+            </if>
+            <if test="map.reviewStatus != null">
+                and t.review_status = #{map.reviewStatus}
+            </if>
+            <if test="map.orgCode!=null and map.orgCode!=''">
+                and (oa.CODE like concat(#{map.orgCode},'%') or ob.CODE like concat(#{map.orgCode},'%') )
+            </if>
+        </where>
+        order by t.c_time desc
+    </sql>
+    <select id="appTerminalTransfer" resultType="java.lang.String">
       select activ_id from a_bus_act_rel where bus_id in
        (
         select t.id from o_terminal_transfer t where id in
@@ -288,7 +291,7 @@
   select ID from O_TERMINAL_TRANSFER where REVIEW_STATUS ='02' and STATUS ='1')  and aaa.STATUS ='1' and aaa.adjust_status = '1' and bbb.STATUS='1'
   and aaa.SN_BEGIN_NUM like CONCAT(CONCAT('%',#{common}),'%')
 </select>
-  <select id="querySubBusNum" parameterType="java.lang.String" resultType="java.util.Map">
+    <select id="querySubBusNum" parameterType="java.lang.String" resultType="java.util.Map">
 
 select distinct nvl(BUS_NUM, '-') BUS_NUM
                from A_AGENT_BUSINFO
@@ -301,30 +304,34 @@ select distinct nvl(BUS_NUM, '-') BUS_NUM
                CONNECT BY PRIOR ID = BUS_PARENT
 </select>
 
-  <select id="querySubBusNumTopAgent" resultType="java.util.Map" parameterType="java.lang.String">
+    <select id="querySubBusNumTopAgent" resultType="java.util.Map" parameterType="java.lang.String">
      select * from (
      select * from A_AGENT_BUSINFO a  start with a.bus_num=#{bus_num}  CONNECT BY PRIOR BUS_PARENT = ID )
       where Bus_PARENT is null
 
   </select>
-  <select id="querySubBusNumTopAgentAll" resultType="java.util.Map" parameterType="java.lang.String">
+    <select id="querySubBusNumTopAgentAll" resultType="java.util.Map" parameterType="java.lang.String">
      select * from A_AGENT_BUSINFO a  start with  a.bus_num=#{bus_num}
   and a.status ='1'and a.bus_status='1' CONNECT BY PRIOR BUS_PARENT = ID
   </select>
+    <select id="queryLowerAgentAll" resultType="java.util.Map" parameterType="java.lang.String">
+     select * from A_AGENT_BUSINFO a  start with  a.bus_num=#{bus_num}
+  and a.status ='1'and a.bus_status='1' CONNECT BY PRIOR ID = BUS_PARENT
+  </select>
 
-  <select id="querySubBusNumAgent" resultType="java.util.Map" parameterType="java.lang.String">
+    <select id="querySubBusNumAgent" resultType="java.util.Map" parameterType="java.lang.String">
      select * from A_AGENT_BUSINFO a  where a.bus_num=#{bus_num}
   </select>
 
-  <select id="queryPlatFrom" resultType="java.util.Map" parameterType="java.lang.String">
+    <select id="queryPlatFrom" resultType="java.util.Map" parameterType="java.lang.String">
      select * from A_PLATFORM a  where a.PLATFORM_NUM=#{PLATFORM_NUM}
   </select>
 
-  <select id="queryBusInfo" resultType="java.util.Map" parameterType="java.util.Map">
+    <select id="queryBusInfo" resultType="java.util.Map" parameterType="java.util.Map">
      select AGENT_ID,BUS_TYPE,BUS_NUM,BUS_PLATFORM from A_AGENT_BUSINFO  where POS_PLAT_CODE = #{POS_PLAT_CODE} and STATUS=1  and BUS_STATUS in('1','2')
   </select>
 
-  <select id="checkSnIsTransfer" parameterType="map" resultType="int">
+    <select id="checkSnIsTransfer" parameterType="map" resultType="int">
     select count(a.id) from o_terminal_transfer_detail a
     left join o_terminal_transfer b on a.terminal_transfer_id = b.id
     WHERE
@@ -343,27 +350,27 @@ select distinct nvl(BUS_NUM, '-') BUS_NUM
         )
   </select>
 
-  <!--查询划拨配置表-->
-  <select id="queryToolsFloor" resultType="java.util.Map" parameterType="java.util.Map">
-  select * from TERINAL_TRANSFER_TOOLS_SET
-  <where>
-    <if test="ORG_ID!=null and ORG_ID!=''">
-      and ORG_ID = #{ORG_ID,jdbcType=VARCHAR}
-    </if>
-    <if test="PLATFORM_TYPE_CODE!=null and PLATFORM_TYPE_CODE!=''">
-      and PLATFORM_TYPE_CODE = #{PLATFORM_TYPE_CODE,jdbcType=VARCHAR}
-    </if>
-    <if test="BUS_CODE_BIG!=null and BUS_CODE_BIG!=''">
-      and BUS_CODE_BIG = #{BUS_CODE_BIG,jdbcType=VARCHAR}
-    </if>
-    <if test="TERINAL_TRANSFER_TYPE!=null and TERINAL_TRANSFER_TYPE!=''">
-      and TERINAL_TRANSFER_TYPE = #{TERINAL_TRANSFER_TYPE,jdbcType=VARCHAR}
-    </if>
-  </where>
-</select>
+    <!--查询划拨配置表-->
+    <select id="queryToolsFloor" resultType="java.util.Map" parameterType="java.util.Map">
+        select * from TERINAL_TRANSFER_TOOLS_SET
+        <where>
+            <if test="ORG_ID!=null and ORG_ID!=''">
+                and ORG_ID = #{ORG_ID,jdbcType=VARCHAR}
+            </if>
+            <if test="PLATFORM_TYPE_CODE!=null and PLATFORM_TYPE_CODE!=''">
+                and PLATFORM_TYPE_CODE = #{PLATFORM_TYPE_CODE,jdbcType=VARCHAR}
+            </if>
+            <if test="BUS_CODE_BIG!=null and BUS_CODE_BIG!=''">
+                and BUS_CODE_BIG = #{BUS_CODE_BIG,jdbcType=VARCHAR}
+            </if>
+            <if test="TERINAL_TRANSFER_TYPE!=null and TERINAL_TRANSFER_TYPE!=''">
+                and TERINAL_TRANSFER_TYPE = #{TERINAL_TRANSFER_TYPE,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
 
 
-  <select id="agentBase" resultType="java.util.Map" parameterType="java.lang.String">
+    <select id="agentBase" resultType="java.util.Map" parameterType="java.lang.String">
   select bb.* ,aa.BUS_NUM,aa.BUS_TYPE,aa.BUS_PLATFORM from A_AGENT_BUSINFO aa,A_AGENT bb
   where aa.BUS_NUM = #{BUS_NUM,jdbcType=VARCHAR}
   and aa.AGENT_ID = bb.ID and aa.STATUS = '1' and aa.BUS_STATUS='1'and bb.STATUS = '1'
