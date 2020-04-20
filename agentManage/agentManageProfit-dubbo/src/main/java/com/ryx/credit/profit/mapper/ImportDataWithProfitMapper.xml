@@ -1023,7 +1023,9 @@
 
   <select id="getListBySheetInfo" resultType="java.util.Map">
     select pd.* from P_IMPORT_DATA_WITH_PROFIT pd
-    left join A_AGENT_BUSINFO ab on pd.AGENT_ID = ab.AGENT_ID
+    <if test="param.agDoc != '' and param.agDoc != null">
+      left join (select distinct AGENT_ID,AG_DOC_PRO from A_AGENT_BUSINFO) ab on pd.AGENT_ID = ab.AGENT_ID
+    </if>
     where 1 = 1
     <if test="param.type != '' and param.type != null">
       and  pd.IMPORT_TYPE = #{param.type}

@@ -456,7 +456,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
                     break;
             }
         }
-        return cellValue;
+        return cellValue.trim();
     }
 
     class SheetThead  implements Callable<Map<String,String>>{
