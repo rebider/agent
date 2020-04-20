@@ -12,40 +12,8 @@
     <result column="STATUS" jdbcType="VARCHAR" property="status" />
     <result column="NOTE" jdbcType="VARCHAR" property="note" />
     <result column="MONTH" jdbcType="VARCHAR" property="month" />
+    <result column="IMPORT_TYPE" jdbcType="VARCHAR" property="importType" />
   </resultMap>
-
-
-  <resultMap id="BaseResultMap2" type="com.ryx.credit.profit.pojo.PmsProfit">
-    <id column="ID" jdbcType="VARCHAR" property="id" />
-    <result column="MONTH" jdbcType="VARCHAR" property="month" />
-    <result column="UNIQUE_FLAG" jdbcType="VARCHAR" property="uniqueFlag" />
-    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
-    <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
-    <result column="BUS_NAME" jdbcType="VARCHAR" property="busName" />
-    <result column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
-    <result column="SHEET_COLUMN" jdbcType="DECIMAL" property="sheetColumn" />
-    <result column="SHEET_HEAD" property="sheetHead" jdbcType="UNDEFINED"  javaType = "java.lang.String"  typeHandler ="com.ryx.credit.common.util.OracleXMLTypeHandler" />
-    <result column="SHEET_DATA" property="sheetData" jdbcType="UNDEFINED"   javaType = "java.lang.String"  typeHandler ="com.ryx.credit.common.util.OracleXMLTypeHandler" />
-    <result column="PROFIT_TYPE" jdbcType="VARCHAR" property="profitType" />
-    <result column="PROFIT_HZ" jdbcType="VARCHAR" property="profitHz" />
-    <result column="PAY_CONDITION" jdbcType="VARCHAR" property="payCondition" />
-    <result column="STATUS" jdbcType="VARCHAR" property="status" />
-    <result column="FREE_REASON" jdbcType="VARCHAR" property="freeReason" />
-    <result column="PAY_TRAN_MONEY" jdbcType="DECIMAL" property="payTranMoney" />
-    <result column="IMPORT_TIME" jdbcType="VARCHAR" property="importTime" />
-    <result column="IMPORT_PERSON" jdbcType="VARCHAR" property="importPerson" />
-    <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
-    <result column="UPDATE_PERSON" jdbcType="VARCHAR" property="updatePerson" />
-    <result column="FREE_TIME" jdbcType="VARCHAR" property="freeTime" />
-    <result column="PAY_TIME" jdbcType="VARCHAR" property="payTime" />
-    <result column="SHEET_ORDER" jdbcType="DECIMAL" property="sheetOrder" />
-    <result column="ORDER_NUMBER" jdbcType="DECIMAL" property="orderNumber" />
-    <result column="PROFIT_AMT" property="profitAmt" jdbcType="VARCHAR" />
-  </resultMap>
-
-
-
-
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -76,8 +44,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    BATCH_NO, UPLOAD_PATH, UPLOAD_NAME, RESULT_PATH, RESULT_NAME, UPLOAD_TIME, UPLOAD_USER, 
-    STATUS, NOTE, MONTH
+    BATCH_NO, UPLOAD_PATH, UPLOAD_NAME, RESULT_PATH, RESULT_NAME, UPLOAD_TIME, UPLOAD_USER,
+    STATUS, NOTE, MONTH, IMPORT_TYPE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitLogExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -96,7 +64,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from PMS_PROFIT_LOG
     where BATCH_NO = #{batchNo,jdbcType=VARCHAR}
@@ -108,14 +76,14 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PmsProfitLog">
-    insert into PMS_PROFIT_LOG (BATCH_NO, UPLOAD_PATH, UPLOAD_NAME, 
-      RESULT_PATH, RESULT_NAME, UPLOAD_TIME, 
-      UPLOAD_USER, STATUS, NOTE, 
-      MONTH)
-    values (#{batchNo,jdbcType=VARCHAR}, #{uploadPath,jdbcType=VARCHAR}, #{uploadName,jdbcType=VARCHAR}, 
-      #{resultPath,jdbcType=VARCHAR}, #{resultName,jdbcType=VARCHAR}, #{uploadTime,jdbcType=VARCHAR}, 
-      #{uploadUser,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, 
-      #{month,jdbcType=VARCHAR})
+    insert into PMS_PROFIT_LOG (BATCH_NO, UPLOAD_PATH, UPLOAD_NAME,
+      RESULT_PATH, RESULT_NAME, UPLOAD_TIME,
+      UPLOAD_USER, STATUS, NOTE,
+      MONTH, IMPORT_TYPE)
+    values (#{batchNo,jdbcType=VARCHAR}, #{uploadPath,jdbcType=VARCHAR}, #{uploadName,jdbcType=VARCHAR},
+      #{resultPath,jdbcType=VARCHAR}, #{resultName,jdbcType=VARCHAR}, #{uploadTime,jdbcType=VARCHAR},
+      #{uploadUser,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR},
+      #{month,jdbcType=VARCHAR}, #{importType,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PmsProfitLog">
     insert into PMS_PROFIT_LOG
@@ -150,6 +118,9 @@
       <if test="month != null">
         MONTH,
       </if>
+      <if test="importType != null">
+        IMPORT_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="batchNo != null">
@@ -181,6 +152,9 @@
       </if>
       <if test="month != null">
         #{month,jdbcType=VARCHAR},
+      </if>
+      <if test="importType != null">
+        #{importType,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -220,6 +194,9 @@
       <if test="month != null">
         MONTH = #{month,jdbcType=VARCHAR},
       </if>
+      <if test="importType != null">
+        IMPORT_TYPE = #{importType,jdbcType=VARCHAR},
+      </if>
     </set>
     where BATCH_NO = #{batchNo,jdbcType=VARCHAR}
   </update>
@@ -233,12 +210,13 @@
       UPLOAD_USER = #{uploadUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=VARCHAR},
       NOTE = #{note,jdbcType=VARCHAR},
-      MONTH = #{month,jdbcType=VARCHAR}
+      MONTH = #{month,jdbcType=VARCHAR},
+      IMPORT_TYPE = #{importType,jdbcType=VARCHAR}
     where BATCH_NO = #{batchNo,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -246,7 +224,6 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-
 
 
 
@@ -292,74 +269,5 @@ select aa.ID,aa.AG_NAME,bb.BUS_PLATFORM,cc.PLATFORM_NAME  from A_AGENT aa,A_AGEN
 		updatePerson,jdbcType=VARCHAR},#{ freeTime,jdbcType=VARCHAR},#{
 		payTime,jdbcType=VARCHAR},#{sheetOrder,jdbcType=INTEGER},#{orderNumber,jdbcType=INTEGER},#{ id,jdbcType=VARCHAR},#{busCode,jdbcType=VARCHAR},#{busName,jdbcType=VARCHAR})
 	</insert>
-
-
-  <select id="selectByMap" resultType="java.util.Map">
-    <include refid="OracleDialectPrefix"/>
-    <include refid="selectRecord_unionSql"/>
-    <include refid="OracleDialectSuffix"/>
-  </select>
-
-  <sql id="selectRecord_unionSql">
-    select * from (
-      select
-      pr.BATCH_NO BATCH_NO,pr.UPLOAD_PATH UPLOAD_PATH,pr.UPLOAD_NAME UPLOAD_NAME,pr.UPLOAD_TIME UPLOAD_TIME,
-      pr.STATUS STATUS,pr.NOTE NOTE,pr.MONTH AMT_MONTH,cu.NAME USER_NAME ,
-      case when pr.IMPORT_TYPE is null  then '00'
-      else pr.IMPORT_TYPE end as IMPORT_TYPE
-      from PMS_PROFIT_LOG pr
-      left join C_USER cu on pr.UPLOAD_USER=cu.ID
-      where 1 = 1
-      <if test="param.month != '' and param.month != null">
-        and pr.MONTH = #{param.month}
-      </if>
-      <if test="param.batchNo != '' and param.batchNo != null">
-        and pr.BATCH_NO = #{param.batchNo}
-      </if>
-      <if test="param.updateTime != '' and param.updateTime != null">
-        and pr.UPLOAD_TIME = #{param.updateTime}
-      </if>
-      <if test="param.status != '' and param.status != null">
-        and pr.STATUS = #{param.status}
-      </if>
-      <if test="param.userCode != '' and param.userCode != null">
-        and cu.ID  = #{param.userCode}
-      </if>
-      union all
-      select
-      pi.ID BATCH_NO,pi.UPLOAD_PATH UPLOAD_PATH,pi.UPLOAD_NAME UPLOAD_NAME,pi.UPLOAD_TIME UPLOAD_TIME,
-      pi.STATUS STATUS,pi.NOTE NOTE,pi.MONTH AMT_MONTH,cu.NAME USER_NAME ,
-      pi.IMPORT_TYPE as IMPORT_TYPE
-      from P_IMPORT_DATA_WITH_PROFIT_LOG pi
-      left join C_USER cu on pi.UPLOAD_USER = cu.ID
-      where 1 = 1
-      <if test="param.month != '' and param.month != null">
-        and pi.MONTH = #{param.month}
-      </if>
-      <if test="param.batchNo != '' and param.batchNo != null">
-        and pi.ID = #{param.batchNo}
-      </if>
-      <if test="param.updateTime != '' and param.updateTime != null">
-        and pi.UPLOAD_TIME = #{param.updateTime}
-      </if>
-      <if test="param.status != '' and param.status != null">
-        and pi.STATUS = #{param.status}
-      </if>
-      <if test="param.userCode != '' and param.userCode != null">
-        and cu.ID  = #{param.userCode}
-      </if>
-    ) zzz
-    where 1 = 1
-    <if test="param.importType != '' and param.importType != null">
-      and zzz.IMPORT_TYPE =#{param.importType}
-    </if>
-    order by zzz.UPLOAD_TIME desc
-  </sql>
-
-  <select id="getCountByMap" resultType="java.lang.Long">
-    select count(1) from(
-    <include refid="selectRecord_unionSql"/>
-    )
-  </select>
 
 </mapper>
