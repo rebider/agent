@@ -804,6 +804,53 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 }
             }
         }
+
+        //删除原账户信息
+        OrderAdjAccountExample orderAdjAccountDel = new OrderAdjAccountExample();
+        orderAdjAccountDel.or().andAdjIdEqualTo(orderAdj.getId())
+                .andOrderIdEqualTo(orderAdj.getOrderId())
+                .andStatusEqualTo(Status.STATUS_1.status);
+        orderAdjAccountMapper.deleteByExample(orderAdjAccountDel);
+
+        for (OrderAdjAccountVo adjAccount:orderUpModelVo.getAccounts()){
+            OrderAdjAccount account = new OrderAdjAccount();
+            account.setId(idService.genId(TabId.O_ORDER_ADJ_ACCOUNT));
+            account.setAdjId(orderAdj.getId());
+            account.setOrderId(orderAdj.getOrderId());
+            account.setType(adjAccount.getType());
+            account.setRefundAccount(adjAccount.getRefundAccount());
+            account.setAccountName(adjAccount.getAccountName());
+            account.setAccountBank(adjAccount.getAccountBank());
+            account.setBranchLineNum(adjAccount.getBranchLineNum());
+            account.setAllLineNum(adjAccount.getAllLineNum());
+            account.setRefundAmo(BigDecimal.ZERO);
+            account.setRefundStat(RefundStat.UNREFUND.key);
+            account.setStatus(Status.STATUS_1.status);
+            account.setVersion(Status.STATUS_1.status);
+            if (1 !=orderAdjAccountMapper.insert(account) ){
+                logger.info("订单调整:{}", "保存账户信息失败");
+                throw new ProcessException("保存账户信息失败");
+            }
+
+            String accountFile = adjAccount.getAccountFile();
+            if (null != accountFile){
+                AttachmentRel recordAccountAtt = new AttachmentRel();
+                recordAccountAtt.setAttId(accountFile);
+                recordAccountAtt.setSrcId(account.getId());
+                recordAccountAtt.setcUser(orderAdj.getAdjUserId());
+                recordAccountAtt.setcTime(orderAdj.getAdjTm());
+                recordAccountAtt.setStatus(Status.STATUS_1.status);
+                recordAccountAtt.setBusType(AttachmentRelType.orderAdjustDk.name());
+                recordAccountAtt.setId(idService.genId(TabId.a_attachment_rel));
+                logger.info("添加订单调整附件关系,订单调整ID{},打款附件ID{}",orderAdj.getId(),accountFile);
+                if (1 != attachmentRelMapper.insertSelective(recordAccountAtt)) {
+                    logger.info("订单调整:{}", "添加订单调整打款附件关系失败");
+                    throw new ProcessException("添加订单调整打款附件关系失败");
+                }
+            }
+
+        }
+
         OPaymentExample oPaymentExample = new OPaymentExample();
         oPaymentExample.or().andOrderIdEqualTo(orderUpModelVo.getOrderId()).andStatusEqualTo(Status.STATUS_1.status);
         List<OPayment> payments = paymentMapper.selectByExample(oPaymentExample);
