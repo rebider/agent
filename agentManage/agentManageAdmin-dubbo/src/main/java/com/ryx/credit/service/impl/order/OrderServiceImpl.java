@@ -6769,11 +6769,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderAdjustVo> excelOrderAdjustDetailAll(Map map) {
 
-        if (map.get("proName") != null && StringUtils.isNotBlank((String)map.get("proName"))){
-            map.put("proName",Arrays.asList(((String)map.get("proName")).split(",")));
-        }else {
-            map.put("proName",new  ArrayList<String>());
-        }
         if(null!=map.get("userId")) {
             Long userId = (Long) map.get("userId");
             List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
