@@ -76,6 +76,16 @@ public class InternetLogoutDetail implements Serializable{
 
     private List<String> issuerList;
 
+    private List<String> reviewStatusList;
+
+    public List<String> getReviewStatusList() {
+        return reviewStatusList;
+    }
+
+    public void setReviewStatusList(List<String> reviewStatusList) {
+        this.reviewStatusList = reviewStatusList;
+    }
+
     public List<String> getLogoutStatusList() {
         return logoutStatusList;
     }

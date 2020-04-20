@@ -502,6 +502,12 @@
           #{logoutStatus2}
         </foreach>
       </if>
+      <if test="reviewStatusList != null and reviewStatusList.size>0">
+        and l.review_status
+        <foreach collection="reviewStatusList" item="reviewStatus" open=" in(" close=")" separator=",">
+          #{reviewStatus}
+        </foreach>
+      </if>
       <if test="beginCTime != null">
         <![CDATA[ and i.c_time >= to_date(#{beginCTime},'yyyy-mm-dd hh24:mi:ss') ]]>
       </if>

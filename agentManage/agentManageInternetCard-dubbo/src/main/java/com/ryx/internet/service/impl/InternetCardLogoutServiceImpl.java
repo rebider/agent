@@ -230,6 +230,9 @@ public class InternetCardLogoutServiceImpl implements InternetCardLogoutService 
         if(internetLogoutDetail.getLogoutStatusList()!=null && internetLogoutDetail.getLogoutStatusList().size()>0){
             reqMap.put("logoutStatusList", internetLogoutDetail.getLogoutStatusList());
         }
+        if(internetLogoutDetail.getReviewStatusList()!=null && internetLogoutDetail.getReviewStatusList().size()>0){
+            reqMap.put("reviewStatusList", internetLogoutDetail.getReviewStatusList());
+        }
         return reqMap;
     }
 
