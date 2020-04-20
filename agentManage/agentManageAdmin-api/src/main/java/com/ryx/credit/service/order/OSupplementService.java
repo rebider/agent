@@ -90,9 +90,18 @@ public interface OSupplementService {
 
     public List<OPaymentDetail>selectCount(String orderId, String code);;
 
+    public List<OPaymentDetail>selectPaymentDetail(String orderId, String code);;
+
     /**
      * 查看补款详情
      */
     public List<OPayDetail> selectOpayDetail(OPaymentDetail oPaymentDetail);
+
+    /**
+     * 查询付款明细的期数
+     * @param opaymentDetailId
+     * @return
+     */
+    public OPaymentDetail selectoPaymentDetail(String opaymentDetailId);
 
 }
