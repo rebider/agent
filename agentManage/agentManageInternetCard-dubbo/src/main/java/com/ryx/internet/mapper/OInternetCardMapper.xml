@@ -760,6 +760,18 @@
       </foreach>
       )
     </if>
+    <if test="reqMap.renewStatusList!=null and reqMap.renewStatusList.size>0">
+        and i.RENEW_STATUS
+      <foreach collection="reqMap.renewStatusList" item="renewStatus" open=" in(" close=")" separator=",">
+        #{renewStatus}
+      </foreach>
+    </if>
+    <if test="reqMap.internetCardStatusList!=null and reqMap.internetCardStatusList.size>0">
+      and i.INTERNET_CARD_STATUS
+      <foreach collection="reqMap.internetCardStatusList" item="internetCardStatus" open=" in(" close=")" separator=",">
+        #{internetCardStatus}
+      </foreach>
+    </if>
     <if test="reqMap.orgCode!=null and reqMap.orgCode!='' and reqMap.agentNameList==null">
       and (oa.CODE like concat(#{reqMap.orgCode},'%') or ob.CODE like concat(#{reqMap.orgCode},'%'))
     </if>

@@ -3,6 +3,7 @@ package com.ryx.internet.pojo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class OInternetRenewDetail implements Serializable {
     private String id;
@@ -74,6 +75,16 @@ public class OInternetRenewDetail implements Serializable {
     private String expireTimeBeginStr;
 
     private String expireTimeEndStr;
+
+    private List<String> renewStatusList;
+
+    public List<String> getRenewStatusList() {
+        return renewStatusList;
+    }
+
+    public void setRenewStatusList(List<String> renewStatusList) {
+        this.renewStatusList = renewStatusList;
+    }
 
     public String getBusNum() {
         return busNum;
