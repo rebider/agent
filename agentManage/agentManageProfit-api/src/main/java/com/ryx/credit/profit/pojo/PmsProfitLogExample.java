@@ -2,10 +2,11 @@ package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PmsProfitLogExample {
+public class PmsProfitLogExample implements Serializable {
     protected String orderByClause;
 
     protected boolean distinct;

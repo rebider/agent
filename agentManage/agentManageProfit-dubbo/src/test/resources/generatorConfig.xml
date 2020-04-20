@@ -84,7 +84,7 @@
 		<!--<table tableName="P_FREEZE_AGENT" domainObjectName="FreezeAgent" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="P_POS_REWARD" domainObjectName="PosReward" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="P_TEMPLATE_APPLY_RECORD" domainObjectName="TemplateRecode" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
-		<!--<table tableName="P_IMPORT_DATA_WITH_PROFIT_LOG" domainObjectName="ImportDataWithProfitLog" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
+		<!--<table tableName="PMS_PROFIT_LOG" domainObjectName="ImportDataWithProfitLog" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
 		<table tableName="P_IMPORT_DATA_WITH_PROFIT" domainObjectName="ImportDataWithProfit" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
 	</context>
 </generatorConfiguration>

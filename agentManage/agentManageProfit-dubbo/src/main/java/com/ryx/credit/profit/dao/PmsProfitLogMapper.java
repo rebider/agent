@@ -34,4 +34,5 @@ public interface PmsProfitLogMapper {
 
     long getCountByMap(@Param("param")Map<String,String>param);
 
+    int updataNoteAndStatusByBatchCode(@Param("batchCode") String batchCode, @Param("status") String status, @Param("note") String note);
 }

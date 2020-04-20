@@ -929,7 +929,7 @@
     DELETE FROM P_IMPORT_DATA_WITH_PROFIT PD
     WHERE EXISTS(
                   SELECT 1
-                  FROM P_IMPORT_DATA_WITH_PROFIT_LOG LOG
+                  FROM PMS_PROFIT_LOG LOG
                   WHERE LOG.ID = #{id,jdbcType=VARCHAR} AND PD.MONTH = LOG.MONTH
                   AND PD.IMPORT_TYPE = LOG.IMPORT_TYPE AND PD.UPLOAD_USER = LOG.UPLOAD_USER
                 )

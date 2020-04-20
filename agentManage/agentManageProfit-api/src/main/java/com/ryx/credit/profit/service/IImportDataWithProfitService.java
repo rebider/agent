@@ -1,6 +1,6 @@
 package com.ryx.credit.profit.service;
 
-import com.ryx.credit.profit.pojo.ImportDataWithProfitLog;
+import com.ryx.credit.profit.pojo.PmsProfitLog;
 
 import java.util.Map;
 import java.util.List;
@@ -11,14 +11,14 @@ public interface IImportDataWithProfitService {
      * @param importLog
      * @return
      */
-    int insertImportLog(ImportDataWithProfitLog importLog);
+    int insertImportLog(PmsProfitLog importLog);
 
     /**
      * 获取导入记录
      * @param batchCode
      * @return
      */
-    List<ImportDataWithProfitLog> getImportLogByBatchCode(String batchCode);
+    PmsProfitLog getImportLogByBatchCode(String batchCode);
     /**
      * 插入分润数据
      * @param profitDatas

@@ -317,4 +317,9 @@ select aa.ID,aa.AG_NAME,bb.BUS_PLATFORM,cc.PLATFORM_NAME  from A_AGENT aa,A_AGEN
     )
   </select>
 
+  <update id="updataNoteAndStatusByBatchCode">
+    update PMS_PROFIT_LOG set status = #{status,jdbcType=VARCHAR} , note = #{note,jdbcType=VARCHAR}
+    where id = #{batchCode,jdbcType=VARCHAR}
+  </update>
+
 </mapper>

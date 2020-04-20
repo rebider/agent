@@ -2,11 +2,10 @@ package com.ryx.credit.profit.service.impl;
 
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.profit.dao.ImportDataWithProfitLogMapper;
 import com.ryx.credit.profit.dao.ImportDataWithProfitMapper;
+import com.ryx.credit.profit.dao.PmsProfitLogMapper;
 import com.ryx.credit.profit.pojo.ImportDataWithProfitExample;
-import com.ryx.credit.profit.pojo.ImportDataWithProfitLog;
-import com.ryx.credit.profit.pojo.ImportDataWithProfitLogExample;
+import com.ryx.credit.profit.pojo.PmsProfitLog;
 import com.ryx.credit.profit.service.IImportDataWithProfitService;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -33,21 +32,18 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
 
 
     @Autowired
-    private ImportDataWithProfitLogMapper importDataWithProfitLogMapper;
+    private PmsProfitLogMapper pmsProfitLogMapper;
     @Autowired
     private ImportDataWithProfitMapper importDataWithProfitMapper;
 
     @Override
-    public int insertImportLog(ImportDataWithProfitLog importLog) {
-        return importDataWithProfitLogMapper.insert(importLog);
+    public int insertImportLog(PmsProfitLog importLog) {
+        return pmsProfitLogMapper.insert(importLog);
     }
 
     @Override
-    public List<ImportDataWithProfitLog> getImportLogByBatchCode(String batchCode) {
-        ImportDataWithProfitLogExample example = new ImportDataWithProfitLogExample();
-        ImportDataWithProfitLogExample.Criteria criteria = example.createCriteria();
-        criteria.andIdEqualTo(batchCode);
-        return importDataWithProfitLogMapper.selectByExample(example);
+    public PmsProfitLog getImportLogByBatchCode(String batchCode) {
+        return pmsProfitLogMapper.selectByPrimaryKey(batchCode);
     }
 
     @Override
@@ -87,11 +83,10 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
     @Override
     public String insertProfitDataByBatchCode(String batchCode) throws Exception {
         //1. 根据batchCode找到文件路径
-        List<ImportDataWithProfitLog> logs = getImportLogByBatchCode(batchCode);
-        if (logs.size()<1){
-            throw new MessageException("");
+        PmsProfitLog log =  getImportLogByBatchCode(batchCode);
+        if (log==null){
+            throw new MessageException("未找到该记录");
         }
-        ImportDataWithProfitLog log = logs.get(0);
 
         String path = log.getUploadPath();
         File file = new File(path);
@@ -107,7 +102,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
             data = new XSSFWorkbook(inputStream);
         }else{
             //文件类型错误，更新记录
-            importDataWithProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1","数据导入失败，文件类型异常！");
+            pmsProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1","数据导入失败，文件类型异常！");
             return "数据导入失败，请检查文件类型。";
         }
 
@@ -118,14 +113,14 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
         resultMap = checkExcelData(data);
         if ("Error".equals(resultMap.get("resultCode"))){    //存在异常数据，生成备注更新导入结果
             String errMsg = resultMap.get("errMsg");
-            importDataWithProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1",errMsg);
+            pmsProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1",errMsg);
             return "数据导入失败,请检查导入文件";
         }
         //2.校验代理商信息
         resultMap = checkAgentData(data,log.getMonth());
         if ("Error".equals(resultMap.get("resultCode"))){    //存在异常数据，生成备注更新导入结果
             String errMsg = resultMap.get("errMsg");
-            importDataWithProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1",errMsg);
+            pmsProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1",errMsg);
             return "数据导入失败,请确认导入数据的完整性";
         }
 
@@ -158,7 +153,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
         int size = taskList.size();
         if (size!=numOfSheets){ //进程任务数量与sheet页个数不一致
             importDataWithProfitMapper.deleteProfitDataByBatchCode(batchCode);//手动回滚
-            importDataWithProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1","进程任务数量与sheet页个数不一致");
+            pmsProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1","进程任务数量与sheet页个数不一致");
             return "数据导入失败";
         }
 
@@ -185,12 +180,12 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
 
         if (!isSuccess){
             importDataWithProfitMapper.deleteProfitDataByBatchCode(batchCode);//手动回滚
-            importDataWithProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1",tempBuffer.toString());
+            pmsProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1",tempBuffer.toString());
             return "数据导入失败";
         }
 
         //数据导入成功
-        importDataWithProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"0","");
+        pmsProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"0","");
 
         return "数据导入成功";
     }
@@ -465,11 +460,11 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
     }
 
     class SheetThead  implements Callable<Map<String,String>>{
-        private ImportDataWithProfitLog log;
+        private PmsProfitLog log;
         private Sheet sheet;
         private int sheetOrder;
 
-        SheetThead(ImportDataWithProfitLog log,Sheet sheet,int sheetOrder){
+        SheetThead(PmsProfitLog log, Sheet sheet, int sheetOrder){
             this.log=log;
             this.sheet=sheet;
             this.sheetOrder=sheetOrder;
@@ -485,7 +480,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
         }
     }
 
-    private Map<String,String> doInsertData(ImportDataWithProfitLog log, Sheet sheet, String sheetName, int sheetOrder) {
+    private Map<String,String> doInsertData(PmsProfitLog log, Sheet sheet, String sheetName, int sheetOrder) {
         Map<String,String> result = new HashMap<String,String>();
         int numberOfRows = sheet.getPhysicalNumberOfRows();//行数
         if (numberOfRows<=0){

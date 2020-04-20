@@ -17,6 +17,8 @@ public class PmsProfitLog implements Serializable {
 
     private String uploadUser;
 
+    private String statusName;
+
     private String status;
 
     private String note;
