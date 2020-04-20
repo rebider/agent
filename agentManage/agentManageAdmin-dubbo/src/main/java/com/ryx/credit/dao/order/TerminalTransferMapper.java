@@ -45,7 +45,7 @@ public interface TerminalTransferMapper {
 
     Map<String, Object> queryPlatFrom(String PLATFORM_NUM);
 
-    List<Map<String, Object>> queryBusInfo(Map<String,String> param);
+    List<Map<String, Object>> queryBusInfo(Map<String, String> param);
 
     int checkSnIsTransfer(Map map);
 
@@ -54,7 +54,7 @@ public interface TerminalTransferMapper {
      * @param param
      * @return
      */
-    List<Map<String, Object>> queryToolsFloor(Map<String,String> param);
+    List<Map<String, Object>> queryToolsFloor(Map<String, String> param);
 
     /**
      * 根据平台码查询代理商基础配置
@@ -62,5 +62,12 @@ public interface TerminalTransferMapper {
      * @return
      */
     Map<String, Object> agentBase(@Param("BUS_NUM") String BUS_NUM);
+
+    /**
+     * 根据平台码查询所有下级
+     * @param bus_num
+     * @return
+     */
+    List<Map<String, Object>> queryLowerAgentAll(String bus_num);
 
 }

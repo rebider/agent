@@ -9,28 +9,28 @@ import java.util.concurrent.FutureTask;
 
 public class FutureTaskUtils {
 
-    public static Map<String, String> getTaskResult(List<FutureTask<Map<String, String>>> taskList, List<String> taskNameList, Logger logger) {
-        Map<String, String> result = new HashMap<>();
-        Boolean success = Boolean.TRUE;
+    public static Map<String, Object> getTaskResult(List<FutureTask<Map<String, Object>>> taskList, List<String> taskNameList, Logger logger) {
+        Map<String, Object> result = new HashMap<>();
         for (int i = 0; i < taskList.size(); i++) {
-            FutureTask<Map<String, String>> thread = taskList.get(i);
-
+            logger.info(taskNameList.get(i) + "开始执行");
+            FutureTask<Map<String, Object>> thread = taskList.get(i);
             try {
-                Map<String, String> sheetMap = thread.get();
+                Map<String, Object> sheetMap = thread.get();
                 if (sheetMap.get("result").equals("success")) {
                     continue;
-                } else if(sheetMap.get("result").equals("fail")){
-                    result.put("result","fail");
-                    result.put("Err",sheetMap.get("Err"));
-                    return sheetMap;
+                } else if (sheetMap.get("result").equals("fail")) {
+                    result.put("result", "fail");
+                    result.put("Err", sheetMap.get("Err"));
+                    return result;
+                } else if (sheetMap.get("result").equals("dispose")) {
+                    result.put("result", "dispose");
+                    result.put(taskNameList.get(i), sheetMap.get("disposeResult"));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            result.put("result","success");
-		}
-		return result;
-	}
+        }
+        return result;
+    }
 
 }
