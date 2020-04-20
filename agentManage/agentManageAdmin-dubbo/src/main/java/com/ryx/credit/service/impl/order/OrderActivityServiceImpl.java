@@ -150,10 +150,20 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         if (StringUtils.isBlank(activity.getVender())) {
             logger.info("请选择厂家");
             throw new MessageException("请选择厂家");
+        }else {
+            Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), activity.getVender());
+            if(null==dictByValue){
+                throw new MessageException("请选择或者填写正确的厂家");
+            }
         }
         if (StringUtils.isBlank(activity.getProModel())) {
             logger.info("请选择型号");
             throw new MessageException("请选择型号");
+        } else {
+            Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.PROMODE.name(), activity.getProModel());
+            if(null==dictByValue){
+                throw new MessageException("请选择或者填写正确的型号");
+            }
         }
         if (StringUtils.isBlank(activity.getPlatform())) {
             logger.info("请选择平台类型");
@@ -245,7 +255,27 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         if (activity.getPrice() == null) {
             return new AgentResult(500, "活动价格不能为空", "");
         }
+        if (StringUtils.isBlank(activity.getVender())) {
+            logger.info("请选择厂家");
+            return AgentResult.fail("请选择厂家");
+        }else {
+            Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), activity.getVender());
+            if(null==dictByValue){
+                logger.info("请选择或者填写正确的厂家");
+                return AgentResult.fail("请选择或者填写正确的厂家");
+            }
+        }
+        if (StringUtils.isBlank(activity.getProModel())) {
+            logger.info("请选择型号");
+            return AgentResult.fail("请选择型号");
 
+        }else {
+            Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.PROMODE.name(), activity.getProModel());
+            if(null==dictByValue){
+                logger.info("请选择或者填写正确的型号");
+                return AgentResult.fail("请选择或者填写正确的型号");
+            }
+        }
         String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
 
         if (StringUtils.isNotBlank(platFormType)) {
@@ -350,6 +380,28 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         }
         if (activity.getPrice() == null) {
             return new AgentResult(500, "活动价格不能为空", "");
+        }
+        if (StringUtils.isBlank(activity.getVender())) {
+            logger.info("请选择厂家");
+            return AgentResult.fail("请选择厂家");
+        }else {
+            Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), activity.getVender());
+            if(null==dictByValue){
+                logger.info("请选择或者填写正确的厂家");
+                return AgentResult.fail("请选择或者填写正确的厂家");
+            }
+        }
+
+        if (StringUtils.isBlank(activity.getProModel())) {
+            logger.info("请选择型号");
+            return AgentResult.fail("请选择型号");
+
+        }else {
+            Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.PROMODE.name(), activity.getProModel());
+            if(null==dictByValue){
+                logger.info("请选择或者填写正确的型号");
+                return AgentResult.fail("请选择或者填写正确的型号");
+            }
         }
 
         String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
