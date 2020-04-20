@@ -343,12 +343,12 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
                 //可以更换活动，封装参参数返回
                 return AgentResult.ok(resJson.get("result"));
             } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
-                //不可以更换活动
+                //不能调整活动
                 JSONArray resultArr = resJson.getJSONArray("result");
                 String reason = resultArr.getJSONObject(0).getString("reason");
                 String snBegin = resultArr.getJSONObject(0).getString("posSnBegin");
                 String sEnd = resultArr.getJSONObject(0).getString("posSnEnd");
-                return AgentResult.fail(snBegin + "-" + sEnd + ":" + reason + "，不可以更换活动！");
+                return AgentResult.fail(snBegin + "-" + sEnd + ":" + reason + "，不能调整活动！");
             } else {
                 //异常结果
                 return AgentResult.fail("查询瑞大宝换活动返回值异常！");
