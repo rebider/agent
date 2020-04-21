@@ -1023,9 +1023,6 @@
 
   <select id="getListBySheetInfo" resultType="java.util.Map">
     select pd.* from P_IMPORT_DATA_WITH_PROFIT pd
-    <if test="param.agDoc != '' and param.agDoc != null">
-      left join (select distinct AGENT_ID,AG_DOC_PRO from A_AGENT_BUSINFO) ab on pd.AGENT_ID = ab.AGENT_ID
-    </if>
     where 1 = 1
     <if test="param.type != '' and param.type != null">
       and  pd.IMPORT_TYPE = #{param.type}
@@ -1040,8 +1037,11 @@
       and  pd.AGENT_NAME = #{param.agentName}
     </if>
     <if test="param.agDoc != '' and param.agDoc != null">
-      and  ( ab.AG_DOC_PRO in ( select id from C_ORGANIZATION where PID = #{param.agDoc} )
-      or ab.AG_DOC_PRO = #{param.agDoc} )
+    and pd.AGENT_ID in(
+    select distinct AGENT_ID from A_AGENT_BUSINFO where
+      AG_DOC_PRO in ( select id from C_ORGANIZATION where PID = #{param.agDoc} )
+      or AG_DOC_PRO = #{param.agDoc}
+    )
     </if>
     <if test="param.sheetName != '' and param.sheetName != null">
       and pd.SHEET_NAME = #{param.sheetName}
