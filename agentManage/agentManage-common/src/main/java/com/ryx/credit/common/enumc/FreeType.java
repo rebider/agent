@@ -16,7 +16,7 @@ import java.util.Map;
 public enum FreeType {
 
     AGNET(1,"本级代理商"),
-    SUB_AGENT(2,"直签下级代理商");
+    SUB_AGENT(2,"非直签下级");
 
     public BigDecimal code;
 
