@@ -368,15 +368,18 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
      */
     @Override
     public AgentResult queryCompensateResult(Map<String, Object> map, String platformType) throws Exception {
+
+        if (null == map || null == map.get("serialNumber") || null == map.get("taskId"))
+            AgentResult.fail().setMsg("瑞大宝查询换活动结果参数为空！");
         String serialNumber = map.get("serialNumber").toString();
-        //查询taskID
-        Map<String, Object> detailMap = orderActivityService.queryTaskIdForChangeActive(serialNumber);
-        if (null == detailMap.get("REFUND_PRICE_DIFF_ID")) throw new Exception("查询退补差价明细失败！");
+        String taskId = map.get("taskId").toString();
+        if (StringUtils.isBlank(serialNumber) || StringUtils.isBlank(taskId))
+            AgentResult.fail().setMsg("瑞大宝查询换活动结果参数为空！");
 
         try {
-            String json = JSONObject.toJSONString(FastMap.fastMap("taskId", detailMap.get("REFUND_PRICE_DIFF_ID")));
+            String json = JSONObject.toJSONString(FastMap.fastMap("taskId", taskId).putKeyV("serialNumber", serialNumber));
             logger.info("RDB换活动查询结果请求:{}", json);
-            String respResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.checkResult"), json);
+            String respResult = HttpClientUtil.doPostJsonWithException(AppConfig.getProperty("rdbpos.checkTermResult"), json);
             logger.info("RDB换活动查询结果返回:{}", respResult);
 
             if (!StringUtils.isNotBlank(respResult)) {

@@ -2087,9 +2087,9 @@ public class CompensateServiceImpl implements CompensateService {
         ORefundPriceDiffDetail detail =  refundPriceDiffDetailMapper.selectByPrimaryKey(id);
         try {
             AgentResult agentResult = termMachineService.queryCompensateResult(
-                    FastMap.fastMap("serialNumber", detail.getId())
-                            .putKeyV("taskId", detail.getRefundPriceDiffId()),
+                    FastMap.fastMap("serialNumber", detail.getId()).putKeyV("taskId", detail.getRefundPriceDiffId()),
                     detail.getPlatformType());
+
             if(agentResult.isOK()){
                 //成功
                 if("00".equals(agentResult.getData())){
