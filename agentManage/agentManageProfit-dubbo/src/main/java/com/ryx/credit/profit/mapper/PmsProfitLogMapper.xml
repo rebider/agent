@@ -279,7 +279,7 @@ select aa.ID,aa.AG_NAME,bb.BUS_PLATFORM,cc.PLATFORM_NAME  from A_AGENT aa,A_AGEN
   <sql id="selectRecord_unionSql">
     select
         pr.BATCH_NO ,pr.UPLOAD_PATH ,pr.UPLOAD_NAME ,pr.UPLOAD_TIME ,
-        pr.STATUS ,pr.NOTE ,pr.MONTH ,cu.NAME  ,pr.IMPORT_TYPE
+        pr.STATUS ,to_char(pr.NOTE) NOTE ,pr.MONTH ,cu.NAME  ,pr.IMPORT_TYPE
     from PMS_PROFIT_LOG pr
     left join C_USER cu on pr.UPLOAD_USER=cu.ID
     where 1 = 1
