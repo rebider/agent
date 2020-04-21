@@ -1235,7 +1235,7 @@ union
     select
        distinct(ab.bus_platform) as bus_platform
       from A_AGENT_BUSINFO ab
-     where ab.AGENT_ID = #{reqMap.agentId}
+     where ab.AGENT_ID = #{reqMap.agentId} and ab.status = 1 and ab.Bus_Status = 1
      <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
        and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
      </if>
@@ -1253,7 +1253,7 @@ union
     select
        distinct(ab.BUS_TYPE) as BUS_TYPE
       from A_AGENT_BUSINFO ab
-     where ab.AGENT_ID = #{reqMap.agentId}
+     where ab.AGENT_ID = #{reqMap.agentId} and ab.status = 1 and ab.Bus_Status = 1
     <if test="reqMap.cloReviewStatus !=null and reqMap.cloReviewStatus !=''">
       and CLO_REVIEW_STATUS = #{reqMap.cloReviewStatus}
     </if>
@@ -1369,9 +1369,9 @@ union
       from a_agent_businfo b
       left join a_agent a on  a.id=b.agent_id and a.status=1
       left join a_platform c on c.platform_num=b.bus_platform and c.status=1
-      where a.status=1 and a.ag_status='Approved' and b.status=1 and b.clo_review_status=3 and b.bus_status in (0,1,2,3)
       left join C_ORGANIZATION o1 on o1.id = b.AG_DOC_DISTRICT
       left join C_ORGANIZATION o2 on o2.id = b.AG_DOC_PRO
+      where a.status=1 and a.ag_status='Approved' and b.status=1 and b.clo_review_status=3 and b.bus_status in (0,1,2,3)
       and c.platform_type=#{platformType} and b.bus_num is not NULL
       <if test="busNum!=null and busNum!=''">and b.bus_num=#{busNum}</if>
     <include refid="OracleDialectSuffix"/>
@@ -1439,4 +1439,28 @@ union
                  left join c_organization c on c.id = CBI.BRANCH_LOGIN
         WHERE CBI.STATUS = 1 and INNER_LOGIN = #{account}
     </select>
+  <select id="queryTreeByBusInfoAndDict" parameterType="map" resultType="map">
+    select
+    A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,A.AG_DOC_PRO,
+    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME,(C.PLATFORM_NAME||'-'||A.BUS_NUM) as FIELDSHOW,c.PLATFORM_TYPE
+    from
+    a_agent_businfo a
+    left join a_agent b on a.agent_id=b.id
+    left join a_platform c on c.platform_num = a.bus_platform
+    LEFT JOIN D_DICT D ON c.platform_num = A.BUS_PLATFORM AND d.d_itemvalue=c.platform_type AND  D.D_GROUP=#{dictGroup} AND  D.D_ARTIFACT = #{dictItem}
+    <where>
+      c.platform_type in
+      (
+        SELECT  dd.d_itemvalue FROM d_dict dd
+        WHERE dd.d_group = #{dictGroup} AND dd.d_artifact = #{dictItem}
+      )
+      and a.agent_id = #{agentId}
+      <if test="busId != null"> and a.id = #{busId} </if>
+      and c.status = 1
+      and d.d_status = 1
+      AND b.status =1
+      and a.status = 1
+      and a.clo_review_status IN (2,3)
+    </where>
+  </select>
 </mapper>

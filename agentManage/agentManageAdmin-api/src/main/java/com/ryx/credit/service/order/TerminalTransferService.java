@@ -67,5 +67,11 @@ public interface TerminalTransferService {
      * @return
      */
     Map<String, Object> agentBase(@Param("BUS_NUM") String BUS_NUM);
+    /**
+     * 根据平台码查询所有下级
+     * @param bus_num
+     * @return
+     */
+    List<Map<String, Object>> queryLowerAgentAll(String bus_num);
 
 }

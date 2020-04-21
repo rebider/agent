@@ -145,7 +145,7 @@ public class PlannerServiceImpl implements PlannerService {
                 throw new MessageException("收货单商品未找到!");
             }
             if(receiptPlan.getPlanProNum().compareTo(oReceiptPro.getProNum().subtract(oReceiptPro.getSendNum()))>0){
-                throw new MessageException("此条配货信息已变更  请点击查询按钮以获取数据!!");
+                throw new MessageException("排单量不能大于订货数量！");
             }
             String planId = idService.genId(TabId.o_receipt_plan);
             receiptPlan.setId(planId);
