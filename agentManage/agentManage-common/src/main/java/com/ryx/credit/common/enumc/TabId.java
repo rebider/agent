@@ -127,7 +127,14 @@ public enum TabId {
     AUTH_SYS_CODE("ASC%s%015d"),
     AUTH_LOGIN_TOKEN("ALT%s%015d"),
     O_PAY_DETAIL("OPDL%s%015d"),
-    O_ORDER_ADJ_ACCOUNT("OAC%s%015d");
+    JO_KEY_MANAGE("JK%s%015d"),
+    jo_order("JO%s%015d"),
+    jo_task("JT%s%015d"),
+    jo_expand_key("JE%s%015d"),
+    jo_order_task("JT%s%015d"),
+    jo_order_expand("JE%s%015d"),
+    jo_custom_key("JCK%s%015d"),
+    O_ORDER_ADJ_ACCOUNT("OAC%s%015d")
 
     public String patt;
 

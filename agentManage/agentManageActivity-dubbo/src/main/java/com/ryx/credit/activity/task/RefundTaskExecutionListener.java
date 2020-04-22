@@ -34,7 +34,9 @@ public class RefundTaskExecutionListener  extends BaseTaskListener implements Ta
 
     @Override
     public void notify(DelegateExecution delegateExecution) throws Exception {
+        logger.info("线上订单退货监听执行，{}，{}，{}", delegateExecution.getProcessInstanceId(),delegateExecution.getEventName(),delegateExecution.getId());
         String eventName = delegateExecution.getEventName();
+        logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName);
         if ("start".equals(eventName)) {
             logger.info("start=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
         } else if ("end".equals(eventName)) {
@@ -43,12 +45,12 @@ public class RefundTaskExecutionListener  extends BaseTaskListener implements Ta
             IOrderReturnService orderReturnService = (IOrderReturnService) MySpringContextHandler.applicationContext.getBean("orderReturnService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
-                logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName);
+                logger.info("=========RefundTaskExecutionListener 流程 {} eventName {} res {}", delegateExecution.getProcessInstanceId(), eventName);
                 orderReturnService.approvalReject(delegateExecution.getProcessInstanceId(),activityName);
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-                logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName);
+                logger.info("=========RefundTaskExecutionListener 流程 {} eventName {} res {}", delegateExecution.getProcessInstanceId(), eventName);
                 orderReturnService.approvalFinish(delegateExecution.getProcessInstanceId(),activityName);
             }
         } else if ("take".equals(eventName)) {

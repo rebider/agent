@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 作者：cx chenxiao 123123
+ * 作者：cx chenxiao
  * 时间：2019/3/7
  * 描述：历史订单监听
  */
@@ -20,7 +20,7 @@ public class OldOrderReturnTaskExcutionListener  extends BaseTaskListener  imple
 
     @Override
     public void notify(DelegateExecution delegateExecution) throws Exception {
-        logger.info("======{}==={}==={}",delegateExecution.getProcessInstanceId(),delegateExecution.getEventName(),delegateExecution.getId());
+        logger.info("历史订单退货监听执行，{}，{}，{}", delegateExecution.getProcessInstanceId(),delegateExecution.getEventName(),delegateExecution.getId());
         String eventName = delegateExecution.getEventName();
         if ("start".equals(eventName)) {
             logger.info("start=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());

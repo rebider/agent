@@ -482,7 +482,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     @Override
     public void approvalReject(String processInstanceId, String activityName) throws MessageException{
         try {
-            logger.info("退货审批拒绝回调:{},{}", processInstanceId, activityName);
+            logger.info("历史订单退货审批拒绝回调:{},{}", processInstanceId, activityName);
             //审批流关系
             BusActRel rel = busActRelService.findById(processInstanceId);
             rel.setActivStatus(AgStatus.Refuse.name());

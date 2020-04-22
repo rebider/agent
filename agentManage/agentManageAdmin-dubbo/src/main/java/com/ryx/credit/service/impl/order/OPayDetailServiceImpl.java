@@ -44,7 +44,7 @@ public class OPayDetailServiceImpl implements OPayDetailService {
                 oPayDetailVo.setArrId(oPayDetail.getArrId());
                 oPayDetailVo.setAmount(oPayDetail.getAmount());
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(oPayDetailVo.getArrId());
-                if (null != oPaymentDetail){
+                if (null !=oPaymentDetail){
                     oPayDetailVo.setOrderId(oPaymentDetail.getOrderId());
                 }
                 oPayDetailVos.add(oPayDetailVo);
