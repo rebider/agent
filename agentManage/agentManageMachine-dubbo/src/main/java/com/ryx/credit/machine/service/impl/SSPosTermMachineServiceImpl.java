@@ -621,6 +621,6 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
-        return AgentResult.fail("实时POS未实现！");
+        return AgentResult.fail("实时POS平台暂不支持重新发送！");
     }
 }

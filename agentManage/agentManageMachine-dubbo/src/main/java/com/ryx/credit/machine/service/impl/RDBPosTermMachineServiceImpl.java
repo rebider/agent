@@ -538,31 +538,30 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
-        return AgentResult.fail("瑞大宝未实现！");
-        /*try {
+        try {
             String httpString = JSONObject.toJSONString(pamMap);
-            logger.info("手刷换活动失败重新发送参数:{},{}", AppConfig.getProperty("mpos.termUnlock"), httpString);
-            String retString = HttpClientUtil.doPostJson(AppConfig.getProperty("mpos.termUnlock"), httpString);
+            logger.info("手刷换活动失败重新发送参数:{},{}", AppConfig.getProperty("rdbpos.retry"), httpString);
+            String retString = HttpClientUtil.doPostJson(AppConfig.getProperty("rdbpos.retry"), httpString);
             logger.info("手刷换活动失败重新发送返回值:{}", retString);
 
             //验证返回值
-            if (!StringUtils.isNotBlank(retString)) return AgentResult.fail("手刷换活动失败重新发送，返回值为空。");
+            if (!StringUtils.isNotBlank(retString)) return AgentResult.fail("瑞大宝换活动失败重新发送，返回值为空。");
             JSONObject resJson = JSONObject.parseObject(retString);
 
             //返回最终查询结果
-            if (null != resJson.getString("code") && resJson.getString("code").equals("00")) {
+            if (null != resJson.getString("code") && resJson.getString("code").equals("0000")) {
                 //可以更换活动，封装参参数返回
-                return AgentResult.ok(resJson.get("result"));
+                return AgentResult.ok();
             } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
                 //不可以更换活动
                 return AgentResult.fail(resJson.getString("msg") + "，不可以更换活动！");
             } else {
                 //异常结果
-                return AgentResult.fail("查询手刷换活动返回值异常！");
+                return AgentResult.fail("瑞大宝换活动失败重新下发返回值异常！");
             }
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
-        }*/
+        }
     }
 }

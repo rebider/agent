@@ -439,7 +439,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
-        return AgentResult.fail("手刷未实现！");
+        return AgentResult.fail("手刷平台暂不支持重新发送！");
         /*try {
             String httpString = JSONObject.toJSONString(pamMap);
             logger.info("手刷换活动失败重新发送参数:{},{}", AppConfig.getProperty("mpos.termUnlock"), httpString);

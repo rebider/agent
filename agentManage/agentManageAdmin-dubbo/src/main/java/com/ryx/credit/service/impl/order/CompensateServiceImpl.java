@@ -1620,8 +1620,9 @@ public class CompensateServiceImpl implements CompensateService {
             //更新退补差价明细状态
             if (agentResult.isOK()) {
                 oRefundPriceDiffDetail.setSendStatus(LogisticsSendStatus.send_ing.code);//更新成联动业务系统处理中
+                oRefundPriceDiffDetail.setSendMsg("");
             } else {
-                oRefundPriceDiffDetail.setStatus(Status.STATUS_2.status);//更新成失败
+                throw new ProcessException(agentResult.getMsg());
             }
             if (1 != refundPriceDiffDetailMapper.updateByPrimaryKeySelective(oRefundPriceDiffDetail))
                 throw new ProcessException("更新退补差价明细异常！");

@@ -466,7 +466,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
     @Override
     public AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
-        return AgentResult.fail("POS未实现！");
+        return AgentResult.fail("POS平台暂不支持重新发送！");
         /*Object o = JSONObject.toJSON(pamMap);
         JSONObject data = new JSONObject();
         data.put("serialNumber", serialNumber);
