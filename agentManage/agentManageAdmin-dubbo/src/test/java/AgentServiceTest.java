@@ -3,6 +3,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.dao.order.OLogisticsDetailMapper;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
+import com.ryx.credit.service.agent.AgentDebitCardFileService;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.DataChangeActivityService;
@@ -39,7 +40,14 @@ public class AgentServiceTest extends BaseSpringTest  {
     private TerminalTransferService terminalTransferService;
     @Autowired
     private DataChangeActivityService dataChangeActivityService;
+    @Autowired
+    private AgentDebitCardFileService agentDebitCardFileService;
 
+
+    @Test
+    public void export() throws Exception {
+        agentDebitCardFileService.exportsForZHposOrPlus();
+    }
     @Test
     public void testNotify(){
 //        agentNotifyService.asynNotifyPlatform();
