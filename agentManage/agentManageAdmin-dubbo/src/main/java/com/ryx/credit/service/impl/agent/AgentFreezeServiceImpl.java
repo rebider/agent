@@ -140,19 +140,20 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             for (BigDecimal freeType:agentFreezePort.getFreeType()){
                 log.info("冻结类型为[{}]",FreeType.getmsg(freeType));
                 AgentFreezeExample agentFreezeExample = new AgentFreezeExample();
-                AgentFreezeExample.Criteria criteria = agentFreezeExample.createCriteria();
-                criteria.andFreezeTypeIsNull();
-                criteria.andStatusEqualTo(Status.STATUS_1.status);
-                criteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
-                criteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
-                criteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                agentFreezeExample.or()
+                        .andFreezeTypeEqualTo(freeType)
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andAgentIdEqualTo(agentFreezePort.getAgentId())
+                        .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
+                        .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+
                 if (freeType.compareTo(FreeType.AGNET.code) == 0){
-                    agentFreezeExample.or()
-                            .andFreezeTypeEqualTo(freeType)
-                            .andStatusEqualTo(Status.STATUS_1.status)
-                            .andAgentIdEqualTo(agentFreezePort.getAgentId())
-                            .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
-                            .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                    AgentFreezeExample.Criteria criteria = agentFreezeExample.createCriteria();
+                    criteria.andFreezeTypeIsNull();
+                    criteria.andStatusEqualTo(Status.STATUS_1.status);
+                    criteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
+                    criteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
+                    criteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
                 }
                 List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
                 if(agentFreezes.size()!=0){
@@ -217,18 +218,18 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             }
             for (BigDecimal freeType:agentFreezePort.getFreeType()){
                 AgentFreezeExample freezeExample = new AgentFreezeExample();
-                AgentFreezeExample.Criteria freezeCriteria = freezeExample.createCriteria();
-                freezeCriteria.andFreezeTypeIsNull();
-                freezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                freezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
-                freezeCriteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
-                freezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                freezeExample.or().andFreezeTypeEqualTo(freeType)
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andAgentIdEqualTo(agentFreezePort.getAgentId())
+                        .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
+                        .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
                 if (freeType.compareTo(FreeType.AGNET.code) == 0){
-                    freezeExample.or().andFreezeTypeEqualTo(freeType)
-                            .andStatusEqualTo(Status.STATUS_1.status)
-                            .andAgentIdEqualTo(agentFreezePort.getAgentId())
-                            .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
-                            .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                    AgentFreezeExample.Criteria freezeCriteria = freezeExample.createCriteria();
+                    freezeCriteria.andFreezeTypeIsNull();
+                    freezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
+                    freezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
+                    freezeCriteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
+                    freezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
                 }
                 List<AgentFreeze> agentFreezeList = agentFreezeMapper.selectByExample(freezeExample);
                 if(agentFreezeList.size()==0){
