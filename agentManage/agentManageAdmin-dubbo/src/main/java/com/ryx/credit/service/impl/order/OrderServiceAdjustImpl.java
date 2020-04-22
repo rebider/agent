@@ -159,6 +159,11 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             agentResult.setMsg("该订单不存在!");
             return agentResult;
         }
+        List<OrderAdjAccountVo>  accounts = orderUpModelVo.getAccounts();
+        if (null == accounts || accounts.size() == 0){
+            agentResult.setMsg("请填写账户信息！");
+            return agentResult;
+        }
         order.setOrderStatus(OrderStatus.LOCK.status);
         if (orderMapper.updateByPrimaryKey(order)!=1){
             agentResult.setMsg("更新订单为["+OrderStatus.LOCK.msg+"]失败!");
@@ -723,6 +728,12 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
         OOrder order = orderMapper.selectByPrimaryKey(orderUpModelVo.getOrderId());
         if (null == order) {
             agentResult.setMsg(orderUpModelVo.getOrderId()+"-此订单不存在！");
+            return agentResult;
+        }
+
+        List<OrderAdjAccountVo>  accounts = orderUpModelVo.getAccounts();
+        if (null == accounts || accounts.size() == 0){
+            agentResult.setMsg("请填写账户信息！");
             return agentResult;
         }
         //检查配货+排单数量
