@@ -118,8 +118,8 @@ public enum DictGroup {
     PLATFROM_TYPE("平台类型"),
     PASSKEY("密码AES_KEY"),
     JOBORDER("工单模块"),
-    JOKEYTYPE("关键词类型")
-    ;
+    JOKEYTYPE("关键词类型"),
+    APPROVAL_OPINION("订单审批意见");
 
 
 

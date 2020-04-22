@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.druid.sql.visitor.functions.If;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -740,9 +742,22 @@ public class OSupplementServiceImpl implements OSupplementService {
 
     @Override
     public BigDecimal selectPayAmout(String srcid, String pkType) {
-        BigDecimal payAmout = oSupplementMapper.selectPayAmout(srcid, pkType);
-        OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectMoney(srcid);
-        BigDecimal amount = (oPaymentDetail.getPayAmount().subtract((oPaymentDetail.getRealPayAmount() == null ? new BigDecimal(0) : oPaymentDetail.getRealPayAmount())).subtract(payAmout));
+//        BigDecimal payAmout = oSupplementMapper.selectPayAmout(srcid, pkType);
+        BigDecimal amount=new BigDecimal(BigInteger.ZERO);
+        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+        OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(srcid);
+        List<OPaymentDetail> oPaymentDetailList = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+        if(null!=oPaymentDetailList && oPaymentDetailList.size()>0){
+            OPaymentDetail oPaymentDetail = oPaymentDetailList.get(0);
+            if(StringUtils.isNotBlank(oPaymentDetail.getOrderId())){
+                SimpleDateFormat mm = new SimpleDateFormat("YYYY-MM");
+                String time = mm.format(new Date());
+                amount=oPaymentDetailMapper.selectQk(oPaymentDetail.getOrderId(),time);
+                if (null==amount){
+                    amount=new BigDecimal(BigInteger.ZERO);
+                }
+            }
+        }
         return amount;
     }
 
@@ -770,6 +785,11 @@ public class OSupplementServiceImpl implements OSupplementService {
     }
 
     @Override
+    public List<OPaymentDetail> selectPaymentDetail(String orderId, String code) {
+        return   oPaymentDetailMapper.selectPaymentDetail(orderId,code, null);
+    }
+
+    @Override
     public List<OPayDetail> selectOpayDetail(OPaymentDetail oPaymentDetail) {
         if(null!=oPaymentDetail){
             if (oPaymentDetail.getPayType().equals(PaymentType.TK.code) || oPaymentDetail.getPayType().equals(PaymentType.GZ.code)){
@@ -779,6 +799,17 @@ public class OSupplementServiceImpl implements OSupplementService {
             }
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public OPaymentDetail selectoPaymentDetail(String orderId) {
+        if (StringUtils.isBlank(orderId)){
+            return null;
+        }
+        SimpleDateFormat mm = new SimpleDateFormat("YYYY-MM");
+        String time = mm.format(new Date());
+        OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectoPaymentDetail(orderId, time);
+        return oPaymentDetail;
     }
 
 }
