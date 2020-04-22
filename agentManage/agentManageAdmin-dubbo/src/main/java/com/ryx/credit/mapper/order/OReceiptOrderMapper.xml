@@ -477,16 +477,16 @@
     c.r_name as ADDR_CITY,
     e.r_name as ADDR_DISTRICT,
     (
-    select LISTAGG(a_approval_flow_record.approval_opinion,';') WITHIN GROUP(ORDER BY ro.order_id)
-    from a_approval_flow_record
-    left join o_order on a_approval_flow_record.bus_id = o_order.id and o_order.status = '1'
-    where o_order.id = ro.order_id and a_approval_flow_record.status = '1' and a_approval_flow_record.bus_type = 'ORDER'
-    <if test="par.approvalOpinion!=null and par.approvalOpinion.size>0">
-      and a_approval_flow_record.approval_person in
-      <foreach collection="par.approvalOpinion" item="approvalOpinionItem" open="(" separator="," close=")">
-        #{approvalOpinionItem.dItemvalue}
-      </foreach>
-    </if>
+      select LISTAGG(re.approval_opinion,';') WITHIN GROUP(ORDER BY rel.activ_id)
+      from a_bus_act_rel rel
+      left join a_approval_flow_record re on re.execution_id = rel.activ_id and rel.status = '1' and re.status = '1'
+      where rel.bus_id = ro.order_id and rel.bus_type = 'ORDER' and re.status = '1' and rel.status = '1'
+      <if test="par.approvalOpinion!=null and par.approvalOpinion.size>0">
+        and re.approval_person in
+        <foreach collection="par.approvalOpinion" item="approvalOpinionItem" open="(" separator="," close=")">
+          #{approvalOpinionItem.dItemvalue}
+        </foreach>
+      </if>
     ) as approval_opinion
     from O_Receipt_order ro
     left join o_Receipt_pro rp on ro.id = rp.receipt_id and rp.status=1
