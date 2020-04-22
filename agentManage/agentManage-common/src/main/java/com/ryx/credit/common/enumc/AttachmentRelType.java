@@ -31,8 +31,7 @@ public enum AttachmentRelType {
     removeAccount("销账附件"),
     orderAdjust("订单调整附件"),
     orderAdjust_refund("订单调整退款附件"),
-    jobOrder("工单任务附件"),
-    orderAdjust_refund("订单调整退款附件");
+    jobOrder("工单任务附件");
 
     public String  msg;
 
