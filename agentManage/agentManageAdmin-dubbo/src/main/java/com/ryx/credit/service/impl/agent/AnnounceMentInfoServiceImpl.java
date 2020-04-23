@@ -312,6 +312,9 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
         Date date = Date.from(zdt.toInstant());
         AnnounceMentInfo announceMentInfo = announceMentInfoMapper.selectByPrimaryKey(announceMentInfoVo.getAnnId());
+        if (null == announceMentInfo){
+            return ResultVO.fail("公告不存在!");
+        }
         announceMentInfo.setAnnoStat(AnnoStat.WAIT.code);
         announceMentInfo.setCreateTm(date);
         try {
