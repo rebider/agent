@@ -378,8 +378,11 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
 </select>
 <select id="selectAnnManage" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix"/>
-    select <include refid="Base_Column_List"/>
+    select
+    ANN_ID, ANN_TITLE, ANN_TYPE, EFFECT_TM, EXPIRE_TM, ANNO_STAT, PUB_TM, PUB_ORG,
+    UP_STAT_USER, UP_STAT_TM, CREATE_TM, CREATE_USER, TO_AGENT, cu.name as PUBLISHER
     from a_announcement_info a
+    left join c_user cu on cu.id = a.publisher
     <where>
         a.ANNO_STAT != 3
         <if test="map.userId!=null and map.userId !=''">
@@ -412,8 +415,11 @@ where ANN_ID = #{annId,jdbcType=VARCHAR}
 </select>
 <select id="selectCountAnnManage" parameterType="map" resultType="int">
     select count(*) from(
-    select <include refid="Base_Column_List"/>
+    select
+    ANN_ID, ANN_TITLE, ANN_TYPE, EFFECT_TM, EXPIRE_TM, ANNO_STAT, PUB_TM, PUB_ORG,
+    UP_STAT_USER, UP_STAT_TM, CREATE_TM, CREATE_USER, TO_AGENT, cu.name as PUBLISHER
     from a_announcement_info a
+    left join c_user cu on cu.id = a.publisher
     <where>
         a.ANNO_STAT != 3
         <if test="map.userId!=null and map.userId !=''">
