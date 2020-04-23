@@ -317,7 +317,7 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         announceMentInfoVo.setAnnoStat(AnnoStat.WAIT.code);
         announceMentInfoVo.setCreateTm(date);
         try {
-            if (1 != announceMentInfoMapper.updateByPrimaryKey(announceMentInfoVo)){
+            if (1 != announceMentInfoMapper.updateByPrimaryKeyWithBLOBs(announceMentInfoVo)){
                 return ResultVO.fail("未更新公告!");
             }
         }catch (Exception e){
