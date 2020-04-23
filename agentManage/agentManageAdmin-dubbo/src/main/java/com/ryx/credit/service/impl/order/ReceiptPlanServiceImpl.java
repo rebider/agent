@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.druid.sql.visitor.functions.If;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
@@ -65,6 +66,10 @@ public class ReceiptPlanServiceImpl implements ReceiptPlanService {
 //        param.put("planOrderStatus", PlannerStatus.YesPlanner.getValue());
         if(param.get("begin")== null && param.get("end")==null && isPlan){
             param.put("isDeliver","yes");//只有导出排单才加此条件，过滤退货
+        }
+        List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.APPROVAL_OPINION.name());
+        if (dictList.size()>0 && dictList!=null) {
+            param.put("approvalOpinion", dictList);
         }
         Long count = receiptPlanMapper.getReceipPlanCount(param);
         List<Map<String, Object>> list = receiptPlanMapper.getReceipPlanList(param);

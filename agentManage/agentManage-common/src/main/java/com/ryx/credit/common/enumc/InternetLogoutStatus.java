@@ -13,12 +13,12 @@ import java.util.Map;
  */
 public enum InternetLogoutStatus {
 
-    ZXZ("ZXZ","注销中"),
-    TJCLZ("TJCLZ","停机处理中"),
-    TJSB("TJSB","停机失败"),
-    DZX("DZX","待注销"),//停机成功
-    ZXCG("ZXCG","注销成功"),
-    SX("SX","失效");
+    ZXZ("ZXZ","待注销"),   // 待注销   提交申请，审批前的状态
+    TJCLZ("TJCLZ","注销中"), // 注销中  审批通过，请求移动停机前
+    TJSB("TJSB","注销失败"), // 注销失败   请求移动停机失败
+    DZX("DZX","已注销"), // 已注销  请求移动停机成功
+    ZXCG("ZXCG","已注销"),// 已注销  注销失败的 人工导入注销的 更改为此状态，中文显示已注销
+    SX("SX","失效"); // 失效  提交申请，被拒绝的状态
 
     public String code;
 

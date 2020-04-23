@@ -360,4 +360,18 @@ public interface OrderService {
      * @return
      */
     AgentResult enableOrderAdjFinish(String orderAdjId)throws Exception;
+
+    /**
+     * 查询订单调整详情
+     * @param par
+     * @param page
+     * @return
+     */
+    PageInfo queryAgentUpModelDetailList(Map par, Page page);
+
+    /**
+     * 订单数量调整明细导出
+     */
+    List<OrderAdjustVo> excelOrderAdjustDetailAll(Map map);
+
 }

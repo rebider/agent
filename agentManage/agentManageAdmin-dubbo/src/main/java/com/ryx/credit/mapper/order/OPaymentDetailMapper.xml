@@ -571,9 +571,24 @@
     </select>
 
     <select id="selectMoney" parameterType="string" resultType="com.ryx.credit.pojo.admin.order.OPaymentDetail">
-        select PAY_AMOUNT as payAmount,REAL_PAY_AMOUNT as realPayAmount from o_Payment_detail where id=#{id} and  PAYMENT_STATUS in(1,3,2)
+        select * from o_Payment_detail where id=#{id} and  PAYMENT_STATUS in(1,3,2)
         and status=1
     </select>
+
+    <select id="selectQk" parameterType="string" resultType="java.math.BigDecimal">
+        select
+        sum(case when o_payment_detail.payment_status in(1,3) then o_payment_detail.pay_amount else 0 end)+
+        sum(case when o_payment_detail.payment_status =2 then o_payment_detail.pay_amount-o_payment_detail.real_pay_amount else 0 end)
+        qiankuan
+        from O_PAYMENT_DETAIL o_payment_detail
+        where  1=1
+        <if test="time!=null and time!='' ">
+            and to_char(o_payment_detail.plan_pay_time,'YYYY-MM')&lt;=#{time}
+        </if>
+        <if test="orderId!=null and orderId!=''"> and o_payment_detail.ORDER_ID=#{orderId} </if>
+        AND status=1 and PAYMENT_STATUS in(1,2,3) order by plan_pay_time
+    </select>
+
 
     <select id="getAllDebtDetail" parameterType="map" resultType="map">
       select * from
@@ -779,6 +794,19 @@
         order by PLAN_PAY_TIME
     </select>
 
+    <select id="selectPaymentDetail" resultMap="BaseResultMap" parameterType="String">
+        select
+        <include refid="Base_Column_List" />
+        from O_PAYMENT_DETAIL
+        <where>
+            <if test=" orderId!= null and orderId != '' ">
+                ORDER_ID=#{orderId}
+            </if>
+        </where>
+        AND PAYMENT_TYPE=#{paymentType} and Payment_status in(1,2,3) and status = 1
+        order by PLAN_PAY_TIME
+    </select>
+
     <select id="selectOPaymentDetail" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List" />
@@ -909,5 +937,13 @@
           and opd.status = '1'
           and od.REVIEW_STATUS = '3'
         order by plan_pay_time asc
+    </select>
+
+    <select id="selectoPaymentDetail" parameterType="string" resultMap="BaseResultMap">
+       select <include refid="Base_Column_List" /> from o_Payment_detail where ORDER_ID=#{orderId} and  PAYMENT_STATUS in(1,3,2)
+        and status=1
+        <if test="time!=null and time!='' ">
+            and to_char(o_payment_detail.plan_pay_time,'YYYY-MM')=#{time}
+        </if>
     </select>
 </mapper>

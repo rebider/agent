@@ -330,6 +330,12 @@
       <if test="orgCode!=null and orgCode!='' and agentNameList==null">
         and (oa.CODE like concat(#{orgCode},'%') or ob.CODE like concat(#{orgCode},'%'))
       </if>
+      <if test="reviewStatusList!=null and reviewStatusList.size>0 ">
+        and i.REVIEW_STATUS
+        <foreach collection="reviewStatusList" item="reviewStatus2" open=" in(" close=")" separator=",">
+          #{reviewStatus2}
+        </foreach>
+      </if>
       <if test="id != null">
        and i.id = #{id}
       </if>
