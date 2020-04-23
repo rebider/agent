@@ -314,10 +314,10 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
         if (null == announceMentInfo){
             return ResultVO.fail("公告不存在!");
         }
-        announceMentInfo.setAnnoStat(AnnoStat.WAIT.code);
-        announceMentInfo.setCreateTm(date);
+        announceMentInfoVo.setAnnoStat(AnnoStat.WAIT.code);
+        announceMentInfoVo.setCreateTm(date);
         try {
-            if (1 != announceMentInfoMapper.updateStatByAnno(announceMentInfo)){
+            if (1 != announceMentInfoMapper.updateByPrimaryKey(announceMentInfoVo)){
                 return ResultVO.fail("未更新公告!");
             }
         }catch (Exception e){
