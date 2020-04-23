@@ -79,6 +79,7 @@
     BATCH_NO, UPLOAD_PATH, UPLOAD_NAME, RESULT_PATH, RESULT_NAME, UPLOAD_TIME, UPLOAD_USER, 
     STATUS, NOTE, MONTH
   </sql>
+
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitLogExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
@@ -258,9 +259,14 @@
 
   <select id="checkoutData" parameterType="java.lang.String" resultType="java.util.Map">
 
-select aa.ID,aa.AG_NAME,bb.BUS_PLATFORM,cc.PLATFORM_NAME  from A_AGENT aa,A_AGENT_BUSINFO bb,A_PLATFORM cc
- where aa.ID = bb.AGENT_ID and bb.BUS_PLATFORM = cc.PLATFORM_NUM
- and aa.ID='${agentId}' and bb.BUS_PLATFORM='${busCode}'
+ select aa.ID,aa.AG_NAME,bb.BUS_PLATFORM,cc.PLATFORM_NAME  from A_AGENT aa,A_AGENT_BUSINFO bb,A_PLATFORM cc
+ where aa.ID = bb.AGENT_ID and bb.BUS_PLATFORM = cc.PLATFORM_NUM and  aa.STATUS = '1'
+    <if test="agentId != null and agentId != ''">
+      and aa.ID = #{agentId,jdbcType=VARCHAR}
+    </if>
+    <if test="busCode != null and busCode != ''">
+      and aa.BUS_PLATFORM = #{busCode,jdbcType=VARCHAR}
+    </if>
   </select>
 
   <select id="getLoginName" parameterType="java.lang.String" resultType="java.util.Map">
@@ -270,27 +276,20 @@ select aa.ID,aa.AG_NAME,bb.BUS_PLATFORM,cc.PLATFORM_NAME  from A_AGENT aa,A_AGEN
 
 
     <insert id="save" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
-		insert into pms_profit (MONTH, UNIQUE_FLAG, AGENT_ID, SHEET_NAME,
-		SHEET_COLUMN, SHEET_HEAD, SHEET_DATA, PROFIT_TYPE, PROFIT_HZ,
-		PAY_CONDITION, STATUS, FREE_REASON, PAY_TRAN_MONEY, IMPORT_TIME,
-		IMPORT_PERSON, UPDATE_TIME, UPDATE_PERSON, FREE_TIME, PAY_TIME,sheet_Order,order_number,ID,BUS_CODE,BUS_NAME)
+		insert into pms_profit (MONTH, UNIQUE_FLAG, AGENT_NAME, BUS_CODE,SHEET_NAME,
+		SHEET_COLUMN, SHEET_HEAD, SHEET_DATA, PROFIT_TYPE,
+		PAY_CONDITION, PAY_TRAN_MONEY, IMPORT_TIME,
+		IMPORT_PERSON, UPDATE_TIME, UPDATE_PERSON, sheet_Order,order_number,ID)
 		values (#{month,jdbcType=VARCHAR},#{ uniqueFlag,jdbcType=VARCHAR},#{
-		agentId,jdbcType=VARCHAR},#{ sheetName,jdbcType=CLOB},#{
+		agentName,jdbcType=VARCHAR},#{busCode,jdbcType=VARCHAR},#{ sheetName,jdbcType=VARCHAR},#{
 		sheetColumn,jdbcType=INTEGER}, xmlType((
-		select sheet_head from PMS_PROFIT_temp where month=#{month,jdbcType=VARCHAR}
-		and order_Number=#{orderNumber,jdbcType=INTEGER}
-		  and sheet_name=#{sheetName,jdbcType=VARCHAR} and IMPORT_PERSON=#{importPerson,jdbcType=VARCHAR}
+		select sheet_head from PMS_PROFIT_temp where ID=#{id,jdbcType=VARCHAR}
 		 )), xmlType((
-		select sheet_data from PMS_PROFIT_temp where month=#{month,jdbcType=VARCHAR}
-		and order_Number=#{orderNumber,jdbcType=INTEGER}
-		  and sheet_name=#{sheetName,jdbcType=VARCHAR} and IMPORT_PERSON=#{importPerson,jdbcType=VARCHAR}
-		 )),#{ profitType,jdbcType=VARCHAR},#{
-		profitHz,jdbcType=VARCHAR},#{ payCondition,jdbcType=VARCHAR},#{
-		status,jdbcType=VARCHAR},#{ freeReason,jdbcType=VARCHAR},#{
+		select sheet_data from PMS_PROFIT_temp where ID=#{id,jdbcType=VARCHAR}
+		 )),#{ profitType,jdbcType=VARCHAR},#{ payCondition,jdbcType=VARCHAR},#{
 		payTranMoney,jdbcType=VARCHAR},#{ importTime,jdbcType=VARCHAR},#{
 		importPerson,jdbcType=VARCHAR},#{ updateTime,jdbcType=VARCHAR},#{
-		updatePerson,jdbcType=VARCHAR},#{ freeTime,jdbcType=VARCHAR},#{
-		payTime,jdbcType=VARCHAR},#{sheetOrder,jdbcType=INTEGER},#{orderNumber,jdbcType=INTEGER},#{ id,jdbcType=VARCHAR},#{busCode,jdbcType=VARCHAR},#{busName,jdbcType=VARCHAR})
+		updatePerson,jdbcType=VARCHAR},#{sheetOrder,jdbcType=INTEGER},#{orderNumber,jdbcType=INTEGER},#{ id,jdbcType=VARCHAR})
 	</insert>
 
 </mapper>

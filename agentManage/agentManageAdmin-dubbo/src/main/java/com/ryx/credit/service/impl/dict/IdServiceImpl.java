@@ -78,6 +78,7 @@ public class IdServiceImpl implements IdService {
         return null;
     }
 
+
     @Override
     public String genOrganizationId(TabId tablename, Integer userid) {
         String data = sdf.format(Calendar.getInstance().getTime());
@@ -105,5 +106,27 @@ public class IdServiceImpl implements IdService {
         return numId;
     }
 
+    /**
+     * PMS_PROFIT_TEMP生成出款流水
+     * @param tablename
+     * @return
+     */
+    @Override
+    public String getPPTId(){
+        String data = sdf.format(Calendar.getInstance().getTime());
+        long id  = dictMapper.sqlId("PMS_PROFIT_TEMP");
+        return String.format("%s%06d",data,id);
+    }
+    /**
+     * PMS_PROFIT_TEMP生成出款批次
+     * @param tablename
+     * @return
+     */
+    @Override
+    public String getPPT2Id(){
+        String data = sdf.format(Calendar.getInstance().getTime());
+        long id  = dictMapper.sqlId("PMS_PROFIT_TEMP2");
+        return String.format("%s%03d",data,id);
+    }
 
 }

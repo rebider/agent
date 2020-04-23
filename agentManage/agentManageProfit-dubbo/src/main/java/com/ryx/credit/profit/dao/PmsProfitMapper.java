@@ -31,11 +31,11 @@ public interface PmsProfitMapper {
      * @param params 传递的查询条件，包括page对象.
      * @return
      */
-    List<PmsProfit> queryAllList(Map<String, Object> params);
+    List<Map<String,Object>> queryAllList(Map<String, Object> params);
 
     Integer queryAllCount(Map<String, Object> params);
 
-    List<PmsProfit> queryAllListWithLower(Map<String, Object> params);
+    List<Map<String,Object>> queryAllListWithLower(Map<String, Object> params);
 
     Integer queryAllCountWithLower(Map<String, Object> params);
 
@@ -79,4 +79,28 @@ public interface PmsProfitMapper {
     List<Map<String,Object>> isAgent(Map<String, Object> params);
 
     String queryProfitAmt(@Param(value = "month")String month);
+
+    /**
+     * 查询冻结
+     * @param params
+     * @return
+     */
+    List<Map<String,Object>> queryFrezzeCause(Map<String, Object> params);
+
+    /**
+     * 本次查询的可以出款的批次（下级查询的）
+     * @param params
+     * @return
+     */
+    List<String> queryAllListWithLowerBalanceId(Map<String, Object> params);
+
+    /**
+     * 本次查询的可以出款的批次
+     *
+     * @param params 传递的查询条件
+     * @return
+     */
+    List<String> queryAllListBalanceId(Map<String, Object> params);
+
+
 }

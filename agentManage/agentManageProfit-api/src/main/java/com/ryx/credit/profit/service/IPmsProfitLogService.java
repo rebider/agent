@@ -1,8 +1,10 @@
 package com.ryx.credit.profit.service;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -42,5 +44,9 @@ public interface IPmsProfitLogService {
 
     int  save(PmsProfit record);
 
-    Map<String,Object> disposeSheet(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder);
+    Map<String,Object> disposeSheet(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder,String type);
+
+    Map<String,Object> disposeUploadExcel(PmsProfitLog pmsProfitLog, String path) throws MessageException;
+
+    Map<String,Object>  disposeUploadExcelSuccess(PmsProfitLog pmsProfitLog, String path) throws MessageException;
 }
