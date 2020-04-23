@@ -307,8 +307,8 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     }
                 }
             }else {
-                agentResult.setMsg("请选择冻结层级");
-                return agentResult;
+                log.info("[{}]未传入冻结层级，默认本级",agentFreezePort.getAgentId());
+                agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
             }
         }
         if(StringUtils.isBlank(agentFreezePort.getOperationPerson())){
