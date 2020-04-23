@@ -307,7 +307,6 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public ResultVO updateAnnInfo(AnnounceMentInfoVo announceMentInfoVo) throws MessageException {
-        ResultVO resultVO = new ResultVO();
         ZoneId zoneId = ZoneId.systemDefault();
         ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
         Date date = Date.from(zdt.toInstant());
