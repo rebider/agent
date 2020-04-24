@@ -1056,6 +1056,76 @@ public class OrderAdjAccountExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andRefundCompanyIsNull() {
+            addCriterion("REFUND_COMPANY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyIsNotNull() {
+            addCriterion("REFUND_COMPANY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyEqualTo(String value) {
+            addCriterion("REFUND_COMPANY =", value, "refundCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyNotEqualTo(String value) {
+            addCriterion("REFUND_COMPANY <>", value, "refundCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyGreaterThan(String value) {
+            addCriterion("REFUND_COMPANY >", value, "refundCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyGreaterThanOrEqualTo(String value) {
+            addCriterion("REFUND_COMPANY >=", value, "refundCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyLessThan(String value) {
+            addCriterion("REFUND_COMPANY <", value, "refundCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyLessThanOrEqualTo(String value) {
+            addCriterion("REFUND_COMPANY <=", value, "refundCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyLike(String value) {
+            addCriterion("REFUND_COMPANY like", value, "refundCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyNotLike(String value) {
+            addCriterion("REFUND_COMPANY not like", value, "refundCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyIn(List<String> values) {
+            addCriterion("REFUND_COMPANY in", values, "refundCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyNotIn(List<String> values) {
+            addCriterion("REFUND_COMPANY not in", values, "refundCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyBetween(String value1, String value2) {
+            addCriterion("REFUND_COMPANY between", value1, value2, "refundCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundCompanyNotBetween(String value1, String value2) {
+            addCriterion("REFUND_COMPANY not between", value1, value2, "refundCompany");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

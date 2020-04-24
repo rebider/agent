@@ -33,6 +33,8 @@ public class OrderAdjAccount implements Serializable {
 
     private BigDecimal version;
 
+    private String refundCompany;
+
     public String getId() {
         return id;
     }
@@ -143,5 +145,13 @@ public class OrderAdjAccount implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getRefundCompany() {
+        return refundCompany;
+    }
+
+    public void setRefundCompany(String refundCompany) {
+        this.refundCompany = refundCompany == null ? null : refundCompany.trim();
     }
 }

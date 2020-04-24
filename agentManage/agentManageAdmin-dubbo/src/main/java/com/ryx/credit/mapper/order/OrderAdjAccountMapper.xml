@@ -16,6 +16,7 @@
     <result column="REFUND_STAT" jdbcType="DECIMAL" property="refundStat" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="REFUND_COMPANY" jdbcType="VARCHAR" property="refundCompany" />
   </resultMap>
   <resultMap id="BaseResultVoMap" type="com.ryx.credit.pojo.admin.vo.OrderAdjAccountVo">
     <id column="ID" jdbcType="VARCHAR" property="id" />
@@ -32,6 +33,7 @@
     <result column="REFUND_STAT" jdbcType="DECIMAL" property="refundStat" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="REFUND_COMPANY" jdbcType="VARCHAR" property="refundCompany" />
     <result column="ACCOUNTFILE" jdbcType="VARCHAR" property="accountFile"/>
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -65,7 +67,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, ADJ_ID, ORDER_ID, TYPE, REFUND_ACCOUNT, ACCOUNT_NAME, ACCOUNT_BANK, BRANCH_LINE_NUM, 
-    ALL_LINE_NUM, REFUND_AMO, REFUND_TM, REFUND_STAT, STATUS, VERSION
+    ALL_LINE_NUM, REFUND_AMO, REFUND_TM, REFUND_STAT, STATUS, VERSION, REFUND_COMPANY
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjAccountExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -100,12 +102,14 @@
       TYPE, REFUND_ACCOUNT, ACCOUNT_NAME, 
       ACCOUNT_BANK, BRANCH_LINE_NUM, ALL_LINE_NUM, 
       REFUND_AMO, REFUND_TM, REFUND_STAT, 
-      STATUS, VERSION)
+      STATUS, VERSION, REFUND_COMPANY
+      )
     values (#{id,jdbcType=VARCHAR}, #{adjId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, 
       #{type,jdbcType=DECIMAL}, #{refundAccount,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR}, 
       #{accountBank,jdbcType=VARCHAR}, #{branchLineNum,jdbcType=VARCHAR}, #{allLineNum,jdbcType=VARCHAR}, 
       #{refundAmo,jdbcType=DECIMAL}, #{refundTm,jdbcType=TIMESTAMP}, #{refundStat,jdbcType=DECIMAL}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{refundCompany,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjAccount">
     insert into O_ORDER_ADJ_ACCOUNT
@@ -152,6 +156,9 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="refundCompany != null">
+        REFUND_COMPANY,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -196,6 +203,9 @@
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
       </if>
+      <if test="refundCompany != null">
+        #{refundCompany,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjAccountExample" resultType="java.lang.Long">
@@ -204,7 +214,7 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjAccount">
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjAccount">
     update O_ORDER_ADJ_ACCOUNT
     <set>
       <if test="adjId != null">
@@ -246,6 +256,9 @@
       <if test="version != null">
         VERSION = VERSION + 1,
       </if>
+      <if test="refundCompany != null">
+        REFUND_COMPANY = #{refundCompany,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -263,7 +276,8 @@
       REFUND_TM = #{refundTm,jdbcType=TIMESTAMP},
       REFUND_STAT = #{refundStat,jdbcType=DECIMAL},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      REFUND_COMPANY = #{refundCompany,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
