@@ -246,22 +246,32 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 if(j!=1){
                     throw new MessageException("更新解冻失败");
                 }
-            }
-            AgentFreezeExample qfreezeExample = new AgentFreezeExample();
-            AgentFreezeExample.Criteria qfreezeCriteria = qfreezeExample.createCriteria();
-            qfreezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
-            qfreezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
-            qfreezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
-            List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(qfreezeExample);
+                if (freeType.compareTo(FreeType.AGNET.code) == 0){
 
-            //没有冻结的 更新代理商状态为解冻
-            if(agentFreezes.size()==0){
-                Map<String,Object> dataMap = (Map<String,Object>)verify.getData();
-                Agent agent = (Agent)dataMap.get("agent");
-                agent.setFreestatus(FreeStatus.JD.getValue());
-                int i = agentMapper.updateByPrimaryKeySelective(agent);
-                if(i!=1){
-                    throw new MessageException("更新代理商信息解冻失败");
+                    AgentFreezeExample qfreezeExample = new AgentFreezeExample();
+                    AgentFreezeExample.Criteria qfreezeCriteria = qfreezeExample.createCriteria();
+                    qfreezeCriteria.andFreezeTypeIsNull();
+                    qfreezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
+                    qfreezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
+                    qfreezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+
+                    qfreezeExample.or().andStatusEqualTo(Status.STATUS_1.status)
+                            .andFreezeTypeEqualTo(freeType)
+                            .andAgentIdEqualTo(agentFreezePort.getAgentId())
+                            .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+
+                    List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(qfreezeExample);
+
+                    //没有冻结的 更新代理商状态为解冻
+                    if(agentFreezes.size()==0){
+                        Map<String,Object> dataMap = (Map<String,Object>)verify.getData();
+                        Agent agent = (Agent)dataMap.get("agent");
+                        agent.setFreestatus(FreeStatus.JD.getValue());
+                        int i = agentMapper.updateByPrimaryKeySelective(agent);
+                        if(i!=1){
+                            throw new MessageException("更新代理商信息解冻失败");
+                        }
+                    }
                 }
             }
             return AgentResult.ok("解冻成功");
