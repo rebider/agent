@@ -571,22 +571,30 @@
     </build>
 
     <repositories>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>Public</id>
+            <name>Public Repositories</name>
+            <url>http://12.3.10.212:9999/nexus/repository/ryx-repository-ry-group/</url>
+        </repository>
     </repositories>
 
-    <pluginRepositories>
 
-    </pluginRepositories>
     <distributionManagement>
         <repository>
-            <id>pro-release</id>
-            <name>Proj Release Repository</name>
-            <url>http://12.3.10.225:9081/nexus/content/repositories/wq-release/</url>
+            <id>Releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://12.3.10.212:9999/nexus/repository/ryx-repository-ry-releases/</url>
         </repository>
-
         <snapshotRepository>
-            <id>pro-snapshot</id>
-            <name>Proj Snapshot Repository</name>
-            <url>http://12.3.10.225:9081/nexus/content/repositories/wq-snapshot/</url>
+            <id>Snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://12.3.10.212:9999/nexus/repository/ryx-repository-ry-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
