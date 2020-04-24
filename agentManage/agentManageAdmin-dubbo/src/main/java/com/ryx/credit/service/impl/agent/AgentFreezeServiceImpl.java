@@ -16,6 +16,7 @@ import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentFreezeService;
 import com.ryx.credit.service.dict.IdService;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -412,5 +413,42 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     public AgentFreeze selectByPrimaryKey(String id){
         AgentFreeze agentFreeze = agentFreezeMapper.selectByPrimaryKey(id);
         return agentFreeze;
+    }
+
+    /**
+     * 查询代理商的冻结状态，下级冻结状态
+     * @param busNum 业务编号
+     * @param platformType 平台类型
+     * @param agBd 品牌编号
+     * @return
+     */
+    @Override
+    public FastMap checkAgentIsFreeze(String busNum, String platformType, String agBd) {
+        Map<String,Object> par = new HashedMap();
+        par.put("agBd",agBd);
+        par.put("platformType",platformType);
+        par.put("busNum",busNum);
+        par.put("busStatus",BusStatus.getAvbList());
+        List<Map<String,Object>> data = agentMapper.queryAgentFreezeInfo(par);
+        if(data.size()!=1){
+            return FastMap.fastFailMap("未找到代理商信息");
+        }
+        Map<String,Object> agentInfo = data.get(0);
+        Object ag = agentInfo.get("AG");
+        //代理商本级有没有冻结
+        AgentFreezeExample bj = new AgentFreezeExample();
+        bj.or().andAgentIdEqualTo(ag.toString())
+                .andFreezeStatusEqualTo(FreeStatus.DJ.getContent())
+                .andFreezeTypeEqualTo(FreeType.AGNET.code)
+                .andStatusEqualTo(Status.STATUS_1.status);
+        long bj_list = agentFreezeMapper.countByExample(bj);
+        //非直签下级代理商有没有冻结
+        AgentFreezeExample fzqxj = new AgentFreezeExample();
+        fzqxj.or().andAgentIdEqualTo(ag.toString())
+                .andFreezeStatusEqualTo(FreeStatus.DJ.getContent())
+                .andFreezeTypeEqualTo(FreeType.SUB_AGENT.code)
+                .andStatusEqualTo(Status.STATUS_1.status);
+        long bj_count = agentFreezeMapper.countByExample(fzqxj);
+        return FastMap.fastSuccessMap("代理商正常").putKeyV("agFcount",bj_list+"").putKeyV("noSignSubAgentFcount",fzqxj+"");
     }
 }
