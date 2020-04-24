@@ -171,14 +171,16 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 agentFreeze.setVersion(BigDecimal.ONE);
                 agentFreeze.setFreezeType(freeType);
                 agentFreezeMapper.insert(agentFreeze);
-            }
-            Map<String,Object> dataMap = (Map<String,Object>)verify.getData();
-            Agent agent = (Agent)dataMap.get("agent");
-            if(agent.getFreestatus().compareTo(FreeStatus.DJ.getValue())!=0){
-                agent.setFreestatus(FreeStatus.DJ.getValue());
-                int i = agentMapper.updateByPrimaryKeySelective(agent);
-                if(i!=1){
-                    throw new MessageException("代理商冻结更新代理商信息失败");
+                if (freeType.compareTo(FreeType.AGNET.code) == 0){
+                    Map<String,Object> dataMap = (Map<String,Object>)verify.getData();
+                    Agent agent = (Agent)dataMap.get("agent");
+                    if(agent.getFreestatus().compareTo(FreeStatus.DJ.getValue())!=0){
+                        agent.setFreestatus(FreeStatus.DJ.getValue());
+                        int i = agentMapper.updateByPrimaryKeySelective(agent);
+                        if(i!=1){
+                            throw new MessageException("代理商冻结更新代理商信息失败");
+                        }
+                    }
                 }
             }
             return AgentResult.ok("冻结成功");
