@@ -90,7 +90,7 @@ public class AgentDebitCardFileServiceImpl implements AgentDebitCardFileService 
         sftp.uploadFileName(remote, filaName, filepath, filaName);
         sftp.disconnect();
         logger.info("智慧POS结算卡信息导出结束");
-        return null;
+        return FastMap.fastSuccessMap();
     }
 
     /**
