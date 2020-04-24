@@ -252,7 +252,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
 
             //判断空行与前四列数据非空
             int rowNum = sheet.getLastRowNum();
-            for (int j = 1; j < rowNum; j++) {
+            for (int j = 1; j <= rowNum; j++) {
 
                 if (errMsg.length()>1200){
                     break;
@@ -386,13 +386,15 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
                 }
             }
 
+        }
+
+        if (errMsg.length()==0){
+            result.put("resultCode","Success");
+        }else{
             result.put("resultCode","Error");
             result.put("errMsg",errMsg.toString());
-        }else{
-            result.put("resultCode","Success");
         }
         return result;
-
     }
 
     /**
