@@ -998,8 +998,21 @@
     )
   </select>
 
+
+  <sql id="base_conclum_list2">
+    MONTH, AGENT_ID, AGENT_NAME, BUS_NUM, BUS_CODE, BRAND_CODE, IMPORT_TYPE, SHEET_NAME, SHEET_COLUMN,
+      SHEET_ORDER, ROW_ORDER, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18,
+      F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32, F33, F34,
+      F35, F36, F37, F38, F39, F40, F41, F42, F43, F44, F45, F46, F47, F48, F49, F50, F51,
+      F52, F53, F54, F55, F56, F57, F58, F59, F60
+  </sql>
+
   <select id="getDistinctSheetInfo" resultType="java.util.Map">
-    select pd.* from P_IMPORT_DATA_WITH_PROFIT pd
+    select pd.* from (
+      select  distinct
+      <include refid="base_conclum_list2"/>
+      from P_IMPORT_DATA_WITH_PROFIT where  ROW_ORDER = '1'
+    ) pd
       where pd.SHEET_ORDER in (
         select a.SHEET_ORDER from P_IMPORT_DATA_WITH_PROFIT  a
         left join A_AGENT_BUSINFO ab on a.AGENT_ID = ab.AGENT_ID
@@ -1017,7 +1030,7 @@
         and a.MONTH = #{param.month}
         and a.IMPORT_TYPE = #{param.type}
       )
-    and pd.MONTH = #{param.month} and  pd.ROW_ORDER = '1' and pd.IMPORT_TYPE = #{param.type}
+    and pd.MONTH = #{param.month}  and pd.IMPORT_TYPE = #{param.type}
     order by pd.SHEET_ORDER asc
   </select>
 
