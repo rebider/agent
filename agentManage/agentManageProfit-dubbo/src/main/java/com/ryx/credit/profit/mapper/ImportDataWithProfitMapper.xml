@@ -1062,6 +1062,9 @@
     <if test="param.sheetOrder != '' and param.sheetOrder != null">
       and pd.SHEET_ORDER = #{param.sheetOrder}
     </if>
+    <if test="param.sheetColumn != '' and param.sheetColumn != null">
+      and pd.SHEET_COLUMN = #{param.sheetColumn}
+    </if>
     and pd.ROW_ORDER <![CDATA[<>]]> 1
     order by pd.ROW_ORDER asc
   </select>
