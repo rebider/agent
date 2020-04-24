@@ -450,7 +450,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 .andFreezeStatusEqualTo(FreeStatus.DJ.getContent())
                 .andFreezeTypeEqualTo(FreeType.SUB_AGENT.code)
                 .andStatusEqualTo(Status.STATUS_1.status);
-        long bj_count = agentFreezeMapper.countByExample(fzqxj);
-        return FastMap.fastSuccessMap("代理商正常").putKeyV("agFcount",bj_list+"").putKeyV("noSignSubAgentFcount",fzqxj+"");
+        long xj_count = agentFreezeMapper.countByExample(fzqxj);
+        return FastMap.fastSuccessMap("代理商正常").putKeyV("agFcount",bj_list+"").putKeyV("noSignSubAgentFcount",xj_count+"");
     }
 }
