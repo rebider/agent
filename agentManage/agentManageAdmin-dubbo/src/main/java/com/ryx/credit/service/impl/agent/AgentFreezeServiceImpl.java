@@ -384,9 +384,15 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         if(agent.getFreestatus().compareTo(FreeStatus.DJ.getValue())==0){
             AgentFreezeExample freezeExample = new AgentFreezeExample();
             AgentFreezeExample.Criteria freezeCriteria = freezeExample.createCriteria();
+            freezeCriteria.andFreezeTypeIsNull();
             freezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
             freezeCriteria.andAgentIdEqualTo(agentId);
             freezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+
+            freezeExample.or().andFreezeTypeEqualTo(FreeType.AGNET.code)
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andAgentIdEqualTo(agentId)
+                    .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
             List<AgentFreeze> agentFreezeList = agentFreezeMapper.selectByExample(freezeExample);
 
             List<Map<String,Object>> resultList = new ArrayList<>();

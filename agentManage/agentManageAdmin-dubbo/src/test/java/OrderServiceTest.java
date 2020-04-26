@@ -1,6 +1,7 @@
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.service.agent.AgentFreezeService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.OrderRepairService;
@@ -31,6 +32,8 @@ public class OrderServiceTest  extends BaseSpringTest  {
     private IPaymentDetailService iPaymentDetailService;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private AgentFreezeService agentFreezeService;
 
     @Test
     public void testIdSn(){
@@ -69,5 +72,11 @@ public class OrderServiceTest  extends BaseSpringTest  {
             e.toString();
         }
 
+    }
+
+    @Test
+    public void test2(){
+        AgentResult agentResult = agentFreezeService.queryAgentFreeze("AG19051970202");
+        System.out.println(agentResult);
     }
 }
