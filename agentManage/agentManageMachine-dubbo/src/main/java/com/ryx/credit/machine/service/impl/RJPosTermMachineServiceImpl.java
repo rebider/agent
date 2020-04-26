@@ -75,7 +75,7 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
             map.put("reqMsgId", reqMsgId);
 
             //下发接口
-            logger.info("瑞+物流下发接口请求地址:{},参数:{},", AppConfig.getProperty("com.ryx.credit.profit.pojo.PmsProfitTemp"), JSONObject.toJSONString(map));
+            logger.info("瑞+物流下发接口请求地址:{},参数:{},", AppConfig.getProperty("rjpos.queryTermActive"), JSONObject.toJSONString(map));
             String respResult = HttpClientUtil.doGet(AppConfig.getProperty("rjpos.queryTermActive"), map);
             logger.info("瑞+物流下发接口返回参数:{}", respResult);
 
@@ -372,11 +372,11 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
             Map<String, Object> mapDetail = new HashMap<>();
             mapDetail.put("agentOrgId", terminalTransferDetail.getOriginalOrgId());
             mapDetail.put("newOrgId", terminalTransferDetail.getGoalOrgId());
-            mapDetail.put("posNum", terminalTransferDetail.getSnCount());
+            mapDetail.put("posNum", String.valueOf(terminalTransferDetail.getSnCount()));
             mapDetail.put("posSnBegin", terminalTransferDetail.getSnBeginNum());
             mapDetail.put("posSnEnd", terminalTransferDetail.getSnEndNum());
             mapDetail.put("serialNumber", terminalTransferDetail.getId());
-            mapDetail.put("num", terminalTransferDetail.getComSnNum());
+            mapDetail.put("num", String.valueOf(terminalTransferDetail.getComSnNum()));
             listDetail.add(mapDetail);
         }
         jsonObject.put("snList", listDetail);
