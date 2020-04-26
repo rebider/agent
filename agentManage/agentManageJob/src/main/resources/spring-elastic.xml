@@ -222,7 +222,7 @@
     <job:simple id="agentDebitCardFileJob"
                 job-ref="agentDebitCardFileJob"
                 registry-center-ref="regCenter"
-                cron="0 0/5 * * * ?"
+                cron="0 0 1 * * ?"
                 overwrite="true"
                 description="智慧POS/PLUS的一级代理商的结算卡信息，放置对账文件的FTP,一天一次"
                 sharding-total-count="1"
