@@ -74,4 +74,11 @@ public interface TerminalTransferService {
      */
     List<Map<String, Object>> queryLowerAgentAll(String bus_num);
 
+    /**
+     * 重回划拨
+     * @param id
+     * @return
+     */
+    AgentResult adjustAgain(String id);
+
 }
