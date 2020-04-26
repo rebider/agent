@@ -3,6 +3,7 @@ package com.ryx.internet.pojo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class OInternetCard implements Serializable{
     private String iccidNum;
@@ -106,6 +107,26 @@ public class OInternetCard implements Serializable{
     private String platformName; //数据库无
 
     private String internetCardStatusName;
+
+    private List<BigDecimal> renewStatusList;
+
+    private List<BigDecimal> internetCardStatusList;
+
+    public List<BigDecimal> getRenewStatusList() {
+        return renewStatusList;
+    }
+
+    public void setRenewStatusList(List<BigDecimal> renewStatusList) {
+        this.renewStatusList = renewStatusList;
+    }
+
+    public List<BigDecimal> getInternetCardStatusList() {
+        return internetCardStatusList;
+    }
+
+    public void setInternetCardStatusList(List<BigDecimal> internetCardStatusList) {
+        this.internetCardStatusList = internetCardStatusList;
+    }
 
     public String getInternetCardStatusName() {
         return internetCardStatusName;

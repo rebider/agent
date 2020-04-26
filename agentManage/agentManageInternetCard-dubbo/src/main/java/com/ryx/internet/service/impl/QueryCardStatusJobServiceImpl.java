@@ -117,17 +117,23 @@ public class QueryCardStatusJobServiceImpl implements QueryCardStatusJobService 
                         log.info("揭阳移动返回数据处理,状态一致无需更新");
                         continue;
                     }
-                    oInternetCard.setInternetCardStatus(cardStatusByJYMobile);
+                    if(oInternetCard.getInternetCardStatus().equals(InternetCardStatus.LOGOUT.getValue())
+                            && cardStatusByJYMobile.compareTo(InternetCardStatus.LOGOUT.getValue())!=0){
+                        // 已经是注销状态了，不再更新， 明细也不需要更新
+                        log.info("物联网卡已经是注销状态，不用再更新"+oInternetCard.getIccidNum());
+                        continue;
+                    }
+                    oInternetCard.setInternetCardStatus(cardStatusByJYMobile);// 修改卡状态
                     if(StringUtils.isNotBlank(statusTime)){
                         oInternetCard.setStatusTime(statusTime);
                     }
-                    //如果是注销状态  更新申请注销明细
+                    // 如果是注销状态  更新申请注销明细
                     if(cardStatusByJYMobile.compareTo(InternetCardStatus.LOGOUT.getValue())==0){
                         InternetLogoutDetailExample internetLogoutDetailExample = new InternetLogoutDetailExample();
                         InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
                         criteria.andStatusEqualTo(Status.STATUS_1.status);
                         criteria.andIccidNumEqualTo(oInternetCard.getIccidNum());
-                        criteria.andLogoutStatusEqualTo(InternetLogoutStatus.DZX.getValue());
+                        criteria.andLogoutStatusEqualTo(InternetLogoutStatus.DZX.getValue());// 已注销 更改为 已注销
                         List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
                         for (InternetLogoutDetail internetLogoutDetail : internetLogoutDetails) {
                             internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.ZXCG.getValue());

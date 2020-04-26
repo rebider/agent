@@ -30,7 +30,6 @@
     <properties>
         <spring.version>4.3.7.RELEASE</spring.version>
         <jackson.version>2.9.5</jackson.version>
-        <agentManage.version>1.0-SNAPSHOT</agentManage.version>
     </properties>
     <dependencies>
         <dependency>
@@ -443,6 +442,7 @@
             <properties>
                 <deploy.env.name>dev</deploy.env.name>
                 <deploy.env.host.name>node</deploy.env.host.name><!-- 测试环境下，所有节点相同 -->
+                <agentManage.version>1.0-SNAPSHOT</agentManage.version>
             </properties>
         </profile>
         <profile>
@@ -450,6 +450,7 @@
             <properties>
                 <deploy.env.name>test</deploy.env.name>
                 <deploy.env.host.name>node</deploy.env.host.name><!-- 测试环境下，所有节点相同 -->
+                <agentManage.version>1.0-SNAPSHOT</agentManage.version>
             </properties>
         </profile>
         <profile>
@@ -457,6 +458,7 @@
             <properties>
                 <deploy.env.name>production</deploy.env.name>
                 <deploy.env.host.name>node</deploy.env.host.name><!-- 测试环境下，所有节点相同 -->
+                <agentManage.version>9.9.20200420</agentManage.version>
             </properties>
         </profile>
         <profile>
@@ -464,6 +466,7 @@
             <properties>
                 <deploy.env.name>preproduction</deploy.env.name>
                 <deploy.env.host.name>node</deploy.env.host.name><!-- 测试环境下，所有节点相同 -->
+                <agentManage.version>1.0-SNAPSHOT</agentManage.version>
             </properties>
         </profile>
         <!-- 2. 部署环境(测试环境/生产环境) end -->
@@ -473,12 +476,14 @@
             <id>api</id>
             <properties>
                 <deploy.env.host.name>api</deploy.env.host.name>
+                <agentManage.version>1.0-SNAPSHOT</agentManage.version>
             </properties>
         </profile>
         <profile>
             <id>web</id>
             <properties>
                 <deploy.env.host.name>web</deploy.env.host.name>
+                <agentManage.version>1.0-SNAPSHOT</agentManage.version>
             </properties>
         </profile>
         <!-- 3. 节点环境（具体部署机器环境） end -->
