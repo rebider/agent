@@ -4,7 +4,10 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.order.OrderAdj;
+import com.ryx.credit.pojo.admin.order.OrderAdjAccount;
+import com.ryx.credit.pojo.admin.vo.OrderAdjAccountVo;
 import com.ryx.credit.pojo.admin.vo.OrderAdjustVo;
 import com.ryx.credit.pojo.admin.vo.OrderUpModelVo;
 
@@ -84,4 +87,8 @@ public interface OrderAdjustService {
      * 执行订单调整计划
      */
     AgentResult adjustDoPayPlan(String adjId,OrderAdj orderAdj)throws Exception;
+
+    AgentResult adjustCheckAmo(OrderUpModelVo orderUpModelVo) throws Exception;
+
+    AgentResult saveAdjAccounts(OrderUpModelVo orderUpModelVo) throws Exception;
 }
