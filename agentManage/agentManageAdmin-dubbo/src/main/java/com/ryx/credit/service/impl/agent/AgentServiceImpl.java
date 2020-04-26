@@ -981,5 +981,22 @@ public class AgentServiceImpl implements AgentService {
         return list;
     }
 
+    /**
+     * 风控服务-代理商列表查询
+     * @param param
+     * @param pageInfo
+     * @return
+     */
+    @Override
+    public PageInfo queryAgentRiskList(Map<String, Object> param, PageInfo pageInfo) {
+        Long userId = (Long) param.get("userId");
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        param.put("platfromPerm", platfromPerm);
+        List<Map<String, Object>> agentRiskView = agentMapper.queryAgentRiskView(param);
+        Long agentRiskCount = agentMapper.queryAgentRiskCount(param);
+        pageInfo.setRows(agentRiskView);
+        pageInfo.setTotal(agentRiskCount.intValue());
+        return pageInfo;
+    }
 
 }

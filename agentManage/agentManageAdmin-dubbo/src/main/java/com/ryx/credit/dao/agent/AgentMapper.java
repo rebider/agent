@@ -57,4 +57,7 @@ public interface AgentMapper {
     List<Map<String,Object>> queryEchartDataList(@Param("map") Map<String,Object> map,@Param("page") Page page);
 
     int queryEchartDataCount(@Param("map") Map<String,Object> map);
+
+    Long queryAgentRiskCount(@Param("map") Map<String, Object> map);
+    List<Map<String, Object>> queryAgentRiskView(@Param("map") Map<String, Object> map);
 }
