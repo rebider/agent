@@ -440,17 +440,19 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         //代理商本级有没有冻结
         AgentFreezeExample bj = new AgentFreezeExample();
         bj.or().andAgentIdEqualTo(ag.toString())
-                .andFreezeStatusEqualTo(FreeStatus.DJ.getContent())
+                .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
                 .andFreezeTypeEqualTo(FreeType.AGNET.code)
                 .andStatusEqualTo(Status.STATUS_1.status);
         long bj_list = agentFreezeMapper.countByExample(bj);
+        log.info("代理商 {} 冻结记录为 {}",ag,bj_list);
         //非直签下级代理商有没有冻结
         AgentFreezeExample fzqxj = new AgentFreezeExample();
         fzqxj.or().andAgentIdEqualTo(ag.toString())
-                .andFreezeStatusEqualTo(FreeStatus.DJ.getContent())
+                .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
                 .andFreezeTypeEqualTo(FreeType.SUB_AGENT.code)
                 .andStatusEqualTo(Status.STATUS_1.status);
         long xj_count = agentFreezeMapper.countByExample(fzqxj);
+        log.info("代理商 {} 冻结非直签下级记录为 {}",ag,bj_list);
         return FastMap.fastSuccessMap("代理商正常").putKeyV("agFcount",bj_list+"").putKeyV("noSignSubAgentFcount",xj_count+"");
     }
 }
