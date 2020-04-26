@@ -130,6 +130,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }else if(StringUtils.isNotBlank(internetRenew.getAgentName())){
             criteria.andAgentNameLike("%"+internetRenew.getAgentName()+"%");
         }
+        if(internetRenew.getRenewWayList()!=null && internetRenew.getRenewWayList().size()>0){
+            reqMap.put("renewWayList", internetRenew.getRenewWayList());
+        }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         internetRenewExample.setReqMap(reqMap);
         internetRenewExample.setPage(page);
@@ -216,7 +219,9 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
         }else if(StringUtils.isNotBlank(internetRenewDetail.getAgentName())){
             criteria.andAgentNameLike("%"+internetRenewDetail.getAgentName()+"%");
         }
-
+        if(internetRenewDetail.getRenewStatusList()!=null && internetRenewDetail.getRenewStatusList().size()>0){
+            reqMap.put("renewStatusList",internetRenewDetail.getRenewStatusList());
+        }
         if(StringUtils.isNotBlank(internetRenewDetail.getIccidNum())){
             criteria.andIccidNumEqualTo(internetRenewDetail.getIccidNum());
         }
@@ -987,6 +992,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
             if(oInternetCard.getRenew().compareTo(BigDecimal.ZERO)==0){
                 throw new MessageException("iccid:"+iccidNumId+",是否需续费为否,不允许续费/注销");
             }
+            // 续费状态为未续费 且 卡状态为 正常，沉默期，测试期 待激活 才可以继续
             if((oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NORMAL.getValue())==0
                     || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.NOACTIVATE.getValue())==0
                     || oInternetCard.getInternetCardStatus().compareTo(InternetCardStatus.silent.getValue())==0
