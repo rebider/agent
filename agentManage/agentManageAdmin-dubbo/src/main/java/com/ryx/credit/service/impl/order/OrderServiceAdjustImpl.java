@@ -1169,25 +1169,25 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                         orderAdj.setRefundStat(RefundStat.REFUNDING.key);
                         reqMap.put("remit",true);
                     }
-                    AgentResult agentResult = adjustCheckAmo(orderUpModelVo);
-                    if (!agentResult.isOK()){
-                        throw new MessageException(agentResult.getMsg());
+                    AgentResult agentResultcheck = adjustCheckAmo(orderUpModelVo);
+                    if (!agentResultcheck.isOK()){
+                        throw new MessageException(agentResultcheck.getMsg());
                     }
                     AgentResult agentResult1 = saveAdjAccounts(orderUpModelVo);
                     if (!agentResult1.isOK()){
                         throw new MessageException(agentResult1.getMsg());
                     }
-//                    AgentResult agentResult = adjustDoPayPlan(orderAdj.getId(),orderAdj);
-//                    if (agentResult.isOK()){
-//                        Map<String, Object> mapData = agentResult.getMapData();
-//                        if (null!= mapData.get("refundAmount")
-//                                && ((BigDecimal)mapData.get("refundAmount")).compareTo(BigDecimal.ZERO)<0
-//                                && String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
-//                            reqMap.put("remit",false);
-//                        };
-//                    }else {
-//                        throw new MessageException("执行抵扣失败!");
-//                    }
+                    AgentResult agentResult = adjustDoPayPlan(orderAdj.getId(),orderAdj);
+                    if (agentResult.isOK()){
+                        Map<String, Object> mapData = agentResult.getMapData();
+                        if (null!= mapData.get("refundAmount")
+                                && ((BigDecimal)mapData.get("refundAmount")).compareTo(BigDecimal.ZERO)<0
+                                && String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+                            reqMap.put("remit",false);
+                        };
+                    }else {
+                        throw new MessageException("执行抵扣失败!");
+                    }
                     //第二个财务节点,线下退款-完成
                 }else if (orderUpModelVo.getSid().equals("sid-E2BA6A16-66BD-4A2D-A006-9AD5DC09A51D")){
                     if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
@@ -1277,7 +1277,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult approveFinishOrderAdjust(String insid, String actname) throws Exception {
-        /*logger.info("订单调整审批完成:{},{}", insid, actname);
+        logger.info("订单调整审批完成:{},{}", insid, actname);
         //审批流关系
         BusActRel busActRel = busActRelService.findById(insid);
         if (actname.equals("finish_end")) { //审批完成
@@ -1346,7 +1346,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             }
             logger.info("订单调整审批完审批拒绝结束", busActRel.getBusId());
         }
-        logger.info("订单调整审批结束", busActRel.getBusId());*/
+        logger.info("订单调整审批结束", busActRel.getBusId());
         return AgentResult.ok();
     }
 
