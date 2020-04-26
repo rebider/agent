@@ -235,12 +235,10 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         String oldContent = StringUtils.isBlank(joTaskOld.getJoTaskContent())?"":joTaskOld.getJoTaskContent();
         if("0".equals(dealCode)){
             joTaskOld.setJoTaskContent(oldContent
-                    +" 转发到发起人:"+
-                    content.substring(content.indexOf(":")+1, content.length()));
+                    + " 转发到发起人:" + content);
         }else{
             joTaskOld.setJoTaskContent(oldContent
-                    +" 转发到" + joTask.getDealGroup()+":"+
-            content.substring(content.indexOf(":")+1, content.length()));
+                    + " 转发到" + joTask.getDealGroup()+":" + content);
         }
         // 结束工单任务
         endJoTask( joTaskOld );

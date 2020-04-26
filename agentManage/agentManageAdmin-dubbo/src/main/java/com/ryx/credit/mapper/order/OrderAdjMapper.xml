@@ -623,7 +623,6 @@
     <where>
       <if test="1==1"> and oa.status=1 </if>
       <if test="map.agName!=null and map.agName!=''"> and ag.ag_name like concat(concat('%',#{map.agName}),'%') </if>
-      <!--<if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.ag_uniq_num = #{map.agUniqNum} </if>-->
       <if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.id = #{map.agUniqNum} </if>
       <if test="map.refundId!=null and map.refundId!=''"> and oa.order_id = #{map.refundId} </if>
       <if test="map.reviewStatus!=null and map.reviewStatus!=''"> and oa.reviews_stat = #{map.reviewStatus} </if>
@@ -671,10 +670,7 @@
   <!--订单数量调整导出(业务、财务)-->
   <select id="excelOrderAdjustAll" parameterType="map" resultMap="OrderAdjustVo">
     select
-    (
-      select re.id from o_refund_agent re
-      where re.src_id = adj.id and re.status=1
-    ) as refund_id,
+    adj.id as adj_Id,
     adj.order_id,
     adj.agent_id,
     ag.ag_name,
@@ -707,10 +703,10 @@
       where os.order_id = adj.order_id and os.status=1
     ) as pro_name,
     (
-    select LISTAGG(oso.pro_model,',') WITHIN GROUP(ORDER BY os.order_id)
-    from o_sub_order_activity oso
-    left join o_sub_order os on oso.sub_order_id = os.id and os.status=1
-    where os.order_id = adj.order_id and oso.status=1
+      select LISTAGG(oso.pro_model,',') WITHIN GROUP(ORDER BY os.order_id)
+      from o_sub_order_activity oso
+      left join o_sub_order os on oso.sub_order_id = os.id and os.status=1
+      where os.order_id = adj.order_id and oso.status=1
     ) as model,
     nvl((
       select LISTAGG(os.pro_rel_price,',') WITHIN GROUP (ORDER BY os.order_id)
@@ -723,10 +719,21 @@
       where os.order_id = adj.order_id and os.status=1
     ),0) as pro_num,
     nvl(oo.pay_amo,0) as pay_amo,
-    nvl(adj.pro_refund_amount,0) as pro_refund_amount,
-    nvl(adj.offset_amount,0) as offset_amount,
-    nvl(adj.real_refund_amo,0) as real_refund_amo,
     cu.name as adj_user_id,
+    (
+      select dq.name
+      from c_organization dq
+      left join a_agent_businfo ab on dq.id = ab.ag_doc_district
+      left join o_order on o_order.bus_id = ab.id
+      where o_order.id = adj.order_id
+    ) as ag_doc_district,
+    (
+      select sq.name
+      from c_organization sq
+      left join a_agent_businfo ab on sq.id = ab.ag_doc_pro
+      left join o_order on o_order.bus_id = ab.id
+      where o_order.id = adj.order_id
+    ) as ag_doc_pro,
     to_char(adj.adj_tm,'yyyy-MM-dd') as adj_tm,
     adj.reviews_stat,
     adj.refund_stat,
@@ -768,9 +775,135 @@
     </where>
     order by adj.adj_tm desc
   </select>
-
+  <sql id="selectOrderAdjustDetailAllSql">
+    select oa.id as adj_id,
+           oa.order_id,
+           oa.agent_id,
+           ag.ag_name,
+           ab.bus_num  as bus_num,
+           (select platform_name
+            from a_platform ap
+            left join a_agent_businfo ab on ap.platform_num = ab.bus_platform
+            left join o_order on o_order.bus_id = ab.id
+            where o_order.id = oa.order_id) as platform_name,
+           soa.activity_name,
+           so.pro_name,
+           soa.pro_model as model,
+           so.pro_rel_price,
+           oad.org_pro_num as pro_num,
+           oad.org_pro_num * so.pro_rel_price as payAmo,
+           oad.adj_num,
+           oad.dif_amount,
+           oa.pro_refund_amount,
+           cu.name as adj_user_id,
+          (
+          select dq.name
+          from c_organization dq
+          left join a_agent_businfo ab on dq.id = ab.ag_doc_district
+          left join o_order on o_order.bus_id = ab.id
+          where o_order.id = oa.order_id
+          ) as ag_doc_district,
+          (
+          select sq.name
+          from c_organization sq
+          left join a_agent_businfo ab on sq.id = ab.ag_doc_pro
+          left join o_order on o_order.bus_id = ab.id
+          where o_order.id = oa.order_id
+          ) as ag_doc_pro,
+           oa.adj_tm,
+           oa.reviews_stat,
+           nvl(oa.refund_stat,'') as refund_stat,
+           nvl(oa.refund_tm,'') as refund_tm,
+           oa.real_refund_amo,
+           oa.reviews_date,
+          nvl((
+          select oan.org_name
+          from o_organization oan
+          left join a_agent_businfo ab on ab.organ_num = oan.org_id
+          where ab.id = oo.bus_id and oan.status=1 and ab.status=1
+          ),'') as organ_num,
+      (select max(o_order_adj.org_pay_amo) from o_order_adj where o_order_adj.order_id = oa.order_id)as current_amo,
+    (select max(o_order_adj_detail.org_pro_num) from o_order_adj_detail where o_order_adj_detail.sub_order_id = oad.sub_order_id) as max_pro_num
+    from o_order_adj_detail oad
+           left join o_sub_order so on so.id = oad.sub_order_id
+           left join o_order_adj oa on oad.adj_id = oa.id
+           left join o_order oo on oa.order_id = oo.id and oo.status = 1
+           left join a_agent ag on ag.id = oa.agent_id and ag.status = 1
+           left join c_user cu on cu.id = oa.adj_user_id
+           left join o_sub_order_activity soa on soa.sub_order_id = oad.sub_order_id  and soa.status = '1'
+           left join a_agent_businfo ab on ab.id = oo.bus_id and ab.agent_id = oa.agent_id and ab.status=1
+    <where>
+      <if test="1==1"> and oa.status=1 </if>
+      <if test="map.agName!=null and map.agName!=''"> and ag.ag_name like concat(concat('%',#{map.agName}),'%') </if>
+      <if test="map.adjId!=null and map.adjId!=''"> and oad.adj_id = #{map.adjId} </if>
+      <if test="map.agUniqNum!=null and map.agUniqNum!=''"> and ag.id = #{map.agUniqNum} </if>
+      <if test="map.orderId!=null and map.orderId!=''"> and oa.order_id = #{map.orderId} </if>
+      <if test="map.reviewStatus!=null and map.reviewStatus!=''"> and oa.reviews_stat = #{map.reviewStatus} </if>
+      <if test="map.proName!=null and map.proName.size>0">
+        and EXISTS
+        (select * from o_sub_order os
+        where os.pro_code in
+          <foreach collection="map.proName" item="proName" open="(" separator="," close=")">
+             #{proName}
+          </foreach>
+      and os.status = 1 and os.id = oad.SUB_ORDER_ID)
+      </if>
+      <if test="map.userName!=null and map.userName!=''">
+        and cu.name = #{map.userName}
+      </if>
+      <if test="map.platform!=null and map.platform !=''">
+        and EXISTS (select ab.bus_num
+        FROM a_agent_businfo ab
+        LEFT JOIN o_order oo
+        ON oo.bus_id = ab.id
+        WHERE oo.id = oa.order_id
+        and ab.status = 1
+        and oo.status = 1
+        and  ab.bus_num= #{map.platform})
+      </if>
+      <if test="map.busPlatform!=null and map.busPlatform!=''">
+        and ab.bus_platform =  #{map.busPlatform}
+      </if>
+      and EXISTS
+      (select ab.id from a_agent_businfo ab
+      left join o_order oo on oo.bus_id = ab.id
+      where oo.id = oa.order_id
+      <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
+        and ab.bus_platform in
+        <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")">
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>)
+      <if test="map.userId != null and map.userId !=''">
+        and oa.adj_user_id = #{map.userId}
+      </if>
+      <if test="map.reviewTime != null and map.reviewTime !=''">
+        and  to_char(oa.REVIEWS_DATE,'yyyy-mm-dd')  = #{map.reviewTime}
+      </if>
+      <if test="map.refundStatus != null and map.refundStatus != ''">
+        and oa.REFUND_STAT = #{map.refundStatus}
+      </if>
+      <if test="map.refundTime != null and map.refundTime != ''">
+        and  to_char(oa.REFUND_TM,'yyyy-mm-dd')  = #{map.refundTime}
+      </if>
+    </where>
+    order by oa.ID desc
+  </sql>
+  <select id="selectOrderAdjustDetailAll" parameterType="map" resultMap="OrderAdjustVo">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="selectOrderAdjustDetailAllSql"/>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+  <select id="selectOrderAdjustDetailAllCount" parameterType="map" resultType="java.lang.Integer">
+    select count(*) from(
+    <include refid="selectOrderAdjustDetailAllSql"/>)
+  </select>
+  <select id="excelOrderAdjustDetailAll" parameterType="map" resultMap="OrderAdjustVo">
+    <include refid="selectOrderAdjustDetailAllSql"/>
+  </select>
   <!--订单数量调整导出VO-->
   <resultMap id="OrderAdjustVo" type="com.ryx.credit.pojo.admin.vo.OrderAdjustVo">
+    <result column="adj_Id" property="adjId" jdbcType="VARCHAR"/>
     <result column="refund_id" property="refundId" jdbcType="VARCHAR"/>
     <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
     <result column="agent_id" property="agentId" jdbcType="VARCHAR"/>
@@ -788,9 +921,16 @@
     <result column="offset_amount" property="offsetAmount" jdbcType="VARCHAR"/>
     <result column="real_refund_amo" property="realRefundAmo" jdbcType="VARCHAR"/>
     <result column="adj_user_id" property="adjUserId" jdbcType="VARCHAR"/>
+    <result column="ag_doc_district" property="agDocDistrict" jdbcType="VARCHAR"/>
+    <result column="ag_doc_pro" property="agDocPro" jdbcType="VARCHAR"/>
     <result column="adj_tm" property="adjTm" jdbcType="VARCHAR"/>
     <result column="reviews_stat" property="reviewsStat" jdbcType="VARCHAR"/>
     <result column="refund_stat" property="refundStat" jdbcType="VARCHAR"/>
     <result column="refund_tm" property="refundTm" jdbcType="VARCHAR"/>
+    <result column="adj_num" property="adjNum" jdbcType="VARCHAR"/>
+    <result column="dif_amount" property="difAmount" jdbcType="VARCHAR"/>
+    <result column="current_amo" property="currentAmo" jdbcType="VARCHAR"/>
+    <result column="max_pro_num" property="maxProNum" jdbcType="VARCHAR"/>
+    <result column="reviews_date" property="reviewsDate" jdbcType="VARCHAR"/>
   </resultMap>
 </mapper>

@@ -58,6 +58,16 @@ public class OInternetRenew implements Serializable{
 
     private List<Attachment> attachmentList;
 
+    private List<String> renewWayList;
+
+    public List<String> getRenewWayList() {
+        return renewWayList;
+    }
+
+    public void setRenewWayList(List<String> renewWayList) {
+        this.renewWayList = renewWayList;
+    }
+
     public String getBusNum() {
         return busNum;
     }

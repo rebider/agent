@@ -64,6 +64,16 @@ public class ReceiptOrderVo implements Serializable {
 
     private String addrMobile;//电话
 
+    private String approvalOpinion;//审批意见
+
+    public String getApprovalOpinion() {
+        return approvalOpinion;
+    }
+
+    public void setApprovalOpinion(String approvalOpinion) {
+        this.approvalOpinion = approvalOpinion;
+    }
+
     public void setAddrMobile(String addrMobile) {
         this.addrMobile = addrMobile;
     }
