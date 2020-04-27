@@ -1564,16 +1564,10 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 .andBatchCodeEqualTo(orderAdj.getOrgPaymentId()==null?"":orderAdj.getOrgPaymentId());
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         Date beginDate = new Date();
-//        for (OPaymentDetail oPaymentDetail:oPaymentDetails){
-//            if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.DF.code) == 0 || oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.YQ.code) == 0 ){
-//                beginDate = oPaymentDetail.getPlanPayTime();
-                Calendar c = Calendar.getInstance();
-                c.setTime(beginDate);
-                c.add(Calendar.MONTH,-1);
-                beginDate = c.getTime();
-//                break;
-//            }
-//        }
+        Calendar c = Calendar.getInstance();
+        c.setTime(beginDate);
+        c.add(Calendar.MONTH,-1);
+        beginDate = c.getTime();
         for(OPaymentDetail oPaymentDetail:oPaymentDetails){
             if (oPaymentDetail.getPaymentStatus().compareTo(PaymentStatus.BF.code) == 0 ){
                 oPaymentDetail.setPayAmount(oPaymentDetail.getRealPayAmount());
