@@ -53,4 +53,14 @@ public class PBalanceSerialServiceImpl implements PBalanceSerialService {
         }
         return mapList;
     }
+
+    @Override
+    public List<Map<String, String>> getListToDownload(Map<String, String> param) {
+        return pBalanceSerialMapper.getListByMap(param,null);
+    }
+
+    @Override
+    public Map<String, Object> statisticalData(Map<String, String> param) {
+        return pBalanceSerialMapper.statisticalData(param);
+    }
 }

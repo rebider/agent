@@ -13,4 +13,7 @@ public interface PBalanceSerialService {
 
     List<Map<String,String>> getRefundLog(String balanceId) throws MessageException;
 
+    List<Map<String,String>> getListToDownload(Map<String,String> param);
+
+    Map<String,Object> statisticalData(Map<String,String> param);
 }

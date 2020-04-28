@@ -304,8 +304,25 @@
 
   <sql id="getListByMap_sql">
     select
-    pb.*,cu.NAME,pp.BATCH_NO,ap.PLATFORM_NAME,pa.NOTICE_RESULT,pa.NOTICE_TIME
-    ,pp.PROFIT_TYPE
+    pb.BALANCE_ID, pb.BALANCE_BATCH_NO, pb.SETTLE_MONTH, pb.SETTLE_DATE, pb.AG_ID, pb.AG_NAME, pb.BRAND_NO,
+     pb.REAL_AG_ID, pb.REAL_AG_NAME, pb.BALANCE_AMT, pb.BALANCE_BANK_NO, pb.BALANCE_BANK_NAME, pb.BALANCE_ACCT_TYPE,
+    pb.BALANCE_ACCT_NO, pb.BALANCE_ACCT_NAME,  pb.BALANCE_DESC, pb.SUBMIT_TER, pb.SUBMIT_TIME, pb.SYNC_TIME, pb.CHECK_STATUS,
+    pb.RECON_STATUS, pb.RECON_REMARK, pb.BALANCE_BANK_VERSION, pb.CKWC_TIME,
+    cu.NAME,ap.PLATFORM_NAME,pa.NOTICE_TIME
+    ,pp.BATCH_NO,pp.IMPORT_BATCH, /**导入批次**/
+    case when pb.IMPORT_BATCH = '77' then '一次请款'
+        when pb.IMPORT_BATCH = '88' then '二次请款'
+        when pb.IMPORT_BATCH = '99' then '补出款'
+        else '分润数据导入' end as PROFIT_TYPE, /**请款批次**/
+    case when pb.BALANCE_STATUS='00' then '未出款'
+          when pb.BALANCE_STATUS='01' then '出款中'
+          when pb.BALANCE_STATUS='02' then '出款成功'
+          when pb.BALANCE_STATUS='03' then '出款失败'
+          else '未知' end as BALANCE_STATUS, /**结算状态**/
+    case when pa.NOTICE_RESULT = '00' then '未通知'
+          when pa.NOTICE_RESULT = '01' then '已通知'
+          when pa.NOTICE_RESULT = '02' then '修改完成'
+          else '' end NOTICE_RESULT  /**通知结果**/
     from P_BALANCE_SERIAL pb
     left join (
     select pr.* from P_REFUND_SERIAL pr
@@ -318,7 +335,7 @@
     ) pa on pb.BALANCE_ID = pa.FIRST_BALANCE_ID
     left join C_USER cu on cu.ID = pb.SUBMIT_TER
     left join PMS_PROFIT pp on pb.BALANCE_ID = pp.BALANCE_ID
-    left join A_PLATFORM ap on pb.BRAND_NO = ap.BUSPLATFORM
+    left join A_PLATFORM ap on pb.BRAND_NO = ap.PLATFORM_NUM
     where 1= 1
     <if test="param.agDoc != '' and param.agDoc != null">
       and pb.AG_ID in (
@@ -350,14 +367,11 @@
         and pb.SETTLE_MONTH = #{param.endMonth}
       </when>
     </choose>
+    <if test="param.busPlayNum != '' and param.busPlayNum != null">
+      and pb.BRAND_NO  = #{param.busPlayNum}
+    </if>
     <if test="param.busPlayName != '' and param.busPlayName != null">
       and pb.BRAND_NO  = #{param.busPlayName}
-    </if>
-    <!--<if test="param.busPlayNum != '' and param.busPlayNum != null">
-      and pb.BRAND_NO  = #{param.busPlayNum}
-    </if>-->
-    <if test="param.busPlayNum != '' and param.busPlayNum != null">
-      and ap.PLATFORM_NAME  = #{param.busPlayNum}
     </if>
     <if test="param.balanceBatchId != '' and param.balanceBatchId != null">
       and pb.BALANCE_BATCH_NO  = #{param.balanceBatchId}
@@ -373,8 +387,8 @@
         and pb.SETTLE_DATE = #{param.settleDateEnd}
       </when>
     </choose>
-    <if test="param.importType != '' and param.importType != null">
-      and pp.PROFIT_TYPE  = #{param.importType}
+    <if test="param.importBatch != '' and param.importBatch != null">
+      and pb.IMPORT_BATCH  = #{param.importBatch}
     </if>
     <if test="param.balanceId != '' and param.balanceId != null">
       and pb.BALANCE_ID  = #{param.balanceId}
@@ -395,11 +409,16 @@
 
   <select id="getRefundLog" resultType="java.util.Map" parameterType="java.lang.String">
     select pr.FIRST_BALANCE_ID,pr.CK_TIME,pr.REFUND_REMARK,
-         pr.PRE_BALANCE_ID,pr.BALANCE_ID,'03' as BALANCE_STATUS
+         pr.PRE_BALANCE_ID,pr.BALANCE_ID,'失败' as BALANCE_STATUS
     from P_REFUND_SERIAL pr
     where FIRST_BALANCE_ID  = #{balanceId}
     order by CK_TIME desc
   </select>
 
+  <select id="statisticalData" resultType="java.util.Map">
+    select count(1) as count,nvl(sum(zzz.BALANCE_AMT),0) as amt from (
+    <include refid="getListByMap_sql"/>
+    ) zzz
+  </select>
 
 </mapper>

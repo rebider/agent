@@ -25,4 +25,6 @@ public interface PBalanceSerialMapper {
 
     List<Map<String,String>> getRefundLog(String balanceId);
 
+    Map<String,Object> statisticalData(@Param("param")Map<String,String> param);
+
 }
