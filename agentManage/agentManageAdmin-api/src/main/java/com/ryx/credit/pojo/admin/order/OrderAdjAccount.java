@@ -35,6 +35,8 @@ public class OrderAdjAccount implements Serializable {
 
     private String refundCompany;
 
+    private String refundUser;
+
     public String getId() {
         return id;
     }
@@ -153,5 +155,13 @@ public class OrderAdjAccount implements Serializable {
 
     public void setRefundCompany(String refundCompany) {
         this.refundCompany = refundCompany == null ? null : refundCompany.trim();
+    }
+
+    public String getRefundUser() {
+        return refundUser;
+    }
+
+    public void setRefundUser(String refundUser) {
+        this.refundUser = refundUser == null ? null : refundUser.trim();
     }
 }

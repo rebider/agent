@@ -91,4 +91,7 @@ public interface OrderAdjustService {
     AgentResult adjustCheckAmo(OrderUpModelVo orderUpModelVo) throws Exception;
 
     AgentResult saveAdjAccounts(OrderUpModelVo orderUpModelVo) throws Exception;
+
+
+    AgentResult updateAdjAccountsByTk(OrderUpModelVo orderUpModelVo,String userId) throws Exception;
 }

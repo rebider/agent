@@ -13,6 +13,8 @@ public class OrderAdjAccountVo extends OrderAdjAccount implements Serializable {
 
     private List<Attachment> attachments;
 
+    private List<Attachment> tkattachments;
+
     public String getAccountFile() {
         return accountFile;
     }
@@ -27,5 +29,13 @@ public class OrderAdjAccountVo extends OrderAdjAccount implements Serializable {
 
     public void setAttachments(List<Attachment> attachments) {
         this.attachments = attachments;
+    }
+
+    public List<Attachment> getTkattachments() {
+        return tkattachments;
+    }
+
+    public void setTkattachments(List<Attachment> tkattachments) {
+        this.tkattachments = tkattachments;
     }
 }

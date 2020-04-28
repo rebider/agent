@@ -1126,6 +1126,76 @@ public class OrderAdjAccountExample {
             addCriterion("REFUND_COMPANY not between", value1, value2, "refundCompany");
             return (Criteria) this;
         }
+
+        public Criteria andRefundUserIsNull() {
+            addCriterion("REFUND_USER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserIsNotNull() {
+            addCriterion("REFUND_USER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserEqualTo(String value) {
+            addCriterion("REFUND_USER =", value, "refundUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserNotEqualTo(String value) {
+            addCriterion("REFUND_USER <>", value, "refundUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserGreaterThan(String value) {
+            addCriterion("REFUND_USER >", value, "refundUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserGreaterThanOrEqualTo(String value) {
+            addCriterion("REFUND_USER >=", value, "refundUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserLessThan(String value) {
+            addCriterion("REFUND_USER <", value, "refundUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserLessThanOrEqualTo(String value) {
+            addCriterion("REFUND_USER <=", value, "refundUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserLike(String value) {
+            addCriterion("REFUND_USER like", value, "refundUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserNotLike(String value) {
+            addCriterion("REFUND_USER not like", value, "refundUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserIn(List<String> values) {
+            addCriterion("REFUND_USER in", values, "refundUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserNotIn(List<String> values) {
+            addCriterion("REFUND_USER not in", values, "refundUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserBetween(String value1, String value2) {
+            addCriterion("REFUND_USER between", value1, value2, "refundUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundUserNotBetween(String value1, String value2) {
+            addCriterion("REFUND_USER not between", value1, value2, "refundUser");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

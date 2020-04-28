@@ -67,7 +67,8 @@
   </sql>
   <sql id="Base_Column_List">
     ID, ADJ_ID, ORDER_ID, TYPE, REFUND_ACCOUNT, ACCOUNT_NAME, ACCOUNT_BANK, BRANCH_LINE_NUM, 
-    ALL_LINE_NUM, REFUND_AMO, REFUND_TM, REFUND_STAT, STATUS, VERSION, REFUND_COMPANY
+    ALL_LINE_NUM, REFUND_AMO, REFUND_TM, REFUND_STAT, STATUS, VERSION, REFUND_COMPANY, 
+    REFUND_USER
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjAccountExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -102,14 +103,14 @@
       TYPE, REFUND_ACCOUNT, ACCOUNT_NAME, 
       ACCOUNT_BANK, BRANCH_LINE_NUM, ALL_LINE_NUM, 
       REFUND_AMO, REFUND_TM, REFUND_STAT, 
-      STATUS, VERSION, REFUND_COMPANY
-      )
+      STATUS, VERSION, REFUND_COMPANY, 
+      REFUND_USER)
     values (#{id,jdbcType=VARCHAR}, #{adjId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, 
       #{type,jdbcType=DECIMAL}, #{refundAccount,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR}, 
       #{accountBank,jdbcType=VARCHAR}, #{branchLineNum,jdbcType=VARCHAR}, #{allLineNum,jdbcType=VARCHAR}, 
       #{refundAmo,jdbcType=DECIMAL}, #{refundTm,jdbcType=TIMESTAMP}, #{refundStat,jdbcType=DECIMAL}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{refundCompany,jdbcType=VARCHAR}
-      )
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{refundCompany,jdbcType=VARCHAR}, 
+      #{refundUser,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjAccount">
     insert into O_ORDER_ADJ_ACCOUNT
@@ -159,6 +160,9 @@
       <if test="refundCompany != null">
         REFUND_COMPANY,
       </if>
+      <if test="refundUser != null">
+        REFUND_USER,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -205,6 +209,9 @@
       </if>
       <if test="refundCompany != null">
         #{refundCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="refundUser != null">
+        #{refundUser,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -259,6 +266,9 @@
       <if test="refundCompany != null">
         REFUND_COMPANY = #{refundCompany,jdbcType=VARCHAR},
       </if>
+      <if test="refundUser != null">
+        REFUND_USER = #{refundUser,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -277,7 +287,8 @@
       REFUND_STAT = #{refundStat,jdbcType=DECIMAL},
       STATUS = #{status,jdbcType=DECIMAL},
       VERSION = #{version,jdbcType=DECIMAL},
-      REFUND_COMPANY = #{refundCompany,jdbcType=VARCHAR}
+      REFUND_COMPANY = #{refundCompany,jdbcType=VARCHAR},
+      REFUND_USER = #{refundUser,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
