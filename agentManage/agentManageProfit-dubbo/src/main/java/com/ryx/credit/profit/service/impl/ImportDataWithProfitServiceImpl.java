@@ -11,11 +11,15 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,6 +34,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
 
     Logger logger = LoggerFactory.getLogger(ImportDataWithProfitServiceImpl.class);
 
+    private static final int importNum = 800;
 
     @Autowired
     private PmsProfitLogMapper pmsProfitLogMapper;
@@ -47,14 +52,14 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
     }
 
     @Override
-    public int insertProfitData(List<Map<String, Object>> profitDatas) {    //批量插入，每次插入1000条数据
+    public int insertProfitData(List<Map<String, Object>> profitDatas) {    //批量插入，每次插入800条数据
 
         int num = profitDatas.size();
         int resNum = 0;
-        int temp = num / 1000;
+        int temp = num / importNum;
         for (int i = 0; i <= temp; i++) {
-            int fromIndex = 1000*i;
-            int toIndex = 1000*(i+1);
+            int fromIndex = importNum*i;
+            int toIndex = importNum*(i+1);
             if (toIndex>num)
                 toIndex = num;
             List<Map<String, Object>> list = profitDatas.subList(fromIndex, toIndex);
@@ -90,7 +95,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
 
         String path = log.getUploadPath();
         File file = new File(path);
-        
+
         //2.读取文件
         FileInputStream inputStream = new FileInputStream(file);
 
@@ -194,11 +199,11 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
     public List<Map<String,String>> checkDataAll(List<Map<String,String>> datas){
 
         int num = datas.size();
-        int temp = num / 1000;
+        int temp = num / importNum;
         List<Map<String,String>> result = new ArrayList<Map<String, String>>();
         for (int i = 0; i <= temp; i++) {
-            int fromIndex = 1000*i;
-            int toIndex = 1000*(i+1);
+            int fromIndex = importNum*i;
+            int toIndex = importNum*(i+1);
             if (toIndex>num)
                 toIndex = num;
             List<Map<String,String>> list = datas.subList(fromIndex, toIndex);
@@ -275,13 +280,13 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
                 String cellValueMonth = getCellValue(month);
                 String cellValueBusCode = getCellValue(busCode);
                 if (StringUtils.isBlank(cellValueAgentId))
-                errMsg.append(sheetName+"页第"+tempNum+"行AG码为空！\n");
+                    errMsg.append(sheetName+"页第"+tempNum+"行AG码为空！\n");
                 if (StringUtils.isBlank(cellValueAgentName))
-                errMsg.append(sheetName+"页第"+tempNum+"行代理商名称为空！\n");
+                    errMsg.append(sheetName+"页第"+tempNum+"行代理商名称为空！\n");
                 if (StringUtils.isBlank(cellValueMonth))
-                errMsg.append(sheetName+"页第"+tempNum+"行月份为空！\n");
+                    errMsg.append(sheetName+"页第"+tempNum+"行月份为空！\n");
                 if (StringUtils.isBlank(cellValueBusCode))
-                errMsg.append(sheetName+"页第"+tempNum+"行品牌码为空！\n");
+                    errMsg.append(sheetName+"页第"+tempNum+"行品牌码为空！\n");
 
             }
 
@@ -431,7 +436,8 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
                 case HSSFCell.CELL_TYPE_FORMULA: // 公式
                     try {
                         // 如果公式结果为字符串
-                        cellValue = String.valueOf(cell.getStringCellValue());
+                        //cellValue = String.valueOf(cell.getStringCellValue());
+                        cellValue = String.valueOf(((XSSFCell)cell).getRawValue ());
                     } catch (IllegalStateException e) {
                         if (HSSFDateUtil.isCellDateFormatted(cell)) {// 判断是否为日期类型
                             Date date = cell.getDateCellValue();
@@ -493,8 +499,13 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
 
         List<Map<String,Object>> datas = new ArrayList<Map<String,Object>>();
 
+        Cell cell = null;
+        Row row = null;
+
         for (int rowNum = 0; rowNum < numberOfRows; rowNum++) {
-            Row row = sheet.getRow(rowNum);
+            logger.info("\n===========正在封装第"+rowNum+"条数据。");
+
+            row = sheet.getRow(rowNum);
             Map<String,Object> data = new HashMap<String,Object>();
             String id = getUUIDForId();
             data.put("id",id);//id 主键
@@ -508,7 +519,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
 
             for (int colNum = 0; colNum < numberOfCells; colNum++) {
 
-                Cell cell = row.getCell(colNum);
+                cell = row.getCell(colNum);
                 String value = getCellValue(cell);
                 switch (colNum){
                     case 0:
@@ -531,14 +542,14 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
             datas.add(data);
         }
         try {
+            logger.info("\n=============================数据封装完成 开始插入数据，共"+datas.size()+"条分润数据。\n");
             insertProfitData(datas);
         }catch (Exception e){
-           e.printStackTrace();
-           result.put("resultCode","Error");
-           result.put("errMsg",sheetName+"页数据插入失败:"+e.getMessage()+"\n");
-           return result;
+            e.printStackTrace();
+            result.put("resultCode","Error");
+            result.put("errMsg",sheetName+"页数据插入失败:"+e.getMessage()+"\n");
+            return result;
         }
-
 
         result.put("resultCode","Success");
         return result;
