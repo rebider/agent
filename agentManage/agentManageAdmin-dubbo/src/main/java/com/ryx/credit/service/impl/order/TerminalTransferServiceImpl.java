@@ -1780,8 +1780,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
             if (agentResult.isOK()) {
                 for (Map<String, String> data : datalist) {
-                    String serialStatus = String.valueOf(data.get("serialStatus"));
-                    if (!"00".equals(serialStatus)) {
+                    String serialNumberStatus = String.valueOf(data.get("serialNumberStatus"));
+                    if (!"00".equals(serialNumberStatus)) {
                         String serialNumberMsg = String.valueOf(data.get("serialNumberMsg"));
                         log.info("调用RJ接口查询验证接口返回异常");
                         throw new MessageException(serialNumberMsg);
@@ -1964,6 +1964,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             agentResult = AgentResult.fail("划拨解锁异常");
         }
 
+
         /**
          * 调用接口远程
          */
@@ -1972,15 +1973,20 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
                 String respCode = String.valueOf(jsonObject.get("respCode"));
                 JSONObject JSONObjectData = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
-                JSONObject data = JSONObject.parseObject(String.valueOf(JSONObjectData.get("data")));
+               /* JSONObject data = JSONObject.parseObject(String.valueOf(JSONObjectData.get("data")));*/
+                List<Map<String, String>> maps = (List<Map<String, String>>) JSONArray.parse(String.valueOf(JSONObjectData.get("data")));
                 if ("000000".equals(respCode)) {
-                    String code = String.valueOf(data.get("code"));
-                    String msg = String.valueOf(data.get("msg"));
-                    if ("0".equals(code)) {
-                        agentResult = AgentResult.ok(msg);
-                    } else if ("1".equals(code)) {
-                        agentResult = AgentResult.fail(msg);
+                    for (Map<String, String> data : maps) {
+                        String resultCode = String.valueOf(data.get("resultCode"));
+                        String resultMsg = String.valueOf(data.get("resultMsg"));
+                        if ("00".equals(resultCode)) {
+                            agentResult = AgentResult.ok(resultMsg);
+                        } else if ("01".equals(resultCode)) {
+                            log.info("终端划拨解锁失败："+String.valueOf(data.get("serialNumber"))+"解锁失败"+resultMsg);
+                            agentResult = AgentResult.fail(String.valueOf(data.get("serialNumber"))+"解锁失败"+resultMsg);
+                        }
                     }
+
                 } else {
                     agentResult = AgentResult.fail("划拨解锁处理失败");
                 }
@@ -2007,8 +2013,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         AgentResult agentResult = null;
         try {
             log.info("划拨重新开始明细id：" + id);
-            agentResult = termMachineService.terminalTransferunlock(terminalTransferMapper.selectByPrimaryKey(terminalTransferDetailMapper.selectByPrimaryKey(id).getTerminalTransferId()).getTaskId(), id, String.valueOf(terminalTransferDetailMapper.selectByPrimaryKey(id).getPlatformType()));
+            agentResult = termMachineService.terminalTransAgain(terminalTransferMapper.selectByPrimaryKey(terminalTransferDetailMapper.selectByPrimaryKey(id).getTerminalTransferId()).getTaskId(), id, String.valueOf(terminalTransferDetailMapper.selectByPrimaryKey(id).getPlatformType()));
             log.info("划拨解锁结束：" + JSONObject.toJSON(agentResult));
+
         } catch (Exception e) {
             log.error("划拨重新发起异常明细id：" + id);
             e.printStackTrace();
@@ -2022,14 +2029,22 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
                 String respCode = String.valueOf(jsonObject.get("respCode"));
                 JSONObject JSONObjectData = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
-                JSONObject data = JSONObject.parseObject(String.valueOf(JSONObjectData.get("data")));
+                List<Map<String, String>> maps = (List<Map<String, String>>) JSONArray.parse(String.valueOf(JSONObjectData.get("data")));
                 if ("000000".equals(respCode)) {
-                    String resultCode = String.valueOf(data.get("resultCode"));
-                    String resultMsg = String.valueOf(data.get("resultMsg"));
-                    if ("00".equals(resultCode)) {
-                        agentResult = AgentResult.ok(resultMsg);
-                    } else if ("01".equals(resultCode)) {
-                        agentResult = AgentResult.fail(resultMsg);
+                    for (Map<String, String> data : maps) {
+                        String serialNumberStatus  = String.valueOf(data.get("serialNumberStatus "));
+                        String resultMsg = String.valueOf(data.get("resultMsg"));
+                        String serialNumber = String.valueOf(data.get("serialNumber"));
+                        if ("00".equals(serialNumberStatus )) {
+                            TerminalTransferDetail terminalTransferDetail = new TerminalTransferDetail();
+                            terminalTransferDetail.setId(serialNumber.trim());
+                            terminalTransferDetail.setAdjustStatus(AdjustStatus.TZZ.getValue());
+                            terminalTransferDetail.setuTime(new Date());
+                            terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                            agentResult = AgentResult.ok(resultMsg);
+                        } else if ("01".equals(serialNumberStatus)) {
+                            agentResult = AgentResult.fail(resultMsg);
+                        }
                     }
                 } else {
                     agentResult = AgentResult.fail("划拨重新发起失败");
