@@ -372,10 +372,10 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                                         ));
                         if(invoiceSum.getOwnInvoice().compareTo(BigDecimal.ZERO) == 1){
                             invoiceSum.setInvoiceStatus("00");
-                            invocationIntFreeze(invoiceSum.getAgentId(),userId,invoiceSum.getId(),"欠票数据导入-冻结");
+                           // invocationIntFreeze(invoiceSum.getAgentId(),userId,invoiceSum.getId(),"欠票数据导入-冻结");
                         }else {
                             invoiceSum.setInvoiceStatus("99");
-                            invocationIntUnFreeze(invoiceSum.getAgentId(),userId,"欠票数据导入-解冻 ");
+                           // invocationIntUnFreeze(invoiceSum.getAgentId(),userId,"欠票数据导入-解冻 ");
                         }
                         invoiceSumMapper.insertSelective(invoiceSum);
                     }else{
@@ -393,10 +393,10 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                                        );
                         if(invoiceSum.getOwnInvoice().compareTo(BigDecimal.ZERO) == 1){
                             invoiceSum.setInvoiceStatus("00");
-                            invocationIntFreeze(invoiceSum.getAgentId(),userId,invoiceSum.getId(),"欠票数据导入-冻结");
+                           // invocationIntFreeze(invoiceSum.getAgentId(),userId,invoiceSum.getId(),"欠票数据导入-冻结");
                         }else {
                             invoiceSum.setInvoiceStatus("99");
-                            invocationIntUnFreeze(invoiceSum.getAgentId(),userId,"欠票数据导入-解冻");
+                           // invocationIntUnFreeze(invoiceSum.getAgentId(),userId,"欠票数据导入-解冻");
                         }
                         invoiceSumMapper.updateByPrimaryKeySelective(invoiceSum);
                     }
