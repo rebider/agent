@@ -110,4 +110,14 @@ public interface OrderAdjustService {
      * @throws Exception
      */
     AgentResult approveFinishOrderAdjustRefund(String insid, String actname) throws Exception;
+
+    /**
+     * 订单调整退款审批处理
+     * @param orderUpModelVo
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    AgentResult approvalTaskOrderAdjustRefund(OrderUpModelVo orderUpModelVo, String userId) throws Exception;
+
 }

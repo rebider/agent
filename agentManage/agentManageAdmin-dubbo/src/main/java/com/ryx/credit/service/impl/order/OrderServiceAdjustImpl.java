@@ -1189,14 +1189,6 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                         throw new MessageException("执行抵扣失败!");
                     }
                     //第二个财务节点,线下退款-完成
-                }else if (orderUpModelVo.getSid().equals("sid-E2BA6A16-66BD-4A2D-A006-9AD5DC09A51D")){
-                    if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
-                        throw new MessageException("该任务审批状态异常!");
-                    }
-                    AgentResult agentResult = updateAdjAccountsByTk(orderUpModelVo, userId);
-                    if (!agentResult.isOK()){
-                        throw new MessageException(agentResult.getMsg());
-                    }
                 }
             }
             if ("boss".equals(orgCode) && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue()) ){
@@ -2606,11 +2598,84 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
 
     @Override
     public AgentResult startOrderAdjustRefund(String id, String cuser) throws Exception {
-        return null;
+        OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(id);
+        if (StringUtils.isBlank(id)) {
+            logger.info("订单调整退款提交审批，订单调整ID为空{}:{}", id, cuser);
+            return AgentResult.fail("订单调整提交审批，订单调整ID为空!");
+        }
+        if (StringUtils.isBlank(cuser)) {
+            logger.info("订单调整退款提交审批，操作用户为空{}:{}", id, cuser);
+            return AgentResult.fail("订单调整审批中，操作用户为空！");
+        }
+        if (!orderAdj.getStatus().equals(Status.STATUS_1.status)) {
+            logger.info("订单调整退款提交审批，订单调整信息已失效{}:{}", id, cuser);
+            return AgentResult.fail("订单调整信息已失效！");
+        }
+        if (orderAdj.getReviewsStat().equals(AgStatus.Approving.name())) {
+            logger.info("订单调整退款提交审批，禁止重复提交审批{}:{}", id, cuser);
+            return AgentResult.fail("订单调整提交审批，禁止重复提交审批！");
+        }
+        if (orderAdj.getReviewsStat().equals(AgStatus.Approved.name())) {
+            logger.info("订单调整退款提交审批，禁止重复提交审批{}:{}", id, cuser);
+            return AgentResult.fail("订单调整提交审批，禁止重复提交审批！");
+        }
+
+        //流程中的部门参数
+        Map startPar = agentEnterService.startPar(cuser);
+        if (null == startPar) {
+            logger.info("========用户{}{}启动部门参数为空", id, cuser);
+            throw new MessageException("启动部门参数为空！");
+        }
+        startPar.put("settlementCardDs","1");
+        startPar.put("settlementCardDg","1");
+        //启动审批
+        String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("orderAdjustRefund"), null, null, startPar);
+        if (proce == null) {
+            logger.info("订单调整提交审批，审批流启动失败{}:{}", id, cuser);
+            throw new MessageException("审批流启动失败！");
+        }
+
+        Agent agent = agentMapper.selectByPrimaryKey(orderAdj.getAgentId());
+        OOrder order = orderMapper.selectByPrimaryKey(orderAdj.getOrderId());
+        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
+        //添加审批关系
+        BusActRel record = new BusActRel();
+        record.setBusId(orderAdj.getId());
+        record.setActivId(proce);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(cuser);
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(BusActRelBusType.orderAdjust.name());
+        record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(orderAdj.getAgentId());
+        record.setAgentName(agent.getAgName());
+        record.setNetInBusType("ACTIVITY_"+agentBusInfo.getBusPlatform());//数据权限
+        record.setDataShiro(BusActRelBusType.orderAdjust.key);
+        record.setAgDocPro(agentBusInfo.getAgDocPro());
+        record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
+        if (1 != busActRelMapper.insertSelective(record)) {
+            logger.info("订单调整退款提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
+            throw new MessageException("订单调整审批流启动失败：添加审批关系失败！");
+        }
+        return AgentResult.ok();
     }
 
     @Override
     public AgentResult approveFinishOrderAdjustRefund(String insid, String actname) throws Exception {
+        return null;
+    }
+
+    @Override
+    public AgentResult approvalTaskOrderAdjustRefund(OrderUpModelVo orderUpModelVo, String userId) throws Exception {
+
+
+//            if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
+//                throw new MessageException("该任务审批状态异常!");
+//            }
+//            AgentResult agentResult = updateAdjAccountsByTk(orderUpModelVo, userId);
+//            if (!agentResult.isOK()){
+//                throw new MessageException(agentResult.getMsg());
+//            }
         return null;
     }
 }
