@@ -331,15 +331,15 @@ public class MposTermMachineServiceImpl implements TermMachineService {
             JSONObject resJson = JSONObject.parseObject(retString);
 
             //返回最终查询结果
-            if (null != resJson.getString("code") && resJson.getString("code").equals("0000")) {
+            if (null != resJson.getString("resultCode") && resJson.getString("resultCode").equals("000000")) {
                 //可以更换活动，封装参参数返回
-                return AgentResult.ok(resJson.get("result"));
-            } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
+                return AgentResult.ok(resJson.get("resultList"));
+            } else if (null != resJson.getString("resultCode") && resJson.getString("resultCode").equals("100007") && null != resJson.getString("resultMsg")) {
                 //不可以更换活动
-                return AgentResult.fail(resJson.getString("msg") + "，不可以更换活动！");
+                return AgentResult.fail(resJson.getString("resultMsg") + "，不能调整活动！");
             } else {
                 //异常结果
-                return AgentResult.fail("查询手刷换活动返回值异常！");
+                return AgentResult.fail("手刷活动调整校验返回值异常！");
             }
         } catch (Exception e) {
             e.printStackTrace();

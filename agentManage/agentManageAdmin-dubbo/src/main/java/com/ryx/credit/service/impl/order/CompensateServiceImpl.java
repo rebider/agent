@@ -881,8 +881,7 @@ public class CompensateServiceImpl implements CompensateService {
                         }
                     }
                 } else if (PlatformType.MPOS.getValue().equals(platformType)) {
-                    JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
-                    List<Map<String,Object>> resultList = (List<Map<String,Object>>)resData.get("resultList");
+                    List<Map<String, Object>> resultList = (List<Map<String, Object>>) synOrVerifyResult.getData();
                     for (Map<String, Object> stringObjectMap : resultList) {
                         String serialNumber = String.valueOf(stringObjectMap.get("serialNumber"));
                         for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
