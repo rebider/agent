@@ -157,7 +157,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                         .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
                 List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
                 if(agentFreezes.size()!=0){
-                    return AgentResult.fail("代理商此原因已被冻结");
+                    throw new MessageException("代理商此原因已被冻结:"+FreeType.getmsg(freeType));
                 }
                 AgentFreeze agentFreeze = new AgentFreeze();
                 agentFreeze.setId(idService.genId(TabId.a_agent_freeze));
