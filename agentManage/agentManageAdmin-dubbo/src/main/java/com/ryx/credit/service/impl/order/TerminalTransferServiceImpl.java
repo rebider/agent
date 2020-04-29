@@ -2032,8 +2032,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 List<Map<String, String>> maps = (List<Map<String, String>>) JSONArray.parse(String.valueOf(JSONObjectData.get("data")));
                 if ("000000".equals(respCode)) {
                     for (Map<String, String> data : maps) {
-                        String serialNumberStatus  = String.valueOf(data.get("serialNumberStatus "));
-                        String resultMsg = String.valueOf(data.get("resultMsg"));
+                        String serialNumberStatus  = String.valueOf(data.get("serialNumberStatus"));
+                        String serialNumberMsg = String.valueOf(data.get("serialNumberMsg"));
                         String serialNumber = String.valueOf(data.get("serialNumber"));
                         if ("00".equals(serialNumberStatus )) {
                             TerminalTransferDetail terminalTransferDetail = new TerminalTransferDetail();
@@ -2041,9 +2041,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                             terminalTransferDetail.setAdjustStatus(AdjustStatus.TZZ.getValue());
                             terminalTransferDetail.setuTime(new Date());
                             terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
-                            agentResult = AgentResult.ok(resultMsg);
+                            agentResult = AgentResult.ok(serialNumberMsg);
                         } else if ("01".equals(serialNumberStatus)) {
-                            agentResult = AgentResult.fail(resultMsg);
+                            agentResult = AgentResult.fail(serialNumberMsg);
                         }
                     }
                 } else {
