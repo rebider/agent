@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.ryx.credit.common.enumc.FreeType;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -452,6 +454,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         agentFreezePort.setFreezeCause("QPDJ");
         agentFreezePort.setFreezeNum(agentId);
         agentFreezePort.setRemark(reason);
+        agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
         AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
         if("200".equals(agentResult.getStatus())){
             logger.info("欠票冻结："+agentId+",代理商冻结成功！");

@@ -32,6 +32,8 @@ public class AgentFreeze implements Serializable{
 
     private BigDecimal version;
 
+    private BigDecimal freezeType;
+
     private String agentName;
 
     private String incomTimeBegin;
@@ -215,5 +217,13 @@ public class AgentFreeze implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public BigDecimal getFreezeType() {
+        return freezeType;
+    }
+
+    public void setFreezeType(BigDecimal freezeType) {
+        this.freezeType = freezeType;
     }
 }

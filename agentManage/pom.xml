@@ -594,9 +594,7 @@
         </repository>
     </repositories>
 
-    <pluginRepositories>
 
-    </pluginRepositories>
     <distributionManagement>
         <repository>
             <id>Releases</id>
