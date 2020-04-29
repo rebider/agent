@@ -2603,4 +2603,9 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
         }
         return AgentResult.ok();
     }
+
+    @Override
+    public AgentResult approveFinishOrderAdjustRefund(String insid, String actname) throws Exception {
+        return null;
+    }
 }

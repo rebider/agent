@@ -94,4 +94,13 @@ public interface OrderAdjustService {
 
 
     AgentResult updateAdjAccountsByTk(OrderUpModelVo orderUpModelVo,String userId) throws Exception;
+
+    /**
+     * 订单调整退款审批
+     * @param insid
+     * @param actname
+     * @return
+     * @throws Exception
+     */
+    AgentResult approveFinishOrderAdjustRefund(String insid, String actname) throws Exception;
 }
