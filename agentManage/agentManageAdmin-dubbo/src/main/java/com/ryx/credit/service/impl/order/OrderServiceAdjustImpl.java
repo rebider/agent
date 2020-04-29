@@ -2605,6 +2605,11 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
     }
 
     @Override
+    public AgentResult startOrderAdjustRefund(String id, String cuser) throws Exception {
+        return null;
+    }
+
+    @Override
     public AgentResult approveFinishOrderAdjustRefund(String insid, String actname) throws Exception {
         return null;
     }
