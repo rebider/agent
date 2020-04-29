@@ -103,7 +103,7 @@ public class ExcelEventParserToMap {
                     Double.parseDouble(formattedValue);
                     curstr.put(keys[thisCol],formattedValue);
                 } catch (NumberFormatException e) {
-                    curstr.put(keys[thisCol],formattedValue);
+                    curstr.put(keys[thisCol],formattedValue.trim());
                 }
             }
         }
