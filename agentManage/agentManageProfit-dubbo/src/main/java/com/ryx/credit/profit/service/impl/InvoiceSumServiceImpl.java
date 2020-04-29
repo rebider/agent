@@ -134,7 +134,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 }
             }
             if (surplusAmt.compareTo(BigDecimal.ZERO) <= 0) {
-                invocationIntUnFreeze(invoiceSum.getAgentId(),param.get("user").toString(),"到票解冻");
+                //(invoiceSum.getAgentId(),param.get("user").toString(),"到票解冻");
                 invoiceSum.setInvoiceStatus("99");
             }
         } catch (Exception e) {
