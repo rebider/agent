@@ -938,7 +938,7 @@
   <select id="checkDataAll" parameterType="java.util.List" resultType="java.util.Map">
     select * from (
       <foreach collection="datas" item="item" index="index" separator="UNION ALL">
-        SELECT  #{item.agentId} as AGENT_ID,#{item.busCode} as BUS_PLATFORM,#{item.rowNum} as ROW_NUM,#{item.sheetName} as SHEET_NAME
+        SELECT  #{item.agentId} as AGENT_ID,#{item.brandCode} as BUS_PLATFORM,#{item.rowOrder} as ROW_NUM,#{item.sheetName} as SHEET_NAME
         FROM dual
       </foreach>
       )aa
@@ -947,7 +947,7 @@
     from (
             select AGENT_ID,BUS_PLATFORM
             from(<foreach collection="datas" item="item" index="index" separator="UNION ALL">
-                    SELECT  #{item.agentId} as AGENT_ID,#{item.busCode} as BUS_PLATFORM,#{item.rowNum} as ROW_NUM,#{item.sheetName} as SHEET_NAME
+                    SELECT  #{item.agentId} as AGENT_ID,#{item.brandCode} as BUS_PLATFORM,#{item.rowOrder} as ROW_NUM,#{item.sheetName} as SHEET_NAME
                     FROM dual
                  </foreach>)
             MINUS

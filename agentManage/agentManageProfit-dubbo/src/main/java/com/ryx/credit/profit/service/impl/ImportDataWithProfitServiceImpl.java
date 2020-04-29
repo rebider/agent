@@ -7,25 +7,12 @@ import com.ryx.credit.profit.dao.PmsProfitLogMapper;
 import com.ryx.credit.profit.pojo.ImportDataWithProfitExample;
 import com.ryx.credit.profit.pojo.PmsProfitLog;
 import com.ryx.credit.profit.service.IImportDataWithProfitService;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import com.ryx.credit.profit.unitmain.BigDataExcelToMapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -52,7 +39,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
     }
 
     @Override
-    public int insertProfitData(List<Map<String, Object>> profitDatas) {    //批量插入，每次插入800条数据
+    public int insertProfitData(List<Map<String, String>> profitDatas) {    //批量插入，每次插入800条数据
 
         int num = profitDatas.size();
         int resNum = 0;
@@ -62,7 +49,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
             int toIndex = importNum*(i+1);
             if (toIndex>num)
                 toIndex = num;
-            List<Map<String, Object>> list = profitDatas.subList(fromIndex, toIndex);
+            List<Map<String, String>> list = profitDatas.subList(fromIndex, toIndex);
             int re = importDataWithProfitMapper.insertProfitData(list);
             resNum+=re;
         }
@@ -87,6 +74,44 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
 
     @Override
     public String insertProfitDataByBatchCode(String batchCode) throws Exception {
+
+        //1. 根据batchCode找到导入记录
+        PmsProfitLog log =  getImportLogByBatchCode(batchCode);
+        if (log==null){
+            throw new MessageException("未找到该记录");
+        }
+
+        //2.解析Excel文件 封装数据
+        List<List<Map<String,String>>> lists;
+        try {
+            lists = BigDataExcelToMapUtils.bigDataGetExcel(log.getUploadPath(),log.getImportType(),log.getUploadTime(),log.getUploadUser());
+        }catch (Exception e){
+            pmsProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1","数据导入失败，文件类型异常！");
+            return "文件解析失败。";
+        }
+        Map<String, String> resultMap;
+        //3.校验数据完整性，固定列数据
+        resultMap = checkExcelData(lists);
+        logger.info("====================checkExcelData()Excel结构检查完成。");
+        if ("Error".equals(resultMap.get("resultCode"))){    //存在异常数据，生成备注更新导入结果
+            String errMsg = resultMap.get("errMsg");
+            pmsProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1",errMsg);
+            return "数据导入失败,请检查导入文件";
+        }
+
+        //2.校验代理商信息
+        resultMap = checkAgentData(lists,log.getMonth());
+        logger.info("====================checkAgentData()数据完整性检查完成。");
+        if ("Error".equals(resultMap.get("resultCode"))){    //存在异常数据，生成备注更新导入结果
+            String errMsg = resultMap.get("errMsg");
+            pmsProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1",errMsg);
+            return "数据导入失败,请确认导入数据的完整性";
+        }
+
+
+
+        /*
+
         //1. 根据batchCode找到文件路径
         PmsProfitLog log =  getImportLogByBatchCode(batchCode);
         if (log==null){
@@ -111,11 +136,15 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
             return "数据导入失败，请检查文件类型。";
         }
 
+
+        logger.info("====================读取文件成功。");
+
         //校验数据
 
         Map<String, String> resultMap;
         //1.校验数据完整性，固定列数据
         resultMap = checkExcelData(data);
+        logger.info("====================checkExcelData()Excel结构检查完成。");
         if ("Error".equals(resultMap.get("resultCode"))){    //存在异常数据，生成备注更新导入结果
             String errMsg = resultMap.get("errMsg");
             pmsProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1",errMsg);
@@ -123,25 +152,28 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
         }
         //2.校验代理商信息
         resultMap = checkAgentData(data,log.getMonth());
+        logger.info("====================checkAgentData()数据完整性检查完成。");
         if ("Error".equals(resultMap.get("resultCode"))){    //存在异常数据，生成备注更新导入结果
             String errMsg = resultMap.get("errMsg");
             pmsProfitLogMapper.updataNoteAndStatusByBatchCode(batchCode,"1",errMsg);
             return "数据导入失败,请确认导入数据的完整性";
         }
 
+        */
 
         importDataWithProfitMapper.deleteProfitDataByBatchCode(batchCode);//插入数据之前先删除已存在的数据
 
         //插入数据
-        int numOfSheets = data.getNumberOfSheets();
+        int numOfSheets = lists.size();
         Executor executor = new ThreadPoolExecutor(numOfSheets, numOfSheets,
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
         List<FutureTask<Map<String,String>>> taskList = new ArrayList();
 
         for (int i = 0; i < numOfSheets; i++) {
-            Sheet sheet = data.getSheetAt(i);
-            SheetThead sheetThead = new SheetThead(log,sheet,i+1);
+            List<Map<String,String>> sheet = lists.get(i);
+            String sheetName = sheet.get(0).get("sheetName");
+            SheetThead sheetThead = new SheetThead(sheet,sheetName);
             FutureTask<Map<String,String>> thread = new FutureTask<>(sheetThead);
             taskList.add(thread);
             executor.execute(thread);
@@ -215,7 +247,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
         return result;
     }
 
-    public Map<String,String> checkExcelData(Workbook data){
+    /*public Map<String,String> checkExcelData(Workbook data){
         Map<String,String> result = new HashMap<String,String>();
 
         if (data == null){
@@ -302,10 +334,101 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
             result.put("resultCode","Success");
         }
         return result;
+    }*/
+
+    public Map<String,String> checkExcelData(List<List<Map<String,String>>> list){
+        Map<String,String> result = new HashMap<String,String>();
+
+        if (list == null || list.size()<1){
+            result.put("resultCode","Error");
+            result.put("errMsg","数据校验异常，数据读取失败，请检查上传文件是否正确。");
+            return result;
+        }
+
+        StringBuffer errMsg = new StringBuffer();
+        int sheetsNum = list.size();
+        for (int i = 0; i < sheetsNum; i++) {
+
+            List<Map<String, String>> sheetList = list.get(i);
+
+            //1.判断表头
+            if (sheetList == null || sheetList.size()<1){
+                errMsg.append("文件中第"+(i+1)+"页为空sheet页！\n");
+                continue;
+            }
+            Map<String,String> title = sheetList.get(0);//表头
+            if (title == null || title.size()<1){
+                errMsg.append("文件中第"+(i+1)+"页为空sheet页！\n");
+                continue;
+            }
+            String sheetName = title.get("sheetName");
+
+            String cellValue01 = title.get("agentId");
+            String cellValue02 = title.get("agentName");
+            String cellValue03= title.get("month");
+            String cellValue04 = title.get("brandCode");
+
+            if (!"AG码".equals(cellValue01)||!"代理商名称".equals(cellValue02)||!"月份".equals(cellValue03)||!"品牌码".equals(cellValue04)){
+                errMsg.append(sheetName+"页表头格式有误，请确认前四列以此为：AG码、代理商名称、月份、品牌码！\n");
+            }
+            int colNum = Integer.valueOf(title.get("sheetColumn")) + 2; //除去前四个固定列以及其他附属字段之外的列数
+            for (int num = 7; num <= colNum; num++){
+                String f = title.get("f" + (num));
+                if (StringUtils.isBlank(f)){
+                    errMsg.append(sheetName+"页表头有空格！\n");
+                    break;
+                }
+            }
+
+
+            //前四列数据非空
+            int rowNum = sheetList.size();
+            for (int j = 1; j < rowNum; j++) {
+
+                if (errMsg.length()>1200){
+                    break;
+                }
+
+                int tempNum = j+1;  //行号
+
+                Map<String, String> row = sheetList.get(j);
+                if (row==null){
+                    errMsg.append(sheetName+"页第"+tempNum+"行为空行！\n");
+                    continue;
+                }
+
+                String agentId = row.get("agentId");
+                String agentName = row.get("agentName");
+                String month = row.get("month");
+                String brandCode = row.get("brandCode");
+
+                if (StringUtils.isBlank(agentId))
+                    errMsg.append(sheetName+"页第"+tempNum+"行AG码为空！\n");
+                if (StringUtils.isBlank(agentName))
+                    errMsg.append(sheetName+"页第"+tempNum+"行代理商名称为空！\n");
+                if (StringUtils.isBlank(month))
+                    errMsg.append(sheetName+"页第"+tempNum+"行月份为空！\n");
+                if (StringUtils.isBlank(brandCode))
+                    errMsg.append(sheetName+"页第"+tempNum+"行品牌码为空！\n");
+
+            }
+
+            if (errMsg.length()>1200){
+                errMsg.append("...等其他异常数据");
+                break;
+            }
+        }
+        if (errMsg.length()>0){
+            result.put("resultCode","Error");
+            result.put("errMsg",errMsg.toString());
+        }else{
+            result.put("resultCode","Success");
+        }
+        return result;
     }
 
     //校验代理商信息
-    public Map<String,String> checkAgentData(Workbook data,String logMonth){
+    /*public Map<String,String> checkAgentData(Workbook data,String logMonth){
         Map<String,String> result = new HashMap<String,String>();
 
         if (data == null){
@@ -332,8 +455,6 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
             for (int rowNum = 1; rowNum < rowsNum; rowNum++) {
                 if (isTooLong)
                     break;
-                /*Row firstRow = sheet.getRow(0);
-                int cellsNum = firstRow.getPhysicalNumberOfCells();//列数*/
                 Row row = sheet.getRow(rowNum);
                 Cell agentIdCell = row.getCell(0);//代理商Id
                 String agentId = getCellValue(agentIdCell);
@@ -400,16 +521,91 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
             result.put("errMsg",errMsg.toString());
         }
         return result;
+    }*/
+
+    public Map<String,String> checkAgentData(List<List<Map<String,String>>> list,String logMonth){
+        Map<String,String> result = new HashMap<String,String>();
+
+        if (list == null){
+            result.put("resultCode","Error");
+            result.put("errMsg","数据校验异常，数据读取失败，请检查上传文件是否正确。");
+            return result;
+        }
+
+        StringBuffer errMsg = new StringBuffer();
+
+        int sheetsNum = list.size();
+        List<Map<String, String>> errorDatas = new ArrayList<Map<String, String>>(); //问题数据
+        boolean isTooLong = false;
+        for (int i = 0; i < sheetsNum; i++) {
+            if (isTooLong)
+                break;
+            List<Map<String, String>> sheet = list.get(i);
+            Map<String, String> title = sheet.get(0);
+            String sheetName = title.get("sheetName");
+            title.put("month",logMonth);
+            int rowsNum = sheet.size();//获取该sheet页中数据的实际行数
+            List<Map<String, String>> errorSheetData;
+
+            for (int rowNum = 1; rowNum < rowsNum; rowNum++) {
+                if (isTooLong)
+                    break;
+                Map<String,String> row = sheet.get(rowNum);
+                String month = row.get("month");
+                if (!month.equals(logMonth)){
+                    errMsg.append(sheetName+"页,第"+(rowNum+1)+"行的月份与上传月份不匹配。\n");
+                }
+
+                if (errMsg.length()>1200)
+                    isTooLong = true;
+
+            }
+
+            errorSheetData = checkDataAll(sheet.subList(1,rowsNum));
+            errorDatas.addAll(errorSheetData);
+        }
+
+        if (errorDatas.size()>0){
+
+            for (int i = 0; i < errorDatas.size(); i++) {
+                if (isTooLong)
+                    break;
+                Map<String, String> errData = errorDatas.get(i);
+                String agentId = errData.get("AGENT_ID");
+                String busPlatform = errData.get("BUS_PLATFORM");
+                String rowNum = errData.get("ROW_NUM");
+                String sheetName = errData.get("SHEET_NAME");
+
+                errMsg.append(sheetName);
+                errMsg.append("页中第");
+                errMsg.append(rowNum);
+                errMsg.append("行数据，代理商ID");
+                errMsg.append(agentId);
+                errMsg.append("与品牌码");
+                errMsg.append(busPlatform);
+                errMsg.append("不匹配");
+
+                if (errMsg.length()>1200){
+                    errMsg.append("...等其他异常数据");
+                    break;
+                }else {
+                    errMsg.append("\n");
+                }
+            }
+
+        }
+
+        if (errMsg.length()==0){
+            result.put("resultCode","Success");
+        }else{
+            result.put("resultCode","Error");
+            result.put("errMsg",errMsg.toString());
+        }
+        return result;
     }
 
-    /**
-     * 自Cell 中取值
-     * @param cell
-     * @return
-     *
-     * 本方法为陈良所写，此处借用
-     */
-    public static String getCellValue(Cell cell) {
+
+    /*public static String getCellValue(Cell cell) {
         String cellValue = "";
         if (null != cell) {
             // 以下是判断数据的类型
@@ -439,6 +635,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
                         //cellValue = String.valueOf(cell.getStringCellValue());
                         cellValue = String.valueOf(((XSSFCell)cell).getRawValue ());
                     } catch (IllegalStateException e) {
+                        e.printStackTrace();
                         if (HSSFDateUtil.isCellDateFormatted(cell)) {// 判断是否为日期类型
                             Date date = cell.getDateCellValue();
                             DateFormat formater = new SimpleDateFormat("yyyy/MM/dd");
@@ -465,85 +662,34 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
             }
         }
         return cellValue.trim();
-    }
+    }*/
 
     class SheetThead  implements Callable<Map<String,String>>{
-        private PmsProfitLog log;
-        private Sheet sheet;
-        private int sheetOrder;
+        private List<Map<String,String>> sheet;
+        private String sheetName;
 
-        SheetThead(PmsProfitLog log, Sheet sheet, int sheetOrder){
-            this.log=log;
+        SheetThead( List<Map<String,String>> sheet, String sheetName){
             this.sheet=sheet;
-            this.sheetOrder=sheetOrder;
+            this.sheetName=sheetName;
         }
 
         @Override
-        public Map<String, String> call() throws Exception {
-
-            String sheetName = this.sheet.getSheetName();
+        public Map<String, String> call() {
             logger.info("========数据导入开始sheet："+sheetName);
-            Map<String, String> result = doInsertData(log, sheet, sheetName, sheetOrder);
+            Map<String, String> result = doInsertData(sheet, sheetName);
             return result;
         }
     }
 
-    private Map<String,String> doInsertData(PmsProfitLog log, Sheet sheet, String sheetName, int sheetOrder) {
+    private Map<String,String> doInsertData(List<Map<String,String>> sheet, String sheetName) {
         Map<String,String> result = new HashMap<String,String>();
-        int numberOfRows = sheet.getPhysicalNumberOfRows();//行数
+        int numberOfRows = sheet.size();//行数
         if (numberOfRows<=0){
             result.put("resultCode","Success");
             return result;
         }
-        int numberOfCells = sheet.getRow(0).getPhysicalNumberOfCells();//列数
-
-        List<Map<String,Object>> datas = new ArrayList<Map<String,Object>>();
-
-        Cell cell = null;
-        Row row = null;
-
-        for (int rowNum = 0; rowNum < numberOfRows; rowNum++) {
-            logger.info("\n===========正在封装第"+rowNum+"条数据。");
-
-            row = sheet.getRow(rowNum);
-            Map<String,Object> data = new HashMap<String,Object>();
-            String id = getUUIDForId();
-            data.put("id",id);//id 主键
-            data.put("importType",log.getImportType());//导入类型
-            data.put("sheetName",sheet.getSheetName());//sheet名
-            data.put("sheetColumn",numberOfCells+"");//列数
-            data.put("uploadUser",log.getUploadUser());//上传人
-            data.put("uploadTime",log.getUploadTime());//上传时间
-            data.put("sheetOrder",sheetOrder+"");//sheet页号
-            data.put("rowOrder",(rowNum+1)+"");//行号
-
-            for (int colNum = 0; colNum < numberOfCells; colNum++) {
-
-                cell = row.getCell(colNum);
-                String value = getCellValue(cell);
-                switch (colNum){
-                    case 0:
-                        data.put("agentId",value);
-                        break;
-                    case 1:
-                        data.put("agentName",value);
-                        break;
-                    case 2:
-                        data.put("month",log.getMonth());
-                        break;
-                    case 3:
-                        data.put("brandCode",value);
-                        break;
-                    default:
-                        data.put("f"+(colNum+3),value);
-                        break;
-                }
-            }
-            datas.add(data);
-        }
         try {
-            logger.info("\n=============================数据封装完成 开始插入数据，共"+datas.size()+"条分润数据。\n");
-            insertProfitData(datas);
+            insertProfitData(sheet);
         }catch (Exception e){
             e.printStackTrace();
             result.put("resultCode","Error");
@@ -555,7 +701,8 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
         return result;
     }
 
-    private String getUUIDForId() {
+    /*private String getUUIDForId() {
         return UUID.randomUUID().toString().replaceAll("-", "");
-    }
+    }*/
+
 }

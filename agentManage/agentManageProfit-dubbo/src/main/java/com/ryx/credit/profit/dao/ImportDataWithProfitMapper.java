@@ -25,7 +25,7 @@ public interface ImportDataWithProfitMapper {
 
     int updateByPrimaryKey(ImportDataWithProfit record);
 
-    int insertProfitData(@Param("profitDatas")List<Map<String, Object>> profitDatas);
+    int insertProfitData(@Param("profitDatas")List<Map<String, String>> profitDatas);
 
     int deleteProfitDataByBatchCode(String batchCode);
 

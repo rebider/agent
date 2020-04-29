@@ -24,7 +24,7 @@ public interface IImportDataWithProfitService {
      * @param profitDatas
      * @return
      */
-    int insertProfitData(List<Map<String,Object>> profitDatas);
+    int insertProfitData(List<Map<String,String>> profitDatas);
 
     /**
      * 根据分润信息删除分润数据
