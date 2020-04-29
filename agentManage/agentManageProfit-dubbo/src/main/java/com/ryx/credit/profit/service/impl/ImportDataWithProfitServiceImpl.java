@@ -353,12 +353,12 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
 
             //1.判断表头
             if (sheetList == null || sheetList.size()<1){
-                errMsg.append("文件中第"+(i+1)+"页为空sheet页！\n");
+                errMsg.append("文件中第"+(i+1)+"页为空sheet页！<br>");
                 continue;
             }
             Map<String,String> title = sheetList.get(0);//表头
             if (title == null || title.size()<1){
-                errMsg.append("文件中第"+(i+1)+"页为空sheet页！\n");
+                errMsg.append("文件中第"+(i+1)+"页为空sheet页！<br>");
                 continue;
             }
             String sheetName = title.get("sheetName");
@@ -369,13 +369,13 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
             String cellValue04 = title.get("brandCode");
 
             if (!"AG码".equals(cellValue01)||!"代理商名称".equals(cellValue02)||!"月份".equals(cellValue03)||!"品牌码".equals(cellValue04)){
-                errMsg.append(sheetName+"页表头格式有误，请确认前四列以此为：AG码、代理商名称、月份、品牌码！\n");
+                errMsg.append(sheetName+"页表头格式有误，请确认前四列以此为：AG码、代理商名称、月份、品牌码！<br>");
             }
             int colNum = Integer.valueOf(title.get("sheetColumn")) + 2; //除去前四个固定列以及其他附属字段之外的列数
             for (int num = 7; num <= colNum; num++){
                 String f = title.get("f" + (num));
                 if (StringUtils.isBlank(f)){
-                    errMsg.append(sheetName+"页表头有空格！\n");
+                    errMsg.append(sheetName+"页表头有空格！<br>");
                     break;
                 }
             }
@@ -393,7 +393,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
 
                 Map<String, String> row = sheetList.get(j);
                 if (row==null){
-                    errMsg.append(sheetName+"页第"+tempNum+"行为空行！\n");
+                    errMsg.append(sheetName+"页第"+tempNum+"行为空行！<br>");
                     continue;
                 }
 
@@ -403,13 +403,13 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
                 String brandCode = row.get("brandCode");
 
                 if (StringUtils.isBlank(agentId))
-                    errMsg.append(sheetName+"页第"+tempNum+"行AG码为空！\n");
+                    errMsg.append(sheetName+"页第"+tempNum+"行AG码为空！<br>");
                 if (StringUtils.isBlank(agentName))
-                    errMsg.append(sheetName+"页第"+tempNum+"行代理商名称为空！\n");
+                    errMsg.append(sheetName+"页第"+tempNum+"行代理商名称为空！<br>");
                 if (StringUtils.isBlank(month))
-                    errMsg.append(sheetName+"页第"+tempNum+"行月份为空！\n");
+                    errMsg.append(sheetName+"页第"+tempNum+"行月份为空！<br>");
                 if (StringUtils.isBlank(brandCode))
-                    errMsg.append(sheetName+"页第"+tempNum+"行品牌码为空！\n");
+                    errMsg.append(sheetName+"页第"+tempNum+"行品牌码为空！<br>");
 
             }
 
@@ -553,7 +553,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
                 Map<String,String> row = sheet.get(rowNum);
                 String month = row.get("month");
                 if (!month.equals(logMonth)){
-                    errMsg.append(sheetName+"页,第"+(rowNum+1)+"行的月份与上传月份不匹配。\n");
+                    errMsg.append(sheetName+"页,第"+(rowNum+1)+"行的月份与上传月份不匹配。<br>");
                 }
 
                 if (errMsg.length()>1200)
@@ -583,7 +583,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
                 errMsg.append(agentId);
                 errMsg.append("与品牌码");
                 errMsg.append(busPlatform);
-                errMsg.append("不匹配");
+                errMsg.append("不匹配<br>");
 
                 if (errMsg.length()>1200){
                     errMsg.append("...等其他异常数据");
@@ -693,7 +693,7 @@ public class ImportDataWithProfitServiceImpl implements IImportDataWithProfitSer
         }catch (Exception e){
             e.printStackTrace();
             result.put("resultCode","Error");
-            result.put("errMsg",sheetName+"页数据插入失败:"+e.getMessage()+"\n");
+            result.put("errMsg",sheetName+"页数据插入失败:"+e.getMessage()+"<br>");
             return result;
         }
 
