@@ -1197,12 +1197,6 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                     if (!agentResult.isOK()){
                         throw new MessageException(agentResult.getMsg());
                     }
-                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
-                    orderAdj.setRefundStat(RefundStat.REFUNED.key);
-                    orderAdj.setRefundTm(new Date());
-                    if(!approvalTaskSettle(orderAdj).isOK()){
-                        throw new MessageException("更新订单调整记录失败!");
-                    }
                 }
             }
             if ("boss".equals(orgCode) && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue()) ){
@@ -1330,7 +1324,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public AgentResult approvalTaskSettle(OrderAdj orderAdj) throws ProcessException {
 
         return orderAdjMapper.updateByPrimaryKeySelective(orderAdj)==1?AgentResult.ok():AgentResult.fail();
@@ -2571,7 +2565,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
         List<OrderAdjAccountVo> accounts = orderUpModelVo.getAccounts();
         for (OrderAdjAccountVo adjAccountVo:accounts){
 
-            if (null == adjAccountVo.getRefundTm() || null == adjAccountVo.getTkattachments()){
+            if (null == adjAccountVo.getRefundTm() || null == adjAccountVo.getTkattachmentsFiles()){
                 throw new MessageException("存在空的必输项!");
             }
 
@@ -2588,16 +2582,16 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 if (1 !=orderAdjAccountMapper.updateByPrimaryKeySelective(account)){
                     return AgentResult.fail("账户信息不存在!");
                 }
-                for (Attachment tkattachment : adjAccountVo.getTkattachments()) {
+                for (String tkattachment : adjAccountVo.getTkattachmentsFiles()) {
                     AttachmentRel  record = new AttachmentRel();
-                    record.setAttId(tkattachment.getId());
+                    record.setAttId(tkattachment);
                     record.setSrcId(account.getAdjId());
                     record.setcUser(userId);
                     record.setcTime(new Date());
                     record.setStatus(Status.STATUS_1.status);
                     record.setBusType(AttachmentRelType.orderAdjust_refund.name());
                     record.setId(idService.genId(TabId.a_attachment_rel));
-                    logger.info("添加订单调整退款附件关系,订单调整ID{},附件ID{}",account.getAdjId(),tkattachment.getId());
+                    logger.info("添加订单调整退款附件关系,订单调整ID{},附件ID{}",account.getAdjId(),tkattachment);
                     if (1 != attachmentRelMapper.insertSelective(record)) {
                         logger.info("订单调整:{}", "添加订单调整附件关系失败");
                         throw new ProcessException("添加订单调整附件关系失败");
