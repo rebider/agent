@@ -22,5 +22,5 @@ public interface AgentDebitCardMapper {
 
     int getNoticeCount(String orgId);
 
-
+    List<Map<String,String>> exportsForZHposOrPlus();
 }
