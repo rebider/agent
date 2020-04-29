@@ -25,6 +25,8 @@ public class PmsProfitLog implements Serializable {
 
     private String month;
 
+    private String importType;
+
     public String getBatchNo() {
         return batchNo;
     }
@@ -105,5 +107,11 @@ public class PmsProfitLog implements Serializable {
         this.month = month == null ? null : month.trim();
     }
 
+    public String getImportType() {
+        return importType;
+    }
 
+    public void setImportType(String importType) {
+        this.importType = importType == null ? null : importType.trim();
+    }
 }
