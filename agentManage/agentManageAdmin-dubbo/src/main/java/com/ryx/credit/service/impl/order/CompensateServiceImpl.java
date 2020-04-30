@@ -559,7 +559,10 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
                 }
             }
+
             //遍历补差价明细进行校验和信息补全
+            Set<String> setPlatform = new HashSet<>();
+            Set<String> setOldOrgId = new HashSet<>();
             refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
                 Map<String, Object> logisticsDetail = null;
                 if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId()) && !refundPriceDiffDetail.getActivityFrontId().equals("undefined")){
