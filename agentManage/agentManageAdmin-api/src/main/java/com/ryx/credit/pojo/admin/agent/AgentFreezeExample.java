@@ -24,20 +24,20 @@ public class AgentFreezeExample {
         oredCriteria = new ArrayList<Criteria>();
     }
 
-    public String getOrderByClause() {
-        return orderByClause;
-    }
-
     public void setOrderByClause(String orderByClause) {
         this.orderByClause = orderByClause;
     }
 
-    public boolean isDistinct() {
-        return distinct;
+    public String getOrderByClause() {
+        return orderByClause;
     }
 
     public void setDistinct(boolean distinct) {
         this.distinct = distinct;
+    }
+
+    public boolean isDistinct() {
+        return distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -73,28 +73,28 @@ public class AgentFreezeExample {
         distinct = false;
     }
 
-    public Page getPage() {
-        return page;
-    }
-
     public void setPage(Page page) {
         this.page=page;
     }
 
-    public Integer getLimitStart() {
-        return limitStart;
+    public Page getPage() {
+        return page;
     }
 
     public void setLimitStart(Integer limitStart) {
         this.limitStart=limitStart;
     }
 
-    public Integer getLimitEnd() {
-        return limitEnd;
+    public Integer getLimitStart() {
+        return limitStart;
     }
 
     public void setLimitEnd(Integer limitEnd) {
         this.limitEnd=limitEnd;
+    }
+
+    public Integer getLimitEnd() {
+        return limitEnd;
     }
 
     protected abstract static class GeneratedCriteria {
@@ -1007,6 +1007,66 @@ public class AgentFreezeExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andFreezeTypeIsNull() {
+            addCriterion("FREEZE_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeTypeIsNotNull() {
+            addCriterion("FREEZE_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeTypeEqualTo(BigDecimal value) {
+            addCriterion("FREEZE_TYPE =", value, "freezeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeTypeNotEqualTo(BigDecimal value) {
+            addCriterion("FREEZE_TYPE <>", value, "freezeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeTypeGreaterThan(BigDecimal value) {
+            addCriterion("FREEZE_TYPE >", value, "freezeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeTypeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("FREEZE_TYPE >=", value, "freezeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeTypeLessThan(BigDecimal value) {
+            addCriterion("FREEZE_TYPE <", value, "freezeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeTypeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("FREEZE_TYPE <=", value, "freezeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeTypeIn(List<BigDecimal> values) {
+            addCriterion("FREEZE_TYPE in", values, "freezeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeTypeNotIn(List<BigDecimal> values) {
+            addCriterion("FREEZE_TYPE not in", values, "freezeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeTypeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FREEZE_TYPE between", value1, value2, "freezeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreezeTypeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FREEZE_TYPE not between", value1, value2, "freezeType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
@@ -1032,6 +1092,38 @@ public class AgentFreezeExample {
         private boolean listValue;
 
         private String typeHandler;
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
+        }
 
         protected Criterion(String condition) {
             super();
@@ -1067,38 +1159,6 @@ public class AgentFreezeExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
-        }
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
         }
     }
 }

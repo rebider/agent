@@ -413,6 +413,7 @@
     WHERE
         1=1
         AND p.status=1
+        AND b.bus_status = 1
         <if test="busNum != null" >
           AND b.bus_num = #{busNum}
         </if>

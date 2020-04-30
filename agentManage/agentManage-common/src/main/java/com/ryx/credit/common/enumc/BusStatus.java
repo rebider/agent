@@ -3,6 +3,8 @@ package com.ryx.credit.common.enumc;
 import org.apache.commons.lang.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @Auther: lrr
@@ -72,5 +74,9 @@ public enum BusStatus {
             }
         }
         return "";
+    }
+
+    public static List<BigDecimal> getAvbList(){
+        return Arrays.asList(BusStatus.QY.status,BusStatus.WJH.status);
     }
 }
