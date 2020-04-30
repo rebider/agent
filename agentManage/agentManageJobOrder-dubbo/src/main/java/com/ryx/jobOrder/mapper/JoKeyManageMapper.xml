@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.jobOrder.dao.JoKeyManageMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.jobOrder.pojo.JoKeyManage">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="JO_KEY_TYPE" jdbcType="VARCHAR" property="joKeyType" />
+    <result column="JO_KEY" jdbcType="VARCHAR" property="joKey" />
+    <result column="JO_KEY_NAME" jdbcType="VARCHAR" property="joKeyName" />
+    <result column="JO_KEY_VALUE_TYPE" jdbcType="VARCHAR" property="joKeyValueType" />
+    <result column="JO_STATUS" jdbcType="VARCHAR" property="joStatus" />
+    <result column="JO_KEY_BACK_NUM" jdbcType="VARCHAR" property="joKeyBackNum" />
+    <result column="JO_KEY_SORT" jdbcType="DECIMAL" property="joKeySort" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, JO_KEY_TYPE, JO_KEY, JO_KEY_NAME, JO_KEY_VALUE_TYPE, JO_STATUS, JO_KEY_BACK_NUM,
+    JO_KEY_SORT
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.jobOrder.pojo.JoKeyManageExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from JO_KEY_MANAGE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from JO_KEY_MANAGE
+    where ID = #{id,jdbcType=VARCHAR} and JO_STATUS=1
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.jobOrder.pojo.JoKeyManageExample">
+    delete from JO_KEY_MANAGE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.jobOrder.pojo.JoKeyManage">
+    insert into JO_KEY_MANAGE (ID, JO_KEY_TYPE, JO_KEY, 
+      JO_KEY_NAME, JO_KEY_VALUE_TYPE, JO_STATUS, 
+      JO_KEY_BACK_NUM, JO_KEY_SORT)
+    values (#{id,jdbcType=VARCHAR}, #{joKeyType,jdbcType=VARCHAR}, #{joKey,jdbcType=VARCHAR}, 
+      #{joKeyName,jdbcType=VARCHAR}, #{joKeyValueType,jdbcType=VARCHAR}, #{joStatus,jdbcType=VARCHAR}, 
+      #{joKeyBackNum,jdbcType=VARCHAR}, #{joKeySort,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.jobOrder.pojo.JoKeyManage">
+    insert into JO_KEY_MANAGE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="joKeyType != null">
+        JO_KEY_TYPE,
+      </if>
+      <if test="joKey != null">
+        JO_KEY,
+      </if>
+      <if test="joKeyName != null">
+        JO_KEY_NAME,
+      </if>
+      <if test="joKeyValueType != null">
+        JO_KEY_VALUE_TYPE,
+      </if>
+      <if test="joStatus != null">
+        JO_STATUS,
+      </if>
+      <if test="joKeyBackNum != null">
+        JO_KEY_BACK_NUM,
+      </if>
+      <if test="joKeySort != null">
+        JO_KEY_SORT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="joKeyType != null">
+        #{joKeyType,jdbcType=VARCHAR},
+      </if>
+      <if test="joKey != null">
+        #{joKey,jdbcType=VARCHAR},
+      </if>
+      <if test="joKeyName != null">
+        #{joKeyName,jdbcType=VARCHAR},
+      </if>
+      <if test="joKeyValueType != null">
+        #{joKeyValueType,jdbcType=VARCHAR},
+      </if>
+      <if test="joStatus != null">
+        #{joStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="joKeyBackNum != null">
+        #{joKeyBackNum,jdbcType=VARCHAR},
+      </if>
+      <if test="joKeySort != null">
+        #{joKeySort,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.jobOrder.pojo.JoKeyManageExample" resultType="java.lang.Long">
+    select count(*) from JO_KEY_MANAGE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.jobOrder.pojo.JoKeyManage">
+    update JO_KEY_MANAGE
+    <set>
+      <if test="joKeyType != null">
+        JO_KEY_TYPE = #{joKeyType,jdbcType=VARCHAR},
+      </if>
+      <if test="joKey != null">
+        JO_KEY = #{joKey,jdbcType=VARCHAR},
+      </if>
+      <if test="joKeyName != null">
+        JO_KEY_NAME = #{joKeyName,jdbcType=VARCHAR},
+      </if>
+      <if test="joKeyValueType != null">
+        JO_KEY_VALUE_TYPE = #{joKeyValueType,jdbcType=VARCHAR},
+      </if>
+      <if test="joStatus != null">
+        JO_STATUS = #{joStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="joKeyBackNum != null">
+        JO_KEY_BACK_NUM = #{joKeyBackNum,jdbcType=VARCHAR},
+      </if>
+      <if test="joKeySort != null">
+        JO_KEY_SORT = #{joKeySort,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.jobOrder.pojo.JoKeyManage">
+    update JO_KEY_MANAGE
+    set JO_KEY_TYPE = #{joKeyType,jdbcType=VARCHAR},
+      JO_KEY = #{joKey,jdbcType=VARCHAR},
+      JO_KEY_NAME = #{joKeyName,jdbcType=VARCHAR},
+      JO_KEY_VALUE_TYPE = #{joKeyValueType,jdbcType=VARCHAR},
+      JO_STATUS = #{joStatus,jdbcType=VARCHAR},
+      JO_KEY_BACK_NUM = #{joKeyBackNum,jdbcType=VARCHAR},
+      JO_KEY_SORT = #{joKeySort,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+
+  <!--              开始写代码         -->
+  <select id="keywordList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    select <include refid="Base_Column_List"/> from JO_KEY_MANAGE jo
+    <where>
+    <include refid="jokeyNabageWhere" />
+    </where>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+
+  <select id="keywordCount" parameterType="map" resultType="int">
+    select count(1) from JO_KEY_MANAGE jo
+    <where>
+    <include refid="jokeyNabageWhere" />
+    </where>
+  </select>
+
+  <sql id="jokeyNabageWhere">
+    and jo.JO_STATUS=1
+    <if test="map.joKeyType!=null and map.joKeyType!=''"> and jo.JO_KEY_TYPE=#{map.joKeyType} </if>
+    <if test="map.joKey!=null and map.joKey!=''"> and jo.JO_KEY LIKE CONCAT(CONCAT('%',#{map.joKey}),'%')</if>
+    <if test="map.joKeyName!=null and map.joKeyName!=''"> and jo.JO_KEY_NAME LIKE CONCAT(CONCAT('%',#{map.joKeyName}),'%')</if>
+    <if test="map.joKeyBackNum!=null and map.joKeyBackNum!=''"> and jo.JO_KEY_BACK_NUM LIKE CONCAT(CONCAT('%',#{map.joKeyBackNum}),'%')</if>
+  </sql>
+
+  <!--查询一级和二级类型-->
+  <select id="selectLevel" resultType="map">
+    select a.*,jo.id as idOne,jo.JO_KEY as joKeyOne, jo.JO_KEY_NAME as joKeyNameOne
+    from (select jk.id as id,jk.JO_KEY as joKey,jk.JO_KEY_NAME as joKeyName,jk.JO_KEY_BACK_NUM  from JO_KEY_MANAGE jk
+    where jo_key_type =2 )a
+    left join JO_KEY_MANAGE  jo on a.JO_KEY_BACK_NUM=jo.id
+  </select>
+
+  <select id="queryJobOrderType" resultType="map">
+    select *
+    from (select m1.jo_key as top_key,
+                 m2.jo_key as first_key,
+                 m3.jo_key as second_key,
+                 m1.jo_key_name || '-' || m2.jo_key_name || '-' || m3.jo_key_name as job_order_type
+          from jo_key_manage m1
+          left join jo_key_manage m2 on m2.jo_key_back_num = m1.id
+          left join jo_key_manage m3 on m3.jo_key_back_num = m2.id
+          where m1.jo_key_type = '0')
+  </select>
+</mapper>

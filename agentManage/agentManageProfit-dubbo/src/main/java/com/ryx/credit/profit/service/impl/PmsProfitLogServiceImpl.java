@@ -22,7 +22,7 @@ import java.util.concurrent.*;
 
 
 @Service("pmsProfitLogService")
-public class PmsProfitLogServiceImpl implements IPmsProfitLogService{
+public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     private final Logger logger = Logger.getLogger(PmsProfitLogServiceImpl.class);
     @Autowired
     PmsProfitLogMapper pmsProfitLogMapper;
@@ -30,6 +30,14 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService{
     PmsProfitTempMapper pmsProfitTempMapper;
     @Autowired
     PmsProfitMapper pmsProfitMapper;
+
+    @Override
+    public PageInfo selectByMap(Map<String,String> param,Page page){
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(pmsProfitLogMapper.selectByMap(param,page));
+        pageInfo.setTotal((int) pmsProfitLogMapper.getCountByMap(param));
+        return pageInfo;
+    }
 
 
     @Override
@@ -128,7 +136,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService{
             criteria.andBatchNoEqualTo(example.getBatchNo());
         }
         if (StringUtils.isNotBlank(example.getUploadTime())) {
-            criteria.andUploadTimeEqualTo(example.getUploadTime());
+            criteria.andUploadTimeBetween(example.getUploadTime()+" "+"00:00:00",example.getUploadTime()+" "+"23:59:59");
         }
         if (StringUtils.isNotBlank(example.getMonth())) {
             criteria.andMonthEqualTo(example.getMonth());
@@ -187,14 +195,46 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService{
     }
 
     @Transactional
-    public void saveSheet(List<Map<String, String>> list, String sheetName, int columnNum, String month, String userId, int sheetOrder,List<Map<String, String>> listOne,int theadi,int count) {
-        if(listOne ==null){
+    public List<Map<String, Object>> saveSheet(List<Map<String, String>> list, String sheetName, int columnNum, String month, String userId, int sheetOrder, List<Map<String, String>> listOne, int theadi, int count) {
+
+        List<Map<String, Object>> saveSheetList = new ArrayList<>();
+        if (listOne == null) {
             listOne = new ArrayList<>();
             listOne.add(list.get(0));
             list.removeAll(listOne);
         }
 
         for (int i = 0; i < list.size(); i++) {
+            if( list.get(i).get("Cell0")==null|| "".equals(list.get(i).get("Cell0"))){
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "AG码错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行AG码错误为空");
+                saveSheetList.add(saveSheetMap);
+                continue;
+            }
+            if( list.get(i).get("Cell1")==null|| "".equals(list.get(i).get("Cell1"))){
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "代理商名称", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行代理商名称为空");
+                saveSheetList.add(saveSheetMap);
+                continue;
+            }
+            if( list.get(i).get("Cell2")==null|| "".equals(list.get(i).get("Cell2"))){
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "月份错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行月份为空");
+                saveSheetList.add(saveSheetMap);
+                continue;
+            }
+            if( list.get(i).get("Cell3")==null|| "".equals(list.get(i).get("Cell3"))){
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "品牌码错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行品牌码为空");
+                saveSheetList.add(saveSheetMap);
+                continue;
+            }
+            if( list.get(i).get("Cell4")==null|| "".equals(list.get(i).get("Cell4"))){
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "品牌名称错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行品牌名称为空");
+                saveSheetList.add(saveSheetMap);
+                continue;
+            }
 
             PmsProfitTempWithBLOBs pmsProfitTempWithBLOBs = new PmsProfitTempWithBLOBs();
             pmsProfitTempWithBLOBs.setMonth(month);
@@ -242,23 +282,17 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService{
                 throw new RuntimeException("数据查询失败");
             }
             if (mapData.size() < 1) {
-                throw new RuntimeException(sheetName + "sheet页第" + ((i+2)+(theadi*count)) + "行的平台下" + busCode + "不存在此行唯一码" + agentId);
-            }
-         /*   if (!list.get(i).get("Cell1").trim().equals(mapData.get(0).get("AG_NAME").toString().trim())) {
-                logger.info("mapData=======================================" + mapData + "+++++++++++" + mapData.get(0).get("AG_NAME").toString().trim());
-                logger.info("mapData=======================================" + list.get(i).get("Cell1").trim());
-                throw new RuntimeException(sheetName + "sheet页第" + i + "行唯一标识与代理商名称不匹配");
-            }*/
-            if (!month.equals((list.get(i).get("Cell2")))) {
-                throw new RuntimeException(sheetName + "sheet页第" + ((i+2)+(theadi*count)) + "行月份与选择不匹配");
-            }
-/*
-            if (mapData.get(0).get("PLATFORM_NAME").toString().trim().indexOf(list.get(i).get("Cell4").trim()) == -1) {
-                logger.info("mapData=======================================" + mapData + "+++++++++++" + mapData.get(0).get("PLATFORM_NAME").toString().trim());
-                logger.info("mapData=======================================" + list.get(i).get("Cell4").trim());
-                throw new RuntimeException(sheetName + "sheet页第" + i + "行平台码与平台名称不匹配");
-            }*/
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "月份错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行的平台下" + busCode + "不存在此行唯一码" + agentId);
+                saveSheetList.add(saveSheetMap);
 
+            }
+            if (!month.equals((list.get(i).get("Cell2")))) {
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "平台错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行月份与选择不匹配");
+                saveSheetList.add(saveSheetMap);
+
+            }
 
             pf.setAgentId((list.get(i).get("Cell1")));
             pf.setBusCode(list.get(i).get("Cell3").trim());
@@ -278,35 +312,38 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService{
 
         }
 
-
+        return saveSheetList;
     }
 
     @Override
     public int updateByPrimaryKey(PmsProfitLog record) {
         return pmsProfitLogMapper.updateByPrimaryKeySelective(record);
     }
+
     public static Executor newFixedThreadPool(int nThreads) {
         return new ThreadPoolExecutor(nThreads, nThreads,
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
     }
 
+
     @Override
     @Transactional
-    public void disposeSheet(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder) {
+    public Map<String, Object> disposeSheet(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder) {
+        Map<String, Object> reMap = new HashMap<>();
+
         if (sheetlists.size() > 0 && sheetlists.size() < 11) {
-            saveSheet(sheetlists, sheetName, columnNum, month, userId, sheetOrder,null,0,0);
-
+            reMap.put(sheetName, saveSheet(sheetlists, sheetName, columnNum, month, userId, sheetOrder, null, 0, 0));
+            return reMap;
         } else {
-
             List<String> taskNameList = new ArrayList<String>();
-            List<FutureTask<Map<String,String>>> taskList = new ArrayList();
+            List<FutureTask<Map<String, Object>>> taskList = new ArrayList();
 
             Executor executor = newFixedThreadPool(10);
 
             List<Map<String, String>> listOne = new ArrayList<>();
-             listOne.add(sheetlists.get(0));
-           sheetlists.removeAll(listOne);
+            listOne.add(sheetlists.get(0));
+            sheetlists.removeAll(listOne);
 
 
             int count = sheetlists.size() / 10;
@@ -319,9 +356,9 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService{
                     list = sheetlists.subList(z * count, count * (z + 1));
                 }
                 try {
-                    SheetThead sheetThead = new SheetThead(list, sheetName, columnNum, month, userId, sheetOrder,listOne,z,count);
-                    FutureTask<Map<String,String>> thread = new FutureTask<>(sheetThead);
-                    taskNameList.add("{ SheetThead================================================================-" + sheetName+z + "}");
+                    SheetThead sheetThead = new SheetThead(list, sheetName, columnNum, month, userId, sheetOrder, listOne, z, count);
+                    FutureTask<Map<String, Object>> thread = new FutureTask<>(sheetThead);
+                    taskNameList.add("{ SheetThead====" + sheetName + z + "}");
                     taskList.add(thread);
                     executor.execute(thread);
                 } catch (Exception e) {
@@ -340,17 +377,21 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService{
                 }
             }
 
-            Map<String,String> resultMap  = FutureTaskUtils.getTaskResult(taskList, taskNameList, logger);
+            Map<String, Object> resultMap = FutureTaskUtils.getTaskResult(taskList, taskNameList, logger);
             // 获取线程执行结果
             if ("fail".equals(resultMap.get("result"))) {
-                throw new RuntimeException(resultMap.get("Err"));
+                throw new RuntimeException(String.valueOf(resultMap.get("Err")));
+            }
+            if ("dispose".equals(resultMap.get("result"))) {
+                resultMap.remove("result");
+                return resultMap;
             }
         }
+        return reMap;
     }
 
 
-
-    class SheetThead  implements Callable<Map<String,String>> {
+    class SheetThead implements Callable<Map<String, Object>> {
 
         private List<Map<String, String>> sheetlists;
         private String month;
@@ -363,30 +404,36 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService{
         int i;
         int count;
 
-        SheetThead(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder,List<Map<String, String>> listOne,int i,int count) {
+        SheetThead(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder, List<Map<String, String>> listOne, int i, int count) {
             this.sheetlists = sheetlists;
             this.month = month;
             this.userId = userId;
             this.sheetOrder = sheetOrder;
             this.sheetName = sheetName;
             this.columnNum = columnNum;
-           this.listOne =listOne;
-            this.i =i;
+            this.listOne = listOne;
+            this.i = i;
             this.count = count;
         }
 
 
-
         @Override
-        public Map<String,String> call(){
+        public Map<String, Object> call() {
             logger.info("分润导入线程 执行开始-当前线程：{" + this.i + "}");
-            Map<String,String> rMap = new HashMap<>();
+            Map<String, Object> rMap = new HashMap<>();
             try {
-                saveSheet(sheetlists, sheetName, columnNum, month, userId, sheetOrder,listOne,i,count);
-                rMap.put("result","success");
-            }catch (Exception e){
-                rMap.put("result","fail");
-                rMap.put("Err",e.getMessage());
+                List<Map<String, Object>> saveSheetList = saveSheet(sheetlists, sheetName, columnNum, month, userId, sheetOrder, listOne, i, count);
+                if (saveSheetList == null || saveSheetList.size() == 0) {
+                    rMap.put("result", "success");
+                } else {
+                    rMap.put("result", "dispose");
+                    rMap.put("disposeResult", saveSheetList);
+                }
+            } catch (Exception e) {
+                e.getStackTrace();
+                logger.error("分润导入线程 执行结束-当前线程：{" + this.i + "}"+"错误："+e.getMessage());
+                rMap.put("result", "fail");
+                rMap.put("Err", "读取Excel文件失败");
             }
             logger.info("分润导入线程 执行结束-当前线程：{" + this.i + "}");
             return rMap;

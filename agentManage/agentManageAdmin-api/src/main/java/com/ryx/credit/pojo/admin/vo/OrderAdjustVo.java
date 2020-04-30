@@ -9,6 +9,7 @@ import java.util.Date;
  * 订单数量调整导出VO
  */
 public class OrderAdjustVo implements Serializable {
+    private String adjId;//订单调整申请编号
     private String refundId;//退款编号
     private String orderId;//订单编号
     private String agentId;//代理商AG码
@@ -26,10 +27,41 @@ public class OrderAdjustVo implements Serializable {
     private String offsetAmount;//冲抵分期金额
     private String realRefundAmo;//线下退款金额
     private String adjUserId;//申请人
+    private String agDocDistrict;//对接大区
+    private String agDocPro;//对接省区
     private String adjTm;//申请时间
     private String reviewsStat;//审批状态
     private String refundStat;//退款状态
     private String refundTm;//退款日期
+    private String maxProNum;//原订单该商品数量
+    private String adjNum;//调整数量
+    private String difAmount;//调整金额
+    private String currentAmo;//调整当前订单金额
+    private String reviewsDate;//审批通过时间
+
+    public String getAdjId() {
+        return adjId;
+    }
+
+    public void setAdjId(String adjId) {
+        this.adjId = adjId;
+    }
+
+    public String getAgDocDistrict() {
+        return agDocDistrict;
+    }
+
+    public void setAgDocDistrict(String agDocDistrict) {
+        this.agDocDistrict = agDocDistrict;
+    }
+
+    public String getAgDocPro() {
+        return agDocPro;
+    }
+
+    public void setAgDocPro(String agDocPro) {
+        this.agDocPro = agDocPro;
+    }
 
     public String getRefundId() {
         return refundId;
@@ -197,5 +229,45 @@ public class OrderAdjustVo implements Serializable {
 
     public void setRefundTm(String refundTm) {
         this.refundTm = refundTm;
+    }
+
+    public String getMaxProNum() {
+        return maxProNum;
+    }
+
+    public void setMaxProNum(String maxProNum) {
+        this.maxProNum = maxProNum;
+    }
+
+    public String getAdjNum() {
+        return adjNum;
+    }
+
+    public void setAdjNum(String adjNum) {
+        this.adjNum = adjNum;
+    }
+
+    public String getDifAmount() {
+        return difAmount;
+    }
+
+    public void setDifAmount(String difAmount) {
+        this.difAmount = difAmount;
+    }
+
+    public String getCurrentAmo() {
+        return currentAmo;
+    }
+
+    public void setCurrentAmo(String currentAmo) {
+        this.currentAmo = currentAmo;
+    }
+
+    public String getReviewsDate() {
+        return reviewsDate;
+    }
+
+    public void setReviewsDate(String reviewsDate) {
+        this.reviewsDate = reviewsDate;
     }
 }

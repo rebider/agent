@@ -68,6 +68,21 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
         BigDecimal resAmt = BigDecimal.ZERO;
         AgentResult result = AgentResult.ok();
         if ( null == opaymentDetailList || !(opaymentDetailList.size()>0) || amount.compareTo(BigDecimal.ZERO)==0 || StringUtils.isBlank(srcId)){
+            OPayDetail oPayDetail = new OPayDetail();
+            oPayDetail.setAmount(BigDecimal.ZERO);
+            oPayDetail.setSrcId(srcId);
+            oPayDetail.setId(idService.genId(TabId.O_PAY_DETAIL));
+            oPayDetail.setArrId("");
+            oPayDetail.setPayType(paytype);
+            oPayDetail.setBusStat(Status.STATUS_0.status);
+            oPayDetail.setStatus(Status.STATUS_1.status);
+            oPayDetail.setVersion(Status.STATUS_1.status);
+            oPayDetail.setcTm(new Date());
+            oPayDetail.setcUser("");
+            if(1!=oPayDetailMapper.insertSelective(oPayDetail)){
+                logger.info("付款明细添加失败");
+                throw new MessageException("付款明细添加失败");
+            }
             resultMap.put("offsetPaymentDetails",resPaymentDetail);
             resultMap.put("residueAmt",amount);
            return AgentResult.okMap(resultMap);
@@ -735,42 +750,46 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                     throw new MessageException("付款明细更新失败");
                 };
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(oPayDetail.getArrId());
-                BigDecimal realAmt = oPaymentDetail.getRealPayAmount()==null?BigDecimal.ZERO:oPaymentDetail.getRealPayAmount();
-                oPaymentDetail.setRealPayAmount(realAmt.add(oPayDetail.getAmount()));
-                if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())>= 0){
-                    oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
-                    oPaymentDetail.setRealPayAmount(oPaymentDetail.getPayAmount());
-                }else if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==-1){
-                    oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
-                }
-                if (paytype.equals(DDBK.code)){
-                    oPaymentDetail.setSrcType(PamentSrcType.XXBK.code);
-                }else if (paytype.equals(DDXZ.code)){
-                    oPaymentDetail.setSrcType(PamentSrcType.XXXZ.code);
-                }else if (paytype.equals(DDTZ.code)){
-                    oPaymentDetail.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
-                }else if (paytype.equals(THTK.code)){
-                    oPaymentDetail.setSrcType(PamentSrcType.TUIKUAN_DIKOU.code);
-                }else if (paytype.equals(FRDK.code)){
-                    oPaymentDetail.setSrcType(PamentSrcType.FENRUN_DIKOU.code);
-                }else if (paytype.equals(DDMD.code)){
-                    oPaymentDetail.setSrcType(PamentSrcType.TUICHAJIA_DIKOU.code);
-                }
+                if (null != oPaymentDetail){
+                    BigDecimal realAmt = oPaymentDetail.getRealPayAmount()==null?BigDecimal.ZERO:oPaymentDetail.getRealPayAmount();
+                    oPaymentDetail.setRealPayAmount(realAmt.add(oPayDetail.getAmount()));
+                    if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())>= 0){
+                        oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+                        oPaymentDetail.setRealPayAmount(oPaymentDetail.getPayAmount());
+                    }else if (oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==-1){
+                        oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
+                    }
+                    if (paytype.equals(DDBK.code)){
+                        oPaymentDetail.setSrcType(PamentSrcType.XXBK.code);
+                    }else if (paytype.equals(DDXZ.code)){
+                        oPaymentDetail.setSrcType(PamentSrcType.XXXZ.code);
+                    }else if (paytype.equals(DDTZ.code)){
+                        oPaymentDetail.setSrcType(PamentSrcType.ORDER_ADJ_SETTLE.code);
+                    }else if (paytype.equals(THTK.code)){
+                        oPaymentDetail.setSrcType(PamentSrcType.TUIKUAN_DIKOU.code);
+                    }else if (paytype.equals(FRDK.code)){
+                        oPaymentDetail.setSrcType(PamentSrcType.FENRUN_DIKOU.code);
+                    }else if (paytype.equals(DDMD.code)){
+                        oPaymentDetail.setSrcType(PamentSrcType.TUICHAJIA_DIKOU.code);
+                    }
 
-                oPaymentDetail.setSrcId(srcId);
-                oPaymentDetail.setPayTime(new Date());
-                if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=1){
-                    logger.info("付款单明细更新失败");
-                    throw new MessageException("付款单明细更新失败");
-                };
-                //更新付款单
-                OPayment oPayment = oPaymentMapper.selectByPrimaryKey(oPaymentDetail.getPaymentId());
-                oPayment.setRealAmount(oPayment.getRealAmount().add(oPayDetail.getAmount()));
-                oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPayDetail.getAmount()));
-                if(oPaymentMapper.updateByPrimaryKeySelective(oPayment)!=1){
-                    logger.info("付款单更新失败");
-                    throw new MessageException("付款单更新失败");
-                };
+                    oPaymentDetail.setSrcId(srcId);
+                    oPaymentDetail.setPayTime(new Date());
+                    if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=1){
+                        logger.info("付款单明细更新失败");
+                        throw new MessageException("付款单明细更新失败");
+                    };
+                    //更新付款单
+                    OPayment oPayment = oPaymentMapper.selectByPrimaryKey(oPaymentDetail.getPaymentId());
+                    oPayment.setRealAmount(oPayment.getRealAmount().add(oPayDetail.getAmount()));
+                    oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPayDetail.getAmount()));
+                    if(oPaymentMapper.updateByPrimaryKeySelective(oPayment)!=1){
+                        logger.info("付款单更新失败");
+                        throw new MessageException("付款单更新失败");
+                    };
+                }else {
+                    logger.info("[{}]不存在欠款!",oPayDetail.getId());
+                }
             }
         }
 
@@ -801,14 +820,18 @@ public class OrderOffsetServiceImpl implements OrderOffsetService {
                 throw new MessageException("付款明细更新失败");
             };
             OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(oPayDetail.getArrId());
-            oPaymentDetail.setPaymentStatus(PaymentStatus.DF.code);
-            if (oPaymentDetail.getRealPayAmount().compareTo(BigDecimal.ZERO)>0){
-                oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
+            if (null != oPaymentDetail){
+                oPaymentDetail.setPaymentStatus(PaymentStatus.DF.code);
+                if (oPaymentDetail.getRealPayAmount().compareTo(BigDecimal.ZERO)>0){
+                    oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
+                }
+                if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=1){
+                    logger.info("付款单明细更新失败");
+                    throw new MessageException("付款单明细更新失败");
+                };
+            }else {
+                logger.info("[{}]不存在欠款!",oPayDetail.getId());
             }
-            if (oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)!=1){
-                logger.info("付款单明细更新失败");
-                throw new MessageException("付款单明细更新失败");
-            };
         }
 
         return AgentResult.ok();

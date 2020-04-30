@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo
+       http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="pms-dubbo-server"/>
+    <dubbo:provider id="payload" payload="888888888"  timeout="1200000"/>
+    <dubbo:registry protocol="zookeeper" address="${zk.server}" group="${zk.group}"  id="myGroup"/>
+    <!-- 用dubbo协议在22880端口暴露服务 -->
+    <dubbo:protocol name="dubbo" port="${zk.port}"/>
+    <dubbo:annotation package="com.ryx.jobOrder.service.*" />
+
+    <dubbo:reference interface="com.ryx.credit.service.IResourceService" id="iResourceService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.IUserService" id="iUserService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.dict.IdService" id="idService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.AttachmentRelService" id="attachmentRelService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.data.AttachmentService" id="attachmentService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.AgentService" id="agentService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.AgentBusinfoService" id="agentBusinfoService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.dict.DepartmentService" id="departmentService" timeout="1200000" registry="myGroup" check="false"/>
+
+
+    <dubbo:service interface="com.ryx.jobOrder.service.JobOrderAuthService" ref="jobOrderAuthService" timeout="1200000" registry="myGroup"></dubbo:service>
+    <dubbo:service interface="com.ryx.jobOrder.service.JobOrderStartService" ref="jobOrderStartService" timeout="1200000" registry="myGroup"></dubbo:service>
+    <dubbo:service interface="com.ryx.jobOrder.service.JobOrderTaskService" ref="jobOrderTaskService" timeout="1200000" registry="myGroup"></dubbo:service>
+    <dubbo:service interface="com.ryx.jobOrder.service.JobOrderManageService" ref="jobOrderManageService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:service interface="com.ryx.jobOrder.service.JobOrderQueryService" ref="jobOrderQueryService"  timeout="1200000" registry="myGroup"/>
+
+</beans>

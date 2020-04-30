@@ -740,8 +740,26 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("保存失败");
                 }
 
-
+                if(StringUtils.isBlank(refundPriceDiffDetail.getPlatformType())){
+                    throw new ProcessException("sn "+refundPriceDiffDetail.getBeginSn()+":"+refundPriceDiffDetail.getEndSn()+" 所属平台不能为空!");
+                }
+                setPlatform.add(refundPriceDiffDetail.getPlatformType());
+                setOldOrgId.add(refundPriceDiffDetail.getOldOrgId());
             });
+
+            if (setPlatform.size() > 1) {
+                setPlatform.forEach(setPlatformType->{
+                    if (!(PlatformType.whetherPOS(setPlatformType) || setPlatformType.equals(PlatformType.SSPOS.code))) {
+                        log.info("申请sn所属平台必须一致：{}", setPlatform);
+                        throw new ProcessException("申请sn所属平台必须一致");
+                    }
+                });
+            }
+
+            if(setOldOrgId.size() > 1){
+                log.info("仅支持单品牌的活动调整申请：{}", setOldOrgId);
+                throw new ProcessException("仅支持单品牌的活动调整申请。");
+            }
 
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check");
             if(!synOrVerifyResult.isOK()){
@@ -1050,6 +1068,50 @@ public class CompensateServiceImpl implements CompensateService {
                 }
                 //1表示机具欠款已抵扣
                 ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
+
+                //校验
+                ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
+                ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
+                criteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
+                criteria.andStatusEqualTo(Status.STATUS_1.status);
+                List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+
+                oRefundPriceDiffDetails.forEach(row->{
+                    OActivity activity = orderActivityService.findById(row.getActivityRealId());
+                    OActivity activityOld = orderActivityService.findById(row.getActivityFrontId());
+                    row.setNewMachineId(activity.getBusProCode());
+                    row.setOldMachineId(activityOld.getBusProCode());
+                    //变更后活动
+                    OActivity new_oActivity = activityMapper.selectByPrimaryKey(row.getActivityRealId());
+                    if(null==new_oActivity) throw new ProcessException("查询新活动失败");
+                    //变更前活动
+                    OActivity old_Activity = activityMapper.selectByPrimaryKey(row.getActivityFrontId());
+                    if(old_Activity==null) throw new ProcessException("查询新活动失败");
+                    //业务平台
+                    PlatForm platForm =  platFormService.selectByPlatformNum(old_Activity.getPlatform());
+                    if(platForm==null) throw new ProcessException("业务平台未找到:"+old_Activity.getPlatform());
+
+                    //封装不同平台所需的不同参数
+                    if (PlatformType.whetherPOS(platForm.getPlatformType()) || PlatformType.SSPOS.getValue().equals(platForm.getPlatformType())){
+                        List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",row.getOldOrgId()));
+                        List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",row.getNewOrgId()));
+                        if (null == oldPlatForm || oldPlatForm.size() != 1 || null == oldPlatForm.get(0).getBusplatform()) {
+                            throw new ProcessException("未找到原目标业务平台，请核查原目标业务平台！");
+                        }
+                        if (null == newPlatForm || newPlatForm.size() != 1 || null == newPlatForm.get(0).getBusplatform()) {
+                            throw new ProcessException("未找到目标业务平台，请核查目标业务平台！");
+                        }
+                        row.setOldBrandCode(oldPlatForm.get(0).getBusplatform());
+                        row.setNewBrandCode(newPlatForm.get(0).getBusplatform());
+                    }
+                });
+
+                //校验是否能通过
+                AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check");
+                if(!synOrVerifyResult_check.isOK()){
+                    throw new ProcessException(synOrVerifyResult_check.getMsg());
+                }
+
                 if(agentVo.getFlag().equals("1")){
                     BigDecimal subtract = oRefundPriceDiff.getRelCompAmt().subtract(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
                     String subtractStr = String.valueOf(subtract);
@@ -1369,10 +1431,13 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("处理失败");
                 }
 
+                OActivity activity = orderActivityService.findById(row.getActivityRealId());
+                OActivity activityOld = orderActivityService.findById(row.getActivityFrontId());
+                row.setNewMachineId(activity.getBusProCode());
+                row.setOldMachineId(activityOld.getBusProCode());
                 //变更后活动
                 OActivity new_oActivity = activityMapper.selectByPrimaryKey(row.getActivityRealId());
                 if(null==new_oActivity) throw new ProcessException("查询新活动失败");
-
                 //变更前活动
                 OActivity old_Activity = activityMapper.selectByPrimaryKey(row.getActivityFrontId());
                 if(old_Activity==null) throw new ProcessException("查询新活动失败");
@@ -1401,10 +1466,14 @@ public class CompensateServiceImpl implements CompensateService {
                 log.error("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId());
                 throw new MessageException("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId()+","+agentResult.getMsg());
             }
+
+            //最终校验
+            AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check");
+            if(!synOrVerifyResult_check.isOK()) throw new ProcessException(synOrVerifyResult_check.getMsg());
+
+            //调整
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust");
-            if(!synOrVerifyResult.isOK()){
-                throw new MessageException(synOrVerifyResult.getMsg());
-            }
+            if(!synOrVerifyResult.isOK()) throw new MessageException(synOrVerifyResult.getMsg());
         }
         return AgentResult.ok();
     }

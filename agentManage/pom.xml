@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
     <groupId>com.ryx.ry</groupId>
     <artifactId>agentManage</artifactId>
     <packaging>pom</packaging>
@@ -23,6 +22,8 @@
         <module>agentManageProfit-dubbo</module>
         <module>agentManageMachine-api</module>
         <module>agentManageMachine-dubbo</module>
+        <module>agentManageJobOrder-api</module>
+        <module>agentManageJobOrder-dubbo</module>
         <module>agentManageJob</module>
     </modules>
     <properties>
@@ -408,6 +409,11 @@
             <artifactId>spring-kafka</artifactId>
             <version>2.1.13.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.55</version>
+        </dependency>
     </dependencies>
     <profiles>
         <!-- 1. 操作系统环境 start -->
@@ -572,8 +578,8 @@
     </repositories>
 
     <pluginRepositories>
-
     </pluginRepositories>
+
     <distributionManagement>
         <repository>
             <id>pro-release</id>
@@ -587,6 +593,4 @@
             <url>http://12.3.10.225:9081/nexus/content/repositories/wq-snapshot/</url>
         </snapshotRepository>
     </distributionManagement>
-
-
 </project>

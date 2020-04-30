@@ -226,6 +226,12 @@ public class InternetCardServiceImpl implements InternetCardService {
         }else if(StringUtils.isNotBlank(internetCard.getAgentName())){
             criteria.andAgentNameLike("%"+internetCard.getAgentName()+"%");
         }
+        if(internetCard.getRenewStatusList()!=null && internetCard.getRenewStatusList().size()>0){
+            reqMap.put("renewStatusList", internetCard.getRenewStatusList());
+        }
+        if(internetCard.getInternetCardStatusList()!=null && internetCard.getInternetCardStatusList().size()>0){
+            reqMap.put("internetCardStatusList", internetCard.getInternetCardStatusList());
+        }
         oInternetCardExample.setReqMap(reqMap);
 //        oInternetCardExample.setOrderByClause("expire_time asc ");
         return oInternetCardExample;
@@ -687,9 +693,9 @@ public class InternetCardServiceImpl implements InternetCardService {
             agentBusInfo.setBusNum(internetCard.getBusNum().trim());
             agentBusInfo.setBusPlatform(platForm.getPlatformNum());
             List<BigDecimal> busStatusList = new ArrayList<>();
-            busStatusList.add(BusStatus.QY.getValue());
-            busStatusList.add(BusStatus.WJH.getValue());
-            busStatusList.add(BusStatus.WQY.getValue());
+            busStatusList.add(BusStatus.QY.getValue());// 启用
+            busStatusList.add(BusStatus.WJH.getValue());// 未激活
+            busStatusList.add(BusStatus.WQY.getValue());// 未启用
             agentBusInfo.setBusStatusList(busStatusList);
             agentBusInfo.setCloReviewStatus(AgStatus.Approved.getValue());
             List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
@@ -773,9 +779,13 @@ public class InternetCardServiceImpl implements InternetCardService {
                 logoutCriteria.andStatusEqualTo(Status.STATUS_1.status);
                 logoutCriteria.andIccidNumEqualTo(internetCard.getIccidNum());
                 List<String> logoutStatusList = new ArrayList<>();
-                logoutStatusList.add(InternetLogoutStatus.ZXZ.getValue());
-                logoutStatusList.add(InternetLogoutStatus.TJCLZ.getValue());
-                logoutCriteria.andLogoutStatusIn(logoutStatusList);
+                if(oInternetCard.getIssuer().equals(Issuerstatus.YT_MOBILE.code) ){
+                    logoutStatusList.add(InternetLogoutStatus.ZXZ.getValue());// 待注销
+                }else if(oInternetCard.getIssuer().equals(Issuerstatus.JY_MOBILE.code)){
+                    logoutStatusList.add(InternetLogoutStatus.ZXZ.getValue());// 待注销
+                    logoutStatusList.add(InternetLogoutStatus.TJCLZ.getValue()); // 注销中  烟台是注销中需要人工处理  揭阳处理中需要自动处理
+                }
+                logoutCriteria.andLogoutStatusIn(logoutStatusList);// 查询是否有在处理中的 条件： 烟台查询 待注销的  ，揭阳查询 待注销和 注销中的
                 List<InternetLogoutDetail> internetLogoutDetailList = internetLogoutDetailMapper.selectByExample(internetLogoutDetailEx);
                 if(internetLogoutDetailList.size()!=0){
                     oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());
@@ -788,10 +798,14 @@ public class InternetCardServiceImpl implements InternetCardService {
                 InternetLogoutDetailExample.Criteria criteria = internetLogoutDetailExample.createCriteria();
                 criteria.andStatusEqualTo(Status.STATUS_1.status);
                 criteria.andIccidNumEqualTo(internetCard.getIccidNum());
-                criteria.andLogoutStatusEqualTo(InternetLogoutStatus.DZX.getValue());
+                if(oInternetCard.getIssuer().equals(Issuerstatus.YT_MOBILE.code) ){
+                    criteria.andLogoutStatusEqualTo(InternetLogoutStatus.TJCLZ.getValue());// 烟台移动 查询注销中的  更新为注销成功（人工导入处理）
+                }else if(oInternetCard.getIssuer().equals(Issuerstatus.JY_MOBILE.code)){
+                    criteria.andLogoutStatusEqualTo(InternetLogoutStatus.TJSB.getValue());// 揭阳移动 查询注销失败的  更新为注销成功（人工导入处理）
+                }
                 List<InternetLogoutDetail> internetLogoutDetails = internetLogoutDetailMapper.selectByExample(internetLogoutDetailExample);
                 for (InternetLogoutDetail internetLogoutDetail : internetLogoutDetails) {
-                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.ZXCG.getValue());
+                    internetLogoutDetail.setLogoutStatus(InternetLogoutStatus.ZXCG.getValue());// 更改为已注销
                     int i = internetLogoutDetailMapper.updateByPrimaryKey(internetLogoutDetail);
                     if(i!=1){
                         oInternetCardImport.setImportStatus(OInternetCardImportStatus.FAIL.getValue());

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
@@ -97,6 +98,8 @@ public interface AgentBusinfoService {
 
     AgentBusInfo selectBusInfo(String busNum);
 
+    Map<String, Object> queryBusInfoType(String busNum, String platformType);
+
     List<AgentBusInfo> selectExistsById(String id);
 
     /**
@@ -150,4 +153,10 @@ public interface AgentBusinfoService {
     PageInfo queyrBusInfoByBusNumAndPlatformTypePage(Page page, String busNum, String platformType)throws MessageException;
 
     List<Map<String,Object>> queryRegionByAccount(String account)throws MessageException;
+    /**
+     * 通过 dict 返回对应的业务数据
+     * @param reqMap
+     * @return
+     */
+    public  List<Map> agentBusByDict(FastMap reqMap);
 }

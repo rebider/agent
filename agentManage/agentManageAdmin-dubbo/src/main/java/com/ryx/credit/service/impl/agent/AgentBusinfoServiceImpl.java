@@ -926,6 +926,19 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 	@Override
+	public Map<String, Object> queryBusInfoType(String busNum, String platformType) {
+		List<Map<String, Object>> queryBusInfoType = agentBusInfoMapper.queryBusInfoType(
+				FastMap.fastMap("busNum", busNum).putKeyV("platformType", platformType));
+		if (null == queryBusInfoType) {
+			return null;
+		}
+		if (queryBusInfoType.size() == 1) {
+			return queryBusInfoType.get(0);
+		}
+		return null;
+	}
+
+	@Override
 	public List<AgentBusInfo> selectExistsById(String id){
 		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
 		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
@@ -1275,4 +1288,14 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		return agentBusInfos;
 	}
+
+	@Override
+	public List<Map> agentBusByDict(FastMap reqMap) {
+		List<Map> data = agentBusInfoMapper.queryTreeByBusInfoAndDict(reqMap);
+		for (Map datum : data) {
+			datum.put("BUS_TYPE_NAME",BusType.getContentByValue(String.valueOf(datum.get("BUS_TYPE"))));
+		}
+		return data;
+	}
+
 }

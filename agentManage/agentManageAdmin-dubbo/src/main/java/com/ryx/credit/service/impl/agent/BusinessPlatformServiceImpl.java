@@ -714,7 +714,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                                 busInfo.setAgDocDistrict(agentBusInfoVo.getAgDocDistrict());
                                 busInfo.setAgDocPro(agentBusInfoVo.getAgDocPro());
                                 busInfo.setVersion(busInfo.getVersion());
-                                if(1!=agentBusInfoMapper.updateByPrimaryKey(busInfo)){
+                                if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(busInfo)){
                                     logger.info("业务修改大区省区更新失败");
                                     throw new MessageException("业务修改大区省区更新失败");
                                 }
@@ -776,30 +776,30 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         //查询代理商业务O码，对应的大区经理账号
                         List<String> oldAccounts = lmsUserService.queryByBusNum(agentInner.getBusNum());
                         //查询新省区，对应的大区经理账号
-                        List<String> newAccounts = branchInnerMapper.selectInnerLoginByBranch(agentBusInfoVo.getAgDocPro());
-
-                        if (newAccounts.size() > 0) {
-                            JSONObject data = new JSONObject();
-                            data.put("addAccounts", String.join(",", newAccounts));
-                            data.put("delAccounts", String.join(",", oldAccounts));
-                            data.put("orgId", agentInner.getBusNum());
-                            try {
-                                AgentResult agentResult = request("ORG021", data);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        } else if (newAccounts.size() <= 0 && oldAccounts.size() > 0) {
-                            JSONObject data = new JSONObject();
-                            data.put("loginname", String.join(",", oldAccounts));
-                            data.put("dType", "1");
-                            data.put("delOrgIds", agentInner.getBusNum());
-                            try {
-                                AgentResult agentResult = request("ORG020", data);
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                        if (StringUtils.isNotBlank(agentBusInfoVo.getAgDocPro())) {
+                            List<String> newAccounts = branchInnerMapper.selectInnerLoginByBranch(agentBusInfoVo.getAgDocPro());
+                            if (newAccounts.size() > 0) {
+                                JSONObject data = new JSONObject();
+                                data.put("addAccounts", String.join(",", newAccounts));
+                                data.put("delAccounts", String.join(",", oldAccounts));
+                                data.put("orgId", agentInner.getBusNum());
+                                try {
+                                    AgentResult agentResult = request("ORG021", data);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            } else if (newAccounts.size() <= 0 && oldAccounts.size() > 0) {
+                                JSONObject data = new JSONObject();
+                                data.put("loginname", String.join(",", oldAccounts));
+                                data.put("dType", "1");
+                                data.put("delOrgIds", agentInner.getBusNum());
+                                try {
+                                    AgentResult agentResult = request("ORG020", data);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
-
 
                     }
                 }

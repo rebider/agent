@@ -42,5 +42,7 @@ public interface IPmsProfitLogService {
 
     int  save(PmsProfit record);
 
-  void disposeSheet(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder);
+    Map<String,Object> disposeSheet(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder);
+
+  PageInfo selectByMap(Map<String,String> param,Page page);
 }

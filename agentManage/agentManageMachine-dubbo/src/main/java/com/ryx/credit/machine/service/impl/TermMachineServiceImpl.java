@@ -225,7 +225,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
     @Override
     public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
         AgentResult agentResult = AgentResult.fail();
-        if(PlatformType.POS.getValue().equals(platformType)){
+        if(PlatformType.whetherPOS(platformType)){
             agentResult =  posTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
         }else if(PlatformType.SSPOS.getValue().equals(platformType)){
             agentResult =  sPosTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);

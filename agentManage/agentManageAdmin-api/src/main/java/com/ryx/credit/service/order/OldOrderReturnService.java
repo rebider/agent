@@ -36,6 +36,13 @@ public interface OldOrderReturnService {
      * @return
      */
     public AgentResult taskApprove(AgentVo agentVo,String userId)throws MessageException;
+
+    /**
+     * 历史订单退货审批拒绝
+     * @param processInstanceId
+     * @param activityName
+     * @throws MessageException
+     */
     public void approvalReject(String processInstanceId, String activityName) throws MessageException;
 
     /**
