@@ -1030,6 +1030,25 @@
         and a.MONTH = #{param.month}
         and a.IMPORT_TYPE = #{param.type}
       )
+
+        and pd.SHEET_NAME in (
+    select a.SHEET_NAME from P_IMPORT_DATA_WITH_PROFIT  a
+    left join A_AGENT_BUSINFO ab on a.AGENT_ID = ab.AGENT_ID
+    where 1=1
+    <if test="param.agentId != '' and param.agentId != null">
+      and a.AGENT_ID = #{param.agentId}
+    </if>
+    <if test="param.agDoc != '' and param.agDoc != null">
+      and (ab.AG_DOC_PRO in ( select id from C_ORGANIZATION where PID = #{param.agDoc} )
+      or ab.AG_DOC_PRO = #{param.agDoc})
+    </if>
+    <if test="param.agentName != '' and param.agentName != null">
+      and a.AGENT_NAME = #{param.agentName}
+    </if>
+    and a.MONTH = #{param.month}
+    and a.IMPORT_TYPE = #{param.type}
+    )
+
     and pd.MONTH = #{param.month}  and pd.IMPORT_TYPE = #{param.type}
     order by pd.SHEET_ORDER asc
   </select>
