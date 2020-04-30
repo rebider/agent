@@ -80,7 +80,7 @@
 
 
  <!--profit-->
- <dubbo:service interface="com.ryx.credit.profit.service.IPmsProfitLogService" ref="pmsProfitLogService"  timeout="1200000" registry="myGroup"/>
+ <dubbo:service interface="com.ryx.credit.profit.service.IPmsProfitLogService" ref="pmsProfitLogService"  timeout="3600000" registry="myGroup"/>
 
 
 </beans>

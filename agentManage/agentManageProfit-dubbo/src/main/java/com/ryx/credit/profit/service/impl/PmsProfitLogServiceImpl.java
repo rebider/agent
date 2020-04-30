@@ -196,16 +196,6 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> disposeUploadExcel2(PmsProfitLog pmsProfitLog, String path) throws MessageException {
-        //第一次导入删除之前导入
-        //根据 月份、导入人删除
-        if (ProfitDataImportType.DYDL.key.equals(pmsProfitLog.getImportType())) {
-            PmsProfitTempExample pmsProfitTempExample = new PmsProfitTempExample();
-            pmsProfitTempExample.or().andMonthEqualTo(pmsProfitLog.getMonth()).andImportPersonEqualTo(pmsProfitLog.getUploadUser());
-            deletePmsProfitTemp(pmsProfitTempExample);
-            PmsProfitExample pmsProfitExample = new PmsProfitExample();
-            pmsProfitExample.or().andSettleMonthEqualTo(pmsProfitLog.getMonth()).andImportPersonEqualTo(pmsProfitLog.getUploadUser());
-            deletePmsProfit(pmsProfitExample);
-        }
         Map resultMap = new HashMap();
         String uploadPath = path + pmsProfitLog.getUploadPath();
         try {
@@ -246,21 +236,27 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                             Cell cell = row.getCell(4);
                             cell.setCellValue(idService.getPPTId());
                         } else if (ProfitDataImportType.DEDL.key.equals(pmsProfitLog.getImportType())||ProfitDataImportType.DSDL.key.equals(pmsProfitLog.getImportType())) {
-                            if (null != getCellValue(row.getCell(4)).trim() && !"".equals(getCellValue(row.getCell(4)).trim())) {
-                                String agId = getCellValue(row.getCell(0)).trim();
-                                String month = getCellValue(row.getCell(2)).trim();
-                                String busCode = getCellValue(row.getCell(3)).trim();
-                                PmsProfitExample pmsProfitExample = new PmsProfitExample();
+                            String agId = getCellValue(row.getCell(0)).trim();
+                            String month = getCellValue(row.getCell(2)).trim();
+                            String busCode = getCellValue(row.getCell(3)).trim();
+                            PmsProfitExample pmsProfitExample = new PmsProfitExample();
 
-                                if (ProfitDataImportType.DSDL.key.equals(pmsProfitLog.getImportType())) {
-                                    pmsProfitExample.or().andUniqueFlagEqualTo(agId).andSettleMonthEqualTo(month).andBusCodeEqualTo(busCode).andSheetNameEqualTo(sheetName).andProfitTypeEqualTo(ProfitDataImportType.DSDL.key);
-                                }else {
-                                    pmsProfitExample.or().andUniqueFlagEqualTo(agId).andSettleMonthEqualTo(month).andBusCodeEqualTo(busCode).andSheetNameEqualTo(sheetName);
-                                }
-                                List<PmsProfit> pmsProfits = pmsProfitMapper.selectByExample(pmsProfitExample);
-                                if (pmsProfits.size() < 1) {
+                            if (ProfitDataImportType.DSDL.key.equals(pmsProfitLog.getImportType())) {
+                                pmsProfitExample.or().andUniqueFlagEqualTo(agId).andSettleMonthEqualTo(month).andBusCodeEqualTo(busCode).andSheetNameEqualTo(sheetName).andProfitTypeEqualTo(ProfitDataImportType.DSDL.key);
+                            }else {
+                                pmsProfitExample.or().andUniqueFlagEqualTo(agId).andSettleMonthEqualTo(month).andBusCodeEqualTo(busCode).andSheetNameEqualTo(sheetName);
+                            }
+                            List<PmsProfit> pmsProfits = pmsProfitMapper.selectByExample(pmsProfitExample);
+                            if (null != getCellValue(row.getCell(4)).trim() && !"".equals(getCellValue(row.getCell(4)).trim())) {
+
+                                if (pmsProfits.size() == 0) {
                                     Map<String, Object> SheetMap = new HashMap<>();
                                     SheetMap.put(sheetRow, sheetName + "sheet页第" + ((j + 1)) + "修改数据输入有误此流水对应信息不存在");
+                                    resultList.add(SheetMap);
+                                    continue;
+                                }else if(pmsProfits.size() >1){
+                                    Map<String, Object> SheetMap = new HashMap<>();
+                                    SheetMap.put(sheetRow, sheetName + "sheet页第" + ((j + 1)) + "行查询到一次请款或补出款的多条记录，请确定是否不是同一人操作，避免重复出款");
                                     resultList.add(SheetMap);
                                     continue;
                                 }
@@ -273,6 +269,12 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                                     continue;
                                 }
                             } else {
+                                if (pmsProfits.size() > 0) {
+                                    Map<String, Object> SheetMap = new HashMap<>();
+                                    SheetMap.put(sheetRow, sheetName + "sheet页第" + ((j + 1)) + "一次请款或补出款时已经存在，无法新增，请检查并填入流水号进行修改。");
+                                    resultList.add(SheetMap);
+                                    continue;
+                                }
                                 Cell cell = row.getCell(4);
                                 cell.setCellValue(idService.getPPTId());
                             }
@@ -733,15 +735,8 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                             save(pf);
                         }
                     } else {
-                        if(pmsProfits != null && pmsProfits.size() == 0){
                             insertSelectiveTemp(pmsProfitTempWithBLOBs);
                             save(pf);
-                        }/*else {
-                            Map<String, Object> saveSheetMap = new HashMap<>();
-                            saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行一次请款或者第三次补出款导入了重复的数据");
-                            saveSheetList.add(saveSheetMap);
-                            continue;
-                        }*/
                     }
                 }
 
