@@ -29,14 +29,11 @@ public class PBalanceSerialServiceImpl implements PBalanceSerialService {
     }
 
     @Override
-    public List<Map<String, String>> getRefundLog(String balanceId) throws MessageException {
+    public List<Map<String, String>> getRefundLog(String balanceId) {
         PBalanceSerialExample example = new PBalanceSerialExample();
         PBalanceSerialExample.Criteria criteria = example.createCriteria();
         criteria.andBalanceIdEqualTo(balanceId);
         List<PBalanceSerial> list = pBalanceSerialMapper.selectByExample(example);
-        if(list.size() != 1){
-            throw new MessageException("获取日志信息异常，请联系管理员！");
-        }
         List<Map<String,String>> mapList = pBalanceSerialMapper.getRefundLog(balanceId);
         if("02".equals(list.get(0).getBalanceStatus())){
             Map<String,String> map = new HashMap<>();
@@ -44,12 +41,13 @@ public class PBalanceSerialServiceImpl implements PBalanceSerialService {
             map.put("CK_TIME",list.get(0).getSyncTime());
             map.put("REFUND_REMARK",list.get(0).getReconRemark());
             map.put("BALANCE_ID",list.get(0).getBalanceId());
-            map.put("BALANCE_STATUS",list.get(0).getBalanceStatus());
+            map.put("BALANCE_STATUS","出款成功");
             if(mapList.size() != 0){
                 map.put("PRE_BALANCE_ID",mapList.get(mapList.size()-1).get("BALANCE_ID"));
             }else {
                 map.put("PRE_BALANCE_ID",null);
             }
+            mapList.add(map);
         }
         return mapList;
     }

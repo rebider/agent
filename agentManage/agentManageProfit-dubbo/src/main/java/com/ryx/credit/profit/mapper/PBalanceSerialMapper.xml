@@ -409,10 +409,10 @@
 
   <select id="getRefundLog" resultType="java.util.Map" parameterType="java.lang.String">
     select pr.FIRST_BALANCE_ID,pr.CK_TIME,pr.REFUND_REMARK,
-         pr.PRE_BALANCE_ID,pr.BALANCE_ID,'失败' as BALANCE_STATUS
+         pr.PRE_BALANCE_ID,pr.BALANCE_ID,'出款失败' as BALANCE_STATUS
     from P_REFUND_SERIAL pr
     where FIRST_BALANCE_ID  = #{balanceId}
-    order by CK_TIME desc
+    order by CK_TIME asc
   </select>
 
   <select id="statisticalData" resultType="java.util.Map">

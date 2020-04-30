@@ -11,7 +11,7 @@ public interface PBalanceSerialService {
 
     PageInfo getListByMap(Map<String,String> param, Page page);
 
-    List<Map<String,String>> getRefundLog(String balanceId) throws MessageException;
+    List<Map<String,String>> getRefundLog(String balanceId) ;
 
     List<Map<String,String>> getListToDownload(Map<String,String> param);
 
