@@ -23,4 +23,8 @@ public interface IdService {
 
     String genInternetOffset();
 
+    String getPPTId();
+
+    String getPPT2Id();
+
 }

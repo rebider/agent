@@ -1,22 +1,34 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.util.DateUtils;
-import com.ryx.credit.common.util.FutureTaskUtils;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.enumc.BillStatus;
+import com.ryx.credit.common.enumc.ProfitDataImportType;
+import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.PmsProfitLogMapper;
 import com.ryx.credit.profit.dao.PmsProfitMapper;
 import com.ryx.credit.profit.dao.PmsProfitTempMapper;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IPmsProfitLogService;
+import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -31,6 +43,9 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     @Autowired
     PmsProfitMapper pmsProfitMapper;
 
+    @Autowired
+    IdService idService;
+
 
     @Override
     public long countByExample(PmsProfitLogExample example) {
@@ -43,20 +58,12 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     }
 
     @Override
-    public int deletePmsProfitTemp(String month, String user) {
-        PmsProfitTempExample pmsProfitTempExample = new PmsProfitTempExample();
-        PmsProfitTempExample.Criteria pmsProfitTempExampleCriteria = pmsProfitTempExample.createCriteria();
-        pmsProfitTempExampleCriteria.andMonthEqualTo(month);
-        pmsProfitTempExampleCriteria.andImportPersonEqualTo(user);
+    public int deletePmsProfitTemp(PmsProfitTempExample pmsProfitTempExample) {
         return pmsProfitTempMapper.deleteByExample(pmsProfitTempExample);
     }
 
     @Override
-    public int deletePmsProfit(String month, String user) {
-        PmsProfitExample pmsProfitExample = new PmsProfitExample();
-        PmsProfitExample.Criteria pmsProfitExampleCriteria = pmsProfitExample.createCriteria();
-        pmsProfitExampleCriteria.andMonthEqualTo(month);
-        pmsProfitExampleCriteria.andImportPersonEqualTo(user);
+    public int deletePmsProfit(PmsProfitExample pmsProfitExample) {
         return pmsProfitMapper.deleteByExample(pmsProfitExample);
     }
 
@@ -71,7 +78,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     }
 
     @Override
-    public int insertSelective(PmsProfitTempWithBLOBs record) {
+    public int insertSelectiveTemp(PmsProfitTempWithBLOBs record) {
         return pmsProfitTempMapper.insertSelective(record);
     }
 
@@ -91,7 +98,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     }
 
     @Override
-    public int updateByPrimaryKeySelective(PmsProfitTempWithBLOBs record) {
+    public int updateByPrimaryKeySelectiveTemp(PmsProfitTempWithBLOBs record) {
         return pmsProfitTempMapper.updateByPrimaryKeySelective(record);
     }
 
@@ -128,8 +135,9 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             criteria.andBatchNoEqualTo(example.getBatchNo());
         }
         if (StringUtils.isNotBlank(example.getUploadTime())) {
-            criteria.andUploadTimeBetween(example.getUploadTime()+" "+"00:00:00",example.getUploadTime()+" "+"23:59:59");
+            criteria.andUploadTimeBetween(example.getUploadTime() + " " + "00:00:00", example.getUploadTime() + " " + "23:59:59");
         }
+
         if (StringUtils.isNotBlank(example.getMonth())) {
             criteria.andMonthEqualTo(example.getMonth());
         }
@@ -155,11 +163,354 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
         return pageInfo;
     }
 
+    /**
+     * 不在事务中进行删除
+     *
+     * @param pmsProfitLog 上传实例
+     * @param path         上传绝对路径
+     * @throws MessageException
+     */
+    @Override
+    public Map<String, Object> disposeUploadExcel(PmsProfitLog pmsProfitLog, String path) throws MessageException {
+        //第一次导入删除之前导入
+        //根据 月份、导入人删除
+        if (ProfitDataImportType.DYDL.key.equals(pmsProfitLog.getImportType())) {
+            PmsProfitTempExample pmsProfitTempExample = new PmsProfitTempExample();
+            pmsProfitTempExample.or().andMonthEqualTo(pmsProfitLog.getMonth()).andImportPersonEqualTo(pmsProfitLog.getUploadUser());
+            deletePmsProfitTemp(pmsProfitTempExample);
+            PmsProfitExample pmsProfitExample = new PmsProfitExample();
+            pmsProfitExample.or().andSettleMonthEqualTo(pmsProfitLog.getMonth()).andImportPersonEqualTo(pmsProfitLog.getUploadUser());
+            deletePmsProfit(pmsProfitExample);
+        }
+        Map<String, Object> stringObjectMap = disposeUploadExcel2(pmsProfitLog, path);
+        return  stringObjectMap;
+
+    }
+
+    /**
+     * 处理上传的Excel
+     *
+     * @param pmsProfitLog 上传实例
+     * @param path         上传绝对路径
+     * @throws MessageException
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> disposeUploadExcel2(PmsProfitLog pmsProfitLog, String path) throws MessageException {
+        //第一次导入删除之前导入
+        //根据 月份、导入人删除
+        if (ProfitDataImportType.DYDL.key.equals(pmsProfitLog.getImportType())) {
+            PmsProfitTempExample pmsProfitTempExample = new PmsProfitTempExample();
+            pmsProfitTempExample.or().andMonthEqualTo(pmsProfitLog.getMonth()).andImportPersonEqualTo(pmsProfitLog.getUploadUser());
+            deletePmsProfitTemp(pmsProfitTempExample);
+            PmsProfitExample pmsProfitExample = new PmsProfitExample();
+            pmsProfitExample.or().andSettleMonthEqualTo(pmsProfitLog.getMonth()).andImportPersonEqualTo(pmsProfitLog.getUploadUser());
+            deletePmsProfit(pmsProfitExample);
+        }
+        Map resultMap = new HashMap();
+        String uploadPath = path + pmsProfitLog.getUploadPath();
+        try {
+            Workbook wookbook = getWookBook(uploadPath);
+            /*sheet数量*/
+            int sheetCount = 0;
+            sheetCount = wookbook.getNumberOfSheets();
+            String successResultPath = null;
+            /*判断是否有汇总sheet页*/
+            boolean tf = false;
+            for (int i = 0; i < sheetCount; i++) {
+                Sheet sheet = wookbook.getSheetAt(i);
+                String sheetName = sheet.getSheetName();
+                /*列数*/
+                /*校验列数是否大于五列*/
+                int columnNum = 0;
+                int rows = sheet.getPhysicalNumberOfRows();
+                if (rows > 0) {
+                    Row hssfRow = sheet.getRow(0);
+                    columnNum = hssfRow.getPhysicalNumberOfCells();
+                }
+                if (columnNum < 5) {
+                    throw new MessageException("Sheet[" + i + "][" + sheetName + "]页列数不足! ");
+                }
+
+                //汇总页面写入出款流水并且输出
+                if ("汇总".equals(sheetName)) {
+                    List<Map<String,Object>> resultList = new ArrayList<>();
+                    tf = true;
+                    for (int j = 1; j < rows; j++) {
+                        Row row = sheet.getRow(j);
+                        if (row == null) {
+                            continue;
+                        }
+
+                        String sheetRow = sheetName + ((j + 1));
+                        if (ProfitDataImportType.DYDL.key.equals(pmsProfitLog.getImportType())) {
+                            Cell cell = row.getCell(4);
+                            cell.setCellValue(idService.getPPTId());
+                        } else if (ProfitDataImportType.DEDL.key.equals(pmsProfitLog.getImportType())||ProfitDataImportType.DSDL.key.equals(pmsProfitLog.getImportType())) {
+                            if (null != getCellValue(row.getCell(4)).trim() && !"".equals(getCellValue(row.getCell(4)).trim())) {
+                                String agId = getCellValue(row.getCell(0)).trim();
+                                String month = getCellValue(row.getCell(2)).trim();
+                                String busCode = getCellValue(row.getCell(3)).trim();
+                                PmsProfitExample pmsProfitExample = new PmsProfitExample();
+
+                                if (ProfitDataImportType.DSDL.key.equals(pmsProfitLog.getImportType())) {
+                                    pmsProfitExample.or().andUniqueFlagEqualTo(agId).andSettleMonthEqualTo(month).andBusCodeEqualTo(busCode).andSheetNameEqualTo(sheetName).andProfitTypeEqualTo(ProfitDataImportType.DSDL.key);
+                                }else {
+                                    pmsProfitExample.or().andUniqueFlagEqualTo(agId).andSettleMonthEqualTo(month).andBusCodeEqualTo(busCode).andSheetNameEqualTo(sheetName);
+                                }
+                                List<PmsProfit> pmsProfits = pmsProfitMapper.selectByExample(pmsProfitExample);
+                                if (pmsProfits.size() < 1) {
+                                    Map<String, Object> SheetMap = new HashMap<>();
+                                    SheetMap.put(sheetRow, sheetName + "sheet页第" + ((j + 1)) + "修改数据输入有误此流水对应信息不存在");
+                                    resultList.add(SheetMap);
+                                    continue;
+                                }
+                                if (pmsProfits.get(0).getBalanceId().equals(getCellValue(row.getCell(4)).trim())) {
+                                    continue;
+                                } else {
+                                    Map<String, Object> SheetMap = new HashMap<>();
+                                    SheetMap.put(sheetRow, sheetName + "sheet页第" + ((j + 1)) + "流水号与所生成不符合");
+                                    resultList.add(SheetMap);
+                                    continue;
+                                }
+                            } else {
+                                Cell cell = row.getCell(4);
+                                cell.setCellValue(idService.getPPTId());
+                            }
+
+                        }
+                    }
+                    if (resultList.size()>0){
+                        resultMap.put("sheetFail",resultList);
+                    }
+
+                }
+                if (!tf) {
+                    throw new MessageException("导入的Excel中没有汇总sheet页");
+                }
+
+
+            }
+            if (resultMap.size()>0&&!ProfitDataImportType.DYDL.key.equals(pmsProfitLog.getImportType())) {
+                return resultMap;
+            }else {
+                /*成功sheet*/
+                FileOutputStream out = null;
+                String[] splitResultPath = pmsProfitLog.getUploadPath().split("\\.");
+                successResultPath = path + splitResultPath[0] + "success." + splitResultPath[1];
+                pmsProfitLog.setResultPath(splitResultPath[0] + "success." + splitResultPath[1]);
+                pmsProfitLog.setResultName("(生成出款流水)" + pmsProfitLog.getUploadName());
+                try {
+                    out = new FileOutputStream(successResultPath);
+                    out.flush();
+                    wookbook.write(out);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new MessageException("IO流异常--插入流水后存取本地异常");
+                } finally {
+                    out.close();
+                }
+
+
+                resultMap.putAll(disposeUploadExcelSuccess(pmsProfitLog, path));
+                return resultMap;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMessage());
+        }
+    }
+
+    /**
+     * 处理增加流水号的上传Excel
+     *
+     * @param pmsProfitLog
+     * @param path
+     * @throws MessageException
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> disposeUploadExcelSuccess(PmsProfitLog pmsProfitLog, String path) throws MessageException {
+
+        String uploadPath = path + pmsProfitLog.getResultPath();
+        Workbook wookbook = getWookBook(uploadPath);
+        //sheet数
+        int sheetCount = wookbook.getNumberOfSheets();
+        Map<String, Object> showMap = new HashMap<>();
+        for (int i = 0; i < sheetCount; i++) {
+            int rowNum = 0;
+            Sheet sheet = wookbook.getSheetAt(i);
+            String sheetName = sheet.getSheetName();
+            int columnNum = 0;
+            List<Map<String, String>> rsList = new ArrayList<>();
+            // 获取到Excel文件中的所有行数
+            int rows = sheet.getPhysicalNumberOfRows();
+            if (rows > 0) {
+                Row hssfRow = sheet.getRow(0);
+                columnNum = hssfRow.getPhysicalNumberOfCells();
+            }
+            // 遍历行 从第1行开始遍历
+            for (int j = 0; j < rows; j++) {
+                Row row = sheet.getRow(j);
+                rowNum = j;
+                // 行不能为空
+                if (row == null) {
+                    continue;
+                }
+
+                Map<String, String> map = new HashMap<>();
+                // 用于判断是否此行所有字段都为空
+                boolean rownull = true;
+
+                // 遍历每列
+                for (int k = 0; k < columnNum; k++) {
+                    map.put("Cell" + k, "");
+
+                    Cell cell = row.getCell(k);
+                    if (cell == null) {
+                        continue;
+                    }
+                    String cellValue = "";
+                    try {
+                        cellValue = getCellValue(cell).trim();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new RuntimeException("数据读取有误，" + sheetName + "页" + ",第" + j + "行，第" + k + "列数据异常");
+                    }
+                    // 如果字段值不为空，设置行空为否
+                    if (rownull && org.apache.commons.lang.StringUtils.isNotEmpty(cellValue)) {
+                        rownull = false;
+                    }
+                    if (j == 0) {
+                        if (cellValue == null || cellValue.equals("")) {
+                            columnNum = k;
+                            break;
+                        }
+                    }
+                    map.put("Cell" + k, cellValue);
+                    map.put("rowNum", String.valueOf(rowNum));
+                }
+
+                // 如果此行所有字段都不为空值加入结果集合
+                if (!rownull) {
+                    rsList.add(map);
+                }
+            }
+
+            try {
+                Map<String, Object> pmsProfitLogMap = disposeSheet(rsList, sheetName, columnNum, pmsProfitLog,i);
+                if (pmsProfitLogMap != null && pmsProfitLogMap.size() != 0) {
+                    showMap.putAll(pmsProfitLogMap);
+                }
+                updateByPrimaryKeySelective(pmsProfitLog);
+            } catch (Exception e) {
+                logger.error("调用disposeSheet方法异常：" + e.getMessage());
+                e.printStackTrace();
+                if((pmsProfitLog.getImportType().equals(ProfitDataImportType.DYDL.key))){
+                    //根据 月份、导入人导入人删除
+                    PmsProfitTempExample pmsProfitTempExample = new PmsProfitTempExample();
+                    pmsProfitTempExample.or().andMonthEqualTo(pmsProfitLog.getMonth()).andImportPersonEqualTo(pmsProfitLog.getUploadUser());
+                    deletePmsProfitTemp(pmsProfitTempExample);
+                    PmsProfitExample pmsProfitExample = new PmsProfitExample();
+                    pmsProfitExample.or().andSettleMonthEqualTo(pmsProfitLog.getMonth()).andImportPersonEqualTo(pmsProfitLog.getUploadUser());
+                    deletePmsProfit(pmsProfitExample);
+                }else {
+                    //导入批次删除
+                    PmsProfitTempExample pmsProfitTempExample = new PmsProfitTempExample();
+                    pmsProfitTempExample.or().andImportBatchEqualTo(pmsProfitLog.getBatchNo());
+                    deletePmsProfitTemp(pmsProfitTempExample);
+                    PmsProfitExample pmsProfitExample = new PmsProfitExample();
+                    pmsProfitExample.or().andImportBatchEqualTo(pmsProfitLog.getBatchNo());
+                    deletePmsProfit(pmsProfitExample);
+
+                }
+
+                pmsProfitLog.setStatus("1");
+                pmsProfitLog.setNote("读取excel文件失败!2"+e.getMessage());
+                try {
+                    updateByPrimaryKeySelective(pmsProfitLog);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                    logger.error("失败后更新数据库异常：" + e1.getMessage());
+                    throw new RuntimeException("失败后更新数据库异常");
+                }
+                throw e;
+            }
+
+        }
+        if (showMap != null && showMap.size() != 0) {
+            /* 根据 月份、导入人删除第一次请款*/
+            if (ProfitDataImportType.DYDL.key.equals(pmsProfitLog.getImportType())) {
+                //根据 月份、导入人导入人删除
+                PmsProfitTempExample pmsProfitTempExample = new PmsProfitTempExample();
+                pmsProfitTempExample.or().andMonthEqualTo(pmsProfitLog.getMonth()).andImportPersonEqualTo(pmsProfitLog.getUploadUser());
+                deletePmsProfitTemp(pmsProfitTempExample);
+                PmsProfitExample pmsProfitExample = new PmsProfitExample();
+                pmsProfitExample.or().andSettleMonthEqualTo(pmsProfitLog.getMonth()).andImportPersonEqualTo(pmsProfitLog.getUploadUser());
+                deletePmsProfit(pmsProfitExample);
+            } else {
+                //导入批次删除
+                PmsProfitTempExample pmsProfitTempExample = new PmsProfitTempExample();
+                pmsProfitTempExample.or().andImportBatchEqualTo(pmsProfitLog.getBatchNo());
+                deletePmsProfitTemp(pmsProfitTempExample);
+                PmsProfitExample pmsProfitExample = new PmsProfitExample();
+                pmsProfitExample.or().andImportBatchEqualTo(pmsProfitLog.getBatchNo());
+                deletePmsProfit(pmsProfitExample);
+            }
+
+        }
+        return showMap;
+    }
+
+    @Override
+    public Map<String, Objects> btnIsNo(String MONTH) {
+        return pmsProfitLogMapper.btnIsNo(MONTH);
+    }
+
+    @Override
+    public Map<String, Objects> btnInsert(Map<String, String> param) {
+        return pmsProfitLogMapper.btnInsert(param);
+    }
+
+    @Override
+    public Map<String, Objects> btnUpdate(Map<String, String> param) {
+        return pmsProfitLogMapper.btnUpdate(param);
+    }
+
+    public Workbook getWookBook(String successResultPath) throws MessageException {
+        MultipartFile file = null;
+        try {
+            file = GetMultipartFile.createMultipartFile(successResultPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new MessageException("IO流异常--读取本地文件时");
+        }
+        Workbook wookbook = null;
+        try {
+            // 创建对Excel工作簿文件的引用
+            String name = file.getOriginalFilename();
+            String fileType = name.substring(name.lastIndexOf(".") + 1,
+                    name.length());
+            if (fileType.equals("xlsx")) {
+                try {
+                    wookbook = new XSSFWorkbook(file.getInputStream());
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            } else if (fileType.equals("xls")) {
+                wookbook = new HSSFWorkbook(file.getInputStream());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException("读取excel文件失败!1 ");
+        }
+        return wookbook;
+    }
+
 
     public String callMapToXML(Map map) {
         StringBuffer sb = new StringBuffer();
         sb.append("<data>");
-        // sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><data>");
         mapToXML(map, sb);
         sb.append("</data>");
         try {
@@ -187,7 +538,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     }
 
     @Transactional
-    public List<Map<String, Object>> saveSheet(List<Map<String, String>> list, String sheetName, int columnNum, String month, String userId, int sheetOrder, List<Map<String, String>> listOne, int theadi, int count) {
+    public List<Map<String, Object>> saveSheet(List<Map<String, String>> list, String sheetName, int columnNum, PmsProfitLog pmsProfitLog, int sheetOrder, List<Map<String, String>> listOne, int theadi, int count) throws MessageException {
 
         List<Map<String, Object>> saveSheetList = new ArrayList<>();
         if (listOne == null) {
@@ -195,117 +546,216 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             listOne.add(list.get(0));
             list.removeAll(listOne);
         }
-
         for (int i = 0; i < list.size(); i++) {
-            if( list.get(i).get("Cell0")==null|| "".equals(list.get(i).get("Cell0"))){
+            String sheetRow = sheetName + ((i + 2) + (theadi * count));
+
+            if (list.get(i).get("Cell1") == null || "".equals(list.get(i).get("Cell1"))) {
                 Map<String, Object> saveSheetMap = new HashMap<>();
-                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "AG码错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行AG码错误为空");
+                saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行代理商名称为空");
                 saveSheetList.add(saveSheetMap);
                 continue;
             }
-            if( list.get(i).get("Cell1")==null|| "".equals(list.get(i).get("Cell1"))){
+            if (list.get(i).get("Cell3") == null || "".equals(list.get(i).get("Cell3"))) {
                 Map<String, Object> saveSheetMap = new HashMap<>();
-                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "代理商名称", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行代理商名称为空");
+                saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行品牌码为空");
                 saveSheetList.add(saveSheetMap);
                 continue;
             }
-            if( list.get(i).get("Cell2")==null|| "".equals(list.get(i).get("Cell2"))){
-                Map<String, Object> saveSheetMap = new HashMap<>();
-                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "月份错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行月份为空");
-                saveSheetList.add(saveSheetMap);
-                continue;
-            }
-            if( list.get(i).get("Cell3")==null|| "".equals(list.get(i).get("Cell3"))){
-                Map<String, Object> saveSheetMap = new HashMap<>();
-                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "品牌码错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行品牌码为空");
-                saveSheetList.add(saveSheetMap);
-                continue;
-            }
-            if( list.get(i).get("Cell4")==null|| "".equals(list.get(i).get("Cell4"))){
-                Map<String, Object> saveSheetMap = new HashMap<>();
-                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "品牌名称错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行品牌名称为空");
-                saveSheetList.add(saveSheetMap);
-                continue;
-            }
+
 
             PmsProfitTempWithBLOBs pmsProfitTempWithBLOBs = new PmsProfitTempWithBLOBs();
-            pmsProfitTempWithBLOBs.setMonth(month);
+            pmsProfitTempWithBLOBs.setMonth(pmsProfitLog.getMonth());
             pmsProfitTempWithBLOBs.setUniqueFlag((list.get(i).get("Cell0")));
-            pmsProfitTempWithBLOBs.setAgentId((list.get(i).get("Cell1")));
+            pmsProfitTempWithBLOBs.setAgentName((list.get(i).get("Cell1")));
             pmsProfitTempWithBLOBs.setBusCode(list.get(i).get("Cell3").trim());
-            pmsProfitTempWithBLOBs.setBusName(list.get(i).get("Cell4").trim());
             pmsProfitTempWithBLOBs.setSheetHead(callMapToXML(listOne.get(0)));
             pmsProfitTempWithBLOBs.setSheetData(callMapToXML(list.get(i)));
             pmsProfitTempWithBLOBs.setSheetName(sheetName);
-            pmsProfitTempWithBLOBs.setImportPerson(userId);
+            pmsProfitTempWithBLOBs.setImportPerson(pmsProfitLog.getUploadUser());
             pmsProfitTempWithBLOBs.setOrderNumber(new BigDecimal((list.get(i).get("rowNum"))));
+            pmsProfitTempWithBLOBs.setImportType(pmsProfitLog.getImportType());
+            pmsProfitTempWithBLOBs.setImportBatch(pmsProfitLog.getBatchNo());
 
 
             PmsProfit pf = new PmsProfit();
-            pf.setMonth(month);
+            pf.setSettleMonth(pmsProfitLog.getMonth());
+            pf.setProfitType(pmsProfitLog.getImportType());
+            /*第几个sheet*/
             pf.setSheetOrder(new BigDecimal(sheetOrder));
-            pf.setPayCondition("1");// 未打款
-            pf.setStatus("0");// 解冻
-            pf.setPayTranMoney(new BigDecimal("0"));
-            pf.setProfitHz("");
-            pf.setProfitType("");
-            pf.setImportPerson(userId);
+            pf.setBillStatus("01");// 未打款
+
+            pf.setImportPerson(pmsProfitLog.getUploadUser());
             pf.setImportTime(DateUtils.dateToStringss(new Date()));
             pf.setSheetName(sheetName);
             pf.setSheetColumn(new BigDecimal(columnNum));
-            pf.setUpdatePerson(userId);
+            pf.setUpdatePerson(pmsProfitLog.getUploadUser());
             pf.setUpdateTime(pf.getImportTime());
             pf.setOrderNumber(new BigDecimal((list.get(i).get("rowNum"))));
-            String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-            pf.setId(uuid);
-            if (logger.isDebugEnabled()) {
-                logger.debug(pmsProfitTempWithBLOBs.getSheetData());
+            pf.setImportBatch(pmsProfitLog.getBatchNo());
+
+            if ("汇总".equals(sheetName)) {
+                if (null != list.get(i).get("Cell4") && !"".equals(list.get(i).get("Cell4"))) {
+                    pmsProfitTempWithBLOBs.setId(list.get(i).get("Cell4"));
+                    pf.setBalanceId(list.get(i).get("Cell4"));
+                } else {
+                    Map<String, Object> saveSheetMap = new HashMap<>();
+                    saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行未获取到流水号，请联系研发人员");
+                    saveSheetList.add(saveSheetMap);
+                    continue;
+                }
+                if (list.get(i).get("Cell6") == null || "".equals(list.get(i).get("Cell6"))) {
+                    Map<String, Object> saveSheetMap = new HashMap<>();
+                    saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行实际收款代理商AG为空");
+                    saveSheetList.add(saveSheetMap);
+                    continue;
+                }
+                if (list.get(i).get("Cell7") == null || "".equals(list.get(i).get("Cell7"))) {
+                    Map<String, Object> saveSheetMap = new HashMap<>();
+                    saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行实际收款代理商名称为空");
+                    saveSheetList.add(saveSheetMap);
+                    continue;
+                }
+                List<Map<String, Object>> mapre = new ArrayList<>();
+                String agentIdrealy = list.get(i).get("Cell6").trim();
+                try {
+                    mapre = checkoutData(agentIdrealy, null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new MessageException(sheetName+"实际代理商数据查询失败");
+                }
+                if (mapre.size() < 1) {
+                    Map<String, Object> saveSheetMap = new HashMap<>();
+                    saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行不存在此实际收款代理商唯一码" + agentIdrealy);
+                    saveSheetList.add(saveSheetMap);
+                    continue;
+                }
+                try {
+                    pf.setBalanceAmt(new BigDecimal(list.get(i).get("Cell5")));
+                } catch (Exception e) {
+                    Map<String, Object> saveSheetMap = new HashMap<>();
+                    saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行解析分润金额出错");
+                    saveSheetList.add(saveSheetMap);
+                    e.printStackTrace();
+                    continue;
+                }
+                pf.setRealityAgId((list.get(i).get("Cell6")));
+                pf.setRealityAgName(list.get(i).get("Cell7").trim());
+            } else {
+                pmsProfitTempWithBLOBs.setId(idService.getPPTId());
+                pf.setBalanceId(pmsProfitTempWithBLOBs.getId());
             }
+
             String agentId = list.get(i).get("Cell0").trim();
             pf.setUniqueFlag(agentId);
 
             String busCode = list.get(i).get("Cell3").trim();
+
+
+            pf.setUniqueFlag(agentId);
             List<Map<String, Object>> mapData;
 
 
-            try {
                 mapData = checkoutData(agentId, busCode);
-            } catch (RuntimeException e) {
-                throw new RuntimeException("数据查询失败");
-            }
+
             if (mapData.size() < 1) {
                 Map<String, Object> saveSheetMap = new HashMap<>();
-                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "月份错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行的平台下" + busCode + "不存在此行唯一码" + agentId);
+                saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行的平台下" + busCode + "不存在此代理商唯一码" + agentId);
                 saveSheetList.add(saveSheetMap);
+                continue;
 
             }
-            if (!month.equals((list.get(i).get("Cell2")))) {
+
+            if (!pmsProfitLog.getMonth().equals((list.get(i).get("Cell2")))) {
                 Map<String, Object> saveSheetMap = new HashMap<>();
-                saveSheetMap.put(sheetName + ((i + 2) + (theadi * count)) + "平台错误", sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行月份与选择不匹配");
+                saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行月份与选择不匹配");
                 saveSheetList.add(saveSheetMap);
+                continue;
 
             }
 
-            pf.setAgentId((list.get(i).get("Cell1")));
+            pf.setAgentName((list.get(i).get("Cell1")));
             pf.setBusCode(list.get(i).get("Cell3").trim());
-            pf.setBusName(list.get(i).get("Cell4").trim());
 
 
-            list.get(i).remove("rowNum");
             try {
-                insertSelective(pmsProfitTempWithBLOBs);
-                save(pf);
+                if (ProfitDataImportType.DYDL.key.equals(pmsProfitLog.getImportType())) {
+                    insertSelectiveTemp(pmsProfitTempWithBLOBs);
+                    save(pf);
+                } else if (ProfitDataImportType.DEDL.key.equals(pmsProfitLog.getImportType()) || ProfitDataImportType.DSDL.key.equals(pmsProfitLog.getImportType())) {
+                    PmsProfitExample pmsProfitExample = new PmsProfitExample();
+                    if (ProfitDataImportType.DSDL.key.equals(pf.getProfitType())) {
+                        pmsProfitExample.or().andUniqueFlagEqualTo(pf.getUniqueFlag()).andSettleMonthEqualTo(pf.getSettleMonth()).andBusCodeEqualTo(pf.getBusCode()).andSheetNameEqualTo(sheetName).andProfitTypeEqualTo(ProfitDataImportType.DSDL.key);
+                    }else{
+                        pmsProfitExample.or().andUniqueFlagEqualTo(pf.getUniqueFlag()).andSettleMonthEqualTo(pf.getSettleMonth()).andBusCodeEqualTo(pf.getBusCode()).andSheetNameEqualTo(sheetName);
+                    }
+                    List<PmsProfit> pmsProfits = pmsProfitMapper.selectByExample(pmsProfitExample);
+                    if (pmsProfits != null && pmsProfits.size() > 0) {
+                        if (sheetName.equals("汇总")) {
+                            if (pmsProfits.get(0).getBalanceId().equals((list.get(i).get("Cell4")))) {
+                                if (ProfitDataImportType.DSDL.key.equals(pmsProfitLog.getImportType())) {
+                                    if (BillStatus.WCK.key.equals(pmsProfits.get(0).getBillStatus()) || BillStatus.CKSB.key.equals(pmsProfits.get(0).getBillStatus()) || BillStatus.SPSB.key.equals(pmsProfits.get(0).getBillStatus()) || BillStatus.FRDF.key.equals(pmsProfits.get(0).getBillStatus()) || BillStatus.FRTF.key.equals(pmsProfits.get(0).getBillStatus())) {
+                                        pmsProfitMapper.deleteByExample(pmsProfitExample);
+                                        PmsProfitTempExample pmsProfitTempExample = new PmsProfitTempExample();
+                                        pmsProfitTempExample.or().andIdEqualTo(pmsProfits.get(0).getBalanceId());
+                                        pmsProfitTempMapper.deleteByExample(pmsProfitTempExample);
+                                        insertSelectiveTemp(pmsProfitTempWithBLOBs);
+                                        pf.setBillStatus(pmsProfits.get(0).getBillStatus());
+                                        save(pf);
+                                    } else {
+                                        Map<String, Object> saveSheetMap = new HashMap<>();
+                                        saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行导入已经进入审批，出款中，或者出款成功");
+                                        saveSheetList.add(saveSheetMap);
+                                        continue;
+                                    }
+                                } else if (ProfitDataImportType.DEDL.key.equals(pmsProfitLog.getImportType())) {
+                                    pmsProfitMapper.deleteByExample(pmsProfitExample);
+                                    PmsProfitTempExample pmsProfitTempExample = new PmsProfitTempExample();
+                                    pmsProfitTempExample.or().andIdEqualTo(pmsProfits.get(0).getBalanceId());
+                                    pmsProfitTempMapper.deleteByExample(pmsProfitTempExample);
+                                    insertSelectiveTemp(pmsProfitTempWithBLOBs);
+                                    pf.setBillStatus(pmsProfits.get(0).getBillStatus());
+                                    save(pf);
+                                }
+
+                            } else {
+                                Map<String, Object> saveSheetMap = new HashMap<>();
+                                saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行导入的出款流水与已知流水不对应");
+                                saveSheetList.add(saveSheetMap);
+                                continue;
+                            }
+                        } else {
+                            pmsProfitMapper.deleteByExample(pmsProfitExample);
+                            PmsProfitTempExample pmsProfitTempExample = new PmsProfitTempExample();
+                            pmsProfitTempExample.or().andIdEqualTo(pmsProfits.get(0).getBalanceId());
+                            pmsProfitTempMapper.deleteByExample(pmsProfitTempExample);
+                            insertSelectiveTemp(pmsProfitTempWithBLOBs);
+                            pf.setBillStatus(pmsProfits.get(0).getBillStatus());
+                            save(pf);
+                        }
+                    } else {
+                        if(pmsProfits != null && pmsProfits.size() == 0){
+                            insertSelectiveTemp(pmsProfitTempWithBLOBs);
+                            save(pf);
+                        }/*else {
+                            Map<String, Object> saveSheetMap = new HashMap<>();
+                            saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行一次请款或者第三次补出款导入了重复的数据");
+                            saveSheetList.add(saveSheetMap);
+                            continue;
+                        }*/
+                    }
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
                 e.getMessage();
-                logger.error("保存数据失败，sheet:" + pf.getSheetName() + "第" + (pf.getOrderNumber().add(new BigDecimal(1))) + "行:" + JSONObject.toJSONString(pf));
-                throw new RuntimeException(e.toString() + pf.getSheetName() + "第" + pf.getOrderNumber() + "行");
+                logger.error("saveSheet方法调用失败"+e.getMessage());
+                throw new MessageException("saveSheet方法调用失败"+e.getMessage());
             }
 
         }
-
         return saveSheetList;
     }
+
 
     @Override
     public int updateByPrimaryKey(PmsProfitLog record) {
@@ -318,14 +768,87 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                 new LinkedBlockingQueue<Runnable>());
     }
 
+    /**
+     * 取得单元格内容.
+     *
+     * @param cell
+     * @return
+     * @throws Exception
+     * @author chenliang
+     */
+    public static String getCellValue(Cell cell) {
+        String cellValue = "";
+        if (null != cell) {
+            // 以下是判断数据的类型
+            switch (cell.getCellType()) {
+                case HSSFCell.CELL_TYPE_NUMERIC: // 数字
+                    if (0 == cell.getCellType()) {// 判断单元格的类型是否则NUMERIC类型
+                        if (HSSFDateUtil.isCellDateFormatted(cell)) {// 判断是否为日期类型
+                            Date date = cell.getDateCellValue();
+                            DateFormat formater = new SimpleDateFormat("yyyy/MM/dd");
+                            cellValue = formater.format(date);
+                        } else {
+                            // 有些数字过大，直接输出使用的是科学计数法： 2.67458622E8 要进行处理
+                            DecimalFormat df = new DecimalFormat("####.########");
+                            cellValue = df.format(cell.getNumericCellValue());
+                        }
+                    }
+                    break;
+                case HSSFCell.CELL_TYPE_STRING: // 字符串
+                    cellValue = cell.getStringCellValue();
+                    break;
+                case HSSFCell.CELL_TYPE_BOOLEAN: // Boolean
+                    cellValue = cell.getBooleanCellValue() + "";
+                    break;
+                case HSSFCell.CELL_TYPE_FORMULA: // 公式
+                    try {
+                        // 如果公式结果为字符串
+                        cellValue = String.valueOf(cell.getStringCellValue());
+                    } catch (IllegalStateException e) {
+                        if (HSSFDateUtil.isCellDateFormatted(cell)) {// 判断是否为日期类型
+                            Date date = cell.getDateCellValue();
+                            DateFormat formater = new SimpleDateFormat("yyyy/MM/dd");
+                            cellValue = formater.format(date);
+                        } else {
+                            FormulaEvaluator evaluator = cell.getSheet().getWorkbook().getCreationHelper()
+                                    .createFormulaEvaluator();
+                            evaluator.evaluateFormulaCell(cell);
+                            // 有些数字过大，直接输出使用的是科学计数法： 2.67458622E8 要进行处理
+                            DecimalFormat df = new DecimalFormat("####.########");
+                            cellValue = df.format(cell.getNumericCellValue());
+                        }
+                    }
+                    break;
+                case HSSFCell.CELL_TYPE_BLANK: // 空值
+                    cellValue = "";
+                    break;
+                case HSSFCell.CELL_TYPE_ERROR: // 故障
+                    cellValue = "非法字符";
+                    break;
+                default:
+                    cellValue = "未知类型";
+                    break;
+            }
+        }
+        return cellValue;
+    }
 
     @Override
     @Transactional
-    public Map<String, Object> disposeSheet(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder) {
+    public Map<String, Object> disposeSheet(List<Map<String, String>> sheetlists, String sheetName, int columnNum, PmsProfitLog pmsProfitLog,int sheetOrder) throws MessageException {
         Map<String, Object> reMap = new HashMap<>();
 
         if (sheetlists.size() > 0 && sheetlists.size() < 11) {
-            reMap.put(sheetName, saveSheet(sheetlists, sheetName, columnNum, month, userId, sheetOrder, null, 0, 0));
+            try {
+                List<Map<String, Object>> maps = saveSheet(sheetlists, sheetName, columnNum, pmsProfitLog, sheetOrder, null, 0, 0);
+                if(maps!=null&&maps.size()>0){
+                    reMap.put(sheetName, maps);
+                }
+            } catch (MessageException e) {
+                reMap.put("result", "fail");
+                reMap.put("Err", e.getMsg());
+                e.printStackTrace();
+            }
             return reMap;
         } else {
             List<String> taskNameList = new ArrayList<String>();
@@ -348,7 +871,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                     list = sheetlists.subList(z * count, count * (z + 1));
                 }
                 try {
-                    SheetThead sheetThead = new SheetThead(list, sheetName, columnNum, month, userId, sheetOrder, listOne, z, count);
+                    SheetThead sheetThead = new SheetThead(list, sheetName, columnNum, pmsProfitLog, sheetOrder, listOne, z, count);
                     FutureTask<Map<String, Object>> thread = new FutureTask<>(sheetThead);
                     taskNameList.add("{ SheetThead====" + sheetName + z + "}");
                     taskList.add(thread);
@@ -372,7 +895,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             Map<String, Object> resultMap = FutureTaskUtils.getTaskResult(taskList, taskNameList, logger);
             // 获取线程执行结果
             if ("fail".equals(resultMap.get("result"))) {
-                throw new RuntimeException(String.valueOf(resultMap.get("Err")));
+                throw new MessageException(String.valueOf(resultMap.get("Err")));
             }
             if ("dispose".equals(resultMap.get("result"))) {
                 resultMap.remove("result");
@@ -386,8 +909,6 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     class SheetThead implements Callable<Map<String, Object>> {
 
         private List<Map<String, String>> sheetlists;
-        private String month;
-        private String userId;
         private int sheetOrder;
         private PmsProfitLog pmsProfitLog;
         private String sheetName;
@@ -396,25 +917,25 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
         int i;
         int count;
 
-        SheetThead(List<Map<String, String>> sheetlists, String sheetName, int columnNum, String month, String userId, int sheetOrder, List<Map<String, String>> listOne, int i, int count) {
+        SheetThead(List<Map<String, String>> sheetlists, String sheetName, int columnNum, PmsProfitLog pmsProfitLog, int sheetOrder, List<Map<String, String>> listOne, int i, int count) {
             this.sheetlists = sheetlists;
-            this.month = month;
-            this.userId = userId;
+            this.pmsProfitLog = pmsProfitLog;
             this.sheetOrder = sheetOrder;
             this.sheetName = sheetName;
             this.columnNum = columnNum;
             this.listOne = listOne;
             this.i = i;
             this.count = count;
+
         }
 
 
         @Override
         public Map<String, Object> call() {
-            logger.info("分润导入线程 执行开始-当前线程：{" + this.i + "}");
+            logger.info("分润导入线程"+sheetName+" 执行开始-当前线程：{" + this.i + "}");
             Map<String, Object> rMap = new HashMap<>();
             try {
-                List<Map<String, Object>> saveSheetList = saveSheet(sheetlists, sheetName, columnNum, month, userId, sheetOrder, listOne, i, count);
+                List<Map<String, Object>> saveSheetList = saveSheet(sheetlists, sheetName, columnNum,pmsProfitLog, sheetOrder, listOne, i, count);
                 if (saveSheetList == null || saveSheetList.size() == 0) {
                     rMap.put("result", "success");
                 } else {
@@ -423,11 +944,11 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                 }
             } catch (Exception e) {
                 e.getStackTrace();
-                logger.error("分润导入线程 执行结束-当前线程：{" + this.i + "}"+"错误："+e.getMessage());
+                logger.error("分润导入线程"+sheetName+" 执行结束-当前线程：{" + this.i + "}" + "错误：" + e.getMessage());
                 rMap.put("result", "fail");
-                rMap.put("Err", "读取Excel文件失败");
+                rMap.put("Err", e.getMessage());
             }
-            logger.info("分润导入线程 执行结束-当前线程：{" + this.i + "}");
+            logger.info("分润导入线程"+sheetName+" 执行结束-当前线程：{" + this.i + "}");
             return rMap;
         }
     }

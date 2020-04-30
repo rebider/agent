@@ -1,604 +1,685 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.profit.dao.PmsProfitMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PmsProfit">
-    <id column="ID" jdbcType="VARCHAR" property="id" />
-    <result column="MONTH" jdbcType="VARCHAR" property="month" />
-    <result column="UNIQUE_FLAG" jdbcType="VARCHAR" property="uniqueFlag" />
-    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
-    <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
-    <result column="BUS_NAME" jdbcType="VARCHAR" property="busName" />
-    <result column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
-    <result column="SHEET_COLUMN" jdbcType="DECIMAL" property="sheetColumn" />
-    <result column="SHEET_HEAD" jdbcType="VARCHAR" property="sheetHead" />
-    <result column="SHEET_DATA" jdbcType="VARCHAR" property="sheetData" />
-    <result column="PROFIT_TYPE" jdbcType="VARCHAR" property="profitType" />
-    <result column="PROFIT_HZ" jdbcType="VARCHAR" property="profitHz" />
-    <result column="PAY_CONDITION" jdbcType="VARCHAR" property="payCondition" />
-    <result column="STATUS" jdbcType="VARCHAR" property="status" />
-    <result column="FREE_REASON" jdbcType="VARCHAR" property="freeReason" />
-    <result column="PAY_TRAN_MONEY" jdbcType="DECIMAL" property="payTranMoney" />
-    <result column="IMPORT_TIME" jdbcType="VARCHAR" property="importTime" />
-    <result column="IMPORT_PERSON" jdbcType="VARCHAR" property="importPerson" />
-    <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
-    <result column="UPDATE_PERSON" jdbcType="VARCHAR" property="updatePerson" />
-    <result column="FREE_TIME" jdbcType="VARCHAR" property="freeTime" />
-    <result column="PAY_TIME" jdbcType="VARCHAR" property="payTime" />
-    <result column="SHEET_ORDER" jdbcType="DECIMAL" property="sheetOrder" />
-    <result column="ORDER_NUMBER" jdbcType="DECIMAL" property="orderNumber" />
-    <result column="PROFIT_AMT" property="profitAmt" jdbcType="VARCHAR" />
-  </resultMap>
-
-  <sql id="Example_Where_Clause">
-    <where>
-      <foreach collection="oredCriteria" item="criteria" separator="or">
-        <if test="criteria.valid">
-          <trim prefix="(" prefixOverrides="and" suffix=")">
-            <foreach collection="criteria.criteria" item="criterion">
-              <choose>
-                <when test="criterion.noValue">
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue">
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue">
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue">
-                  and ${criterion.condition}
-                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
+    <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PmsProfit">
+        <id column="BALANCE_ID" jdbcType="VARCHAR" property="balanceId" />
+        <result column="SETTLE_MONTH" jdbcType="VARCHAR" property="settleMonth" />
+        <result column="UNIQUE_FLAG" jdbcType="VARCHAR" property="uniqueFlag" />
+        <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+        <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
+        <result column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
+        <result column="SHEET_COLUMN" jdbcType="DECIMAL" property="sheetColumn" />
+        <result column="SHEET_HEAD" jdbcType="VARCHAR" property="sheetHead" />
+        <result column="SHEET_DATA" jdbcType="VARCHAR" property="sheetData" />
+        <result column="PROFIT_TYPE" jdbcType="VARCHAR" property="profitType" />
+        <result column="BILL_STATUS" jdbcType="VARCHAR" property="billStatus" />
+        <result column="BALANCE_AMT" jdbcType="DECIMAL" property="balanceAmt" />
+        <result column="IMPORT_TIME" jdbcType="VARCHAR" property="importTime" />
+        <result column="IMPORT_PERSON" jdbcType="VARCHAR" property="importPerson" />
+        <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
+        <result column="UPDATE_PERSON" jdbcType="VARCHAR" property="updatePerson" />
+        <result column="SHEET_ORDER" jdbcType="DECIMAL" property="sheetOrder" />
+        <result column="ORDER_NUMBER" jdbcType="DECIMAL" property="orderNumber" />
+        <result column="BATCH_NO" jdbcType="VARCHAR" property="batchNo" />
+        <result column="REMIT_FAIL_REASON" jdbcType="VARCHAR" property="remitFailReason" />
+        <result column="BALANCE_BANK_NO" jdbcType="VARCHAR" property="balanceBankNo" />
+        <result column="BALANCE_BANK_NAME" jdbcType="VARCHAR" property="balanceBankName" />
+        <result column="BALANCE_ACCT_NAME" jdbcType="VARCHAR" property="balanceAcctName" />
+        <result column="BALANCE_ACCT_NO" jdbcType="VARCHAR" property="balanceAcctNo" />
+        <result column="SUNBMIT_CHECK_TIME" jdbcType="VARCHAR" property="sunbmitCheckTime" />
+        <result column="SUNBMIT_REMIT_TIME" jdbcType="VARCHAR" property="sunbmitRemitTime" />
+        <result column="SETTLE_DATE" jdbcType="VARCHAR" property="settleDate" />
+        <result column="IMPORT_BATCH" jdbcType="VARCHAR" property="importBatch" />
+        <result column="REALITY_AG_ID" jdbcType="VARCHAR" property="realityAgId" />
+        <result column="REALITY_AG_NAME" jdbcType="VARCHAR" property="realityAgName" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
             </foreach>
-          </trim>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    BALANCE_ID, SETTLE_MONTH, UNIQUE_FLAG, AGENT_NAME, BUS_CODE, SHEET_NAME, SHEET_COLUMN,
+    SHEET_HEAD, SHEET_DATA, PROFIT_TYPE, BILL_STATUS, BALANCE_AMT, IMPORT_TIME, IMPORT_PERSON,
+    UPDATE_TIME, UPDATE_PERSON, SHEET_ORDER, ORDER_NUMBER, BATCH_NO, REMIT_FAIL_REASON,
+    BALANCE_BANK_NO, BALANCE_BANK_NAME, BALANCE_ACCT_NAME, BALANCE_ACCT_NO, SUNBMIT_CHECK_TIME,
+    SUNBMIT_REMIT_TIME, SETTLE_DATE, IMPORT_BATCH, REALITY_AG_ID, REALITY_AG_NAME, REMARK
+  </sql>
+    <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitExample" resultMap="BaseResultMap">
+        <include refid="OracleDialectPrefix" />
+        select
+        <if test="distinct">
+            distinct
         </if>
-      </foreach>
-    </where>
-  </sql>
-  <sql id="Base_Column_List">
-    ID, MONTH, UNIQUE_FLAG, AGENT_ID, BUS_CODE, BUS_NAME, SHEET_NAME, SHEET_COLUMN, SHEET_HEAD, 
-    SHEET_DATA, PROFIT_TYPE, PROFIT_HZ, PAY_CONDITION, STATUS, FREE_REASON, PAY_TRAN_MONEY, 
-    IMPORT_TIME, IMPORT_PERSON, UPDATE_TIME, UPDATE_PERSON, FREE_TIME, PAY_TIME, SHEET_ORDER, 
-    ORDER_NUMBER
-  </sql>
-  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitExample" resultMap="BaseResultMap">
-    <include refid="OracleDialectPrefix" />
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from PMS_PROFIT
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
-    <include refid="OracleDialectSuffix" />
-  </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
-    <include refid="Base_Column_List" />
-    from PMS_PROFIT
-    where ID = #{id,jdbcType=VARCHAR}
-  </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitExample">
-    delete from PMS_PROFIT
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </delete>
-  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
-    insert into PMS_PROFIT (ID, MONTH, UNIQUE_FLAG, 
-      AGENT_ID, BUS_CODE, BUS_NAME, 
-      SHEET_NAME, SHEET_COLUMN, SHEET_HEAD, 
-      SHEET_DATA, PROFIT_TYPE, PROFIT_HZ, 
-      PAY_CONDITION, STATUS, FREE_REASON, 
-      PAY_TRAN_MONEY, IMPORT_TIME, IMPORT_PERSON, 
-      UPDATE_TIME, UPDATE_PERSON, FREE_TIME, 
-      PAY_TIME, SHEET_ORDER, ORDER_NUMBER
-      )
-    values (#{id,jdbcType=VARCHAR}, #{month,jdbcType=VARCHAR}, #{uniqueFlag,jdbcType=VARCHAR}, 
-      #{agentId,jdbcType=VARCHAR}, #{busCode,jdbcType=VARCHAR}, #{busName,jdbcType=VARCHAR}, 
-      #{sheetName,jdbcType=VARCHAR}, #{sheetColumn,jdbcType=DECIMAL}, #{sheetHead,jdbcType=VARCHAR}, 
-      #{sheetData,jdbcType=VARCHAR}, #{profitType,jdbcType=VARCHAR}, #{profitHz,jdbcType=VARCHAR}, 
-      #{payCondition,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{freeReason,jdbcType=VARCHAR}, 
-      #{payTranMoney,jdbcType=DECIMAL}, #{importTime,jdbcType=VARCHAR}, #{importPerson,jdbcType=VARCHAR}, 
-      #{updateTime,jdbcType=VARCHAR}, #{updatePerson,jdbcType=VARCHAR}, #{freeTime,jdbcType=VARCHAR}, 
-      #{payTime,jdbcType=VARCHAR}, #{sheetOrder,jdbcType=DECIMAL}, #{orderNumber,jdbcType=DECIMAL}
-      )
+        <include refid="Base_Column_List" />
+        from PMS_PROFIT
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <include refid="OracleDialectSuffix" />
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from PMS_PROFIT
+        where BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitExample">
+        delete from PMS_PROFIT
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
+    insert into PMS_PROFIT (BALANCE_ID, SETTLE_MONTH, UNIQUE_FLAG,
+      AGENT_NAME, BUS_CODE, SHEET_NAME,
+      SHEET_COLUMN, SHEET_HEAD, SHEET_DATA,
+      PROFIT_TYPE, BILL_STATUS, BALANCE_AMT,
+      IMPORT_TIME, IMPORT_PERSON, UPDATE_TIME,
+      UPDATE_PERSON, SHEET_ORDER, ORDER_NUMBER,
+      BATCH_NO, REMIT_FAIL_REASON, BALANCE_BANK_NO,
+      BALANCE_BANK_NAME, BALANCE_ACCT_NAME, BALANCE_ACCT_NO,
+      SUNBMIT_CHECK_TIME, SUNBMIT_REMIT_TIME, SETTLE_DATE,
+      IMPORT_BATCH, REALITY_AG_ID, REALITY_AG_NAME,
+      REMARK)
+    values (#{balanceId,jdbcType=VARCHAR}, #{settleMonth,jdbcType=VARCHAR}, #{uniqueFlag,jdbcType=VARCHAR},
+      #{agentName,jdbcType=VARCHAR}, #{busCode,jdbcType=VARCHAR}, #{sheetName,jdbcType=VARCHAR},
+      #{sheetColumn,jdbcType=DECIMAL}, #{sheetHead,jdbcType=VARCHAR}, #{sheetData,jdbcType=VARCHAR},
+      #{profitType,jdbcType=VARCHAR}, #{billStatus,jdbcType=VARCHAR}, #{balanceAmt,jdbcType=DECIMAL},
+      #{importTime,jdbcType=VARCHAR}, #{importPerson,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR},
+      #{updatePerson,jdbcType=VARCHAR}, #{sheetOrder,jdbcType=DECIMAL}, #{orderNumber,jdbcType=DECIMAL},
+      #{batchNo,jdbcType=VARCHAR}, #{remitFailReason,jdbcType=VARCHAR}, #{balanceBankNo,jdbcType=VARCHAR},
+      #{balanceBankName,jdbcType=VARCHAR}, #{balanceAcctName,jdbcType=VARCHAR}, #{balanceAcctNo,jdbcType=VARCHAR},
+      #{sunbmitCheckTime,jdbcType=VARCHAR}, #{sunbmitRemitTime,jdbcType=VARCHAR}, #{settleDate,jdbcType=VARCHAR},
+      #{importBatch,jdbcType=VARCHAR}, #{realityAgId,jdbcType=VARCHAR}, #{realityAgName,jdbcType=VARCHAR},
+      #{remark,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
-    insert into PMS_PROFIT
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        ID,
-      </if>
-      <if test="month != null">
-        MONTH,
-      </if>
-      <if test="uniqueFlag != null">
-        UNIQUE_FLAG,
-      </if>
-      <if test="agentId != null">
-        AGENT_ID,
-      </if>
-      <if test="busCode != null">
-        BUS_CODE,
-      </if>
-      <if test="busName != null">
-        BUS_NAME,
-      </if>
-      <if test="sheetName != null">
-        SHEET_NAME,
-      </if>
-      <if test="sheetColumn != null">
-        SHEET_COLUMN,
-      </if>
-      <if test="sheetHead != null">
-        SHEET_HEAD,
-      </if>
-      <if test="sheetData != null">
-        SHEET_DATA,
-      </if>
-      <if test="profitType != null">
-        PROFIT_TYPE,
-      </if>
-      <if test="profitHz != null">
-        PROFIT_HZ,
-      </if>
-      <if test="payCondition != null">
-        PAY_CONDITION,
-      </if>
-      <if test="status != null">
-        STATUS,
-      </if>
-      <if test="freeReason != null">
-        FREE_REASON,
-      </if>
-      <if test="payTranMoney != null">
-        PAY_TRAN_MONEY,
-      </if>
-      <if test="importTime != null">
-        IMPORT_TIME,
-      </if>
-      <if test="importPerson != null">
-        IMPORT_PERSON,
-      </if>
-      <if test="updateTime != null">
-        UPDATE_TIME,
-      </if>
-      <if test="updatePerson != null">
-        UPDATE_PERSON,
-      </if>
-      <if test="freeTime != null">
-        FREE_TIME,
-      </if>
-      <if test="payTime != null">
-        PAY_TIME,
-      </if>
-      <if test="sheetOrder != null">
-        SHEET_ORDER,
-      </if>
-      <if test="orderNumber != null">
-        ORDER_NUMBER,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=VARCHAR},
-      </if>
-      <if test="month != null">
-        #{month,jdbcType=VARCHAR},
-      </if>
-      <if test="uniqueFlag != null">
-        #{uniqueFlag,jdbcType=VARCHAR},
-      </if>
-      <if test="agentId != null">
-        #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="busCode != null">
-        #{busCode,jdbcType=VARCHAR},
-      </if>
-      <if test="busName != null">
-        #{busName,jdbcType=VARCHAR},
-      </if>
-      <if test="sheetName != null">
-        #{sheetName,jdbcType=VARCHAR},
-      </if>
-      <if test="sheetColumn != null">
-        #{sheetColumn,jdbcType=DECIMAL},
-      </if>
-      <if test="sheetHead != null">
-        #{sheetHead,jdbcType=VARCHAR},
-      </if>
-      <if test="sheetData != null">
-        #{sheetData,jdbcType=VARCHAR},
-      </if>
-      <if test="profitType != null">
-        #{profitType,jdbcType=VARCHAR},
-      </if>
-      <if test="profitHz != null">
-        #{profitHz,jdbcType=VARCHAR},
-      </if>
-      <if test="payCondition != null">
-        #{payCondition,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null">
-        #{status,jdbcType=VARCHAR},
-      </if>
-      <if test="freeReason != null">
-        #{freeReason,jdbcType=VARCHAR},
-      </if>
-      <if test="payTranMoney != null">
-        #{payTranMoney,jdbcType=DECIMAL},
-      </if>
-      <if test="importTime != null">
-        #{importTime,jdbcType=VARCHAR},
-      </if>
-      <if test="importPerson != null">
-        #{importPerson,jdbcType=VARCHAR},
-      </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=VARCHAR},
-      </if>
-      <if test="updatePerson != null">
-        #{updatePerson,jdbcType=VARCHAR},
-      </if>
-      <if test="freeTime != null">
-        #{freeTime,jdbcType=VARCHAR},
-      </if>
-      <if test="payTime != null">
-        #{payTime,jdbcType=VARCHAR},
-      </if>
-      <if test="sheetOrder != null">
-        #{sheetOrder,jdbcType=DECIMAL},
-      </if>
-      <if test="orderNumber != null">
-        #{orderNumber,jdbcType=DECIMAL},
-      </if>
-    </trim>
-  </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitExample" resultType="java.lang.Long">
-    select count(*) from PMS_PROFIT
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
+    <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
+        insert into PMS_PROFIT
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="balanceId != null">
+                BALANCE_ID,
+            </if>
+            <if test="settleMonth != null">
+                SETTLE_MONTH,
+            </if>
+            <if test="uniqueFlag != null">
+                UNIQUE_FLAG,
+            </if>
+            <if test="agentName != null">
+                AGENT_NAME,
+            </if>
+            <if test="busCode != null">
+                BUS_CODE,
+            </if>
+            <if test="sheetName != null">
+                SHEET_NAME,
+            </if>
+            <if test="sheetColumn != null">
+                SHEET_COLUMN,
+            </if>
+            <if test="sheetHead != null">
+                SHEET_HEAD,
+            </if>
+            <if test="sheetData != null">
+                SHEET_DATA,
+            </if>
+            <if test="profitType != null">
+                PROFIT_TYPE,
+            </if>
+            <if test="billStatus != null">
+                BILL_STATUS,
+            </if>
+            <if test="balanceAmt != null">
+                BALANCE_AMT,
+            </if>
+            <if test="importTime != null">
+                IMPORT_TIME,
+            </if>
+            <if test="importPerson != null">
+                IMPORT_PERSON,
+            </if>
+            <if test="updateTime != null">
+                UPDATE_TIME,
+            </if>
+            <if test="updatePerson != null">
+                UPDATE_PERSON,
+            </if>
+            <if test="sheetOrder != null">
+                SHEET_ORDER,
+            </if>
+            <if test="orderNumber != null">
+                ORDER_NUMBER,
+            </if>
+            <if test="batchNo != null">
+                BATCH_NO,
+            </if>
+            <if test="remitFailReason != null">
+                REMIT_FAIL_REASON,
+            </if>
+            <if test="balanceBankNo != null">
+                BALANCE_BANK_NO,
+            </if>
+            <if test="balanceBankName != null">
+                BALANCE_BANK_NAME,
+            </if>
+            <if test="balanceAcctName != null">
+                BALANCE_ACCT_NAME,
+            </if>
+            <if test="balanceAcctNo != null">
+                BALANCE_ACCT_NO,
+            </if>
+            <if test="sunbmitCheckTime != null">
+                SUNBMIT_CHECK_TIME,
+            </if>
+            <if test="sunbmitRemitTime != null">
+                SUNBMIT_REMIT_TIME,
+            </if>
+            <if test="settleDate != null">
+                SETTLE_DATE,
+            </if>
+            <if test="importBatch != null">
+                IMPORT_BATCH,
+            </if>
+            <if test="realityAgId != null">
+                REALITY_AG_ID,
+            </if>
+            <if test="realityAgName != null">
+                REALITY_AG_NAME,
+            </if>
+            <if test="remark != null">
+                REMARK,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="balanceId != null">
+                #{balanceId,jdbcType=VARCHAR},
+            </if>
+            <if test="settleMonth != null">
+                #{settleMonth,jdbcType=VARCHAR},
+            </if>
+            <if test="uniqueFlag != null">
+                #{uniqueFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="agentName != null">
+                #{agentName,jdbcType=VARCHAR},
+            </if>
+            <if test="busCode != null">
+                #{busCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sheetName != null">
+                #{sheetName,jdbcType=VARCHAR},
+            </if>
+            <if test="sheetColumn != null">
+                #{sheetColumn,jdbcType=DECIMAL},
+            </if>
+            <if test="sheetHead != null">
+                #{sheetHead,jdbcType=VARCHAR},
+            </if>
+            <if test="sheetData != null">
+                #{sheetData,jdbcType=VARCHAR},
+            </if>
+            <if test="profitType != null">
+                #{profitType,jdbcType=VARCHAR},
+            </if>
+            <if test="billStatus != null">
+                #{billStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceAmt != null">
+                #{balanceAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="importTime != null">
+                #{importTime,jdbcType=VARCHAR},
+            </if>
+            <if test="importPerson != null">
+                #{importPerson,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=VARCHAR},
+            </if>
+            <if test="updatePerson != null">
+                #{updatePerson,jdbcType=VARCHAR},
+            </if>
+            <if test="sheetOrder != null">
+                #{sheetOrder,jdbcType=DECIMAL},
+            </if>
+            <if test="orderNumber != null">
+                #{orderNumber,jdbcType=DECIMAL},
+            </if>
+            <if test="batchNo != null">
+                #{batchNo,jdbcType=VARCHAR},
+            </if>
+            <if test="remitFailReason != null">
+                #{remitFailReason,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceBankNo != null">
+                #{balanceBankNo,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceBankName != null">
+                #{balanceBankName,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceAcctName != null">
+                #{balanceAcctName,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceAcctNo != null">
+                #{balanceAcctNo,jdbcType=VARCHAR},
+            </if>
+            <if test="sunbmitCheckTime != null">
+                #{sunbmitCheckTime,jdbcType=VARCHAR},
+            </if>
+            <if test="sunbmitRemitTime != null">
+                #{sunbmitRemitTime,jdbcType=VARCHAR},
+            </if>
+            <if test="settleDate != null">
+                #{settleDate,jdbcType=VARCHAR},
+            </if>
+            <if test="importBatch != null">
+                #{importBatch,jdbcType=VARCHAR},
+            </if>
+            <if test="realityAgId != null">
+                #{realityAgId,jdbcType=VARCHAR},
+            </if>
+            <if test="realityAgName != null">
+                #{realityAgName,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitExample" resultType="java.lang.Long">
+        select count(*) from PMS_PROFIT
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
+        update PMS_PROFIT
+        <set>
+            <if test="settleMonth != null">
+                SETTLE_MONTH = #{settleMonth,jdbcType=VARCHAR},
+            </if>
+            <if test="uniqueFlag != null">
+                UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="agentName != null">
+                AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+            </if>
+            <if test="busCode != null">
+                BUS_CODE = #{busCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sheetName != null">
+                SHEET_NAME = #{sheetName,jdbcType=VARCHAR},
+            </if>
+            <if test="sheetColumn != null">
+                SHEET_COLUMN = #{sheetColumn,jdbcType=DECIMAL},
+            </if>
+            <if test="sheetHead != null">
+                SHEET_HEAD = #{sheetHead,jdbcType=VARCHAR},
+            </if>
+            <if test="sheetData != null">
+                SHEET_DATA = #{sheetData,jdbcType=VARCHAR},
+            </if>
+            <if test="profitType != null">
+                PROFIT_TYPE = #{profitType,jdbcType=VARCHAR},
+            </if>
+            <if test="billStatus != null">
+                BILL_STATUS = #{billStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceAmt != null">
+                BALANCE_AMT = #{balanceAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="importTime != null">
+                IMPORT_TIME = #{importTime,jdbcType=VARCHAR},
+            </if>
+            <if test="importPerson != null">
+                IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null">
+                UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
+            </if>
+            <if test="updatePerson != null">
+                UPDATE_PERSON = #{updatePerson,jdbcType=VARCHAR},
+            </if>
+            <if test="sheetOrder != null">
+                SHEET_ORDER = #{sheetOrder,jdbcType=DECIMAL},
+            </if>
+            <if test="orderNumber != null">
+                ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL},
+            </if>
+            <if test="batchNo != null">
+                BATCH_NO = #{batchNo,jdbcType=VARCHAR},
+            </if>
+            <if test="remitFailReason != null">
+                REMIT_FAIL_REASON = #{remitFailReason,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceBankNo != null">
+                BALANCE_BANK_NO = #{balanceBankNo,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceBankName != null">
+                BALANCE_BANK_NAME = #{balanceBankName,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceAcctName != null">
+                BALANCE_ACCT_NAME = #{balanceAcctName,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceAcctNo != null">
+                BALANCE_ACCT_NO = #{balanceAcctNo,jdbcType=VARCHAR},
+            </if>
+            <if test="sunbmitCheckTime != null">
+                SUNBMIT_CHECK_TIME = #{sunbmitCheckTime,jdbcType=VARCHAR},
+            </if>
+            <if test="sunbmitRemitTime != null">
+                SUNBMIT_REMIT_TIME = #{sunbmitRemitTime,jdbcType=VARCHAR},
+            </if>
+            <if test="settleDate != null">
+                SETTLE_DATE = #{settleDate,jdbcType=VARCHAR},
+            </if>
+            <if test="importBatch != null">
+                IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR},
+            </if>
+            <if test="realityAgId != null">
+                REALITY_AG_ID = #{realityAgId,jdbcType=VARCHAR},
+            </if>
+            <if test="realityAgName != null">
+                REALITY_AG_NAME = #{realityAgName,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
     update PMS_PROFIT
-    <set>
-      <if test="month != null">
-        MONTH = #{month,jdbcType=VARCHAR},
-      </if>
-      <if test="uniqueFlag != null">
-        UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
-      </if>
-      <if test="agentId != null">
-        AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="busCode != null">
-        BUS_CODE = #{busCode,jdbcType=VARCHAR},
-      </if>
-      <if test="busName != null">
-        BUS_NAME = #{busName,jdbcType=VARCHAR},
-      </if>
-      <if test="sheetName != null">
-        SHEET_NAME = #{sheetName,jdbcType=VARCHAR},
-      </if>
-      <if test="sheetColumn != null">
-        SHEET_COLUMN = #{sheetColumn,jdbcType=DECIMAL},
-      </if>
-      <if test="sheetHead != null">
-        SHEET_HEAD = #{sheetHead,jdbcType=VARCHAR},
-      </if>
-      <if test="sheetData != null">
-        SHEET_DATA = #{sheetData,jdbcType=VARCHAR},
-      </if>
-      <if test="profitType != null">
-        PROFIT_TYPE = #{profitType,jdbcType=VARCHAR},
-      </if>
-      <if test="profitHz != null">
-        PROFIT_HZ = #{profitHz,jdbcType=VARCHAR},
-      </if>
-      <if test="payCondition != null">
-        PAY_CONDITION = #{payCondition,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null">
-        STATUS = #{status,jdbcType=VARCHAR},
-      </if>
-      <if test="freeReason != null">
-        FREE_REASON = #{freeReason,jdbcType=VARCHAR},
-      </if>
-      <if test="payTranMoney != null">
-        PAY_TRAN_MONEY = #{payTranMoney,jdbcType=DECIMAL},
-      </if>
-      <if test="importTime != null">
-        IMPORT_TIME = #{importTime,jdbcType=VARCHAR},
-      </if>
-      <if test="importPerson != null">
-        IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR},
-      </if>
-      <if test="updateTime != null">
-        UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
-      </if>
-      <if test="updatePerson != null">
-        UPDATE_PERSON = #{updatePerson,jdbcType=VARCHAR},
-      </if>
-      <if test="freeTime != null">
-        FREE_TIME = #{freeTime,jdbcType=VARCHAR},
-      </if>
-      <if test="payTime != null">
-        PAY_TIME = #{payTime,jdbcType=VARCHAR},
-      </if>
-      <if test="sheetOrder != null">
-        SHEET_ORDER = #{sheetOrder,jdbcType=DECIMAL},
-      </if>
-      <if test="orderNumber != null">
-        ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL},
-      </if>
-    </set>
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
-    update PMS_PROFIT
-    set MONTH = #{month,jdbcType=VARCHAR},
+    set SETTLE_MONTH = #{settleMonth,jdbcType=VARCHAR},
       UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
       BUS_CODE = #{busCode,jdbcType=VARCHAR},
-      BUS_NAME = #{busName,jdbcType=VARCHAR},
       SHEET_NAME = #{sheetName,jdbcType=VARCHAR},
       SHEET_COLUMN = #{sheetColumn,jdbcType=DECIMAL},
       SHEET_HEAD = #{sheetHead,jdbcType=VARCHAR},
       SHEET_DATA = #{sheetData,jdbcType=VARCHAR},
       PROFIT_TYPE = #{profitType,jdbcType=VARCHAR},
-      PROFIT_HZ = #{profitHz,jdbcType=VARCHAR},
-      PAY_CONDITION = #{payCondition,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=VARCHAR},
-      FREE_REASON = #{freeReason,jdbcType=VARCHAR},
-      PAY_TRAN_MONEY = #{payTranMoney,jdbcType=DECIMAL},
+      BILL_STATUS = #{billStatus,jdbcType=VARCHAR},
+      BALANCE_AMT = #{balanceAmt,jdbcType=DECIMAL},
       IMPORT_TIME = #{importTime,jdbcType=VARCHAR},
       IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR},
       UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
       UPDATE_PERSON = #{updatePerson,jdbcType=VARCHAR},
-      FREE_TIME = #{freeTime,jdbcType=VARCHAR},
-      PAY_TIME = #{payTime,jdbcType=VARCHAR},
       SHEET_ORDER = #{sheetOrder,jdbcType=DECIMAL},
-      ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
+      ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL},
+      BATCH_NO = #{batchNo,jdbcType=VARCHAR},
+      REMIT_FAIL_REASON = #{remitFailReason,jdbcType=VARCHAR},
+      BALANCE_BANK_NO = #{balanceBankNo,jdbcType=VARCHAR},
+      BALANCE_BANK_NAME = #{balanceBankName,jdbcType=VARCHAR},
+      BALANCE_ACCT_NAME = #{balanceAcctName,jdbcType=VARCHAR},
+      BALANCE_ACCT_NO = #{balanceAcctNo,jdbcType=VARCHAR},
+      SUNBMIT_CHECK_TIME = #{sunbmitCheckTime,jdbcType=VARCHAR},
+      SUNBMIT_REMIT_TIME = #{sunbmitRemitTime,jdbcType=VARCHAR},
+      SETTLE_DATE = #{settleDate,jdbcType=VARCHAR},
+      IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR},
+      REALITY_AG_ID = #{realityAgId,jdbcType=VARCHAR},
+      REALITY_AG_NAME = #{realityAgName,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
   </update>
-  <sql id="OracleDialectPrefix">
-    <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
-    </if>
-  </sql>
-  <sql id="OracleDialectSuffix">
-    <if test="page != null">
-      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
-    </if>
-  </sql>
+    <sql id="OracleDialectPrefix">
+        <if test="page != null">
+            select * from ( select row_.*, rownum rownum_ from (
+        </if>
+    </sql>
+    <sql id="OracleDialectSuffix">
+        <if test="page != null">
+            <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+        </if>
+    </sql>
 
-  <select id="queryAllList" resultMap="BaseResultMap" >
-    <include refid="OracleDialectPrefix" />
-    select  t.id,t.month,t.unique_flag,t.agent_id,t.bus_code,t.bus_name,
-            t.SHEET_NAME,t.SHEET_COLUMN,
-            t.profit_type,t.profit_hz,  t.pay_time,
-            extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-3)) as status,
-            extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-2)) as free_reason,
-            extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-1)) as pay_condition,
-            extractValue(t.sheet_data,'/data/Cell5') as profit_amt,
-            t.pay_tran_money,t.free_time,
-            t.import_time,t.import_person,
-            t.update_time,t.update_person
-    from pms_profit t
-    where  sheet_name='汇总'
-    <if test="profit_month != null and profit_month != ''">
-      and t.month = #{profit_month,jdbcType=VARCHAR}
-    </if>
-    <if test="AGENT_ID != null and AGENT_ID != ''">
-      and t.unique_flag = #{AGENT_ID,jdbcType=VARCHAR}
-    </if>
-    <if test="AGENT_NAME != null and AGENT_NAME != ''">
-      and t.agent_id  = #{AGENT_NAME,jdbcType=VARCHAR}
-    </if>
-    <if test="BUS_CODE != null and BUS_CODE != ''">
-      and t.BUS_CODE = #{BUS_CODE,jdbcType=VARCHAR}
-    </if>
-    <if test="BUS_NAME != null and BUS_NAME != ''">
-      and t.BUS_NAME = #{BUS_NAME,jdbcType=VARCHAR}
-    </if>
-    <if test="STATUS != null and STATUS != ''">
-      and nvl(extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-3)),'正常') = #{STATUS,jdbcType=VARCHAR}
-    </if>
-    <if test="city != null and city != ''">
-      and t.unique_flag in (
-          select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
+
+    <!-- =============================================以上代码自动生成不要修改=================================================================-->
+    <select id="queryAllList" resultType="java.util.Map">
+        <include refid="OracleDialectPrefix"/>
+        select t.IMPORT_BATCH,t.PROFIT_TYPE,t.BALANCE_ID,t.SETTLE_MONTH,t.unique_flag,t.AGENT_NAME,t.bus_code,
+        t.BALANCE_AMT,t.REALITY_AG_ID,t.REMARK,
+        t.REALITY_AG_NAME,t.BILL_STATUS,t.REMIT_FAIL_REASON,aa.FREESTATUS,ap.PLATFORM_NAME
+        from pms_profit t left join A_AGENT aa on t.unique_flag = aa.ID left join A_PLATFORM ap on
+        ap.PLATFORM_NUM=t.BUS_CODE
+        where t.sheet_name='汇总' and aa.STATUS = '1'
+        <if test="profit_month != null and profit_month != ''">
+            and t.SETTLE_MONTH = #{profit_month,jdbcType=VARCHAR}
+        </if>
+        <if test="AGENT_ID != null and AGENT_ID != ''">
+            and t.unique_flag = #{AGENT_ID,jdbcType=VARCHAR}
+        </if>
+        <if test="AGENT_NAME != null and AGENT_NAME != ''">
+            and t.AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR}
+        </if>
+        <if test="BUS_CODE != null and BUS_CODE != ''">
+            and t.BUS_CODE = #{BUS_CODE,jdbcType=VARCHAR}
+        </if>
+        <if test="BUS_NAME != null and BUS_NAME != ''">
+            and ap.PLATFORM_NAME = #{BUS_NAME,jdbcType=VARCHAR}
+        </if>
+        <if test="STATUS != null and STATUS != ''">
+            and aa.FREESTATUS = #{STATUS,jdbcType=VARCHAR}
+        </if>
+        <if test="BILL_STATUS != null and BILL_STATUS != ''">
+            and t.BILL_STATUS = #{BILL_STATUS,jdbcType=VARCHAR}
+        </if>
+        <if test="PROFIT_TYPE != null and PROFIT_TYPE != ''">
+            and t.PROFIT_TYPE = #{PROFIT_TYPE,jdbcType=VARCHAR}
+        </if>
+        <if test="BALANCE_ID != null and BALANCE_ID != ''">
+            and t.BALANCE_ID = #{BALANCE_ID,jdbcType=VARCHAR}
+        </if>
+        <if test="city != null and city != ''">
+            and t.unique_flag in (
+            select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
-          )
-      )
-    </if>
-    <if test="isAgent !=null"><!--代理商登录 查看权限为本身和下级-->
-        and t.unique_flag in (
-        select distinct ab.AGENT_ID
-        from A_AGENT_BUSINFO ab
-        start with ab.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
-        connect by PRIOR ab.ID = ab.BUS_PARENT
-        )
-    </if>
-    <include refid="OracleDialectSuffix" />
-  </select>
-
-  <select id="queryAllCount" resultType="java.lang.Integer">
-    select count(1) from (
-      select  t.id,t.month,t.unique_flag,t.agent_id,t.bus_code,t.bus_name,
-      t.SHEET_NAME,t.SHEET_COLUMN,
-      t.profit_type,t.profit_hz,  t.pay_time,
-      extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-3)) as status,
-      extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-2)) as free_reason,
-      extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-1)) as pay_condition,
-      extractValue(t.sheet_data,'/data/Cell5') as profit_amt,
-      t.pay_tran_money,t.free_time,
-      t.import_time,t.import_person,
-      t.update_time,t.update_person
-      from pms_profit t
-      where  sheet_name='汇总'
-      <if test="profit_month != null and profit_month != ''">
-        and t.month = #{profit_month,jdbcType=VARCHAR}
-      </if>
-      <if test="AGENT_ID != null and AGENT_ID != ''">
-        and t.unique_flag = #{AGENT_ID,jdbcType=VARCHAR}
-      </if>
-      <if test="AGENT_NAME != null and AGENT_NAME != ''">
-        and t.agent_id  = #{AGENT_NAME,jdbcType=VARCHAR}
-      </if>
-      <if test="BUS_CODE != null and BUS_CODE != ''">
-        and t.BUS_CODE = #{BUS_CODE,jdbcType=VARCHAR}
-      </if>
-      <if test="BUS_NAME != null and BUS_NAME != ''">
-        and t.BUS_NAME = #{BUS_NAME,jdbcType=VARCHAR}
-      </if>
-      <if test="STATUS != null and STATUS != ''">
-        and nvl(extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-3)),'正常') = #{STATUS,jdbcType=VARCHAR}
-      </if>
-      <if test="city != null and city != ''">
-        and t.unique_flag in (
-          select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
-            select o.id
-            from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu where cu.ID= #{city,jdbcType=VARCHAR})
-            connect by PRIOR o.id=o.PID
-          )
-        )
-      </if>
-      <if test="isAgent !=null"><!--代理商登录 查看权限为本身和下级-->
-          and t.unique_flag in (
-          select distinct ab.AGENT_ID
-          from A_AGENT_BUSINFO ab
-          start with ab.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
-          connect by PRIOR ab.ID = ab.BUS_PARENT
-          )
-      </if>
-                           )
-  </select>
-
-  <select id="queryAllListWithLower" resultMap="BaseResultMap" >
-    <include refid="OracleDialectPrefix" />
-    select  t.id,t.month,t.unique_flag,t.agent_id,t.bus_code,t.bus_name,
-    t.SHEET_NAME,t.SHEET_COLUMN,
-    t.profit_type,t.profit_hz,  t.pay_time,
-    extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-3)) as status,
-    extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-2)) as free_reason,
-    extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-1)) as pay_condition,
-    extractValue(t.sheet_data,'/data/Cell5') as profit_amt,
-    t.pay_tran_money,t.free_time,
-    t.import_time,t.import_person,
-    t.update_time,t.update_person
-    from pms_profit t
-    where  sheet_name='汇总'
-    <if test="profit_month != null and profit_month != ''">
-      and t.month = #{profit_month,jdbcType=VARCHAR}
-    </if>
-    <!--<if test="AGENT_ID != null and uniqueFlag != ''">
-      and t.unique_flag = #{AGENT_ID,jdbcType=VARCHAR}
-    </if>
-    <if test="AGENT_NAME != null and agentId != ''">
-      and t.agent_id  = #{AGENT_NAME,jdbcType=VARCHAR}
-    </if>-->
-
-      and t.unique_flag in (
-        select distinct ab.AGENT_ID
-        from A_AGENT_BUSINFO ab
-        start with ab.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
-        connect by PRIOR ab.ID = ab.BUS_PARENT
-    )
-
-    <if test="BUS_CODE != null and BUS_CODE != ''">
-      and t.BUS_CODE = #{BUS_CODE,jdbcType=VARCHAR}
-    </if>
-    <if test="BUS_NAME != null and BUS_NAME != ''">
-      and t.BUS_NAME = #{BUS_NAME,jdbcType=VARCHAR}
-    </if>
-    <if test="STATUS != null and STATUS != ''">
-      and nvl(extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-3)),'正常') = #{STATUS,jdbcType=VARCHAR}
-    </if>
-    <if test="city != null and city != ''">
-      and t.unique_flag in (
-      select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
-      select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
-      where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
-      )
-      )
-    </if>
-    <include refid="OracleDialectSuffix" />
-  </select>
-
-  <select id="queryAllCountWithLower" resultType="java.lang.Integer">
-    select count (1) from (
-        select  t.id,t.month,t.unique_flag,t.agent_id,t.bus_code,t.bus_name,
-        t.SHEET_NAME,t.SHEET_COLUMN,
-        t.profit_type,t.profit_hz,  t.pay_time,
-        extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-3)) as status,
-        extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-2)) as free_reason,
-        extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-1)) as pay_condition,
-        extractValue(t.sheet_data,'/data/Cell5') as profit_amt,
-        t.pay_tran_money,t.free_time,
-        t.import_time,t.import_person,
-        t.update_time,t.update_person
-        from pms_profit t
-        where  sheet_name='汇总'
-        <if test="profit_month != null and profit_month != ''">
-          and t.month = #{profit_month,jdbcType=VARCHAR}
+            )
+            )
         </if>
-        <!--<if test="AGENT_ID != null and uniqueFlag != ''">
-          and t.unique_flag = #{AGENT_ID,jdbcType=VARCHAR}
-        </if>
-        <if test="AGENT_NAME != null and agentId != ''">
-          and t.agent_id  = #{AGENT_NAME,jdbcType=VARCHAR}
-        </if>-->
-
-        and t.unique_flag in (
+        <if test="isAgent !=null">
+            and t.unique_flag in (
             select distinct ab.AGENT_ID
             from A_AGENT_BUSINFO ab
             start with ab.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
             connect by PRIOR ab.ID = ab.BUS_PARENT
-        )
+            )
+        </if>
+        <include refid="OracleDialectSuffix"/>
+    </select>
 
+    <select id="queryAllCount" resultType="java.lang.Integer">
+        select count(1) from (
+        select t.IMPORT_BATCH,t.PROFIT_TYPE,t.BALANCE_ID,t.SETTLE_MONTH,t.unique_flag,t.AGENT_NAME,t.bus_code,
+        t.BALANCE_AMT,t.REALITY_AG_ID,t.REMARK,
+        t.REALITY_AG_NAME,t.BILL_STATUS,t.REMIT_FAIL_REASON,aa.FREESTATUS,ap.PLATFORM_NAME
+        from pms_profit t left join A_AGENT aa on t.unique_flag = aa.ID left join A_PLATFORM ap on
+        ap.PLATFORM_NUM=t.BUS_CODE
+        where t.sheet_name='汇总' and aa.STATUS = '1'
+        <if test="profit_month != null and profit_month != ''">
+            and t.SETTLE_MONTH = #{profit_month,jdbcType=VARCHAR}
+        </if>
+        <if test="AGENT_ID != null and AGENT_ID != ''">
+            and t.unique_flag = #{AGENT_ID,jdbcType=VARCHAR}
+        </if>
+        <if test="AGENT_NAME != null and AGENT_NAME != ''">
+            and t.AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR}
+        </if>
         <if test="BUS_CODE != null and BUS_CODE != ''">
-          and t.BUS_CODE = #{BUS_CODE,jdbcType=VARCHAR}
+            and t.BUS_CODE = #{BUS_CODE,jdbcType=VARCHAR}
         </if>
         <if test="BUS_NAME != null and BUS_NAME != ''">
-          and t.BUS_NAME = #{BUS_NAME,jdbcType=VARCHAR}
+            and ap.PLATFORM_NAME = #{BUS_NAME,jdbcType=VARCHAR}
         </if>
         <if test="STATUS != null and STATUS != ''">
-          and nvl(extractValue(t.sheet_data,'/data/Cell' || (t.sheet_column-3)),'正常') = #{STATUS,jdbcType=VARCHAR}
+            and aa.FREESTATUS = #{STATUS,jdbcType=VARCHAR}
+        </if>
+        <if test="BILL_STATUS != null and BILL_STATUS != ''">
+            and t.BILL_STATUS = #{BILL_STATUS,jdbcType=VARCHAR}
+        </if>
+        <if test="PROFIT_TYPE != null and PROFIT_TYPE != ''">
+            and t.PROFIT_TYPE = #{PROFIT_TYPE,jdbcType=VARCHAR}
+        </if>
+        <if test="BALANCE_ID != null and BALANCE_ID != ''">
+            and t.BALANCE_ID = #{BALANCE_ID,jdbcType=VARCHAR}
         </if>
         <if test="city != null and city != ''">
             and t.unique_flag in (
-              select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
-                select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
-                where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
-              )
+            select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
+            select o.id
+            from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu where cu.ID=
+            #{city,jdbcType=VARCHAR})
+            connect by PRIOR o.id=o.PID
+            )
+            )
+        </if>
+        <if test="isAgent !=null">
+            and t.unique_flag in (
+            select distinct ab.AGENT_ID
+            from A_AGENT_BUSINFO ab
+            start with ab.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
+            connect by PRIOR ab.ID = ab.BUS_PARENT
+            )
+        </if>
+        )
+    </select>
+
+    <select id="queryAllListWithLower" resultType="java.util.Map">
+        <include refid="OracleDialectPrefix"/>
+        select t.IMPORT_BATCH,t.PROFIT_TYPE,t.BALANCE_ID,t.SETTLE_MONTH,t.unique_flag,t.AGENT_NAME,t.bus_code,
+        t.BALANCE_AMT,t.REALITY_AG_ID,t.REMARK,
+        t.REALITY_AG_NAME,t.BILL_STATUS,t.REMIT_FAIL_REASON,aa.FREESTATUS,ap.PLATFORM_NAME
+        from pms_profit t left join A_AGENT aa on t.unique_flag = aa.ID left join A_PLATFORM ap on
+        ap.PLATFORM_NUM=t.BUS_CODE
+        where t.sheet_name='汇总' and aa.STATUS = '1'
+        <if test="profit_month != null and profit_month != ''">
+            and t.SETTLE_MONTH= #{profit_month,jdbcType=VARCHAR}
+        </if>
+        and t.unique_flag in (
+        select distinct ab.AGENT_ID
+        from A_AGENT_BUSINFO ab
+        start with ab.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
+        connect by PRIOR ab.ID = ab.BUS_PARENT
+        )
+
+        <if test="BUS_CODE != null and BUS_CODE != ''">
+            and t.BUS_CODE = #{BUS_CODE,jdbcType=VARCHAR}
+        </if>
+        <if test="BUS_NAME != null and BUS_NAME != ''">
+            and ap.PLATFORM_NAME = #{BUS_NAME,jdbcType=VARCHAR}
+        </if>
+        <if test="STATUS != null and STATUS != ''">
+            and aa.FREESTATUS = #{STATUS,jdbcType=VARCHAR}
+        </if>
+        <if test="BILL_STATUS != null and BILL_STATUS != ''">
+            and t.BILL_STATUS = #{BILL_STATUS,jdbcType=VARCHAR}
+        </if>
+        <if test="PROFIT_TYPE != null and PROFIT_TYPE != ''">
+            and t.PROFIT_TYPE = #{PROFIT_TYPE,jdbcType=VARCHAR}
+        </if>
+        <if test="BALANCE_ID != null and BALANCE_ID != ''">
+            and t.BALANCE_ID = #{BALANCE_ID,jdbcType=VARCHAR}
+        </if>
+        <if test="city != null and city != ''">
+            and t.unique_flag in (
+            select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
+            select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
+            where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
+            )
+            )
+        </if>
+        <include refid="OracleDialectSuffix"/>
+    </select>
+
+    <select id="queryAllCountWithLower" resultType="java.lang.Integer">
+        select count (1) from (
+        select t.IMPORT_BATCH,t.PROFIT_TYPE,t.BALANCE_ID,t.SETTLE_MONTH,t.unique_flag,t.AGENT_NAME,t.bus_code,
+        t.BALANCE_AMT,t.REALITY_AG_ID,t.REMARK,
+        t.REALITY_AG_NAME,t.BILL_STATUS,t.REMIT_FAIL_REASON,aa.FREESTATUS,ap.PLATFORM_NAME
+        from pms_profit t left join A_AGENT aa on t.unique_flag = aa.ID left join A_PLATFORM ap on
+        ap.PLATFORM_NUM=t.BUS_CODE
+        where t.sheet_name='汇总' and aa.STATUS = '1'
+        <if test="profit_month != null and profit_month != ''">
+            and t.SETTLE_MONTH = #{profit_month,jdbcType=VARCHAR}
+        </if>
+        and t.unique_flag in (
+        select distinct ab.AGENT_ID
+        from A_AGENT_BUSINFO ab
+        start with ab.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
+        connect by PRIOR ab.ID = ab.BUS_PARENT
+        )
+
+        <if test="BUS_CODE != null and BUS_CODE != ''">
+            and t.BUS_CODE = #{BUS_CODE,jdbcType=VARCHAR}
+        </if>
+        <if test="BUS_NAME != null and BUS_NAME != ''">
+            and ap.PLATFORM_NAME = #{BUS_NAME,jdbcType=VARCHAR}
+        </if>
+        <if test="STATUS != null and STATUS != ''">
+            and aa.FREESTATUS = #{STATUS,jdbcType=VARCHAR}
+        </if>
+        <if test="BILL_STATUS != null and BILL_STATUS != ''">
+            and t.BILL_STATUS = #{BILL_STATUS,jdbcType=VARCHAR}
+        </if>
+        <if test="PROFIT_TYPE != null and PROFIT_TYPE != ''">
+            and t.PROFIT_TYPE = #{PROFIT_TYPE,jdbcType=VARCHAR}
+        </if>
+        <if test="BALANCE_ID != null and BALANCE_ID != ''">
+            and t.BALANCE_ID = #{BALANCE_ID,jdbcType=VARCHAR}
+        </if>
+        <if test="city != null and city != ''">
+            and t.unique_flag in (
+            select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
+            select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
+            where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
+            )
             )
         </if>
 
-                            )
-  </select>
+        )
+    </select>
 
-  <select id="isAgent" resultType="java.util.Map">
-    select id from A_AGENT a where 1=1
-    <if test="AGENT_ID != null and uniqueFlag != ''">
-      and a.id = #{AGENT_ID,jdbcType=VARCHAR}
-    </if>
-    <if test="AGENT_NAME != null and AGENT_NAME != ''">
-      and a.agent_name = #{AGENT_NAME,jdbcType=VARCHAR}
-    </if>
-  </select>
+    <select id="isAgent" resultType="java.util.Map">
+        select id from A_AGENT a where 1=1
+        <if test="AGENT_ID != null and uniqueFlag != ''">
+            and a.id = #{AGENT_ID,jdbcType=VARCHAR}
+        </if>
+        <if test="AGENT_NAME != null and AGENT_NAME != ''">
+            and a.agent_name = #{AGENT_NAME,jdbcType=VARCHAR}
+        </if>
+    </select>
 
-  <select id="queryProfitAmt" resultType="string">
+    <select id="queryProfitAmt" resultType="string">
     select nvl(sum(extractValue(t.sheet_data,'/data/Cell5')),0)  as totalProfitAmt
     from pms_profit t
     where  month=#{month,jdbcType=VARCHAR}
@@ -606,92 +687,205 @@
       and trim(translate(extractValue(sheet_data,'/data/Cell5'),'0123456789',' ')) is NULL
     group by month,sheet_name
   </select>
-  <!-- 查询存在多少tab页  -->
-  <select id="getTabCounts" resultMap="BaseResultMap">
-    select month,sheet_name,sheet_order from  pms_profit
-    where month=#{month,jdbcType=VARCHAR}
-    <if test="uniqueFlag != null and uniqueFlag != ''">
-      and unique_flag=#{uniqueFlag,jdbcType=VARCHAR}
-    </if>
-    <if test="agentId != null and agentId != ''">
-      and agent_id=#{agentId,jdbcType=VARCHAR}
-    </if>
-    <if test="busCode != null and busCode != ''">
-      and bus_code=#{busCode,jdbcType=VARCHAR}
-    </if>
-    group by month
-    <if test="uniqueFlag != null and uniqueFlag != ''">
-      ,unique_flag
-    </if>
-    <if test="agentId != null and agentId != ''">
-      ,agent_Id
-    </if>
-    ,sheet_name,sheet_order
-    order by sheet_order
+    <!--查询存在多少tab页 -->
+    <select id="getTabCounts" resultMap="BaseResultMap">
+        select SETTLE_MONTH,sheet_name,sheet_order from pms_profit
+        where SETTLE_MONTH=#{settleMonth,jdbcType=VARCHAR}
+        <if test="uniqueFlag != null and uniqueFlag != ''">
+            and unique_flag=#{uniqueFlag,jdbcType=VARCHAR}
+        </if>
+        <if test="agentName != null and agentName != ''">
+            and agent_id=#{agentName,jdbcType=VARCHAR}
+        </if>
+        <if test="busCode != null and busCode != ''">
+            and bus_code=#{busCode,jdbcType=VARCHAR}
+        </if>
+        group by SETTLE_MONTH
+        <if test="uniqueFlag != null and uniqueFlag != ''">
+            ,unique_flag
+        </if>
+        <if test="agentName != null and agentName != ''">
+            ,agent_Name
+        </if>
+        ,sheet_name,sheet_order
+        order by sheet_order
+    </select>
+    <!-- 获取sheet页的列数 -->
+    <select id="getSheetColumn" resultMap="BaseResultMap">
+        select * from (
+        select SETTLE_MONTH,unique_flag,sheet_name,max(sheet_column) sheet_column
+        from pms_profit
+        where SETTLE_MONTH=#{settleMonth,jdbcType=VARCHAR}
+        <if test="uniqueFlag != null and uniqueFlag != ''">
+            and unique_flag=#{uniqueFlag,jdbcType=VARCHAR}
+        </if>
+        <if test="agentName != null and agentName != ''">
+            and agent_Name=#{agentName,jdbcType=VARCHAR}
+        </if>
+        <if test="sheetName != null and sheetName != ''">
+            and sheet_name=#{sheetName,jdbcType=VARCHAR}
+        </if>
+        <if test="busCode != null and busCode != ''">
+            and bus_code=#{busCode,jdbcType=VARCHAR}
+        </if>
+        group by SETTLE_MONTH,unique_flag,sheet_name
+        order by dbms_random.value
+        )where rownum &lt; 2
+    </select>
+    <!-- 获取表头 -->
+    <select id="getTableHeadList" resultMap="BaseResultMap">
+        select a.SETTLE_MONTH,a.unique_flag,a.sheet_name,extractValue(a.sheet_head,'/data/Cell'||(b.num-1)) as
+        sheet_head,'/data/Cell'||(b.num-1) as keystr,b.num-1 as seq
+        from
+        (select * from pms_profit t where t.SETTLE_MONTH =#{settleMonth,jdbcType=VARCHAR}
+        <if test="uniqueFlag != null and uniqueFlag != ''">
+            and t.unique_flag=#{uniqueFlag,jdbcType=VARCHAR}
+        </if>
+        <if test="agentName != null and agentName != ''">
+            and t.agent_Name=#{agentName,jdbcType=VARCHAR}
+        </if>
+        <if test="sheetName != null and sheetName != ''">
+            and t.sheet_name=#{sheetName,jdbcType=VARCHAR}
+        </if>
+        <if test="busCode != null and busCode != ''">
+            and t.bus_code=#{busCode,jdbcType=VARCHAR}
+        </if>
+        and rownum&lt;=1
+        ) a
+        join (select rownum as num from A_AGENT where rownum &lt;= #{sheetColumn,jdbcType=INTEGER}) b on 1=1
+        where extractValue(a.sheet_head,'/data/Cell'||(b.num-1)) is not null
+        order by b.num
+    </select>
+    <!--   获取表内容  -->
+    <select id="getTableData" resultType="java.util.Map">
+        select t.BALANCE_ID,t.sheet_data.getSTRINGVal() as sheet_data
+        from pms_profit t
+        where t.SETTLE_MONTH=#{settleMonth,jdbcType=VARCHAR}
+        <if test="uniqueFlag != null and uniqueFlag != ''">
+            and t.unique_flag=#{uniqueFlag,jdbcType=VARCHAR}
+        </if>
+        <if test="agentName != null and agentName != ''">
+            and t.agent_Name=#{agentName,jdbcType=VARCHAR}
+        </if>
+        <if test="sheetName != null and sheetName != ''">
+            and t.sheet_name=#{sheetName,jdbcType=VARCHAR}
+        </if>
+        <if test="busCode != null and busCode != ''">
+            and t.bus_code=#{busCode,jdbcType=VARCHAR}
+        </if>
+        order by t.order_number
+    </select>
 
-  </select>
-  <!--获取sheet页的列数  -->
-  <select id="getSheetColumn" resultMap="BaseResultMap">
-    select * from (
-    select month,unique_flag,sheet_name,max(sheet_column) sheet_column
-    from  pms_profit
-    where month=#{month,jdbcType=VARCHAR}
-    <if test="uniqueFlag != null and uniqueFlag != ''">
-      and unique_flag=#{uniqueFlag,jdbcType=VARCHAR}
-    </if>
-    <if test="agentId != null and agentId != ''">
-      and agent_id=#{agentId,jdbcType=VARCHAR}
-    </if>
-    <if test="sheetName != null and sheetName != ''">
-      and sheet_name=#{sheetName,jdbcType=VARCHAR}
-    </if>
-    <if test="busCode != null and busCode != ''">
-      and bus_code=#{busCode,jdbcType=VARCHAR}
-    </if>
-    group by month,unique_flag,sheet_name
-    order by dbms_random.value
-    )where rownum &lt; 2
-  </select>
-  <!--获取表头  -->
-  <select id="getTableHeadList"   resultMap="BaseResultMap">
-    select a.month,a.unique_flag,a.sheet_name,extractValue(a.sheet_head,'/data/Cell'||(b.num-1)) as sheet_head,'/data/Cell'||(b.num-1) as keystr,b.num-1 as seq
-    from
-    (select * from pms_profit t  where t.month=#{month,jdbcType=VARCHAR}
-    <if test="uniqueFlag != null and uniqueFlag != ''">
-      and t.unique_flag=#{uniqueFlag,jdbcType=VARCHAR}
-    </if>
-    <if test="agentId != null and agentId != ''">
-      and t.agent_id=#{agentId,jdbcType=VARCHAR}
-    </if>
-    <if test="sheetName != null and sheetName != ''">
-      and t.sheet_name=#{sheetName,jdbcType=VARCHAR}
-    </if>
-    <if test="busCode != null and busCode != ''">
-      and t.bus_code=#{busCode,jdbcType=VARCHAR}
-    </if>
-    and rownum&lt;=1
-    ) a
-    join (select rownum as num from A_AGENT where rownum &lt;= #{sheetColumn,jdbcType=INTEGER}) b on 1=1
-    where extractValue(a.sheet_head,'/data/Cell'||(b.num-1)) is not null
-    order by b.num
-  </select>
-  <!--  获取表内容  -->
-  <select id="getTableData"  resultType="java.util.Map">
-    select t.id,t.sheet_data.getSTRINGVal() as sheet_data
-    from pms_profit t
-    where t.month=#{month,jdbcType=VARCHAR}
-    <if test="uniqueFlag != null and uniqueFlag != ''">
-      and t.unique_flag=#{uniqueFlag,jdbcType=VARCHAR}
-    </if>
-    <if test="agentId != null and agentId != ''">
-      and t.agent_id=#{agentId,jdbcType=VARCHAR}
-    </if>
-    <if test="sheetName != null and sheetName != ''">
-      and t.sheet_name=#{sheetName,jdbcType=VARCHAR}
-    </if>
-    <if test="busCode != null and busCode != ''">
-      and t.bus_code=#{busCode,jdbcType=VARCHAR}
-    </if>
-    order by t.order_number
-  </select>
+
+    <select id="queryFrezzeCause" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT a.* FROM( SELECT ROW_NUMBER () OVER ( PARTITION BY FREEZE_CAUSE ORDER BY FREEZE_DATE DESC ) rn,
+        a_agent_freeze.* FROM a_agent_freeze where 1=1
+        <if test="AGENT_ID != null and AGENT_ID != ''">
+            and AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}
+        </if>
+        <if test="FREEZE_STATUS != null and FREEZE_STATUS != ''">
+            and FREEZE_STATUS=#{FREEZE_STATUS,jdbcType=VARCHAR}
+        </if>
+        ) a WHERE a.rn =1
+    </select>
+
+
+    <select id="queryAllListBalanceId" resultType="java.lang.String">
+        select t.BALANCE_ID
+        from pms_profit t left join A_AGENT aa on t.unique_flag = aa.ID left join A_PLATFORM ap on
+        ap.PLATFORM_NUM=t.BUS_CODE
+        where t.sheet_name='汇总' and aa.STATUS = '1'
+        <if test="profit_month != null and profit_month != ''">
+            and t.SETTLE_MONTH = #{profit_month,jdbcType=VARCHAR}
+        </if>
+        <if test="AGENT_ID != null and AGENT_ID != ''">
+            and t.unique_flag = #{AGENT_ID,jdbcType=VARCHAR}
+        </if>
+        <if test="AGENT_NAME != null and AGENT_NAME != ''">
+            and t.AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR}
+        </if>
+        <if test="BUS_CODE != null and BUS_CODE != ''">
+            and t.BUS_CODE = #{BUS_CODE,jdbcType=VARCHAR}
+        </if>
+        <if test="BUS_NAME != null and BUS_NAME != ''">
+            and ap.PLATFORM_NAME = #{BUS_NAME,jdbcType=VARCHAR}
+        </if>
+        <if test="STATUS != null and STATUS != ''">
+            and aa.FREESTATUS = #{STATUS,jdbcType=VARCHAR}
+        </if>
+        <if test="BILL_STATUS != null and BILL_STATUS != ''">
+            and t.BILL_STATUS = #{BILL_STATUS,jdbcType=VARCHAR}
+        </if>
+        <if test="PROFIT_TYPE != null and PROFIT_TYPE != ''">
+            and t.PROFIT_TYPE = #{PROFIT_TYPE,jdbcType=VARCHAR}
+        </if>
+        <if test="BALANCE_ID != null and BALANCE_ID != ''">
+            and t.BALANCE_ID = #{BALANCE_ID,jdbcType=VARCHAR}
+        </if>
+        and aa.FREESTATUS = '1'
+        and t.BILL_STATUS in('01','03','05')
+        <if test="city != null and city != ''">
+            and t.unique_flag in (
+            select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
+            select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
+            where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
+            )
+            )
+        </if>
+        <if test="isAgent !=null">
+            and t.unique_flag in (
+            select distinct ab.AGENT_ID
+            from A_AGENT_BUSINFO ab
+            start with ab.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
+            connect by PRIOR ab.ID = ab.BUS_PARENT
+            )
+        </if>
+    </select>
+
+
+    <select id="queryAllListWithLowerBalanceId" resultType="java.lang.String">
+        select t.BALANCE_ID
+        from pms_profit t left join A_AGENT aa on t.unique_flag = aa.ID left join A_PLATFORM ap on
+        ap.PLATFORM_NUM=t.BUS_CODE
+        where t.sheet_name='汇总' and aa.STATUS = '1'
+        <if test="profit_month != null and profit_month != ''">
+            and t.SETTLE_MONTH= #{profit_month,jdbcType=VARCHAR}
+        </if>
+        and t.unique_flag in (
+        select distinct ab.AGENT_ID
+        from A_AGENT_BUSINFO ab
+        start with ab.AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}
+        connect by PRIOR ab.ID = ab.BUS_PARENT
+        )
+
+        <if test="BUS_CODE != null and BUS_CODE != ''">
+            and t.BUS_CODE = #{BUS_CODE,jdbcType=VARCHAR}
+        </if>
+        <if test="BUS_NAME != null and BUS_NAME != ''">
+            and ap.PLATFORM_NAME = #{BUS_NAME,jdbcType=VARCHAR}
+        </if>
+        <if test="STATUS != null and STATUS != ''">
+            and aa.FREESTATUS = #{STATUS,jdbcType=VARCHAR}
+        </if>
+        <if test="BILL_STATUS != null and BILL_STATUS != ''">
+            and t.BILL_STATUS = #{BILL_STATUS,jdbcType=VARCHAR}
+        </if>
+        <if test="PROFIT_TYPE != null and PROFIT_TYPE != ''">
+            and t.PROFIT_TYPE = #{PROFIT_TYPE,jdbcType=VARCHAR}
+        </if>
+        <if test="BALANCE_ID != null and BALANCE_ID != ''">
+            and t.BALANCE_ID = #{BALANCE_ID,jdbcType=VARCHAR}
+        </if>
+        and aa.FREESTATUS = '1'
+        and t.BILL_STATUS in('01','03','05')
+        <if test="city != null and city != ''">
+            and t.unique_flag in (
+            select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
+            select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
+            where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
+            )
+            )
+        </if>
+    </select>
+
 </mapper>

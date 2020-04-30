@@ -2,14 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.profit.dao.PmsProfitTempMapper">
   <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PmsProfitTemp">
-    <id column="MONTH" jdbcType="VARCHAR" property="month" />
-    <id column="ORDER_NUMBER" jdbcType="DECIMAL" property="orderNumber" />
-    <id column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
-    <id column="IMPORT_PERSON" jdbcType="VARCHAR" property="importPerson" />
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="MONTH" jdbcType="VARCHAR" property="month" />
     <result column="UNIQUE_FLAG" jdbcType="VARCHAR" property="uniqueFlag" />
-    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
     <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
     <result column="BUS_NAME" jdbcType="VARCHAR" property="busName" />
+    <result column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
+    <result column="ORDER_NUMBER" jdbcType="DECIMAL" property="orderNumber" />
+    <result column="IMPORT_PERSON" jdbcType="VARCHAR" property="importPerson" />
+    <result column="IMPORT_TYPE" jdbcType="VARCHAR" property="importType" />
+    <result column="IMPORT_BATCH" jdbcType="VARCHAR" property="importBatch" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ryx.credit.profit.pojo.PmsProfitTempWithBLOBs">
     <result column="SHEET_HEAD" jdbcType="CLOB" property="sheetHead" />
@@ -45,8 +48,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    MONTH, ORDER_NUMBER, SHEET_NAME, IMPORT_PERSON, UNIQUE_FLAG, AGENT_ID, BUS_CODE, 
-    BUS_NAME
+    ID, MONTH, UNIQUE_FLAG, AGENT_NAME, BUS_CODE, BUS_NAME, SHEET_NAME, ORDER_NUMBER,
+    IMPORT_PERSON, IMPORT_TYPE, IMPORT_BATCH
   </sql>
   <sql id="Blob_Column_List">
     SHEET_HEAD, SHEET_DATA
@@ -83,16 +86,13 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempKey" resultMap="ResultMapWithBLOBs">
-    select 
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
     from PMS_PROFIT_TEMP
-    where MONTH = #{month,jdbcType=VARCHAR}
-      and ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL}
-      and SHEET_NAME = #{sheetName,jdbcType=VARCHAR}
-      and IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempExample">
     delete from PMS_PROFIT_TEMP
@@ -101,41 +101,52 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempWithBLOBs">
-    insert into PMS_PROFIT_TEMP (MONTH, ORDER_NUMBER, SHEET_NAME, 
-      IMPORT_PERSON, UNIQUE_FLAG, AGENT_ID, 
-      BUS_CODE, BUS_NAME, SHEET_HEAD, 
+    insert into PMS_PROFIT_TEMP (ID, MONTH, UNIQUE_FLAG,
+      AGENT_NAME, BUS_CODE, BUS_NAME,
+      SHEET_NAME, ORDER_NUMBER, IMPORT_PERSON,
+      IMPORT_TYPE, IMPORT_BATCH, SHEET_HEAD,
       SHEET_DATA)
-    values (#{month,jdbcType=VARCHAR}, #{orderNumber,jdbcType=DECIMAL}, #{sheetName,jdbcType=VARCHAR}, 
-      #{importPerson,jdbcType=VARCHAR}, #{uniqueFlag,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
-      #{busCode,jdbcType=VARCHAR}, #{busName,jdbcType=VARCHAR}, #{sheetHead,jdbcType=CLOB}, 
+    values (#{id,jdbcType=VARCHAR}, #{month,jdbcType=VARCHAR}, #{uniqueFlag,jdbcType=VARCHAR},
+      #{agentName,jdbcType=VARCHAR}, #{busCode,jdbcType=VARCHAR}, #{busName,jdbcType=VARCHAR},
+      #{sheetName,jdbcType=VARCHAR}, #{orderNumber,jdbcType=DECIMAL}, #{importPerson,jdbcType=VARCHAR},
+      #{importType,jdbcType=VARCHAR}, #{importBatch,jdbcType=VARCHAR}, #{sheetHead,jdbcType=CLOB},
       #{sheetData,jdbcType=CLOB})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempWithBLOBs">
     insert into PMS_PROFIT_TEMP
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
       <if test="month != null">
         MONTH,
-      </if>
-      <if test="orderNumber != null">
-        ORDER_NUMBER,
-      </if>
-      <if test="sheetName != null">
-        SHEET_NAME,
-      </if>
-      <if test="importPerson != null">
-        IMPORT_PERSON,
       </if>
       <if test="uniqueFlag != null">
         UNIQUE_FLAG,
       </if>
-      <if test="agentId != null">
-        AGENT_ID,
+      <if test="agentName != null">
+        AGENT_NAME,
       </if>
       <if test="busCode != null">
         BUS_CODE,
       </if>
       <if test="busName != null">
         BUS_NAME,
+      </if>
+      <if test="sheetName != null">
+        SHEET_NAME,
+      </if>
+      <if test="orderNumber != null">
+        ORDER_NUMBER,
+      </if>
+      <if test="importPerson != null">
+        IMPORT_PERSON,
+      </if>
+      <if test="importType != null">
+        IMPORT_TYPE,
+      </if>
+      <if test="importBatch != null">
+        IMPORT_BATCH,
       </if>
       <if test="sheetHead != null">
         SHEET_HEAD,
@@ -145,29 +156,38 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
       <if test="month != null">
         #{month,jdbcType=VARCHAR},
-      </if>
-      <if test="orderNumber != null">
-        #{orderNumber,jdbcType=DECIMAL},
-      </if>
-      <if test="sheetName != null">
-        #{sheetName,jdbcType=VARCHAR},
-      </if>
-      <if test="importPerson != null">
-        #{importPerson,jdbcType=VARCHAR},
       </if>
       <if test="uniqueFlag != null">
         #{uniqueFlag,jdbcType=VARCHAR},
       </if>
-      <if test="agentId != null">
-        #{agentId,jdbcType=VARCHAR},
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
       </if>
       <if test="busCode != null">
         #{busCode,jdbcType=VARCHAR},
       </if>
       <if test="busName != null">
         #{busName,jdbcType=VARCHAR},
+      </if>
+      <if test="sheetName != null">
+        #{sheetName,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNumber != null">
+        #{orderNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="importPerson != null">
+        #{importPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="importType != null">
+        #{importType,jdbcType=VARCHAR},
+      </if>
+      <if test="importBatch != null">
+        #{importBatch,jdbcType=VARCHAR},
       </if>
       <if test="sheetHead != null">
         #{sheetHead,jdbcType=CLOB},
@@ -186,17 +206,35 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempWithBLOBs">
     update PMS_PROFIT_TEMP
     <set>
+      <if test="month != null">
+        MONTH = #{month,jdbcType=VARCHAR},
+      </if>
       <if test="uniqueFlag != null">
         UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
       </if>
-      <if test="agentId != null">
-        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
       </if>
       <if test="busCode != null">
         BUS_CODE = #{busCode,jdbcType=VARCHAR},
       </if>
       <if test="busName != null">
         BUS_NAME = #{busName,jdbcType=VARCHAR},
+      </if>
+      <if test="sheetName != null">
+        SHEET_NAME = #{sheetName,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNumber != null">
+        ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="importPerson != null">
+        IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="importType != null">
+        IMPORT_TYPE = #{importType,jdbcType=VARCHAR},
+      </if>
+      <if test="importBatch != null">
+        IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR},
       </if>
       <if test="sheetHead != null">
         SHEET_HEAD = #{sheetHead,jdbcType=CLOB},
@@ -205,38 +243,41 @@
         SHEET_DATA = #{sheetData,jdbcType=CLOB},
       </if>
     </set>
-    where MONTH = #{month,jdbcType=VARCHAR}
-      and ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL}
-      and SHEET_NAME = #{sheetName,jdbcType=VARCHAR}
-      and IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempWithBLOBs">
     update PMS_PROFIT_TEMP
-    set UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    set MONTH = #{month,jdbcType=VARCHAR},
+      UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
       BUS_CODE = #{busCode,jdbcType=VARCHAR},
       BUS_NAME = #{busName,jdbcType=VARCHAR},
+      SHEET_NAME = #{sheetName,jdbcType=VARCHAR},
+      ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL},
+      IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR},
+      IMPORT_TYPE = #{importType,jdbcType=VARCHAR},
+      IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR},
       SHEET_HEAD = #{sheetHead,jdbcType=CLOB},
       SHEET_DATA = #{sheetData,jdbcType=CLOB}
-    where MONTH = #{month,jdbcType=VARCHAR}
-      and ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL}
-      and SHEET_NAME = #{sheetName,jdbcType=VARCHAR}
-      and IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PmsProfitTemp">
     update PMS_PROFIT_TEMP
-    set UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    set MONTH = #{month,jdbcType=VARCHAR},
+      UNIQUE_FLAG = #{uniqueFlag,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
       BUS_CODE = #{busCode,jdbcType=VARCHAR},
-      BUS_NAME = #{busName,jdbcType=VARCHAR}
-    where MONTH = #{month,jdbcType=VARCHAR}
-      and ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL}
-      and SHEET_NAME = #{sheetName,jdbcType=VARCHAR}
-      and IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR}
+      BUS_NAME = #{busName,jdbcType=VARCHAR},
+      SHEET_NAME = #{sheetName,jdbcType=VARCHAR},
+      ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL},
+      IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR},
+      IMPORT_TYPE = #{importType,jdbcType=VARCHAR},
+      IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

@@ -17,4 +17,26 @@ public interface IProfitManageService {
     public List<String> getTableHead(PmsProfit profit);
 
     public List<Map<String, Object>> getTableData(PmsProfit profit);
+
+    /**
+     * 本次查询的可以出款的批次（下级查询的）
+     * @param params
+     * @return
+     */
+    List<String> queryAllListWithLowerBalanceId(Map<String, Object> params);
+
+    /**
+     * 本次查询的可以出款的批次
+     *
+     * @param params 传递的查询条件
+     * @return
+     */
+    List<String> queryAllListBalanceId(Map<String, Object> params);
+
+    /**
+     * 出款
+     * @param parm
+     * @return
+     */
+    String billFunction( List<String> parm);
 }
