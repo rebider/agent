@@ -1474,7 +1474,7 @@
     select
     o.c_time as apytime,
     o.o_num as num,  o.o_inuretime,
-    b.ag_uniq_num,
+    b.ag_uniq_num,b.id as agent_id,
     aab.bus_num,
     c.platform_name,
     b.ag_name,
@@ -1676,7 +1676,7 @@
     select
     o.c_time as apytime,
     o.o_num as num,  o.o_inuretime ,
-    b.ag_uniq_num,
+    b.ag_uniq_num,b.id as agent_id,
     aab.bus_num,
     c.platform_name,
     b.ag_name,
@@ -1922,6 +1922,7 @@
     <result column="org_name" property="orgName" jdbcType="VARCHAR"/>
     <result column="order_date" property="orderDate" jdbcType="TIMESTAMP"/>
     <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    <result column="agent_id" property="agentId" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--欠款查询 -->

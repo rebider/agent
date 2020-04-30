@@ -76,7 +76,15 @@ public class OrderoutVo implements Serializable{
     private String agDocPro;//对接省区
     private String proCode;//商品编号
     private String proName;//商品名称
+    private String agentId;//代理商唯一编码
 
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
 
     public String getPlatformType() {
         return platformType;
