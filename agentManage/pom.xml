@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
     <groupId>com.ryx.ry</groupId>
     <artifactId>agentManage</artifactId>
     <packaging>pom</packaging>
@@ -579,8 +578,8 @@
     </repositories>
 
     <pluginRepositories>
-
     </pluginRepositories>
+
     <distributionManagement>
         <repository>
             <id>pro-release</id>
@@ -594,6 +593,4 @@
             <url>http://12.3.10.225:9081/nexus/content/repositories/wq-snapshot/</url>
         </snapshotRepository>
     </distributionManagement>
-
-
 </project>
