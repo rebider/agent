@@ -421,15 +421,17 @@
   <select id="getNeedNoticeList" resultType="java.util.Map">
     select  * from (
     select  pr.BALANCE_ID,pr.FIRST_BALANCE_ID,
-    pb.BALANCE_BANK_NAME,pb.BALANCE_BATCH_NO,pb.BALANCE_ACCT_NAME,pb.BALANCE_ACCT_NO,pb.BALANCE_BANK_VERSION,
-    pb.AG_ID,pb.AG_NAME,
+    pb.BALANCE_BANK_NAME,pb.BALANCE_BATCH_NO,pb.BALANCE_ACCT_NAME,
+    pb.BALANCE_ACCT_NO,pb.BALANCE_BANK_VERSION,
+    pb.AG_ID,pb.AG_NAME,pr.NOTICE_RESULT,
     row_number() over (partition by  FIRST_BALANCE_ID order by CK_TIME desc ) rn
     from P_REFUND_SERIAL pr
     inner join P_BALANCE_SERIAL pb on pr.FIRST_BALANCE_ID = pb.BALANCE_ID
     where 1 =1
-    and pr.NOTICE_RESULT = '00'
     and pb.BALANCE_STATUS = '03'
-    ) where rn = 1
+    )
+    where rn=1
+    and NOTICE_RESULT = '00'
   </select>
 
   <update id="updateNoticeStatus">
