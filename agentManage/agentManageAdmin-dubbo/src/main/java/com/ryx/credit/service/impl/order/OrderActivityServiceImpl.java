@@ -174,9 +174,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             throw new MessageException("活动代码不能为空");
         }
         if (StringUtils.isNotBlank(activity.getActCode())) {
-           if("2004".equals(activity.getActCode()) || "2204".equals(activity.getActCode())){
-               logger.info("2004和2204活动代码禁止使用");
-               throw new MessageException("2004和2204活动代码禁止使用");
+            List<String> actCodeList = dictOptionsService.dictValueList("AGENT", "ACTCODE");
+           if(actCodeList.contains(activity.getActCode())){
+               logger.info(actCodeList.toString() + "活动代码禁止使用");
+               throw new MessageException(actCodeList.toString() + "活动代码禁止使用");
            }
         }
         if (activity.getPrice() == null) {
@@ -316,9 +317,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         }
         OActivity db_activity = activityMapper.selectByPrimaryKey(activity.getId());
         if (StringUtils.isNotBlank(activity.getActCode())) {
-            if(("2004".equals(db_activity.getActCode()) || "2204".equals(db_activity.getActCode()) && (!"2004".equals(activity.getActCode()) && !"2204".equals(activity.getActCode())))){
-                logger.info("2004和2204活动代码禁止使用");
-                return AgentResult.fail("2004和2204活动代码禁止使用");
+            List<String> actCodeList = dictOptionsService.dictValueList("AGENT", "ACTCODE");
+            if((actCodeList.contains(db_activity.getActCode())) && (!actCodeList.contains(activity.getActCode()))){
+                logger.info(actCodeList.toString() + "活动代码禁止使用");
+                return AgentResult.fail(actCodeList.toString() + "活动代码禁止使用");
             }
         }
         OProductExample oProductExample = new OProductExample();
@@ -445,9 +447,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
         if (StringUtils.isNotBlank(activity.getActCode())) {
             if (StringUtils.isNotBlank(activity.getActCode())) {
-                if("2004".equals(activity.getActCode()) || "2204".equals(activity.getActCode())){
-                    logger.info("2004和2204活动代码禁止使用");
-                    return AgentResult.fail("2004和2204活动代码禁止使用");
+                List<String> actCodeList = dictOptionsService.dictValueList("AGENT", "ACTCODE");
+                if(actCodeList.contains(activity.getActCode())){
+                    logger.info(actCodeList.toString() + "活动活动代码禁止使用");
+                    return AgentResult.fail(actCodeList.toString() + "活动活动代码禁止使用");
                 }
             }
         }

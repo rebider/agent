@@ -226,4 +226,14 @@ public class DictOptionsServiceImpl implements DictOptionsService {
         example.setOrderByClause(" D_sort desc");
         return dictMapper.selectByExample(example);
     }
+
+    @Override
+    public List<String> dictValueList(String group, String artifact) {
+        List<Dict> dictList = dictList( group,  artifact);
+        List<String> valueList = new ArrayList<String>();
+        dictList.stream().forEach(ite -> {
+            valueList.add(ite.getdItemvalue());
+        });
+        return valueList;
+    }
 }
