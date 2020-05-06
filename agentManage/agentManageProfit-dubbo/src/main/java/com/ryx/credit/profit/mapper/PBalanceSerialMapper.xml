@@ -373,7 +373,7 @@
     <if test="param.balanceBatchId != '' and param.balanceBatchId != null">
       and pb.BALANCE_BATCH_NO  = #{param.balanceBatchId}
     </if>
-    <choose>
+    <!--<choose>
       <when test="param.settleDateStart != '' and param.settleDateStart !=null and param.settleDateEnd !='' and param.settleDateEnd != null">
         and pb.SETTLE_DATE between #{param.settleDateStart} and #{param.settleDateEnd}
       </when>
@@ -383,14 +383,14 @@
       <when test="param.settleDateEnd != '' and param.settleDateEnd !=null">
         and pb.SETTLE_DATE = #{param.settleDateEnd}
       </when>
-    </choose>
+    </choose>-->
     <if test="param.importBatch != '' and param.importBatch != null">
       and pb.IMPORT_BATCH  = #{param.importBatch}
     </if>
     <if test="param.balanceId != '' and param.balanceId != null">
       and pb.BALANCE_ID  = #{param.balanceId}
     </if>
-    <choose>
+    <!--<choose>
       <when test="param.paymentTimeStart != '' and param.paymentTimeStart !=null and param.paymentTimeEnd !='' and param.paymentTimeEnd != null">
         and pb.SYNC_TIME between #{param.paymentTimeStart} and #{param.paymentTimeEnd}
       </when>
@@ -400,7 +400,29 @@
       <when test="param.paymentTimeEnd != '' and param.paymentTimeEnd !=null">
         and pb.SYNC_TIME = #{param.settleDateEnd}
       </when>
-    </choose>
+    </choose>-->
+    <choose>
+    <when test="param.cktjDateStart != '' and param.cktjDateStart !=null and param.cktjDateEnd !='' and param.cktjDateEnd != null">
+      and pb.SUBMIT_TIME between #{param.cktjDateStart} and #{param.cktjDateEnd}
+    </when>
+    <when test="param.cktjDateStart != '' and param.cktjDateStart !=null">
+      and pb.SUBMIT_TIME = #{param.cktjDateStart}
+    </when>
+    <when test="param.cktjDateEnd != '' and param.cktjDateEnd !=null">
+      and pb.SUBMIT_TIME = #{param.cktjDateEnd}
+    </when>
+  </choose>
+    <choose>
+    <when test="param.ckwcStart != '' and param.ckwcStart !=null and param.ckwcEnd !='' and param.ckwcEnd != null">
+      and pb.CKWC_TIME between #{param.ckwcStart} and #{param.ckwcEnd}
+    </when>
+    <when test="param.ckwcStart != '' and param.ckwcStart !=null">
+      and pb.CKWC_TIME = #{param.ckwcStart}
+    </when>
+    <when test="param.ckwcEnd != '' and param.ckwcEnd !=null">
+      and pb.CKWC_TIME = #{param.ckwcEnd}
+    </when>
+  </choose>
     order by pb.SYNC_TIME desc
   </sql>
 
