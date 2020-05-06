@@ -27,4 +27,9 @@ public interface PBalanceSerialMapper {
 
     Map<String,Object> statisticalData(@Param("param")Map<String,String> param);
 
+    /**获取需要通知结算卡信息修改出款数据**/
+    List<Map<String,String>> getNeedNoticeList();
+    /**更新结算卡通知状态为已通知**/
+    void updateNoticeStatus( @Param("list") List<Map<String,String>> list,@Param("status") String status);
+
 }

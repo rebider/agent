@@ -325,13 +325,10 @@
           else '' end NOTICE_RESULT  /**通知结果**/
     from P_BALANCE_SERIAL pb
     left join (
-    select pr.* from P_REFUND_SERIAL pr
-    inner join (
-    select FIRST_BALANCE_ID,max(CK_TIME) CK_TIME
-    from P_REFUND_SERIAL
-    group by FIRST_BALANCE_ID
-    ) pd
-    on pr.FIRST_BALANCE_ID = pd.FIRST_BALANCE_ID and  pr.CK_TIME = pd.CK_TIME
+    select * from(
+      select  BALANCE_ID,PRE_BALANCE_ID,FIRST_BALANCE_ID,NOTICE_RESULT,CK_TIME,NOTICE_TIME ,
+      row_number() over (partition by  FIRST_BALANCE_ID order by CK_TIME desc ) rn from P_REFUND_SERIAL pr
+      ) where rn = 1
     ) pa on pb.BALANCE_ID = pa.FIRST_BALANCE_ID
     left join C_USER cu on cu.ID = pb.SUBMIT_TER
     left join PMS_PROFIT pp on pb.BALANCE_ID = pp.BALANCE_ID
@@ -420,5 +417,27 @@
     <include refid="getListByMap_sql"/>
     ) zzz
   </select>
+
+  <select id="getNeedNoticeList" resultType="java.util.Map">
+    select  * from (
+    select  pr.BALANCE_ID,pr.FIRST_BALANCE_ID,
+    pb.BALANCE_BANK_NAME,pb.BALANCE_BATCH_NO,pb.BALANCE_ACCT_NAME,pb.BALANCE_ACCT_NO,pb.BALANCE_BANK_VERSION,
+    pb.AG_ID,pb.AG_NAME,
+    row_number() over (partition by  FIRST_BALANCE_ID order by CK_TIME desc ) rn
+    from P_REFUND_SERIAL pr
+    inner join P_BALANCE_SERIAL pb on pr.FIRST_BALANCE_ID = pb.BALANCE_ID
+    where 1 =1
+    and pr.NOTICE_RESULT = '00'
+    and pb.BALANCE_STATUS = '03'
+    ) where rn = 1
+  </select>
+
+  <update id="updateNoticeStatus">
+    <foreach collection="list" item="item" index="index" open="begin" close=";end;" separator=";">
+      update P_REFUND_SERIAL pr
+      set pr.NOTICE_RESULT = #{status}
+      WHERE pr.BALANCE_ID =#{item.BALANCE_ID}
+    </foreach>
+  </update>
 
 </mapper>
