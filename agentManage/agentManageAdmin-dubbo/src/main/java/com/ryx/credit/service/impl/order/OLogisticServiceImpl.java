@@ -1088,7 +1088,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         OLogisticsDetailExample.Criteria criteria = oLogisticsDetailExample.createCriteria();
         criteria.andLogisticsIdEqualTo(oLogistics.getId())
                 .andRecordStatusIn(Arrays.asList(OLogisticsDetailStatus.RECORD_STATUS_VAL.code, OLogisticsDetailStatus.RECORD_STATUS_HIS.code))
-                .andOptTypeEqualTo("ORDER");
+                .andOptTypeEqualTo(OLogisticsDetailOptType.ORDER.code);
         List<OLogisticsDetail> oLogisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
         if (oLogistics.getSendNum().intValue() != oLogisticsDetails.size()){
             throw new MessageException("物流明细异常！");

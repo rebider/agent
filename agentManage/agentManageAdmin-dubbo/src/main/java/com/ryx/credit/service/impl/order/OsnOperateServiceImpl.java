@@ -284,6 +284,7 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                     querySnNumExample.or()
                             .andLogisticsIdEqualTo(id)
                             .andRecordStatusEqualTo(Status.STATUS_1.status)
+                            .andOptTypeEqualTo(OLogisticsDetailOptType.ORDER.code)
                             .andStatusEqualTo(Status.STATUS_1.status);
                     if (logistics_item.getSendNum().compareTo(new BigDecimal(oLogisticsDetailMapper.countByExample(querySnNumExample))) != 0) {
                         logistics_item.setSendStatus(LogisticsSendStatus.send_fail.code);
