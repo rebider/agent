@@ -25,11 +25,7 @@ public enum ReceiptPlanExportColum {
 
     //导出活动调整明细
     RefundPriceDiffDetail_Column("id,refundPriceDiffId,proName,changeCount,activityName,frontPrice,price,beginSn,endSn,pre_activity_activityName,pre_activity_act_code,pre_activity_bus_pro_code,pre_activity_price,orderType,oldOrgId,oldOrgName,newOrgId,newOrgName,oldSupdOrgId,oldSupdOrgName,newSupdOrgId,newSupdOrgName,uTime","活动调整明细导出字段"),
-    RefundPriceDiffDetail_Title("编号,申请单号,商品名称,变更数量,活动名称,前价格,价格,开始SN,结束SN,原活动,原活动代码,原机具编号,原价格,订单类型,原机构编号,原机构名称,目标机构编号,目标机构名称,原机构直签类上级平台码,原机构直签类上级,目标机构直签类上级平台码,目标机构直签类上级,更新时间","活动调整明细导出标题"),
-
-    //导出风控服务列表数据
-    AgentRisk_Column("ID,AG_UNIQ_NUM,AG_NAME,AG_BUS_LIC,AG_LEGAL_CERNUM,CLO_BANK_ACCOUNT","风控服务导出字段"),
-    AgentRisk_Title("AG,代理商唯一编码,代理商名称,营业执照号,法人身份证号,结算银行卡号","风控服务导出标题");
+    RefundPriceDiffDetail_Title("编号,申请单号,商品名称,变更数量,活动名称,前价格,价格,开始SN,结束SN,原活动,原活动代码,原机具编号,原价格,订单类型,原机构编号,原机构名称,目标机构编号,目标机构名称,原机构直签类上级平台码,原机构直签类上级,目标机构直签类上级平台码,目标机构直签类上级,更新时间","活动调整明细导出标题");
 
     public String code;
 
