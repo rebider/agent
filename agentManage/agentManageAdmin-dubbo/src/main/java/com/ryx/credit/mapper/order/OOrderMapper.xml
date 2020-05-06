@@ -1230,7 +1230,7 @@
     dict.D_ITEMNAME as platformType,
     o.c_time as apytime,
     o.o_num as num,o.O_INURETIME,
-    b.ag_uniq_num,
+    b.ag_uniq_num,b.id as agent_id,
     aab.bus_num,
     c.platform_name,
     b.ag_name,
