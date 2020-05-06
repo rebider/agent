@@ -31,4 +31,9 @@ public class CRoleServiceImpl implements CRoleService {
         return roleMapper.findFinanceRole(userId);
     }
 
+    @Override
+    public Set<String> findFinanceRoleId(Long userId) {
+        return roleMapper.findFinanceRoleId(userId);
+    }
+
 }

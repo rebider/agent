@@ -82,6 +82,12 @@
         and u.id = #{userId}
     </select>
 
+    <select id="findFinanceRoleId" resultType="java.lang.String">
+        select to_char(r.id) from c_user u,c_role r,c_user_role ur
+        where u.id = ur.user_id and r.id = ur.role_id
+          and u.id = #{userId}
+    </select>
+
 
     <insert id="insertRole" parameterType="com.ryx.credit.pojo.admin.CRole" >
         insert into

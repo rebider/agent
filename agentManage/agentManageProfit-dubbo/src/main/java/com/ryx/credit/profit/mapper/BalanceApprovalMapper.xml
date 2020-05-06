@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.BalanceApprovalMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.BalanceApproval">
+    <result column="BALANCE_ID" jdbcType="VARCHAR" property="balanceId" />
+    <result column="BATCH_NO" jdbcType="VARCHAR" property="batchNo" />
+    <result column="SETTLE_MONTH" jdbcType="VARCHAR" property="settleMonth" />
+    <result column="APPLY_DATE" jdbcType="VARCHAR" property="applyDate" />
+    <result column="APPLY_USER" jdbcType="VARCHAR" property="applyUser" />
+    <result column="APPLY_TIME" jdbcType="VARCHAR" property="applyTime" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
+    <result column="REQUEST_NO" jdbcType="VARCHAR" property="requestNo" />
+    <result column="BALANCE_AMT" jdbcType="DECIMAL" property="balanceAmt" />
+    <result column="APPROVAL_STATUS" jdbcType="VARCHAR" property="approvalStatus" />
+    <result column="BALANCE_REMARK" jdbcType="VARCHAR" property="balanceRemark" />
+    <result column="BALANCE_ACCT_NO" jdbcType="VARCHAR" property="balanceAcctNo" />
+    <result column="BALANCE_ACCT_NAME" jdbcType="VARCHAR" property="balanceAcctName" />
+    <result column="BALANCE_BANK_NO" jdbcType="VARCHAR" property="balanceBankNo" />
+    <result column="BALANCE_BANK_NAME" jdbcType="VARCHAR" property="balanceBankName" />
+    <result column="REALITY_AG_ID" jdbcType="VARCHAR" property="realityAgId" />
+    <result column="REALITY_AG_NAME" jdbcType="VARCHAR" property="realityAgName" />
+    <result column="END_TIME" jdbcType="VARCHAR" property="endTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    P.BALANCE_ID, P.BATCH_NO, P.SETTLE_MONTH, P.APPLY_DATE, P.APPLY_USER, P.APPLY_TIME, P.AGENT_ID,
+        P.AGENT_NAME, P.BUS_CODE, P.REQUEST_NO, P.BALANCE_AMT, P.APPROVAL_STATUS, P.BALANCE_REMARK,
+        NVL(P.BALANCE_ACCT_NO,C.CLO_BANK_ACCOUNT) AS BALANCE_ACCT_NO,
+        NVL(P.BALANCE_ACCT_NAME,C.CLO_REALNAME) AS BALANCE_ACCT_NAME,
+        NVL(P.BALANCE_BANK_NO,C.CLO_BANK_BRANCH) AS BALANCE_BANK_NO,
+        NVL(P.BALANCE_BANK_NAME,C.CLO_BANK) AS BALANCE_BANK_NAME,
+        P.REALITY_AG_ID, P.REALITY_AG_NAME, P.END_TIME
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.BalanceApprovalExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_BALANCE_APPROVAL P LEFT JOIN A_AGENT_COLINFO C ON P.REALITY_AG_ID=C.AGENT_ID
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.BalanceApprovalExample">
+    delete from P_BALANCE_APPROVAL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.BalanceApproval">
+    insert into P_BALANCE_APPROVAL (BALANCE_ID, BATCH_NO, SETTLE_MONTH, 
+      APPLY_DATE, APPLY_USER, APPLY_TIME, 
+      AGENT_ID, AGENT_NAME, BUS_CODE,
+      REQUEST_NO, BALANCE_AMT, APPROVAL_STATUS,
+      BALANCE_REMARK, BALANCE_ACCT_NO, BALANCE_ACCT_NAME,
+      BALANCE_BANK_NO, BALANCE_BANK_NAME, REALITY_AG_ID,
+      REALITY_AG_NAME, END_TIME)
+    values (#{balanceId,jdbcType=VARCHAR}, #{batchNo,jdbcType=VARCHAR}, #{settleMonth,jdbcType=VARCHAR}, 
+      #{applyDate,jdbcType=VARCHAR}, #{applyUser,jdbcType=VARCHAR}, #{applyTime,jdbcType=VARCHAR}, 
+      #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, #{busCode,jdbcType=VARCHAR},
+      #{requestNo,jdbcType=VARCHAR}, #{balanceAmt,jdbcType=DECIMAL}, #{approvalStatus,jdbcType=VARCHAR}, 
+      #{balanceRemark,jdbcType=VARCHAR}, #{balanceAcctNo,jdbcType=VARCHAR}, #{balanceAcctName,jdbcType=VARCHAR},
+      #{balanceBankNo,jdbcType=VARCHAR}, #{balanceBankName,jdbcType=VARCHAR}, #{realityAgId,jdbcType=VARCHAR},
+      #{realityAgName,jdbcType=VARCHAR}, #{endTime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.BalanceApproval">
+    insert into P_BALANCE_APPROVAL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="balanceId != null">
+        BALANCE_ID,
+      </if>
+      <if test="batchNo != null">
+        BATCH_NO,
+      </if>
+      <if test="settleMonth != null">
+        SETTLE_MONTH,
+      </if>
+      <if test="applyDate != null">
+        APPLY_DATE,
+      </if>
+      <if test="applyUser != null">
+        APPLY_USER,
+      </if>
+      <if test="applyTime != null">
+        APPLY_TIME,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="busCode != null">
+        BUS_CODE,
+      </if>
+      <if test="requestNo != null">
+        REQUEST_NO,
+      </if>
+      <if test="balanceAmt != null">
+        BALANCE_AMT,
+      </if>
+      <if test="approvalStatus != null">
+        APPROVAL_STATUS,
+      </if>
+      <if test="balanceRemark != null">
+        BALANCE_REMARK,
+      </if>
+      <if test="balanceAcctNo != null">
+        BALANCE_ACCT_NO,
+      </if>
+      <if test="balanceAcctName != null">
+        BALANCE_ACCT_NAME,
+      </if>
+      <if test="balanceBankNo != null">
+        BALANCE_BANK_NO,
+      </if>
+      <if test="balanceBankName != null">
+        BALANCE_BANK_NAME,
+      </if>
+      <if test="realityAgId != null">
+        REALITY_AG_ID,
+      </if>
+      <if test="realityAgName != null">
+        REALITY_AG_NAME,
+      </if>
+      <if test="endTime != null">
+        END_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="balanceId != null">
+        #{balanceId,jdbcType=VARCHAR},
+      </if>
+      <if test="batchNo != null">
+        #{batchNo,jdbcType=VARCHAR},
+      </if>
+      <if test="settleMonth != null">
+        #{settleMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="applyDate != null">
+        #{applyDate,jdbcType=VARCHAR},
+      </if>
+      <if test="applyUser != null">
+        #{applyUser,jdbcType=VARCHAR},
+      </if>
+      <if test="applyTime != null">
+        #{applyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="busCode != null">
+        #{busCode,jdbcType=VARCHAR},
+      </if>
+      <if test="requestNo != null">
+        #{requestNo,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceAmt != null">
+        #{balanceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="approvalStatus != null">
+        #{approvalStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceRemark != null">
+        #{balanceRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceAcctNo != null">
+        #{balanceAcctNo,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceAcctName != null">
+        #{balanceAcctName,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceBankNo != null">
+        #{balanceBankNo,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceBankName != null">
+        #{balanceBankName,jdbcType=VARCHAR},
+      </if>
+      <if test="realityAgId != null">
+        #{realityAgId,jdbcType=VARCHAR},
+      </if>
+      <if test="realityAgName != null">
+        #{realityAgName,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.BalanceApprovalExample" resultType="java.lang.Long">
+    select count(*) from P_BALANCE_APPROVAL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+  <!--以上为生成SQL-->
+
+  <select id="queryDetailByBatchNo" resultType="java.util.Map" parameterType="java.lang.String">
+    select BALANCE_ID, BATCH_NO, SETTLE_MONTH, APPLY_DATE, APPLY_USER, APPLY_TIME, AGENT_ID,
+           AGENT_NAME, BUS_CODE, REQUEST_NO, BALANCE_AMT, APPROVAL_STATUS, BALANCE_REMARK
+    from P_BALANCE_APPROVAL
+    where BATCH_NO = #{batchNo,jdbcType=VARCHAR}
+  </select>
+
+  <update id="updateAgentPayByBalanceIdAndBatchNo">
+    update P_BALANCE_APPROVAL set APPROVAL_STATUS = #{approvalStatus,jdbcType=VARCHAR}
+    where 1=1
+    <if test="balanceId != null and balanceId != ''">
+      and BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
+    </if>
+       and BATCH_NO = #{batchNo,jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateBalanceApproval">
+    update P_BALANCE_APPROVAL set APPROVAL_STATUS = #{approvalStatus,jdbcType=VARCHAR}
+    where 1=1 and BATCH_NO = #{batchNo,jdbcType=VARCHAR}
+    <if test="originalStatus != null and originalStatus != ''">
+      and APPROVAL_STATUS= #{originalStatus,jdbcType=VARCHAR}
+    </if>
+  </update>
+
+  <select id="getBalanceApprovalList" resultType="java.util.Map" parameterType="com.ryx.credit.profit.pojo.BalanceApproval">
+    select case  when pba.REQUEST_NO = '77' then '第一次导入'
+                 when pba.REQUEST_NO = '88' then '第二次导入'
+                 when pba.REQUEST_NO = '99' then '第三次导入'
+           else '数据错误'
+           end as REQUEST_NO,
+
+           case  when C.CLO_TYPE = '1' then '1'
+           else '0'
+           end as CLO_TYPE,
+
+           pba.BALANCE_ID, pba.BATCH_NO, pba.APPLY_DATE,
+           pba.APPLY_USER, pba.APPLY_TIME, pba.SETTLE_MONTH, pba.AGENT_ID,
+           pba.AGENT_NAME, pba.BUS_CODE, ap.PLATFORM_NAME as BUS_NAME,
+           pba.BALANCE_AMT,pba.REQUEST_NO as REQUEST_NO_TEMP,
+           NVL(pba.BALANCE_ACCT_NO,C.CLO_BANK_ACCOUNT) AS BALANCE_ACCT_NO,
+           NVL(pba.BALANCE_ACCT_NAME,C.CLO_REALNAME) AS BALANCE_ACCT_NAME,
+           NVL(pba.BALANCE_BANK_NO,C.CLO_BANK_BRANCH) AS BALANCE_BANK_NO,
+           NVL(pba.BALANCE_BANK_NAME,C.CLO_BANK) AS BALANCE_BANK_NAME,
+           pba.APPROVAL_STATUS,pba.REALITY_AG_ID, pba.REALITY_AG_NAME,C.VARSION
+    from P_BALANCE_APPROVAL pba
+    left join A_PLATFORM ap on pba.BUS_CODE = ap.PLATFORM_NUM
+    LEFT JOIN A_AGENT_COLINFO C ON pba.REALITY_AG_ID=C.AGENT_ID
+    where 1=1 and APPROVAL_STATUS != #{approvalStatus,jdbcType=VARCHAR}
+    <if test="agentId != null and agentId != ''">
+      and pba.AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    </if>
+    <if test="agentName != null and agentName != ''">
+      and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
+    </if>
+    <if test="settleMonth != null and settleMonth != ''">
+      and SETTLE_MONTH = #{settleMonth,jdbcType=VARCHAR}
+    </if>
+    <if test="busCode != null and busCode != ''">
+      and BUS_CODE = #{busCode,jdbcType=VARCHAR}
+    </if>
+    <if test="requestNo != null and requestNo != ''">
+      and REQUEST_NO = #{requestNo,jdbcType=VARCHAR}
+    </if>
+    <if test="balanceId != null and balanceId != ''">
+      and BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
+    </if>
+    <if test="batchNo != null and batchNo != ''">
+      and BATCH_NO = #{batchNo,jdbcType=VARCHAR}
+    </if>
+  </select>
+
+  <update id="updateBalanceApprovalAcct" parameterType="com.ryx.credit.profit.pojo.BalanceApproval">
+    update P_BALANCE_APPROVAL
+    set BALANCE_BANK_NO = #{balanceBankNo,jdbcType=VARCHAR},
+        BALANCE_BANK_NAME = #{balanceBankName,jdbcType=VARCHAR},
+        BALANCE_ACCT_NAME = #{balanceAcctName,jdbcType=VARCHAR},
+        BALANCE_ACCT_NO = #{balanceAcctNo,jdbcType=VARCHAR},
+        END_TIME = #{endTime,jdbcType=VARCHAR}
+    where BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
+  </update>
+
+</mapper>

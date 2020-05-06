@@ -18,7 +18,7 @@ public interface PmsProfitMapper {
 
     List<PmsProfit> selectByExample(PmsProfitExample example);
 
-    PmsProfit selectByPrimaryKey(String id);
+    PmsProfit selectByPrimaryKey(String balanceId);
 
     int updateByPrimaryKeySelective(PmsProfit record);
 
