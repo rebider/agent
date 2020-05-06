@@ -85,6 +85,34 @@ public class AgentoutVo extends AgentExtends implements Serializable {
 
     private String freeStatus;
 
+    private String agBusLic;
+    private String agLegalCernum;
+    private String agStatus;
+
+    public String getAgBusLic() {
+        return agBusLic;
+    }
+
+    public void setAgBusLic(String agBusLic) {
+        this.agBusLic = agBusLic;
+    }
+
+    public String getAgLegalCernum() {
+        return agLegalCernum;
+    }
+
+    public void setAgLegalCernum(String agLegalCernum) {
+        this.agLegalCernum = agLegalCernum;
+    }
+
+    public String getAgStatus() {
+        return agStatus;
+    }
+
+    public void setAgStatus(String agStatus) {
+        this.agStatus = agStatus;
+    }
+
     public String getFreeStatus() {
         return freeStatus;
     }

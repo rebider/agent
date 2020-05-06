@@ -16,6 +16,7 @@ import com.ryx.credit.pojo.admin.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentCaVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.ICuserAgentService;
 import com.ryx.credit.service.IResourceService;
@@ -37,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -983,20 +985,43 @@ public class AgentServiceImpl implements AgentService {
 
     /**
      * 风控服务-代理商列表查询
-     * @param param
-     * @param pageInfo
+     * @param page
+     * @param map
      * @return
      */
     @Override
-    public PageInfo queryAgentRiskList(Map<String, Object> param, PageInfo pageInfo) {
-        Long userId = (Long) param.get("userId");
+    public PageInfo queryAgentRiskList(Page page, Map map) {
+        Long userId = (Long) map.get("userId");
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
-        param.put("platfromPerm", platfromPerm);
-        List<Map<String, Object>> agentRiskView = agentMapper.queryAgentRiskView(param);
-        Long agentRiskCount = agentMapper.queryAgentRiskCount(param);
+        map.put("platfromPerm", platfromPerm);
+        PageInfo pageInfo = new PageInfo();
+        List<Map<String, Object>> agentRiskView = agentMapper.queryAgentRiskView(map, page);
+        int agentRiskCount = agentMapper.queryAgentRiskCount(map);
         pageInfo.setRows(agentRiskView);
-        pageInfo.setTotal(agentRiskCount.intValue());
+        pageInfo.setTotal(agentRiskCount);
         return pageInfo;
+    }
+
+    /**
+     * 风控服务-代理商列表导出
+     * @param map
+     * @return
+     * @throws ParseException
+     */
+    @Override
+    public List<AgentoutVo> exportAgentRisk(Map map) throws ParseException {
+        Long userId = (Long) map.get("userId");
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        map.put("platfromPerm", platfromPerm);
+        List<AgentoutVo> agentoutVoList = agentMapper.exportAgentRisk(map);
+        if (null==agentoutVoList && agentoutVoList.size()<1) {
+            return null;
+        }
+//        if (null != agentoutVos && agentoutVos.size() > 0) {
+//            for (AgentoutVo agentoutVo : agentoutVos) {
+//            }
+//        }
+        return agentoutVoList;
     }
 
 }
