@@ -1106,6 +1106,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         updateLogistics.setVersion(oLogistics.getVersion());
         updateLogistics.setwNumber(oLogistics.getwNumber() + "_" + (new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())));
         updateLogistics.setcUser(userId);
+        updateLogistics.setSendMsg("物流已删除！");
         if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
             logger.info("物流删除操作，更新数据库失败:{},{},{}", oLogistics.getId(), oLogistics.getSnBeginNum(), oLogistics.getSnEndNum());
             throw new MessageException("更新物流状态异常！");
