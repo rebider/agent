@@ -477,7 +477,8 @@ public class OsnOperateServiceImpl implements OsnOperateService {
         if(PlatformType.MPOS.code.equals(platForm.getPlatformType())){
             logger.info("首刷发货 更新库存记录:{}:{}-{}",logistics.getProType(),logistics.getSnBeginNum(),logistics.getSnEndNum());
             //遍历sn进行逐个更新
-            if (oActivity_plan != null && StringUtils.isNotBlank(oActivity_plan.getActCode()) && ("2204".equals(oActivity_plan.getActCode()) || "2004".equals(oActivity_plan.getActCode()))) {
+            List<String> actCodeList = dictOptionsService.dictValueList("AGENT", "ACTCODE");
+            if (oActivity_plan != null && StringUtils.isNotBlank(oActivity_plan.getActCode()) && (actCodeList.contains(oActivity_plan.getActCode()))) {
                 for (String id : ids) {
                     OLogisticsDetail detail = new OLogisticsDetail();
                     //id，物流id，创建人，更新人，状态
@@ -871,7 +872,8 @@ public class OsnOperateServiceImpl implements OsnOperateService {
         OActivity oActivity = oActivityMapper.selectByPrimaryKey(oSubOrderActivity.getActivityId());
 
         //流量卡不进行下发操作
-        if(oActivity_plan!=null && com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity_plan.getActCode()) && ("2204".equals(oActivity_plan.getActCode()) || "2004".equals(oActivity_plan.getActCode())) ){
+        List<String> actCodeList = dictOptionsService.dictValueList("AGENT", "ACTCODE");
+        if(oActivity_plan!=null && com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity_plan.getActCode()) && actCodeList.contains(oActivity_plan.getActCode())){
             logger.info("导入物流数据,流量卡不进行下发操作,活动代码:{},物流ID:{},物流信息:{}" ,oActivity_plan.getActCode(),logcId, JSONObject.toJSONString(logistics));
             listOLogisticsDetailSn.forEach(detail -> {
                 detail.setSendStatus(LogisticsDetailSendStatus.send_success.code);

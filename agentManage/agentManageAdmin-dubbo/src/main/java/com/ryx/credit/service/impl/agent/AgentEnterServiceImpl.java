@@ -1081,6 +1081,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             agentFreezePort.setFreezeCause(FreeCause.HTDJ.getValue());
             agentFreezePort.setOperationPerson(agent.getcUser());
             agentFreezePort.setFreezeNum(agent.getId());
+            agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
             AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
             if(!agentResult.isOK()){
                 throw new ProcessException(agentResult.getMsg());

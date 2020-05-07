@@ -433,7 +433,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
         }
 
         //检验流量卡(流量卡直接)
-        if (oActivity != null && StringUtils.isNotBlank(oActivity.getActCode()) && ("2204".equals(oActivity.getActCode()) || "2004".equals(oActivity.getActCode()))) {
+        List<String> actCodeList = dictOptionsService.dictValueList("AGENT", "ACTCODE");
+        if (oActivity != null && StringUtils.isNotBlank(oActivity.getActCode()) && (actCodeList.contains(oActivity.getActCode()))) {
             //更新物流,后续优化
             return AgentResult.ok();
         }
