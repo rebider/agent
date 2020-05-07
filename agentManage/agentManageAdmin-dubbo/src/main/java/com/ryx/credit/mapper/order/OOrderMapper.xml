@@ -1952,7 +1952,7 @@
 
   <select id="arrearageList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    select a.*,a_platform.platform_name,agent.ag_name,agent.AG_UNIQ_NUM from
+    select a.*,a_platform.platform_name,agent.ag_name,agent.AG_UNIQ_NUM,agent.id as agId from
     (
     select
     to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as tm,businfo.agent_id,businfo.bus_platform,
@@ -1978,6 +1978,7 @@
 
   <sql id="BASE_WHERE_SQL">
     <if test="agUniqNum!=null and agUniqNum!=''"> and agent.AG_UNIQ_NUM=#{agUniqNum} </if>
+    <if test="agId!=null and agId!=''"> and agent.id=#{agId} </if>
     <if test="agName !=null and agName !='' ">
       and  agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')
     </if>
