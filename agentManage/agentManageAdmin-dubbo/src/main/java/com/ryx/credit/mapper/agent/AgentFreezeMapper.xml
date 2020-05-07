@@ -269,7 +269,10 @@
            and t.id = #{map.id,jdbcType=VARCHAR}
         </if>
         <if test="map.agentId != null and map.agentId != '' ">
-          and t.agent_Id = #{map.agentId,jdbcType=VARCHAR}
+          and t.agent_Id in
+        <foreach collection="map.agentId" item="listItem" open="(" close=")" separator="," >
+            #{listItem}
+        </foreach>
         </if>
         <if test="map.agentName != null and map.agentName != '' ">
           and a.ag_name LIKE CONCAT(CONCAT('%',#{map.agentName}),'%')

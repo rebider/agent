@@ -59,7 +59,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             reqMap.put("id",agentFreeze.getId());
         }
         if(StringUtils.isNotBlank(agentFreeze.getAgentId())){
-            reqMap.put("agentId",agentFreeze.getAgentId());
+            String agentIdS = String.valueOf(agentFreeze.getAgentId());
+            String[] split = agentIdS.split(",");
+            reqMap.put("agentId",split);
         }
         if(StringUtils.isNotBlank(agentFreeze.getAgentName())){
             reqMap.put("agentName",agentFreeze.getAgentName());
