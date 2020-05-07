@@ -4,6 +4,7 @@ import com.ryx.credit.profit.pojo.BalanceApproval;
 import com.ryx.credit.profit.pojo.BalanceApprovalExample;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -32,4 +33,6 @@ public interface BalanceApprovalMapper {
     List<Map<String, Object>> getBalanceApprovalList(BalanceApproval balanceApproval);
 
     int updateBalanceApprovalAcct(BalanceApproval approval);
+
+    BigDecimal countAmtByBatchNo(BalanceApprovalExample example);
 }

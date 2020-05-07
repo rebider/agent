@@ -55,10 +55,22 @@
   <sql id="Base_Column_List">
     P.BALANCE_ID, P.BATCH_NO, P.SETTLE_MONTH, P.APPLY_DATE, P.APPLY_USER, P.APPLY_TIME, P.AGENT_ID,
         P.AGENT_NAME, P.BUS_CODE, P.REQUEST_NO, P.BALANCE_AMT, P.APPROVAL_STATUS, P.BALANCE_REMARK,
-        NVL(P.BALANCE_ACCT_NO,C.CLO_BANK_ACCOUNT) AS BALANCE_ACCT_NO,
-        NVL(P.BALANCE_ACCT_NAME,C.CLO_REALNAME) AS BALANCE_ACCT_NAME,
-        NVL(P.BALANCE_BANK_NO,C.CLO_BANK_BRANCH) AS BALANCE_BANK_NO,
-        NVL(P.BALANCE_BANK_NAME,C.CLO_BANK) AS BALANCE_BANK_NAME,
+           NVL(P.BALANCE_ACCT_NO,
+              CASE  WHEN P.BUS_CODE = '6000' THEN AC600.BANKCODE
+              ELSE C.CLO_BANK_ACCOUNT
+              END) AS BALANCE_ACCT_NO,
+           NVL(P.BALANCE_ACCT_NAME,
+              CASE  WHEN P.BUS_CODE = '6000' THEN AC600.ACCOUNTNAME
+              ELSE C.CLO_REALNAME
+              END) AS BALANCE_ACCT_NAME,
+           NVL(P.BALANCE_BANK_NO,
+              CASE  WHEN P.BUS_CODE = '6000' THEN AC600.BANKID
+              ELSE C.CLO_BANK_BRANCH
+              END) AS BALANCE_BANK_NO,
+           NVL(P.BALANCE_BANK_NAME,
+              CASE  WHEN P.BUS_CODE = '6000' THEN AC600.ACCOUNTBANK
+              ELSE C.CLO_BANK
+              END) AS BALANCE_BANK_NAME,
         P.REALITY_AG_ID, P.REALITY_AG_NAME, P.END_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.BalanceApprovalExample" resultMap="BaseResultMap">
@@ -68,7 +80,14 @@
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from P_BALANCE_APPROVAL P LEFT JOIN A_AGENT_COLINFO C ON P.REALITY_AG_ID=C.AGENT_ID
+    from P_BALANCE_APPROVAL P
+        LEFT JOIN A_AGENT_COLINFO C ON P.REALITY_AG_ID=C.AGENT_ID
+        LEFT JOIN (SELECT A.AGENCYID,A.BANKCODE,A.ACCOUNTNAME,A.ACCOUNTBANK,A.BANKID FROM RYX_AGENCYBANKINFO A WHERE A.AGENCYID LIKE '600%'
+        UNION ALL
+        SELECT A.AGENCY_ID AGENCYID,A.BANKCODE,A.ACCOUNTNAME,A.ACCOUNTBANK,A.BANKID FROM QT1TBLAGENCY A WHERE NOT EXISTS (
+        SELECT 1 FROM RYX_AGENCYBANKINFO RABI WHERE RABI.AGENCYID LIKE '600%' AND  RABI.AGENCYID=A.AGENCY_ID
+        ) AND A.BANKID IS NOT NULL AND A.BANKCODE IS NOT NULL AND A.ACCOUNTNAME IS NOT NULL
+        AND LENGTH(A.BANKID)=12 AND LENGTH(A.ACCOUNTNAME)>=2) AC600 ON P.REALITY_AG_ID = AC600.AGENCYID
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -271,31 +290,50 @@
   </update>
 
   <select id="getBalanceApprovalList" resultType="java.util.Map" parameterType="com.ryx.credit.profit.pojo.BalanceApproval">
-    select case  when pba.REQUEST_NO = '77' then '第一次导入'
-                 when pba.REQUEST_NO = '88' then '第二次导入'
-                 when pba.REQUEST_NO = '99' then '第三次导入'
-           else '数据错误'
-           end as REQUEST_NO,
-
-           case  when C.CLO_TYPE = '1' then '1'
-           else '0'
-           end as CLO_TYPE,
-
-           pba.BALANCE_ID, pba.BATCH_NO, pba.APPLY_DATE,
-           pba.APPLY_USER, pba.APPLY_TIME, pba.SETTLE_MONTH, pba.AGENT_ID,
-           pba.AGENT_NAME, pba.BUS_CODE, ap.PLATFORM_NAME as BUS_NAME,
-           pba.BALANCE_AMT,pba.REQUEST_NO as REQUEST_NO_TEMP,
-           NVL(pba.BALANCE_ACCT_NO,C.CLO_BANK_ACCOUNT) AS BALANCE_ACCT_NO,
-           NVL(pba.BALANCE_ACCT_NAME,C.CLO_REALNAME) AS BALANCE_ACCT_NAME,
-           NVL(pba.BALANCE_BANK_NO,C.CLO_BANK_BRANCH) AS BALANCE_BANK_NO,
-           NVL(pba.BALANCE_BANK_NAME,C.CLO_BANK) AS BALANCE_BANK_NAME,
-           pba.APPROVAL_STATUS,pba.REALITY_AG_ID, pba.REALITY_AG_NAME,C.VARSION
-    from P_BALANCE_APPROVAL pba
-    left join A_PLATFORM ap on pba.BUS_CODE = ap.PLATFORM_NUM
-    LEFT JOIN A_AGENT_COLINFO C ON pba.REALITY_AG_ID=C.AGENT_ID
-    where 1=1 and APPROVAL_STATUS != #{approvalStatus,jdbcType=VARCHAR}
+    SELECT CASE  WHEN PBA.REQUEST_NO = '77' THEN '第一次导入'
+        WHEN PBA.REQUEST_NO = '88' THEN '第二次导入'
+        WHEN PBA.REQUEST_NO = '99' THEN '第三次导入'
+        ELSE '数据错误'
+    END AS REQUEST_NO,
+    CASE  WHEN C.CLO_TYPE = '1' THEN '1'
+        ELSE '0'
+    END AS CLO_TYPE,
+    PBA.BALANCE_ID, PBA.BATCH_NO, PBA.APPLY_DATE,
+    PBA.APPLY_USER, PBA.APPLY_TIME, PBA.SETTLE_MONTH, PBA.AGENT_ID,
+    PBA.AGENT_NAME, PBA.BUS_CODE, AP.PLATFORM_NAME AS BUS_NAME,
+    PBA.BALANCE_AMT,PBA.REQUEST_NO AS REQUEST_NO_TEMP,
+    NVL(PBA.BALANCE_ACCT_NO,
+      CASE  WHEN PBA.BUS_CODE = '6000' THEN AC600.BANKCODE
+          ELSE C.CLO_BANK_ACCOUNT
+      END) AS BALANCE_ACCT_NO,
+    NVL(PBA.BALANCE_ACCT_NAME,
+      CASE  WHEN PBA.BUS_CODE = '6000' THEN AC600.ACCOUNTNAME
+        ELSE C.CLO_REALNAME
+      END) AS BALANCE_ACCT_NAME,
+    NVL(PBA.BALANCE_BANK_NO,
+      CASE  WHEN PBA.BUS_CODE = '6000' THEN AC600.BANKID
+        ELSE C.CLO_BANK_BRANCH
+      END) AS BALANCE_BANK_NO,
+    NVL(PBA.BALANCE_BANK_NAME,
+      CASE  WHEN PBA.BUS_CODE = '6000' THEN AC600.ACCOUNTBANK
+        ELSE C.CLO_BANK
+      END) AS BALANCE_BANK_NAME,
+    PBA.APPROVAL_STATUS,PBA.REALITY_AG_ID, PBA.REALITY_AG_NAME,C.VARSION
+    FROM P_BALANCE_APPROVAL PBA
+    LEFT JOIN A_PLATFORM AP ON PBA.BUS_CODE = AP.PLATFORM_NUM
+    LEFT JOIN A_AGENT_COLINFO C ON PBA.REALITY_AG_ID=C.AGENT_ID
+    LEFT JOIN (SELECT A.AGENCYID,A.BANKCODE,A.ACCOUNTNAME,A.ACCOUNTBANK,A.BANKID FROM RYX_AGENCYBANKINFO A WHERE A.AGENCYID LIKE '600%'
+      UNION ALL
+      SELECT A.AGENCY_ID AGENCYID,A.BANKCODE,A.ACCOUNTNAME,A.ACCOUNTBANK,A.BANKID FROM QT1TBLAGENCY A WHERE NOT EXISTS (
+      SELECT 1 FROM RYX_AGENCYBANKINFO RABI WHERE RABI.AGENCYID LIKE '600%' AND  RABI.AGENCYID=A.AGENCY_ID
+      ) AND A.BANKID IS NOT NULL AND A.BANKCODE IS NOT NULL AND A.ACCOUNTNAME IS NOT NULL
+      AND LENGTH(A.BANKID)=12 AND LENGTH(A.ACCOUNTNAME)>=2) AC600 ON PBA.REALITY_AG_ID = AC600.AGENCYID
+    WHERE 1=1
+    <if test="approvalStatus != null and approvalStatus != ''">
+      and APPROVAL_STATUS != #{approvalStatus,jdbcType=VARCHAR}
+    </if>
     <if test="agentId != null and agentId != ''">
-      and pba.AGENT_ID = #{agentId,jdbcType=VARCHAR}
+      and PBA.AGENT_ID = #{agentId,jdbcType=VARCHAR}
     </if>
     <if test="agentName != null and agentName != ''">
       and AGENT_NAME = #{agentName,jdbcType=VARCHAR}
@@ -327,4 +365,10 @@
     where BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
   </update>
 
+  <select id="countAmtByBatchNo" parameterType="com.ryx.credit.profit.pojo.BalanceApprovalExample" resultType="java.math.BigDecimal">
+    select sum(nvl(BALANCE_AMT,0)) as approvalConutAmt from P_BALANCE_APPROVAL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
 </mapper>

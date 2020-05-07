@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 分润模板线上审批
- * @Author cqt
+ * 出款申请审批
+ * @Author Renshenghao
  */
 
 public class ProfitAgentPayExecutionListener extends BaseTaskListener  implements TaskListener, ExecutionListener {

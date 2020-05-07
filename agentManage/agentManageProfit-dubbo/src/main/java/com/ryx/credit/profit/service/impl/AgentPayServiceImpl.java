@@ -111,7 +111,7 @@ public class AgentPayServiceImpl implements IAgentPayService {
 
 
         String applyDate = DateUtil.format(new Date(), "yyyyMMdd");
-        String applyTime = DateUtil.format(new Date(), "HHmmss");
+        String applyTime = DateUtil.format(new Date(), "HH:mm:ss");
         for (String balanceId:balanceIds){
             BalanceApproval approval = new BalanceApproval();
             PmsProfit pmsProfit = pmsProfitMapper.selectByPrimaryKey(balanceId);
@@ -188,6 +188,14 @@ public class AgentPayServiceImpl implements IAgentPayService {
     }
 
     @Override
+    public BigDecimal countAmtByBatchNo(String batchNo) {
+        BalanceApprovalExample example = new BalanceApprovalExample();
+        BalanceApprovalExample.Criteria criteria = example.createCriteria();
+        criteria.andBatchNoEqualTo(batchNo);
+        return balanceApprovalMapper.countAmtByBatchNo(example);
+    }
+
+    @Override
     public int updateBalanceApprovalAcct(BalanceApproval approval) {
         return balanceApprovalMapper.updateBalanceApprovalAcct(approval);
     }
@@ -257,12 +265,12 @@ public class AgentPayServiceImpl implements IAgentPayService {
             String endTime = DateUtil.format(new Date(),DateUtil.DATE_FORMAT_1);
             String settleDate = DateUtil.format(new Date(),DateUtil.DATE_FORMAT_3);//清结算日期
             if (rel != null) {
+                BalanceApproval approval = new BalanceApproval();
+                approval.setBatchNo(batchNo);
                 if("0".equals(status)){ //审批通过
                     //业务相关
-                    int result = updateBalanceApproval(batchNo, "0");   //审批流表状态更新
-                    BalanceApproval approval = new BalanceApproval();
-                    approval.setBatchNo(batchNo);
-                    List<Map<String, Object>> approvalList = getBalanceApprovalList(approval);
+                    updateBalanceApproval(batchNo, "0");   //审批流表状态更新
+                    List<Map<String, Object>> approvalList = getBalanceApprovalList(approval);  //此批次的所有出款审批
                     for (int i = 0; i < approvalList.size(); i++) {
                         Map<String, Object> approvalMap = approvalList.get(i);
 
@@ -272,7 +280,7 @@ public class AgentPayServiceImpl implements IAgentPayService {
                             PmsProfit pmsProfit = new PmsProfit();
                             pmsProfit.setBalanceId(balanceId);
                             pmsProfit.setBillStatus("05");
-                            pmsProfitMapper.updateByPrimaryKey(pmsProfit);
+                            pmsProfitMapper.updateByPrimaryKeySelective(pmsProfit);
 
                             BalanceApproval upApproval = new BalanceApproval();
                             upApproval.setBalanceId(balanceId);
@@ -295,7 +303,7 @@ public class AgentPayServiceImpl implements IAgentPayService {
                         pmsProfit.setBalanceBankNo(balanceBankNo);
                         pmsProfit.setBalanceBankName(balanceBankName);
                         pmsProfit.setBillStatus("06");
-                        pmsProfitMapper.updateByPrimaryKey(pmsProfit);  //审批通过 更新pmsProfit表中状态以及结算卡信息
+                        pmsProfitMapper.updateByPrimaryKeySelective(pmsProfit);  //审批通过 更新pmsProfit表中状态以及结算卡信息
 
                         BalanceApproval upApproval = new BalanceApproval();
                         upApproval.setBalanceId(balanceId);
@@ -337,9 +345,9 @@ public class AgentPayServiceImpl implements IAgentPayService {
                         pBalanceSerial.setBalanceAcctType(balanceAcctType);
                         pBalanceSerial.setBalanceBankNo(balanceBankNo);
                         pBalanceSerial.setBalanceBankName(balanceBankName);
-                        pBalanceSerial.setBalanceStatus("01");
+                        pBalanceSerial.setBalanceStatus("00");
                         pBalanceSerial.setSubmitTer(applyUser);
-                        pBalanceSerial.setSubmitTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new SimpleDateFormat("yyyyMMddHHmmss").parse(applyDate+applyTime)));
+                        pBalanceSerial.setSubmitTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new SimpleDateFormat("yyyyMMddHH:mm:ss").parse(applyDate+applyTime)));
                         pBalanceSerial.setBalanceBankVersion(varsion);
                         pBalanceSerialMapper.insert(pBalanceSerial);
 
@@ -349,8 +357,25 @@ public class AgentPayServiceImpl implements IAgentPayService {
                     rel.setActivStatus(AgStatus.Approved.name());
                 }else if ("1".equals(status)){  //审批拒绝
                     //业务相关
-                    int result = updateBalanceApproval(batchNo, "1");   //审批流表状态更新
+                    updateBalanceApproval(batchNo, "1");   //审批流表状态更新
+                    List<Map<String, Object>> approvalList = getBalanceApprovalList(approval);  //此批次的所有出款审批
+                    for (int i = 0; i < approvalList.size(); i++) {
+                        Map<String, Object> approvalMap = approvalList.get(i);
 
+                        String approvalStatus = String.valueOf(approvalMap.get("APPROVAL_STATUS"));
+                        String balanceId = String.valueOf(approvalMap.get("BALANCE_ID"));
+                        if ("03".equals(approvalStatus)) {//审批退回的
+                            PmsProfit pmsProfit = new PmsProfit();
+                            pmsProfit.setBalanceId(balanceId);
+                            pmsProfit.setBillStatus("05");
+                            pmsProfitMapper.updateByPrimaryKeySelective(pmsProfit);
+
+                            BalanceApproval upApproval = new BalanceApproval();
+                            upApproval.setBalanceId(balanceId);
+                            upApproval.setEndTime(endTime);
+                            updateBalanceApprovalAcct(upApproval);
+                        }
+                    }
 
                     rel.setActivStatus(AgStatus.Refuse.name());
                 }else throw new RuntimeException("审批流异常");

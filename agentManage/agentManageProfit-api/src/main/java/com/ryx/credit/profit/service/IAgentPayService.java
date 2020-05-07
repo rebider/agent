@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,8 @@ public interface IAgentPayService {
     int updateAgentPayByBalanceIdAndBatchNo(String balanceId,String batchNo,String approvalStatus);
 
     long countByBatchNo(String batchNo);
+
+    BigDecimal countAmtByBatchNo(String batchNo);
 
     int updateBalanceApprovalAcct(BalanceApproval approval);
 }
