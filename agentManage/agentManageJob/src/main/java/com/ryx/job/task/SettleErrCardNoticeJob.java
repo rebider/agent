@@ -31,8 +31,10 @@ public class SettleErrCardNoticeJob implements SimpleJob {
     @Override
     public void execute(ShardingContext shardingContext) {
         logger.info("****************分润出款结算卡异常通知处理任务开始{}**************",shardingContext.getJobName());
-        List<Map<String,String>>  list = pBalanceSerialService.getNeedNoticeList();
-        pBalanceSerialService.updateNoticeStatus(list,"01");
+        //List<Map<String,String>>  list = pBalanceSerialService.getNeedNoticeList();
+        //if(list.size() > 0){
+        //    pBalanceSerialService.updateNoticeStatus(list,"01");
+        //}
         logger.info("****************分润出款结算卡异常通知处理任务结束{}**************",shardingContext.getJobName());
     }
 }
