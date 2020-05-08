@@ -1030,9 +1030,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     if (agentResult != null) {
                         if (agentResult.isOK()) {
                             JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
+                            String respCode = (String) jsonObject.get("respCode");
                             JSONObject JSONObjectData = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
                             JSONObject data = JSONObject.parseObject(String.valueOf(JSONObjectData.get("data")));
-                            String respCode = String.valueOf(data.get("respCode"));
                             String resMsg = String.valueOf(data.get("resMsg"));
                             if ("000000".equals(respCode)) {
                                 String transferStatus = String.valueOf(data.get("transferStatus"));
