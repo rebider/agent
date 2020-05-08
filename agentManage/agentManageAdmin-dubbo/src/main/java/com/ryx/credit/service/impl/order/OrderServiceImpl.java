@@ -3762,7 +3762,7 @@ public class OrderServiceImpl implements OrderService {
                         if (orderoutVo.getPayMethod().equals("首付+分润分期") || orderoutVo.getPayMethod().equals("分润分期")) {
                             orderoutVo.setMqydkAmt(String.valueOf(BigDecimal.ZERO));
                         } else if (orderoutVo.getPayMethod().equals("首付+打款分期") || orderoutVo.getPayMethod().equals("付款分期")) {
-                            orderoutVo.setMqykAmt(BigDecimal.ZERO);
+                            orderoutVo.setMqykAmt(String.valueOf(BigDecimal.ZERO));
                         }
                     }
                 }
@@ -3828,25 +3828,25 @@ public class OrderServiceImpl implements OrderService {
         List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.SETTLEMENT_TYPE.name());
         List<Dict> capitalType = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
 
-        if (null!=orderoutList  && orderoutList.size()>0){
+        if (null!=orderoutList && orderoutList.size()>0) {
             for (OrderoutVo orderoutVo : orderoutList) {
                 if (StringUtils.isNotBlank(orderoutVo.getPayMethod()) && !orderoutVo.getPayMethod().equals("null")) {
                     for (Dict dict : dictList) {
-                        if (null!=dict  &&  orderoutVo.getPayMethod().equals(dict.getdItemvalue())){
+                        if (null!=dict && orderoutVo.getPayMethod().equals(dict.getdItemvalue())) {
                             orderoutVo.setPayMethod(dict.getdItemname());
                             break;
                         }
                     }
                 }
-                if (StringUtils.isNotBlank(orderoutVo.getDeductionType()) && !orderoutVo.getDeductionType().equals("null")){
+                if (StringUtils.isNotBlank(orderoutVo.getDeductionType()) && !orderoutVo.getDeductionType().equals("null")) {
                     for (Dict dict : capitalType) {
-                        if (null!=dict && orderoutVo.getDeductionType().equals(dict.getdItemvalue())){
+                        if (null!=dict && orderoutVo.getDeductionType().equals(dict.getdItemvalue())) {
                             orderoutVo.setDeductionType(dict.getdItemname());
-                            BigDecimal deductionAmount=new BigDecimal(0);
-                            if (null!=orderoutVo.getDeductionAmount()){
-                                deductionAmount= orderoutVo.getDeductionAmount();
+                            BigDecimal deductionAmount = new BigDecimal(0);
+                            if (null != orderoutVo.getDeductionAmount()) {
+                                deductionAmount = orderoutVo.getDeductionAmount();
                             }
-                            orderoutVo.setAmount(orderoutVo.getDeductionType()+":"+orderoutVo.getDeductionAmount());
+                            orderoutVo.setAmount(orderoutVo.getDeductionType() + ":" + orderoutVo.getDeductionAmount());
                             break;
                         }
                     }
@@ -3856,7 +3856,7 @@ public class OrderServiceImpl implements OrderService {
                         if (orderoutVo.getPayMethod().equals("首付+分润分期") || orderoutVo.getPayMethod().equals("分润分期")) {
                             orderoutVo.setMqydkAmt(String.valueOf(BigDecimal.ZERO));
                         } else if (orderoutVo.getPayMethod().equals("首付+打款分期") || orderoutVo.getPayMethod().equals("付款分期")) {
-                            orderoutVo.setMqykAmt(BigDecimal.ZERO);
+                            orderoutVo.setMqykAmt(String.valueOf(BigDecimal.ZERO));
                         }
                     }
                 }
@@ -3884,15 +3884,16 @@ public class OrderServiceImpl implements OrderService {
                         }
                     }
                 }
-                if(StringUtils.isNotBlank(orderoutVo.getNuclearUser())){
+                if (StringUtils.isNotBlank(orderoutVo.getNuclearUser())) {
                     CUser cUser = iUserService.selectById(orderoutVo.getNuclearUser());
-                    if(null!=cUser)
+                    if (null != cUser)
                         orderoutVo.setNuclearUser(cUser.getName());
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getOrderUser())) {
                     CUser cUser = iUserService.selectById(orderoutVo.getOrderUser());
-                    if(null != cUser)
+                    if(null != cUser) {
                         orderoutVo.setOrderUser(cUser.getName());
+                    }
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getReviewStatus()) && !orderoutVo.getReviewStatus().equals("null")) {
                     String agStatusByValue = AgStatus.getMsg(new BigDecimal(orderoutVo.getReviewStatus()));

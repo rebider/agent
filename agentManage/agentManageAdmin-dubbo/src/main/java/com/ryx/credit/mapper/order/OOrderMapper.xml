@@ -1309,8 +1309,9 @@
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as checkDate,
+    d.down_payment,
     nvl((
-      select LISTAGG(cr.amount,',') WITHIN GROUP (ORDER BY cr.src_id)
+      select LISTAGG(cr.amount,'/') WITHIN GROUP (ORDER BY cr.src_id)
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),0) as xxAmount,
@@ -1325,12 +1326,20 @@
         else 0
       end
     ),0) as down_payment_count,
-    nvl((
-      select max(o_payment_detail.pay_amount)
-      from o_payment_detail
-      where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
-      and (o_payment_detail.pay_type='FRFQ' or o_payment_detail.pay_type='DKFQ')
-    ),0) as mqyk_amt,
+    (decode(d.custom_staging,'1',
+       nvl((
+         select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.payment_id)
+         from o_payment_detail de
+         where de.payment_id = d.id and de.order_id = o.id and de.status = 1
+         and (de.pay_type='FRFQ' or de.pay_type='DKFQ')
+       ),0),
+       nvl((
+         select max(de.pay_amount)
+         from o_payment_detail de
+         where de.payment_id = d.id and de.order_id = o.id and de.status = 1
+         and (de.pay_type='FRFQ' or de.pay_type='DKFQ')
+       ),0))
+    ) as mqyk_amt,
     nvl((
       case d.pay_method
         when 'SF2' then d.pay_amount-d.down_payment
@@ -1345,18 +1354,25 @@
         else 0
       end
     ),0) as frdk_count,
-    nvl((
-      select max(o_payment_detail.pay_amount)
-      from o_payment_detail
-      where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
-      and (o_payment_detail.pay_type='FRFQ' or o_payment_detail.pay_type='DKFQ')
-    ),0) as mqydkAmt,
+    (decode(d.custom_staging,'1',
+       nvl((
+         select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.payment_id)
+         from o_payment_detail de
+         where de.payment_id = d.id and de.order_id = o.id and de.status = 1
+         and de.pay_type='DKFQ'
+       ),0),
+       nvl((
+         select max(de.pay_amount)
+         from o_payment_detail de
+         where de.payment_id = d.id and de.order_id = o.id and de.status = 1
+         and de.pay_type='DKFQ'
+       ),0))
+    ) as mqydkAmt,
     nvl((
       select sum(o_payment_detail.real_pay_amount)
       from o_payment_detail
       where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
-      and (o_payment_detail.payment_status = 4 or o_payment_detail.payment_status = 6)
-      and (o_payment_detail.pay_type='DKFQ' or o_payment_detail.pay_type='FRFQ')
+      and (o_payment_detail.payment_status = 4 or o_payment_detail.payment_status = 2)
     ),0) as sjdk_amt,
     nvl(d.outstanding_amount,0) as syqk_amt,
     (
@@ -1899,13 +1915,14 @@
     <result column="real_rec_time" property="realRecTime" jdbcType="TIMESTAMP"/>
     <result column="nuclear_user" property="nuclearUser" jdbcType="VARCHAR"/>
     <result column="check_date" property="checkDate" jdbcType="TIMESTAMP"/>
+    <result column="down_payment" property="downPayment" jdbcType="VARCHAR"/>
     <result column="xxAmount" property="xxAmount" jdbcType="VARCHAR"/>
     <result column="profit_mouth" property="profitMouth" jdbcType="VARCHAR"/>
     <result column="profit_form" property="profitForm" jdbcType="VARCHAR"/>
     <result column="ykfr_amt" property="ykfrAmt" jdbcType="DECIMAL"/>
     <result column="down_payment_date" property="downPaymentDate" jdbcType="TIMESTAMP"/>
     <result column="down_payment_count" property="downPaymentCount" jdbcType="DECIMAL"/>
-    <result column="mqyk_amt" property="mqykAmt" jdbcType="DECIMAL"/>
+    <result column="mqyk_amt" property="mqykAmt" jdbcType="VARCHAR"/>
     <result column="fqdk_amt" property="fqdkAmt" jdbcType="DECIMAL"/>
     <result column="frdk_count" property="frdkCount" jdbcType="DECIMAL"/>
     <result column="mqydk_amt" property="mqydkAmt" jdbcType="VARCHAR"/>

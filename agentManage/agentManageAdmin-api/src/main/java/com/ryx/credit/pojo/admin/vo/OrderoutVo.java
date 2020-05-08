@@ -43,8 +43,8 @@ public class OrderoutVo implements Serializable{
     private BigDecimal ykfrAmt;//应扣分润金额
     private String downPaymentDate;//分润扣款开始月份
     private BigDecimal downPaymentCount;//分期扣分润期数
-    private BigDecimal downPayment;//首付金额
-    private BigDecimal mqykAmt;//每期应扣分润金额
+    private BigDecimal downPayment;////首付款合计
+    private String mqykAmt;//每期应扣分润金额
     private BigDecimal skfrAmt;//实扣分润金额
     private BigDecimal fqdkAmt;//分期打款金额
     private BigDecimal frdkCount;//分期打款期数
@@ -278,11 +278,11 @@ public class OrderoutVo implements Serializable{
         this.downPayment = downPayment;
     }
 
-    public BigDecimal getMqykAmt() {
+    public String getMqykAmt() {
         return mqykAmt;
     }
 
-    public void setMqykAmt(BigDecimal mqykAmt) {
+    public void setMqykAmt(String mqykAmt) {
         this.mqykAmt = mqykAmt;
     }
 
