@@ -953,8 +953,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                         } else {
                             log.info("POS未连通查询请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
                             log.info("POS未连通查询请求结果：{}", JSONObject.toJSON(agentResult));
-                            terminalTransferDetail.setRemark("POS未联动调整需线下处理");
-                            terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
+                           /* terminalTransferDetail.setRemark("POS未联动调整需线下处理");
+                            terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());*/
+                            continue;
                         }
                         terminalTransferDetail.setAdjustTime(new Date());
                         terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
@@ -1000,8 +1001,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                         } else {
                             log.info("MPOS手刷划拨未联动请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
                             log.info("MPOS手刷划拨未联动返回参数：{}", JSONObject.toJSON(agentResult));
-                            terminalTransferDetail.setRemark("MPOS手刷未联动调整需线下处理");
-                            terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
+                           /* terminalTransferDetail.setRemark("MPOS手刷未联动调整需线下处理");
+                            terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());*/
+                            continue;
                         }
                         terminalTransferDetail.setAdjustTime(new Date());
                         terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
@@ -1060,8 +1062,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                         } else {
                             log.info("瑞+未连通查询请求参数：{}", JSONObject.toJSON(terminalTransferDetail));
                             log.info("瑞+未连通查询请求结果：{}", JSONObject.toJSON(agentResult));
-                            terminalTransferDetail.setRemark("瑞+未联动调整需线下处理");
-                            terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());
+                            /*terminalTransferDetail.setRemark("瑞+未联动调整需线下处理");
+                            terminalTransferDetail.setAdjustStatus(AdjustStatus.WLDTZ.getValue());*/
+                            continue;
                         }
                         terminalTransferDetail.setAdjustTime(new Date());
                         terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
