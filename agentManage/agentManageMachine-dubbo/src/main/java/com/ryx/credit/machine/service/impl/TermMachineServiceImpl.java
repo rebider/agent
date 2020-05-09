@@ -207,19 +207,17 @@ public class TermMachineServiceImpl  implements TermMachineService {
     @Override
     public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
         String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
-        AgentResult agentResult = AgentResult.fail();
-        if(PlatformType.whetherPOS(platformType)){
-            agentResult =  posTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList,operation);
-        }else if(PlatformType.SSPOS.getValue().equals(platformType)){
-            agentResult =  sPosTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList,operation);
-        }else if(PlatformType.MPOS.getValue().equals(platformType)){
-            agentResult =  mposTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList,operation);
-        }else if(PlatformType.RDBPOS.getValue().equals(platformType)){
-            agentResult =  rdbTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList,operation);
-        }else {
-            return AgentResult.ok("未联动");
+        if (PlatformType.whetherPOS(platformType)) {
+            return posTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation);
+        } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
+            return sPosTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation);
+        } else if (PlatformType.MPOS.getValue().equals(platformType)) {
+            return mposTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation);
+        } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
+            return rdbTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation);
+        } else {
+            return AgentResult.fail(platformType + "平台活动调整功能未实现");
         }
-        return agentResult;
     }
 
     @Override
