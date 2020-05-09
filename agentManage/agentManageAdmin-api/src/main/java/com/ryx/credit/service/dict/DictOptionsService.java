@@ -41,4 +41,6 @@ public interface DictOptionsService {
     boolean editDictByOldDict(Dict oldDict, Dict newDict)throws Exception;
 
     List<Dict> queryDictList(Dict dict);
+
+    List<String> dictValueList(String group,String artifact);
 }

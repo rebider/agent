@@ -65,6 +65,13 @@ public class DictServiceTest extends BaseSpringTest {
     }
 
     @Test
+    public void testValueList(){
+        List<String> actCodeList = dictOptionsService.dictValueList("AGENT", "ACTCODE");
+        logger.info("=======testValueList====="+ actCodeList.contains("2004"));
+        logger.info("=======testValueList=2===="+ actCodeList.toString());
+    }
+
+    @Test
     public void testOptions(){
         logger.info("=======testOptions=====");
         List<Dict> list =  dictOptionsService.dictList("AGENT","CAPITAL_TYPE");
