@@ -2015,10 +2015,11 @@
     ),0) as sjdk_amt,
     nvl(d.outstanding_amount,0) as syqk_amt,
     (
-      nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
+      nvl(os.pro_num,0)
       -
-      nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro
-      where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
+      nvl((select sum(pro.pro_num) from o_receipt_pro pro
+      left join o_receipt_order ro on ro.id = pro.receipt_id
+      where pro.orderid = o.id and pro.status=1 and ro.status = 1 and os.pro_id = pro.pro_id and pro.receipt_pro_status in (1,2)),0)
     )as to_pick_num,
     nvl((
       select sum(plans.plan_pro_num)
@@ -2029,7 +2030,8 @@
     nvl((
       select sum(pro.pro_num) - sum(pro.send_num)
       from o_receipt_pro pro
-      where pro.orderid = o.id and pro.status=1 and pro.receipt_pro_status in (1,2)
+      left join o_receipt_order ro on ro.id = pro.receipt_id
+      where pro.orderid = o.id and pro.status=1 and ro.status = 1 and os.pro_id = pro.pro_id and pro.receipt_pro_status in (1,2)
     ),0) as toPlanNum,
     o.review_status,
     to_char(o.o_inuretime,'yyyy-MM-dd hh24:mi:ss') as oinuretime,
