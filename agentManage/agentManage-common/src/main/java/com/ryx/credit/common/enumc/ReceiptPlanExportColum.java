@@ -17,7 +17,7 @@ public enum ReceiptPlanExportColum {
 
     //导出欠款记录
     ARREARAGE_Column("TM,AGID,AG_UNIQ_NUM,AG_NAME,BUS_NUM,PLATFORM_NAME,JJQK","欠款导出字段"),
-    ARREARAGE_Title("月份,代理商唯一编码,自编唯一码,代理商名称,业务平台编码,业务平台,机具欠款","欠款导出标题"),
+    ARREARAGE_Title("月份,代理商唯一编码,自编唯一码,代理商名称,业务平台编号,业务平台,机具欠款","欠款导出标题"),
 
     //导出活动调整
     RefundPriceDiff_Column("ID,AGENT_ID,AG_NAME,DEDUCT_AMT,BELOW_PAY_AMT,SHARE_DEDUCT_AMT,GATHER_TIME,GATHER_AMT,APPLY_REMARK,REVIEW_STATUS,ORDER_TYPE,S_TIME,U_TIME","活动调整导出字段"),
