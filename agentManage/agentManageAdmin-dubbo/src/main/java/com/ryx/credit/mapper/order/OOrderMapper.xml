@@ -1328,7 +1328,7 @@
     ),0) as down_payment_count,
     (decode(d.custom_staging,'1',
        nvl((
-         select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.pay_time)
+         select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.plan_pay_time)
          from o_payment_detail de
          where de.payment_id = d.id and de.order_id = o.id and de.status = 1
          and (de.pay_type='FRFQ' or de.pay_type='DKFQ')
@@ -1356,7 +1356,7 @@
     ),0) as frdk_count,
     (decode(d.custom_staging,'1',
        nvl((
-         select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.pay_time)
+         select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.plan_pay_time)
          from o_payment_detail de
          where de.payment_id = d.id and de.order_id = o.id and de.status = 1
          and de.pay_type='DKFQ'
@@ -1967,7 +1967,7 @@
     ),0) as down_payment_count,
     (decode(d.custom_staging,'1',
       nvl((
-        select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.pay_time)
+        select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.plan_pay_time)
         from o_payment_detail de
         where de.payment_id = d.id and de.order_id = o.id and de.status = 1
         and de.pay_type='FRFQ'
@@ -1995,7 +1995,7 @@
     ),0) as frdk_count,
     (decode(d.custom_staging,'1',
       nvl((
-        select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.pay_time)
+        select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.plan_pay_time)
         from o_payment_detail de
         where de.payment_id = d.id and de.order_id = o.id and de.status = 1
         and de.pay_type='DKFQ'
