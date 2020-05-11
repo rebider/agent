@@ -498,7 +498,6 @@ public class CompensateServiceImpl implements CompensateService {
             Date nowDate = new Date();
             oRefundPriceDiff.setAgentId(refundPriceDiffDetailList.get(0).getAgentId());
             oRefundPriceDiff.setRelCompType(oRefundPriceDiff.getApplyCompType());
-            oRefundPriceDiff.setRelCompAmt(oRefundPriceDiff.getApplyCompAmt());
             oRefundPriceDiff.setMachOweAmt(new BigDecimal(0));
             oRefundPriceDiff.setDeductAmt(new BigDecimal(0));
             oRefundPriceDiff.setGatherAmt(new BigDecimal(0));
@@ -520,8 +519,17 @@ public class CompensateServiceImpl implements CompensateService {
                     shareDeductAmt = shareDeductAmt.add(oCashReceivablesVo.getAmount());
                 }
             }
-            oRefundPriceDiff.setBelowPayAmt(belowPayAmt);
-            oRefundPriceDiff.setShareDeductAmt(shareDeductAmt);
+            //pos平台重新请求后，说明机具是已付状态，仅支持划拨，不支持换活动。
+            if(null != agentVo.getPosPaidFlag() && agentVo.getPosPaidFlag().equals("1")) {
+                oRefundPriceDiff.setBelowPayAmt(new BigDecimal(0));
+                oRefundPriceDiff.setShareDeductAmt(new BigDecimal(0));
+                oRefundPriceDiff.setRelCompAmt(new BigDecimal(0));
+                oRefundPriceDiff.setApplyCompAmt(new BigDecimal(0));
+            } else {
+                oRefundPriceDiff.setRelCompAmt(oRefundPriceDiff.getApplyCompAmt());
+                oRefundPriceDiff.setBelowPayAmt(belowPayAmt);
+                oRefundPriceDiff.setShareDeductAmt(shareDeductAmt);
+            }
             int refundDiffInsert = refundPriceDiffMapper.insert(oRefundPriceDiff);
             if(refundDiffInsert!=1){
                 log.info("插入补退差价申请表异常");
@@ -566,6 +574,10 @@ public class CompensateServiceImpl implements CompensateService {
             //POS平台换活动或者划拨标志
             boolean posExecuteFalg = false;
             for (ORefundPriceDiffDetail refundPriceDiffDetail: refundPriceDiffDetailList) {
+                //pos平台重新请求后，说明机具是已付状态，仅支持划拨，不支持换活动。
+                if(null != agentVo.getPosPaidFlag() && agentVo.getPosPaidFlag().equals("1")) {
+                    refundPriceDiffDetail.setActivityRealId(refundPriceDiffDetail.getActivityFrontId());
+                }
                 Map<String, Object> logisticsDetail = null;
                 if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId()) && !refundPriceDiffDetail.getActivityFrontId().equals("undefined")){
                     Map<String, Object> reqParam = new HashMap<>();
@@ -753,8 +765,7 @@ public class CompensateServiceImpl implements CompensateService {
             }
 
             //业务平台校验并返回相应数据
-            //AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check");
-            AgentResult synOrVerifyResult = AgentResult.ok().setMapData(FastMap.fastMap("allPayStaus","1"));
+            AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check");
             if (!synOrVerifyResult.isOK()) throw new ProcessException(synOrVerifyResult.getMsg());
 
             String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
@@ -842,8 +853,8 @@ public class CompensateServiceImpl implements CompensateService {
             } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
                 JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
                 //POS平台allPayStaus为1说明已付执行划拨，不执行换活动
-                if (posExecuteFalg ) {
-                    throw new ProcessException("POSTIPS", "SN为已付，不允许换活动，本次支持划拨。点击确认后，执行下一步流程！");
+                if (posExecuteFalg && resData.getString("allPayStaus").equals("1")) {
+                    throw new ProcessException("POSTIPS","SN为已付，不允许换活动，本次支持划拨。点击确认后，执行下一步流程！");
                 }
                 List<Map<String,Object>> resultList = (List<Map<String,Object>>)resData.get("resultList");
                 for (Map<String, Object> stringObjectMap : resultList) {
