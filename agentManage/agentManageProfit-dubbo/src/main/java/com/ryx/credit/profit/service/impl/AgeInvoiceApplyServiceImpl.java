@@ -266,7 +266,14 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                         BigDecimal invoiceTax = invoiceApply.getTax();
                         if(invoiceTax != null){
                             BigDecimal agentTax = invoiceApplyMapper.getAgentTaxByAgentId(agentId);
-                            if(invoiceTax.compareTo(agentTax) != 0){
+                            if(agentTax.compareTo(new BigDecimal(0.03)) == 0){
+                                if(invoiceTax.compareTo(new BigDecimal(0.03)) != 0
+                                        && invoiceTax.compareTo(new BigDecimal(0.01)) != 0
+                                        && invoiceTax.compareTo(BigDecimal.ZERO) != 0){
+                                    invoiceApply.setYsResult("0");
+                                    invoiceApply.setRev1("代理商税点为0.03时,只允许发票税点为(0.03、0.01、0)");
+                                }
+                            }else if(invoiceTax.compareTo(agentTax) != 0){
                                 invoiceApply.setYsResult("0");
                                 invoiceApply.setRev1("该发票税点和代理商税点不相同");
                             }
