@@ -1269,19 +1269,19 @@
       where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as model,
     nvl((
-      select LISTAGG(o_sub_order.pro_rel_price,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+      select LISTAGG(o_sub_order.pro_rel_price,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
       from o_sub_order
       left join o_order on o_sub_order.order_id = o_order.id
       where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_rel_price,
     nvl((
-      select LISTAGG(o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+      select LISTAGG(o_sub_order.pro_num,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
       from o_sub_order
       left join o_order on o_sub_order.order_id = o_order.id
       where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_num,
     nvl((
-      select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+      select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
       from o_sub_order
       left join o_order on o_sub_order.order_id = o_order.id
       where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
@@ -1534,19 +1534,19 @@
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as model,
     nvl((
-    select LISTAGG(o_sub_order.pro_rel_price,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+    select LISTAGG(o_sub_order.pro_rel_price,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
     from o_sub_order
     left join o_order on o_sub_order.order_id = o_order.id
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_rel_price,
     nvl((
-    select LISTAGG(o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+    select LISTAGG(o_sub_order.pro_num,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
     from o_sub_order
     left join o_order on o_sub_order.order_id = o_order.id
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_num,
     nvl((
-    select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+    select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
     from o_sub_order
     left join o_order on o_sub_order.order_id = o_order.id
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
@@ -1575,7 +1575,7 @@
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as checkDate,
     nvl((
-    select LISTAGG(cr.amount,',') WITHIN GROUP (ORDER BY cr.src_id)
+    select LISTAGG(cr.amount,'/') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),0) as xxAmount,
@@ -1736,19 +1736,19 @@
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as model,
     nvl((
-    select LISTAGG(o_sub_order.pro_rel_price,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+    select LISTAGG(o_sub_order.pro_rel_price,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
     from o_sub_order
     left join o_order on o_sub_order.order_id = o_order.id
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_rel_price,
     nvl((
-    select LISTAGG(o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+    select LISTAGG(o_sub_order.pro_num,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
     from o_sub_order
     left join o_order on o_sub_order.order_id = o_order.id
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_num,
     nvl((
-    select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+    select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
     from o_sub_order
     left join o_order on o_sub_order.order_id = o_order.id
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
@@ -1777,7 +1777,7 @@
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as checkDate,
     nvl((
-    select LISTAGG(cr.amount,',') WITHIN GROUP (ORDER BY cr.src_id)
+    select LISTAGG(cr.amount,'/') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),0) as xxAmount,
