@@ -82,7 +82,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
 
            agents.forEach((cer)->{
 
-               FastMap par = FastMap.fastMap("id",cer.getAgUniqNum());
+               FastMap par = FastMap.fastMap("id",cer.getId());
                AgentCertification agentCertification = agentCertificationMapper.queryCers(par);
                 if (agentCertification!=null){
                     resStr.append(agentCertification.getOrgAgName()).append(",");
@@ -94,7 +94,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                Date date = Date.from(zdt.toInstant());
 
                agentCer.setId(idService.genIdInTran(TabId.a_agent_certification));
-               agentCer.setAgentId(cer.getAgUniqNum());
+               agentCer.setAgentId(cer.getId());
                agentCer.setReqRegNo("");
                agentCer.setReqEntName(cer.getAgName());
                agentCer.setReqCerTm(date);
@@ -167,11 +167,11 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
         Agent agent = agentMapper.selectByAgent(orgagent);
         AgentCertification agentCertification = agentCertificationMapper.selectByPrimaryKey(id);
         if(agent==null){
-            orgagent.setCaStatus(Status.STATUS_0.status);
-            agentCertification.setCerProStat(Status.STATUS_2.status);
-            agentCertification.setCerRes(Status.STATUS_0.status);
+            orgagent.setCaStatus(Status.STATUS_0.status);//工商认证状态
+            agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程--处理成功
+            agentCertification.setCerRes(Status.STATUS_0.status);//认证结果
             if(1==agentMapper.updateByPrimaryKeySelective(orgagent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
-                logger.info("认证代理商不存在，认证代理商{}状态为{},不进行信息同步",orgagent.getAgUniqNum(),orgagent.getCaStatus());
+                logger.info("认证代理商不存在，认证代理商{}状态为{},不进行信息同步",orgagent.getId(),orgagent.getCaStatus());
             }
             return new AgentResult(404,"工商认证代理商未找到"+agent.getId(),"");
         }
@@ -191,7 +191,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                 agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
                 agentCertification.setCerRes(new BigDecimal(2));//测试环境不认证
                 if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
-                    logger.info("测试环境不认证，认证代理商{}状态为{},不进行信息同步",agent.getAgUniqNum(),agent.getCaStatus());
+                    logger.info("测试环境不认证，认证代理商{}状态为{},不进行信息同步",agent.getId(),agent.getCaStatus());
                 }
                 return AgentResult.ok(dataObj);
             }
