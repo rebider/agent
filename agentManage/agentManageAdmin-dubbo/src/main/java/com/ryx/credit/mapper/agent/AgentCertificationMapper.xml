@@ -1128,8 +1128,8 @@
     <if test="map.agBusLic!=null and map.agBusLic!=''">
       AND AGENT.AG_BUS_LIC = #{map.agBusLic}
     </if>
-    <if test="map.agUniqNum!=null and map.agUniqNum!=''">
-      AND AGENT.AG_UNIQ_NUM = #{map.agUniqNum}
+    <if test="map.agId!=null and map.agId!=''">
+      AND AGENT.id = #{map.agId}
     </if>
     <if test="map.agName!=null and map.agName!=''">
       AND AGENT.AG_NAME = #{map.agName}
