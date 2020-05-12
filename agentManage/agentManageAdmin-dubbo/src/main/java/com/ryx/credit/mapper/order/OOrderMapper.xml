@@ -2057,7 +2057,7 @@
     left join o_sub_order os on os.order_id = o.id
     left join o_sub_order_activity oso on oso.sub_order_id = os.id
     <where>
-      <if test="1==1"> and o.status = 1 and b.status = 1 and aab.status = 1 </if>
+      <if test="1==1"> and o.status = 1 and b.status = 1 and aab.status = 1 and os.status = 1 and oso.status = 1 </if>
       <if test="nuclearUser!=null and nuclearUser!=''"> and d.nuclear_user = #{nuclearUser} </if>
       <if test="oNum!=null and oNum!=''"> and o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and o.id = #{id} </if>
