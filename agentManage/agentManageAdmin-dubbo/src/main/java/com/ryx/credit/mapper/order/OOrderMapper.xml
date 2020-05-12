@@ -2019,7 +2019,7 @@
       -
       nvl((select sum(pro.pro_num) from o_receipt_pro pro
       left join o_receipt_order ro on ro.id = pro.receipt_id
-      where pro.orderid = o.id and pro.status=1 and ro.status = 1 and os.pro_id = pro.pro_id and pro.receipt_pro_status in (1,2)),0)
+      where pro.orderid = o.id and pro.status = 1 and ro.status = 1 and os.pro_id = pro.pro_id and pro.receipt_pro_status in (1,2)),0)
     )as to_pick_num,
     nvl((
       select sum(plans.plan_pro_num)
@@ -2028,10 +2028,10 @@
       where plans.order_id = o.id and plans.status = 1 and oso.activity_id = plans.activity_id
     ),0) as is_plan_num,
     nvl((
-      select sum(pro.pro_num) - sum(pro.send_num)
+      select sum(pro.pro_num)
       from o_receipt_pro pro
       left join o_receipt_order ro on ro.id = pro.receipt_id
-      where pro.orderid = o.id and pro.status=1 and ro.status = 1 and os.pro_id = pro.pro_id and pro.receipt_pro_status in (1,2)
+      where pro.orderid = o.id and pro.status = 1 and ro.status = 1 and os.pro_id = pro.pro_id and pro.receipt_pro_status in (1,2)
     ),0) as toPlanNum,
     o.review_status,
     to_char(o.o_inuretime,'yyyy-MM-dd hh24:mi:ss') as oinuretime,
