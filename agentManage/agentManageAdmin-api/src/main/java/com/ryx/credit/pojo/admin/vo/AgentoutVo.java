@@ -88,6 +88,15 @@ public class AgentoutVo extends AgentExtends implements Serializable {
     private String agBusLic;
     private String agLegalCernum;
     private String agStatus;
+    private String cIncomTime;
+
+    public String getCIncomTime() {
+        return cIncomTime;
+    }
+
+    public void getCIncomTime(String cIncomTime) {
+        this.cIncomTime = cIncomTime;
+    }
 
     public String getAgBusLic() {
         return agBusLic;
