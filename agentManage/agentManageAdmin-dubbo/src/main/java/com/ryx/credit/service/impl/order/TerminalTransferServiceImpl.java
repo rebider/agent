@@ -1084,12 +1084,14 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     terminalTransferDetail.setRemark("划拨超时失败");
                     terminalTransferDetail.setAdjustTime(new Date());
                     terminalTransferDetail.setAdjustStatus(AdjustStatus.WCDJG.getValue());
-                    terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+
                     //解锁 todo
                     AgentResult agentResultlock = terminalTransferunlock(terminalTransferMapper.selectByPrimaryKey(terminalTransferDetail.getTerminalTransferId()).getTaskId(), terminalTransferDetail.getId(), terminalTransferDetail.getPlatformType().toString());
                     if (!agentResultlock.isOK()) {
                         log.info("超时划拨更新解冻失败!：" + agentResultlock);
+                        continue;
                     }
+                    terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                 }
             } catch (Exception e) {
                 log.error("划拨超时更新数据库失败");
@@ -1225,7 +1227,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                  */
                 AgentResult agentResultlock = terminalTransferunlock(terminalTransferMapper.selectByPrimaryKey(terminalTransferDetail.getTerminalTransferId()).getTaskId(), terminalTransferDetail.getId(), terminalTransferDetail.getPlatformType().toString());
                 if (!agentResultlock.isOK()) {
-                    throw new MessageException("导入解冻失败!：" + agentResultlock);
+                    throw new MessageException("导入解冻失败!：" + JSONObject.toJSON(agentResultlock));
                 }
             }
         }
@@ -2042,6 +2044,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                             TerminalTransferDetail terminalTransferDetail = new TerminalTransferDetail();
                             terminalTransferDetail.setId(serialNumber.trim());
                             terminalTransferDetail.setAdjustStatus(AdjustStatus.TZZ.getValue());
+                            terminalTransferDetail.setRemark("");
                             terminalTransferDetail.setuTime(new Date());
                             terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                             agentResult = AgentResult.ok(serialNumberMsg);
