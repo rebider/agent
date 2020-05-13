@@ -656,7 +656,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             AgentResult agentResult = terminalTransferunlock(terminalTransfer.getTaskId(), null, terminalTransferDetails.get(0).getPlatformType().toString());
             if (!agentResult.isOK()) {
                 log.info("审批退回，且解冻失败!：" + agentResult);
-                throw new MessageException("审批退回，且解冻失败!" );
+                throw new MessageException("审批退回，且解冻失败!");
             }
         }
         AgentResult result = null;
@@ -672,7 +672,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             AgentResult agentResultUnlock = terminalTransferunlock(terminalTransfer.getTaskId(), null, terminalTransferDetails.get(0).getPlatformType().toString());
             if (!agentResultUnlock.isOK()) {
                 log.info("工作流处理任务异常，且解冻失败!：" + agentResultUnlock);
-                throw new MessageException("工作流处理任务异常，且解冻失败!" );
+                throw new MessageException("工作流处理任务异常，且解冻失败!");
             }
             log.info(result.getMsg());
             throw new MessageException("工作流处理任务异常");
@@ -1958,6 +1958,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
      * @return
      */
     public AgentResult terminalTransferunlock(String taskId, String serialNumber, String type) {
+
+        /**
+         * 调用接口远程解锁
+         */
         AgentResult agentResult = null;
         try {
             log.info("划拨解锁开始：" + taskId + "明细id：" + serialNumber);
@@ -1969,38 +1973,53 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             agentResult = AgentResult.fail("划拨解锁异常");
         }
 
-
-        /**
-         * 调用接口远程
-         */
         if (agentResult != null) {
-            if (agentResult.isOK()) {
-                JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
-                String respCode = String.valueOf(jsonObject.get("respCode"));
-                JSONObject JSONObjectData = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
-               /* JSONObject data = JSONObject.parseObject(String.valueOf(JSONObjectData.get("data")));*/
-                List<Map<String, String>> maps = (List<Map<String, String>>) JSONArray.parse(String.valueOf(JSONObjectData.get("data")));
-                if ("000000".equals(respCode)) {
-                    for (Map<String, String> data : maps) {
-                        String resultCode = String.valueOf(data.get("resultCode"));
-                        String resultMsg = String.valueOf(data.get("resultMsg"));
-                        if ("00".equals(resultCode)) {
-                            agentResult = AgentResult.ok(resultMsg);
-                        } else if ("01".equals(resultCode)) {
-                            log.info("终端划拨解锁失败："+String.valueOf(data.get("serialNumber"))+"解锁失败"+resultMsg);
-                            agentResult = AgentResult.fail(String.valueOf(data.get("serialNumber"))+"解锁失败"+resultMsg);
-                        }
-                    }
+            if (String.valueOf(TerminalPlatformType.POS.getValue()).equals(type) || String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)) {
 
-                } else {
-                    agentResult = AgentResult.fail("划拨解锁处理失败");
+            } else if (String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)) {
+
+            } else if (String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)) {
+
+            } else if (String.valueOf(TerminalPlatformType.RJPOS.getValue()).equals(type)) {
+                return terminalTransferunlockRJPOS(agentResult);
+            }
+        } else {
+            //未实现功能默认成功
+            agentResult = AgentResult.ok();
+        }
+        return agentResult;
+    }
+
+    /**
+     * 瑞+解锁返回处理
+     * @param agentResult
+     * @return
+     */
+    public AgentResult terminalTransferunlockRJPOS(AgentResult agentResult) {
+        if (agentResult.isOK()) {
+            JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
+            String respCode = String.valueOf(jsonObject.get("respCode"));
+            JSONObject JSONObjectData = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
+            /* JSONObject data = JSONObject.parseObject(String.valueOf(JSONObjectData.get("data")));*/
+            List<Map<String, String>> maps = (List<Map<String, String>>) JSONArray.parse(String.valueOf(JSONObjectData.get("data")));
+            if ("000000".equals(respCode)) {
+                for (Map<String, String> data : maps) {
+                    String resultCode = String.valueOf(data.get("resultCode"));
+                    String resultMsg = String.valueOf(data.get("resultMsg"));
+                    if ("00".equals(resultCode)) {
+                        agentResult = AgentResult.ok(resultMsg);
+                    } else if ("01".equals(resultCode)) {
+                        log.info("终端划拨解锁失败：" + String.valueOf(data.get("serialNumber")) + "解锁失败" + resultMsg);
+                        agentResult = AgentResult.fail(String.valueOf(data.get("serialNumber")) + "解锁失败" + resultMsg);
+                    }
                 }
 
             } else {
-                agentResult = AgentResult.fail("划拨解锁调用接口失败");
+                agentResult = AgentResult.fail("划拨解锁处理失败");
             }
+
         } else {
-            agentResult = AgentResult.ok();
+            agentResult = AgentResult.fail("划拨解锁调用接口失败");
         }
         return agentResult;
     }
@@ -2015,6 +2034,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     @Override
     public AgentResult adjustAgain(String id) {
 
+        /**
+         * 调用接口远程
+         */
         AgentResult agentResult = null;
         try {
             log.info("划拨重新开始明细id：" + id);
@@ -2026,44 +2048,63 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             e.printStackTrace();
             agentResult = AgentResult.fail("划拨重新发起异常");
         }
-        /**
-         * 调用接口远程
-         */
-        if (agentResult != null) {
-            if (agentResult.isOK()) {
-                JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
-                String respCode = String.valueOf(jsonObject.get("respCode"));
-                JSONObject JSONObjectData = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
-                List<Map<String, String>> maps = (List<Map<String, String>>) JSONArray.parse(String.valueOf(JSONObjectData.get("data")));
-                if ("000000".equals(respCode)) {
-                    for (Map<String, String> data : maps) {
-                        String serialNumberStatus  = String.valueOf(data.get("serialNumberStatus"));
-                        String serialNumberMsg = String.valueOf(data.get("serialNumberMsg"));
-                        String serialNumber = String.valueOf(data.get("serialNumber"));
-                        if ("00".equals(serialNumberStatus )) {
-                            TerminalTransferDetail terminalTransferDetail = new TerminalTransferDetail();
-                            terminalTransferDetail.setId(serialNumber.trim());
-                            terminalTransferDetail.setAdjustStatus(AdjustStatus.TZZ.getValue());
-                            terminalTransferDetail.setRemark("");
-                            terminalTransferDetail.setuTime(new Date());
-                            terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
-                            agentResult = AgentResult.ok(serialNumberMsg);
-                        } else if ("01".equals(serialNumberStatus)) {
-                            agentResult = AgentResult.fail(serialNumberMsg);
-                        }
-                    }
-                } else {
-                    agentResult = AgentResult.fail("划拨重新发起失败");
-                }
+        String type = String.valueOf(terminalTransferDetailMapper.selectByPrimaryKey(id).getPlatformType());
 
-            } else {
-                agentResult = AgentResult.fail("划拨重新发起调用接口失败");
+        if (agentResult != null) {
+            if (String.valueOf(TerminalPlatformType.POS.getValue()).equals(type) || String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)) {
+
+            } else if (String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)) {
+
+            } else if (String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)) {
+
+            } else if (String.valueOf(TerminalPlatformType.RJPOS.getValue()).equals(type)) {
+                return adjustAgainRJPOS(agentResult);
             }
         } else {
             agentResult = AgentResult.ok();
         }
         return agentResult;
 
+    }
+
+    /**
+     * 瑞+再次划拨结果返回
+     * @param agentResult
+     * @return
+     */
+    public AgentResult adjustAgainRJPOS(AgentResult agentResult) {
+
+        if (agentResult.isOK()) {
+            JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
+            String respCode = String.valueOf(jsonObject.get("respCode"));
+            JSONObject JSONObjectData = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
+            List<Map<String, String>> maps = (List<Map<String, String>>) JSONArray.parse(String.valueOf(JSONObjectData.get("data")));
+            if ("000000".equals(respCode)) {
+                for (Map<String, String> data : maps) {
+                    String serialNumberStatus = String.valueOf(data.get("serialNumberStatus"));
+                    String serialNumberMsg = String.valueOf(data.get("serialNumberMsg"));
+                    String serialNumber = String.valueOf(data.get("serialNumber"));
+                    if ("00".equals(serialNumberStatus)) {
+                        TerminalTransferDetail terminalTransferDetail = new TerminalTransferDetail();
+                        terminalTransferDetail.setId(serialNumber.trim());
+                        terminalTransferDetail.setAdjustStatus(AdjustStatus.TZZ.getValue());
+                        terminalTransferDetail.setRemark("");
+                        terminalTransferDetail.setuTime(new Date());
+                        terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                        agentResult = AgentResult.ok(serialNumberMsg);
+                    } else if ("01".equals(serialNumberStatus)) {
+                        agentResult = AgentResult.fail(serialNumberMsg);
+                    }
+                }
+            } else {
+                agentResult = AgentResult.fail("划拨重新发起失败");
+            }
+
+        } else {
+            agentResult = AgentResult.fail("划拨重新发起调用接口失败");
+        }
+
+        return agentResult;
     }
 
 
