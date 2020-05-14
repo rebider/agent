@@ -488,7 +488,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             if (PlatformType.whetherPOS(platformType)) {
                 JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
                 //POS平台allPayStaus为1说明已付执行划拨，不执行换活动
-                if (posExecuteFalg && resData.getString("allPayStaus").equals("1")) {
+                if (posExecuteFalg && null !=resData.getString("allPayStaus") && resData.getString("allPayStaus").equals("1")) {
                     throw new ProcessException("POSTIPS","SN为已付，不允许换活动，本次支持划拨。点击确认后，执行下一步流程！");
                 }
                 List<Map<String,Object>> resultList = (List<Map<String,Object>>)resData.get("resultList");
@@ -569,7 +569,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
             JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
             //POS平台allPayStaus为1说明已付执行划拨，不执行换活动
-            if (posExecuteFalg && resData.getString("allPayStaus").equals("1")) {
+            if (posExecuteFalg && null != resData.getString("allPayStaus") && resData.getString("allPayStaus").equals("1")) {
                 throw new ProcessException("POSTIPS","SN为已付，不允许换活动，本次支持划拨。点击确认后，执行下一步流程！");
             }
             List<Map<String,Object>> resultList = (List<Map<String,Object>>)resData.get("resultList");
