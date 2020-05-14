@@ -264,12 +264,12 @@ public class MposTermMachineServiceImpl implements TermMachineService {
         try {
             res = request(data, AppConfig.getProperty("mpos.termMachineResult"));
         } catch (Exception e) {
-            logger.info("MPOS机具终端划拨查询结果调用远程接口:{}失败", AppConfig.getProperty("mpos.termMachineResult"));
+            logger.info("MPOS机具终端划拨查询结果调用远程接口失败:{}", AppConfig.getProperty("mpos.termMachineResult"));
             return AgentResult.fail("MPOS机具终端划拨查询结果调用远程接口失败");
         }
         if (null != res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))) {
             logger.info("MPOS机具终端划拨结果查询成功:{}{}{}", AppConfig.getProperty("mpos.termMachineResult"), res.getString("respMsg"), res.toJSONString());
-            JSONObject codeType = JSONObject.parseObject(String.valueOf(res.get("data")));
+            List<Map<String,Object>> codeType = (List<Map<String, Object>>) JSONArray.parse(String.valueOf(res.get("data")));
             return AgentResult.ok(codeType);
         } else {
             logger.info("MPOS机具终端划拨结果查询失败:{}{}{}", AppConfig.getProperty("mpos.termMachineResult"), res.getString("respMsg"), res.toJSONString());
