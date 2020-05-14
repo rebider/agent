@@ -239,7 +239,7 @@ public class TermMachineServiceImpl implements TermMachineService {
         if (String.valueOf(TerminalPlatformType.POS.getValue()).equals(type) || String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)) {
 
         } else if (String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)) {
-
+            return mposTermMachineServiceImpl.terminalTransferunlock(taskId,serialNumber,type);
         } else if (String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)) {
 
         }else if (String.valueOf(TerminalPlatformType.RJPOS.getValue()).equals(type)) {

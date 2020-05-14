@@ -419,7 +419,7 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
         JSONObject data = new JSONObject();
         data.put("taskId",taskId);
         data.put("serialNumber",serialNumber);
-        logger.info("终端划拨解锁参数"+JSONObject.toJSON(data));
+        logger.info("RJPOS终端划拨解锁参数"+JSONObject.toJSON(data));
         return  request( data,"transfer001");
     }
 
@@ -428,13 +428,14 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
         JSONObject data = new JSONObject();
         data.put("taskId",taskId);
         data.put("serialNumber",serialNumber);
-        logger.info("终端划拨重新发起参数"+JSONObject.toJSON(data));
+        logger.info("RJPOS终端划拨重新发起参数"+JSONObject.toJSON(data));
         return  request( data,"transfer005");
     }
 
 
     /**
      * 封装请求参数
+     * chenliang
      * @param data  封装好的map
      * @param transfer 交易码
      * @return
