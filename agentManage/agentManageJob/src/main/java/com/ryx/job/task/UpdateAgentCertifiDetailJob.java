@@ -69,7 +69,7 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
                 String orgCerId = "";
                 if (null!=agentCertification)
                     orgCerId=agentCertification.getId();
-                AgentResult agentResult = agentCertificationService.processData(agent, cer.getId(),orgCerId);
+                AgentResult agentResult = agentCertificationService.processData(agent, cer.getId(),orgCerId);// 代理商信息  认证id 最近的一条认证记录
                 if (200!=agentResult.getStatus()){
                     cer.setCerProStat(Status.STATUS_2.status);
                     cer.setCerRes(Status.STATUS_2.status);
