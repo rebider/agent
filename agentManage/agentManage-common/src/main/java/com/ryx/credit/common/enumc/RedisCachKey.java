@@ -21,7 +21,8 @@ public enum RedisCachKey {
     AGENT_UN_FREEZE_LOCK("AGENT_UN_FREEZE_LOCK:", "代理商解冻锁"),
     CARD_RENEW_ONOFF("OnOff:CardRenew22OnOff", "续费限制开关"),
     LOGOUT_ONOFF("OnOff:CardLogoutOnOff", "注销限制开关"),
-    LOGOUT_MOBILE_STOP_JOB("LOGOUT_MOBILE_STOP_JOB", "推送移动关停数据");
+    LOGOUT_MOBILE_STOP_JOB("LOGOUT_MOBILE_STOP_JOB", "推送移动关停数据"),
+    AGENT_CA_TIMES("AGENT_CA_TIMES", "代理商工商认证次数限制");
 
     public String code;
 
