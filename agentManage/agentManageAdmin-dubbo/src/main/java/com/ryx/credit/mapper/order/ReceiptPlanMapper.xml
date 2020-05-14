@@ -347,7 +347,7 @@
   <select id="getReceipPlanList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
     SELECT agent.AG_UNIQ_NUM,
-    agent.AG_NAME,
+    agent.AG_NAME,  agent.id as agent_id,
     a_platform.PLATFORM_NAME,
     oso.activity_name,
     (P.PRO_NUM - P.SEND_NUM) AS residue,

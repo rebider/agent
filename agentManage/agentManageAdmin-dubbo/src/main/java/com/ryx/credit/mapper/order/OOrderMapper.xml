@@ -1230,7 +1230,7 @@
     dict.D_ITEMNAME as platformType,
     o.c_time as apytime,
     o.o_num as num,o.O_INURETIME,
-    b.ag_uniq_num,
+    b.ag_uniq_num,b.id as agent_id,
     aab.bus_num,
     c.platform_name,
     b.ag_name,
@@ -1496,7 +1496,7 @@
     select
     o.c_time as apytime,
     o.o_num as num,  o.o_inuretime,
-    b.ag_uniq_num,
+    b.ag_uniq_num,b.id as agent_id,
     aab.bus_num,
     c.platform_name,
     b.ag_name,
@@ -1698,7 +1698,7 @@
     select
     o.c_time as apytime,
     o.o_num as num,  o.o_inuretime ,
-    b.ag_uniq_num,
+    b.ag_uniq_num,b.id as agent_id,
     aab.bus_num,
     c.platform_name,
     b.ag_name,
@@ -2181,6 +2181,7 @@
     <result column="org_name" property="orgName" jdbcType="VARCHAR"/>
     <result column="order_date" property="orderDate" jdbcType="TIMESTAMP"/>
     <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    <result column="agent_id" property="agentId" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--欠款查询 -->
@@ -2210,7 +2211,7 @@
 
   <select id="arrearageList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    select a.*,a_platform.platform_name,agent.ag_name,agent.AG_UNIQ_NUM from
+    select a.*,a_platform.platform_name,agent.ag_name,agent.AG_UNIQ_NUM,agent.id as agId from
     (
     select
     to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as tm,businfo.agent_id,businfo.bus_platform,
@@ -2236,6 +2237,7 @@
 
   <sql id="BASE_WHERE_SQL">
     <if test="agUniqNum!=null and agUniqNum!=''"> and agent.AG_UNIQ_NUM=#{agUniqNum} </if>
+    <if test="agId!=null and agId!=''"> and agent.id=#{agId} </if>
     <if test="agName !=null and agName !='' ">
       and  agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')
     </if>
