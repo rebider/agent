@@ -1,10 +1,12 @@
 import com.ryx.credit.common.enumc.CerResStatus;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentCertificationService;
+import com.ryx.credit.service.agent.BusinessCAService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import com.ryx.credit.service.order.ORemoveAccountService;
 import org.junit.Test;
@@ -30,7 +32,8 @@ public class ActivityServiceTest extends BaseSpringTest {
     private ORemoveAccountService oRemoveAccountService;
     @Autowired
     private AgentCertificationService agentCertificationService;
-
+    @Autowired
+    private BusinessCAService businessCAService;
     @Test
     public void a(){
         List<String> list = new ArrayList<>();
@@ -41,10 +44,10 @@ public class ActivityServiceTest extends BaseSpringTest {
 
     @Test
     public void b() throws MessageException {
-        Agent agent = new Agent();
+        /*Agent agent = new Agent();
         agent.setId("AG20043770130");
-
-        agentCertificationService.processData(agent,"AC20200515000000000000581",null);
+        agentCertificationService.processData(agent,"AC20200515000000000000581",null);*/
+        AgentResult agentResult = businessCAService.agentBusinessCA("恩施银合网络科技有限公司", "0");
     }
 
     @Test

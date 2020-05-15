@@ -3,6 +3,7 @@ package com.ryx.job.task;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.dataflow.DataflowJob;
+import com.ryx.credit.common.enumc.CerResStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
@@ -63,23 +64,24 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
             try {
                 logger.info("商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());
                 Agent agent = new Agent();
-                agent.setAgUniqNum(cer.getAgentId());
+                agent.setId(cer.getAgentId());
                 FastMap par = FastMap.fastMap("agentId",cer.getAgentId());
                 AgentCertification  agentCertification = agentCertificationService.getMaxId(par);
                 String orgCerId = "";
                 if (null!=agentCertification)
                     orgCerId=agentCertification.getId();
+
                 AgentResult agentResult = agentCertificationService.processData(agent, cer.getId(),orgCerId);
                 if (200!=agentResult.getStatus()){
                     cer.setCerProStat(Status.STATUS_2.status);
-                    cer.setCerRes(Status.STATUS_2.status);
+                    cer.setCerRes(CerResStatus.FAIL.status);
                     cer.setCerSuccessTm(date);
                     agentCertificationService.updateCertifi(cer);
                 }
             }catch (Exception e){
                 logger.error(e.toString());
                 cer.setCerProStat(Status.STATUS_2.status);
-                cer.setCerRes(Status.STATUS_2.status);
+                cer.setCerRes(CerResStatus.FAIL.status);
                 cer.setCerSuccessTm(date);
                 agentCertificationService.updateCertifi(cer);
                 logger.error("认证任务执行出错!商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());

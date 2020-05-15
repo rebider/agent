@@ -171,6 +171,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 agentFreeze.setStatus(Status.STATUS_1.status);
                 agentFreeze.setVersion(BigDecimal.ONE);
                 agentFreeze.setFreezeType(freeType);
+                if(StringUtils.isNotBlank(agentFreezePort.getRemark())){//备注
+                    agentFreeze.setRemark(agentFreezePort.getRemark());
+                }
                 agentFreezeMapper.insert(agentFreeze);
                 if (freeType.compareTo(FreeType.AGNET.code) == 0){
                     Map<String,Object> dataMap = (Map<String,Object>)verify.getData();
@@ -245,6 +248,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 agentFreeze.setUnfreezeDate(new Date());
                 agentFreeze.setUnfreezeCause(agentFreezePort.getUnfreezeCause());
                 agentFreeze.setFreezeStatus(FreeStatus.JD.getValue().toString());
+                if(StringUtils.isNotBlank(agentFreezePort.getRemark())){//备注
+                    agentFreeze.setRemark(agentFreezePort.getRemark());
+                }
                 int j = agentFreezeMapper.updateByPrimaryKeySelective(agentFreeze);
                 if(j!=1){
                     throw new MessageException("更新解冻失败");

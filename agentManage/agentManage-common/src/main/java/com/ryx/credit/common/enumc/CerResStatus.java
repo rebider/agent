@@ -8,6 +8,7 @@ import java.math.BigDecimal;
  * @Description:认证结果枚举
  */
 public enum CerResStatus {
+    NORECORD(0, "查询无记录"),
     SUCCESS(1, "认证成功"),
     FAIL(2, "认证失败"),
     INCONFORMITY(3, "认证成功,与本地信息不符"),

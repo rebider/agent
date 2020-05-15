@@ -1124,7 +1124,7 @@
     row_number() OVER(PARTITION BY t.agent_id ORDER BY t.agent_id, t.req_cer_tm desc) as row_flg
     from a_agent_certification t) AGENTCER,a_agent AGENT
     where AGENTCER.row_flg = '1' and
-    AGENTCER.AGENT_ID = AGENT.AG_UNIQ_NUM
+    ( agentcer.agent_id = agent.ag_uniq_num  or   agentcer.agent_id = agent.id)
     <if test="map.agBusLic!=null and map.agBusLic!=''">
       AND AGENT.AG_BUS_LIC = #{map.agBusLic}
     </if>
