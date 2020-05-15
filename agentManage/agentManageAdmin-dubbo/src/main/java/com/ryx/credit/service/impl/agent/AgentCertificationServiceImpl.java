@@ -82,7 +82,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
 
            agents.forEach((cer)->{
 
-               FastMap par = FastMap.fastMap("id",cer.getAgUniqNum());
+               FastMap par = FastMap.fastMap("id",cer.getId());
                AgentCertification agentCertification = agentCertificationMapper.queryCers(par);
                 if (agentCertification!=null){
                     resStr.append(agentCertification.getOrgAgName()).append(",");
@@ -94,7 +94,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                Date date = Date.from(zdt.toInstant());
 
                agentCer.setId(idService.genIdInTran(TabId.a_agent_certification));
-               agentCer.setAgentId(cer.getAgUniqNum());
+               agentCer.setAgentId(cer.getId());
                agentCer.setReqRegNo("");
                agentCer.setReqEntName(cer.getAgName());
                agentCer.setReqCerTm(date);
