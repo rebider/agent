@@ -95,6 +95,26 @@ public class Agent extends AgentExtends implements Serializable {
 
     private Date reportTime;
 
+    private String agRunAdd;
+
+    private Date agLegalCerdate;
+
+    public String getAgRunAdd() {
+        return agRunAdd;
+    }
+
+    public void setAgRunAdd(String agRunAdd) {
+        this.agRunAdd = agRunAdd;
+    }
+
+    public Date getAgLegalCerdate() {
+        return agLegalCerdate;
+    }
+
+    public void setAgLegalCerdate(Date agLegalCerdate) {
+        this.agLegalCerdate = agLegalCerdate;
+    }
+
     public String getBusRiskEmail() {
         return busRiskEmail;
     }
