@@ -220,6 +220,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             if(StringUtils.isBlank(agentFreezePort.getUnfreezeCause())){
                 return AgentResult.fail("解冻原因必填");
             }
+            if (null == agentFreezePort.getFreeType()){
+                agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+            }
             for (BigDecimal freeType:agentFreezePort.getFreeType()){
                 AgentFreezeExample freezeExample = new AgentFreezeExample();
                 if (freeType.compareTo(FreeType.AGNET.code) == 0){
