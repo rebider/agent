@@ -63,7 +63,7 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
             try {
                 logger.info("商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());
                 Agent agent = new Agent();
-                agent.setAgUniqNum(cer.getAgentId());
+                agent.setId(cer.getAgentId());
                 FastMap par = FastMap.fastMap("agentId",cer.getAgentId());
                 AgentCertification  agentCertification = agentCertificationService.getMaxId(par);
                 String orgCerId = "";
