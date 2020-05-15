@@ -1,31 +1,20 @@
 package com.ryx.credit.common.enumc;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
-/***
- * 冻结原因
- * @Author liudh
- * @Description //TODO 
- * @Date 2019/10/10 10:34
- * @Param
- * @return
- **/
-public enum FreeCause {
+/**
+ * Created by lhl on 2020/5/15.
+ */
+public enum UnfreePerson {
 
-    QPDJ("QPDJ","欠票冻结"),
-    RRDJ("RRDJ","分润冻结"),
-    HTDJ("HTDJ","合同冻结"),
-    RZDJ("RZDJ","认证冻结"),
-    QTDJ("QTDJ","其他原因"),
-    XXQS("XXQS","基本信息缺失");
+    XTJD("XTJD","系统解冻");
 
     public String code;
 
     public String msg;
 
-    FreeCause(String c, String m){
+    UnfreePerson(String c, String m) {
         this.code = c;
         this.msg = m;
     }
@@ -36,9 +25,9 @@ public enum FreeCause {
      * @return
      */
     public static String getContentByValue(String value) {
-        FreeCause[] freeCause = FreeCause.values();
-        for (FreeCause cc : freeCause) {
-            if(cc.code.equals(value)){
+        UnfreePerson[] unfreePerson = UnfreePerson.values();
+        for (UnfreePerson cc : unfreePerson) {
+            if (cc.code.equals(value)) {
                 return cc.msg;
             }
         }
@@ -46,14 +35,13 @@ public enum FreeCause {
     }
 
     public static Map<Object, Object> getContentMap() {
-        FreeCause[] freeCause = FreeCause.values();
+        UnfreePerson[] unfreePerson = UnfreePerson.values();
         Map<Object, Object> resultMap = new HashMap<>();
-        for (FreeCause cc : freeCause) {
-            resultMap.put(cc.code,cc.msg);
+        for (UnfreePerson cc : unfreePerson) {
+            resultMap.put(cc.code, cc.msg);
         }
         return resultMap;
     }
-
 
     /**
      * 取得枚举对象值
@@ -70,4 +58,5 @@ public enum FreeCause {
     public String getContent() {
         return this.msg;
     }
+
 }
