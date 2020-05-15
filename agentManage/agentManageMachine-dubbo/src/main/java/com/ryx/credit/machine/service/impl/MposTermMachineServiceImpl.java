@@ -300,7 +300,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
             return AgentResult.fail("MPOS机具终端划拨解锁调用远程接口失败");
         }
         logger.info("MPOS机具终端划拨解锁调用远程接口返回:{}{}", AppConfig.getProperty("mpos.terminalTransferunlock"), res.toJSONString());
-        return AgentResult.ok(res);
+        return AgentResult.build(200, res.toString(),res.toString());
     }
 
     /**
