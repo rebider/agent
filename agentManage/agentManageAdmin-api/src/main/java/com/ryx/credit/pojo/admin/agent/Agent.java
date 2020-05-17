@@ -97,6 +97,10 @@ public class Agent extends AgentExtends implements Serializable {
 
     private String agRunAdd;
 
+    @JSONField(format="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonDeserialize(using = DateJsonDeserializer.class)
+    @JsonSerialize(using = DateJsonSerializer.class)
     private Date agLegalCerdate;
 
     public String getAgRunAdd() {

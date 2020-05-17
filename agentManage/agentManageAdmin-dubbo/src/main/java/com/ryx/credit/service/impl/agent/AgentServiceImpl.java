@@ -377,6 +377,8 @@ public class AgentServiceImpl implements AgentService {
         db_agent.setAgRegArea(agent.getAgRegArea());
         db_agent.setBusRiskEmail(agent.getBusRiskEmail());
         db_agent.setBusContactEmail(agent.getBusContactEmail());
+        db_agent.setAgRunAdd(agent.getAgRunAdd());
+        db_agent.setAgLegalCerdate(agent.getAgLegalCerdate());
         if (1 != agentMapper.updateByPrimaryKeySelective(db_agent)) {
             throw new ProcessException("代理商信息更新失败");
         }else{
