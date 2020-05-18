@@ -368,8 +368,6 @@
         select ab.id from a_agent_businfo ab
         where ab.agent_id = aa.id and ab.status = '1' and ab.clo_review_status = '3' and ab.bus_status in (0,1,2,3)
       )
-      and aa.id in (
-      'AG19073567931','AG19073564955','AG19073569940')
     )
     a order by c_time desc
   </sql>

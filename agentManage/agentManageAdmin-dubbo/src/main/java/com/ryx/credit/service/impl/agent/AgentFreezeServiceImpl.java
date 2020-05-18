@@ -516,19 +516,19 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     if (agentFreezeVo.getCloType().equals("2")) { // 对私
                         str_empty += agentFreezeVo.getAcAgLegalCernum() == null ? "结算卡法人证件号" : "";
                     }
-                    log.info("基础信息缺失-agentId-", agent_id);
+                    log.info("基础信息缺失AG码:", agent_id.toString());
                     listMap.put("agent_id", agent_id);
                     listMap.put("str_remark", str_empty);
                     stringList.add(listMap);
                 } else {
-                    log.info("结算卡类型为空代理商-基础信息缺失-agentId-", agent_id);
-                    str_empty = "代理商没有结算卡信息";
+                    log.info("结算卡类型为空代理商-基础信息缺失:", agent_id.toString());
+                    str_empty = "代理商缺失结算卡信息";
                     listMap.put("agent_id", agent_id);
                     listMap.put("str_remark", str_empty);
                     stringList.add(listMap);
                 }
             }
-            log.info("基础信息缺失代理商:", stringList.size(), stringList.toString());
+            log.info("基础信息缺失代理商:", stringList.toString());
         }
         try {
             if (stringList.size()>0 && stringList!=null) { // 基本信息缺失的代理商id
@@ -600,7 +600,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     }
 
     /**
-     * 校验代理商
+     * 校验审批通过代理商
      * @param agentId
      * @param freeCause
      * @param freeType
