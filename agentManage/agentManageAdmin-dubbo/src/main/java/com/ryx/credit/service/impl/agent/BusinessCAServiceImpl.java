@@ -84,6 +84,11 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 						return new AgentResult(405,"营业执照号已存在："+dataMap.getString("creditCode")+"代理商编号为："+agentResult.getData(),dataMap);
 					}
 				}
+				if(StringUtils.isNotBlank(dataMap.getString("enterpriseName"))){
+					if(!agentBusinfoName.equals(dataMap.getString("enterpriseName"))){
+						return new AgentResult(405,"认证名称不一致，请重新输入", dataMap);
+					}
+				}
 				return AgentResult.ok(dataMap);
 			}
 		} catch (Exception e) {

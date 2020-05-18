@@ -9,7 +9,9 @@ import com.ryx.credit.pojo.admin.CuserAgent;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.vo.AgentCaVo;
+import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +28,8 @@ public interface AgentService {
     PageInfo queryAgentList(PageInfo page, Agent agent);
     PageInfo queryAgentAll(Page page, Map map,Long userId);
     PageInfo agentManageList(Page page, Map map,Long userId);
+    PageInfo queryAgentRiskList(Page page, Map map);
+    List<AgentoutVo> exportAgentRisk(Map map) throws ParseException;
 
     /**
      * 代理商新曾
