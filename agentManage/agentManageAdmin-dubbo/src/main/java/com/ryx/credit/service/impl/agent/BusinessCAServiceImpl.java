@@ -55,14 +55,13 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		}
 		try {
 			result.setMsg("服务器异常");
-			String httpResult = industryAuthRequest(agentBusinfoName,"0");
-			/*String httpResult = null;
+			String httpResult = null;
 
 			if(EnvironmentUtil.isProduction()){
 				httpResult = industryAuthRequest(agentBusinfoName,isCache);
 			}else{	//测试环境不作工商认证
 				httpResult = "{'respType':'TEST','data':{'isTest':'1'}}";
-			}*/
+			}
 
 			if(StringUtils.isBlank(httpResult)){
 				return result;
@@ -70,10 +69,10 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 			JSONObject jsonObject = JSONObject.parseObject(httpResult);
 			JSONObject dataMap = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
 			String respType = (String)jsonObject.get("respType");
-			/*if ("TEST".equals(respType)){
+			if ("TEST".equals(respType)){
 				logger.info("-------------测试环境不作工商认证-----------");
 				return AgentResult.ok(dataMap);
-			}*/
+			}
 			if(respType.equals("E")){
 				logger.error("调用接口失败"+String.valueOf(jsonObject.get("respMsg")));
 				return new AgentResult(404,String.valueOf(jsonObject.get("respMsg")),"");
@@ -136,8 +135,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		map.put("tranCode", tranCode);
 		map.put("reqMsgId", reqMsgId);
 
-//		String respStr = HttpUtil.doPost(AppConfig.getProperty("gs_auth_url"), map);
-		String respStr = HttpUtil.doPost("http://10.3.60.110:9080/iom-plugin/gateway", map);
+		String respStr = HttpUtil.doPost(AppConfig.getProperty("gs_auth_url"), map);
 
 		logger.info("返回密文======" + respStr);
 		//返回报文解密开始
