@@ -8,19 +8,16 @@ import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.commons.result.Result;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentCertificationMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentCertifiVo;
 import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
-import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.agent.AgentCertificationService;
 import com.ryx.credit.service.agent.BusinessCAService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
-import org.apache.poi.ss.format.CellTextFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import sun.management.resources.agent;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -185,26 +179,27 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                 || null==agent.getAgBusLicb() || null==agent.getAgBusLice()){
             logger.info("基础信息有缺失",agent.getId());
             if(StringUtils.isBlank(agent.getAgName())){//代理商名称
-                remark="代理商名称缺失";
+                remark="代理商名称缺失;";
             }
             if(StringUtils.isBlank(agent.getAgBusLic())){ //营业执照
-                remark+=";营业执照缺失";
+                remark+="营业执照缺失;";
             }
             if(StringUtils.isBlank(agent.getAgLegal())){//法人证件号
-                remark+=";法人证件号缺失";
+                remark+="法人证件号缺失;";
             }
             if(StringUtils.isBlank(agent.getAgLegalCernum())){//法人姓名
-                remark+=";法人姓名缺失";
+                remark+="法人姓名缺失;";
             }
             if(null==agent.getAgBusLicb()){//经营开始日期
-                remark+=";经营开始日期缺失";
+                remark+="经营开始日期缺失;";
             }
             if(null==agent.getAgBusLice()){//经营结束日期
-                remark+=";经营结束日期缺失";
+                remark+="经营结束日期缺失;";
             }
+            remark = remark.substring(0,remark.length() - 1);
             map.put("remark",remark);
-            map.put("cerRes",cerResStatus);
-            Agentfreeze(agent,agentCertification,map);
+            map.put("cerResStatus",cerResStatus);
+            return AgentfreezeShare(agent, agentCertification, map);
         }
         agentCertification = copyOrgAgentToCertifi(agent,agentCertification);
         agentCertification.setOrgCerId(orgId);
@@ -228,38 +223,38 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
             }
             if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")) && dataObj.getString("enterpriseStatus").startsWith("在营")){
 //                如果与系统中的字段不一致  则进行冻结
-                if(!agentCertification.getFrName().equals(dataObj.getString("frName")) ||
-                        !agentCertification.getEnterpriseName().equals(dataObj.getString("enterpriseName")) ||
-                        !agentCertification.getOpenFrom().equals(dataObj.getString("openFrom"))||
-                        !agentCertification.getOpenTo().equals(dataObj.getString("openTo")) ||
-                        !agentCertification.getCreditCode().equals(dataObj.getString("creditCode"))){
+                if(!agent.getAgLegal().equals(dataObj.getString("frName")) ||
+                        !agent.getAgName().equals(dataObj.getString("enterpriseName")) ||
+                        !agent.getAgBusLicb().equals(dataObj.getString("openFrom"))||
+                        !agent.getAgBusLice().equals(dataObj.getString("openTo")) ||
+                        !agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
                     logger.info("认证成功，与本地信息不符",agentCertification.getId());
                     cerResStatus = CerResStatus.INCONFORMITY.status;
                     remark+="认证成功，与本地信息不符";
                     map.put("remark",remark);
-                    map.put("cerRes",cerResStatus);
-                    Agentfreeze(agent,agentCertification,map);
-                }else if(agentCertification.getFrName().equals(dataObj.getString("frName")) &&
-                         agentCertification.getEnterpriseName().equals(dataObj.getString("enterpriseName")) &&
-                         agentCertification.getOpenFrom().equals(dataObj.getString("openFrom"))&&
-                         agentCertification.getOpenTo().equals(dataObj.getString("openTo")) &&
-                         agentCertification.getCreditCode().equals(dataObj.getString("creditCode"))){
+                    map.put("cerResStatus",cerResStatus);
+                    return  AgentfreezeShare(agent,agentCertification,map);
+                }else if(agent.getAgLegal().equals(dataObj.getString("frName")) &&
+                        agent.getAgName().equals(dataObj.getString("enterpriseName")) &&
+                        agent.getAgBusLicb().equals(dataObj.getString("openFrom"))&&
+                        agent.getAgBusLice().equals(dataObj.getString("openTo")) &&
+                        agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
 //                    一致则解冻 为认证通过
                     logger.info("认证成功,开始解冻",agentCertification.getId());
                     cerResStatus = CerResStatus.SUCCESS.status;
                     remark+="认证成功";
                     map.put("remark",remark);
-                    map.put("cerRes",cerResStatus);
-                    agentUnFreeze(agent,agentCertification,dataObj,map);
+                    map.put("cerResStatus",cerResStatus);
+                    return agentUnFreeze(agent,agentCertification,dataObj,map);
                 }
             }else if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")) && !dataObj.getString("enterpriseStatus").startsWith("在营")){
                 logger.info("非在营状态,进行冻结操作",dataObj.getString("enterpriseStatus"));
                 //非在营状态则冻结该代理商
                 agent.setCaStatus(Status.STATUS_2.status);
-                agentCertification.setCerRes(CerResStatus.SUCCESS.status);//认证结果;1-成功,2-失败
+                agentCertification.setCerRes(CerResStatus.FAIL.status);//认证结果;1-成功,2-失败
                 agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
                 if(1==agentMapper.updateByPrimaryKeySelective(agent)&& 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
-                    logger.info("工商认证成功，认证代理商{}状态为{},不进行信息同步",agent.getAgUniqNum(),dataObj.getString("enterpriseStatus"));
+                    logger.info("工商认证成功，认证代理商{}状态为{},不进行信息同步",agent.getId(),dataObj.getString("enterpriseStatus"));
                 }
             //非在营状态则冻结该代理商
                 AgentResult agentResultFreeze = queryAgentFreeze(agent.getId());
@@ -273,6 +268,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                         agentFreezePort.setFreezeNum(agentCertification.getId());
                         agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
                         agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+                        agentFreezePort.setRemark("认证结果非在营");
                         logger.info("代理商{}开始冻结",agent.getId());
                             AgentResult agentFreeze = agentFreeze(agentFreezePort);
                             if (agentFreeze.isOK()){
@@ -460,16 +456,16 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
      * @param agentCertification
      * @throws MessageException
      */
-    private void Agentfreeze(Agent agent,AgentCertification agentCertification,Map map)throws MessageException {
+    private AgentResult AgentfreezeShare(Agent agent,AgentCertification agentCertification,Map map)throws MessageException {
         agent.setCaStatus(Status.STATUS_2.status);
         if(null!=map && null!=(BigDecimal) map.get("cerResStatus")){
             agentCertification.setCerRes((BigDecimal) map.get("cerResStatus"));//“认证通过” "认证失败","信息缺失"，“认证成功，与本地信息不符“
         }
         agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
-        if(1==agentMapper.updateByPrimaryKeySelective(agent)&& 1 == agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
-            logger.info(("基础信息更改成功"));
+        if(1!=agentMapper.updateByPrimaryKeySelective(agent) && 1 != agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
+            logger.info(("基础信息更改失败"));
+            return AgentResult.fail("基础信息更改失败");
         }
-        //非在营状态则冻结该代理商
         AgentResult agentResultFreeze = queryAgentFreeze(agent.getId());
         logger.info("代理商:{},查询冻结解冻状态{}",agent.getId(),agentResultFreeze.getData());
         if (agentResultFreeze.isOK()){
@@ -488,20 +484,23 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                 AgentResult agentFreeze = agentFreeze(agentFreezePort);
                 if (agentFreeze.isOK()){
                     logger.info("代理商{}冻结成功",agent.getId());
+                    return AgentResult.ok("冻结成功");
                 }else {
                     logger.info("代理商{}冻结失败{}",agent.getId(),agentFreeze.getMsg());
+                    return AgentResult.fail("冻结失败");
                 }
 
             }
 
         }
+        return AgentResult.ok("冻结成功");
     }
 
 
     /**
      * 解冻公共方法
      */
-    private void agentUnFreeze(Agent agent,AgentCertification agentCertification,JSONObject dataObj,Map map)throws MessageException {
+    private AgentResult agentUnFreeze(Agent agent,AgentCertification agentCertification,JSONObject dataObj,Map map)throws MessageException {
         //更新代理商信息
         if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("regCap")))
             agent.setAgCapital(new BigDecimal(dataObj.getString("regCap").trim()));
@@ -532,8 +531,9 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
             agentCertification.setCerRes((BigDecimal) map.get("cerResStatus"));//“认证通过” "认证失败","信息缺失"，“认证成功，与本地信息不符“
         }
         agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
-        if(1==agentMapper.updateByPrimaryKeySelective(agent)&& 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
-            logger.info("工商认证成功，认证代理商{}状态为{},同步信息成功",agent.getAgUniqNum(),dataObj.getString("enterpriseStatus"));
+        if(1!=agentMapper.updateByPrimaryKeySelective(agent)&& 1 != agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
+            logger.info("工商认证失败，认证代理商{}状态为{},同步信息失败",agent.getId(),dataObj.getString("enterpriseStatus"));
+            return AgentResult.fail("工商认证失败，认证代理商{}:"+agent.getId());
         }
 
         AgentResult agentResultFreeze =  queryAgentFreeze(agent.getId());
@@ -554,12 +554,15 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                 agentUnFreeze =  agentUnFreeze(agentFreezePort);
                 if (agentUnFreeze.isOK()){
                     logger.info("代理商{},解冻成功",agent.getId());
+                    return AgentResult.ok("解冻成功");
                 }else {
                     logger.info("代理商{},解冻失败:{}",agent.getId(),agentResultFreeze.getMsg());
+                    return AgentResult.fail("解冻失败");
                 }
 
             }
 
         }
+        return AgentResult.ok("解冻成功");
     }
 }
