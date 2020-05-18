@@ -43,6 +43,11 @@
     <result column="REV2" jdbcType="VARCHAR" property="rev2" />
     <result column="REV3" jdbcType="VARCHAR" property="rev3" />
     <result column="REV4" jdbcType="VARCHAR" property="rev4" />
+    <result column="MAILING_STATUS" jdbcType="VARCHAR" property="mailingStatus" />
+    <result column="IMPORT_BATCH" jdbcType="VARCHAR" property="importBatch" />
+    <result column="BATCH_NO" jdbcType="VARCHAR" property="batchNo" />
+    <result column="AGENT_IMPORT" jdbcType="VARCHAR" property="agentImport" />
+    <result column="CW_IMPORT" jdbcType="VARCHAR" property="cwImport" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -108,7 +113,8 @@
     YS_DATE, ES_DATE, YS_RESULT, RETURN_REASON, RETURN_DATE, RETURN_EXPRESS_NUMBER, RETURN_EXPRESS_COMPANY,
     CREATE_DATE, CREATE_NAME, AGENT_ID, AGENT_NAME, INVOICE_AMT_MONTH, ES_RESULT, AMOUNT_TAX,
     STATUS, SERIAL_NO, AMOUNT, EXPENSE_STATUS, INVOICE_TYPE, SALLER_NAME, SALLER_NO,
-    REMARK, PROFIT_MONTH, REV1, REV2, REV3, REV4
+    REMARK, PROFIT_MONTH, REV1, REV2, REV3, REV4, MAILING_STATUS, IMPORT_BATCH, BATCH_NO,
+    AGENT_IMPORT, CW_IMPORT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.InvoiceApplyExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -152,7 +158,9 @@
       AMOUNT, EXPENSE_STATUS, INVOICE_TYPE,
       SALLER_NAME, SALLER_NO, REMARK,
       PROFIT_MONTH, REV1, REV2,
-      REV3, REV4)
+      REV3, REV4, MAILING_STATUS,
+      IMPORT_BATCH, BATCH_NO, AGENT_IMPORT,
+      CW_IMPORT)
     values (#{id,jdbcType=VARCHAR}, #{invoiceCompany,jdbcType=VARCHAR}, #{invoiceDate,jdbcType=VARCHAR},
       #{invoiceNumber,jdbcType=VARCHAR}, #{invoiceCode,jdbcType=VARCHAR}, #{invoiceItem,jdbcType=VARCHAR},
       #{unitPrice,jdbcType=DECIMAL}, #{numberSl,jdbcType=DECIMAL}, #{sumAmt,jdbcType=DECIMAL},
@@ -166,7 +174,9 @@
       #{amount,jdbcType=DECIMAL}, #{expenseStatus,jdbcType=VARCHAR}, #{invoiceType,jdbcType=VARCHAR},
       #{sallerName,jdbcType=VARCHAR}, #{sallerNo,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
       #{profitMonth,jdbcType=VARCHAR}, #{rev1,jdbcType=VARCHAR}, #{rev2,jdbcType=VARCHAR},
-      #{rev3,jdbcType=VARCHAR}, #{rev4,jdbcType=VARCHAR})
+      #{rev3,jdbcType=VARCHAR}, #{rev4,jdbcType=VARCHAR}, #{mailingStatus,jdbcType=VARCHAR},
+      #{importBatch,jdbcType=VARCHAR}, #{batchNo,jdbcType=VARCHAR}, #{agentImport,jdbcType=VARCHAR},
+      #{cwImport,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.InvoiceApply">
     insert into P_INVOICE_APPLY
@@ -294,6 +304,21 @@
       <if test="rev4 != null">
         REV4,
       </if>
+      <if test="mailingStatus != null">
+        MAILING_STATUS,
+      </if>
+      <if test="importBatch != null">
+        IMPORT_BATCH,
+      </if>
+      <if test="batchNo != null">
+        BATCH_NO,
+      </if>
+      <if test="agentImport != null">
+        AGENT_IMPORT,
+      </if>
+      <if test="cwImport != null">
+        CW_IMPORT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -418,6 +443,21 @@
       </if>
       <if test="rev4 != null">
         #{rev4,jdbcType=VARCHAR},
+      </if>
+      <if test="mailingStatus != null">
+        #{mailingStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="importBatch != null">
+        #{importBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="batchNo != null">
+        #{batchNo,jdbcType=VARCHAR},
+      </if>
+      <if test="agentImport != null">
+        #{agentImport,jdbcType=VARCHAR},
+      </if>
+      <if test="cwImport != null">
+        #{cwImport,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -553,6 +593,21 @@
       <if test="record.rev4 != null">
         REV4 = #{record.rev4,jdbcType=VARCHAR},
       </if>
+      <if test="record.mailingStatus != null">
+        MAILING_STATUS = #{record.mailingStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="record.importBatch != null">
+        IMPORT_BATCH = #{record.importBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="record.batchNo != null">
+        BATCH_NO = #{record.batchNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentImport != null">
+        AGENT_IMPORT = #{record.agentImport,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cwImport != null">
+        CW_IMPORT = #{record.cwImport,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -600,7 +655,12 @@
     REV1 = #{record.rev1,jdbcType=VARCHAR},
     REV2 = #{record.rev2,jdbcType=VARCHAR},
     REV3 = #{record.rev3,jdbcType=VARCHAR},
-    REV4 = #{record.rev4,jdbcType=VARCHAR}
+    REV4 = #{record.rev4,jdbcType=VARCHAR},
+    MAILING_STATUS = #{record.mailingStatus,jdbcType=VARCHAR},
+    IMPORT_BATCH = #{record.importBatch,jdbcType=VARCHAR},
+    BATCH_NO = #{record.batchNo,jdbcType=VARCHAR},
+    AGENT_IMPORT = #{record.agentImport,jdbcType=VARCHAR},
+    CW_IMPORT = #{record.cwImport,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -728,6 +788,21 @@
       <if test="rev4 != null">
         REV4 = #{rev4,jdbcType=VARCHAR},
       </if>
+      <if test="mailingStatus != null">
+        MAILING_STATUS = #{mailingStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="importBatch != null">
+        IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="batchNo != null">
+        BATCH_NO = #{batchNo,jdbcType=VARCHAR},
+      </if>
+      <if test="agentImport != null">
+        AGENT_IMPORT = #{agentImport,jdbcType=VARCHAR},
+      </if>
+      <if test="cwImport != null">
+        CW_IMPORT = #{cwImport,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -772,7 +847,12 @@
       REV1 = #{rev1,jdbcType=VARCHAR},
       REV2 = #{rev2,jdbcType=VARCHAR},
       REV3 = #{rev3,jdbcType=VARCHAR},
-      REV4 = #{rev4,jdbcType=VARCHAR}
+      REV4 = #{rev4,jdbcType=VARCHAR},
+      MAILING_STATUS = #{mailingStatus,jdbcType=VARCHAR},
+      IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR},
+      BATCH_NO = #{batchNo,jdbcType=VARCHAR},
+      AGENT_IMPORT = #{agentImport,jdbcType=VARCHAR},
+      CW_IMPORT = #{cwImport,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -785,6 +865,10 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <!-- *************************************以上是自动生成代码，有少许修改**************************************-->
+
 
   <delete id="deleteById" parameterType="java.lang.String">
     delete from P_INVOICE_APPLY where ID = #{id,jdbcType=VARCHAR}

@@ -4,8 +4,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class InvoiceApply implements Serializable {
-    private String id;
 
+    private String id;
+    /*开票公司*/
     private String invoiceCompany;
 
     private String invoiceDate;
@@ -15,9 +16,9 @@ public class InvoiceApply implements Serializable {
     private String invoiceCode;
 
     private String invoiceItem;
-
+    /*该字段未启用*/
     private BigDecimal unitPrice;
-
+    /*该字段未启用*/
     private Long numberSl;
 
     private BigDecimal sumAmt;
@@ -35,8 +36,7 @@ public class InvoiceApply implements Serializable {
     private String ysDate;
 
     private String esDate;
-
-    /** 0：初审造成的未通过  1：初审通过  2：由终审导入的未通过**/
+    /* 0：初审造成的未通过  1：初审通过  2：由终审导入的未通过*/
     private String ysResult;
 
     private String returnReason;
@@ -47,22 +47,20 @@ public class InvoiceApply implements Serializable {
 
     private String returnExpressCompany;
 
-    private String createDate;
+    private String createDate;/*录入时间*/
 
-    private String createName;
+    private String createName;/*录入人*/
 
     private String agentId;
 
     private String agentName;
 
     private String invoiceAmtMonth;
-
-    /****0: 终审未通过  1：终审通过***/
+    /*0: 终审未通过  1：终审通过*/
     private String esResult;
 
     private BigDecimal amountTax;
-
-    /***0：该发票金额未汇总  1：该发票金额已汇总至本月到票 **/
+    /*0：该发票金额未汇总  1：该发票金额已汇总至本月到票 */
     private String status;
 
     private String serialNo;
@@ -76,22 +74,28 @@ public class InvoiceApply implements Serializable {
     private String sallerName;
 
     private String sallerNo;
-
-    /**发票备注**/
+    /*发票备注*/
     private String remark;
-
-    /***汇总月份****/
+    /*汇总月份*/
     private String profitMonth;
-
-    /***初审备注**/
+    /*初审备注*/
     private String rev1;
-
-    /*******终审备注*****/
+    /*终审备注*/
     private String rev2;
 
-    private String rev3;
+    private String rev3;/*该字段暂未使用*/
 
-    private String rev4;
+    private String rev4;/*该字段暂未使用*/
+    /*发票代理商寄出状态*/
+    private String mailingStatus;
+    /*导入批次*/
+    private String importBatch;
+    /*导入序号*/
+    private String batchNo;
+    /*代理商导入状态*/
+    private String agentImport;
+    /*财务导入状态*/
+    private String cwImport;
 
     public String getId() {
         return id;
@@ -419,5 +423,45 @@ public class InvoiceApply implements Serializable {
 
     public void setRev4(String rev4) {
         this.rev4 = rev4 == null ? null : rev4.trim();
+    }
+
+    public String getMailingStatus() {
+        return mailingStatus;
+    }
+
+    public void setMailingStatus(String mailingStatus) {
+        this.mailingStatus = mailingStatus == null ? null : mailingStatus.trim();
+    }
+
+    public String getImportBatch() {
+        return importBatch;
+    }
+
+    public void setImportBatch(String importBatch) {
+        this.importBatch = importBatch == null ? null : importBatch.trim();
+    }
+
+    public String getBatchNo() {
+        return batchNo;
+    }
+
+    public void setBatchNo(String batchNo) {
+        this.batchNo = batchNo == null ? null : batchNo.trim();
+    }
+
+    public String getAgentImport() {
+        return agentImport;
+    }
+
+    public void setAgentImport(String agentImport) {
+        this.agentImport = agentImport == null ? null : agentImport.trim();
+    }
+
+    public String getCwImport() {
+        return cwImport;
+    }
+
+    public void setCwImport(String cwImport) {
+        this.cwImport = cwImport == null ? null : cwImport.trim();
     }
 }
