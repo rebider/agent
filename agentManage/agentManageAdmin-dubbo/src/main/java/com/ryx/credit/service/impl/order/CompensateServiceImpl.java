@@ -416,7 +416,7 @@ public class CompensateServiceImpl implements CompensateService {
         ArrayList<Object> recordStatusList = new ArrayList<>();
         if(null!=oRefundPriceDiff && null!=oRefundPriceDiff.getId()){
             oRefundPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(oRefundPriceDiff.getId());
-            if(oRefundPriceDiff.getReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
+            if(null != oRefundPriceDiff && null != oRefundPriceDiff.getReviewStatus() && oRefundPriceDiff.getReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
                 recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
             }else{
                 recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
@@ -555,13 +555,6 @@ public class CompensateServiceImpl implements CompensateService {
             if(!agentResult.isOK()){
                 log.info("活动调整保存打款记录失败1");
                 throw new ProcessException("保存打款记录失败");
-            }
-            //代理商打款，代理商打款不能小于活动差价。
-            if (null != oRefundPriceDiff.getApplyCompType() && oRefundPriceDiff.getApplyCompType().equals("1")) {
-                //状态为1说明代理商要打款
-                if (oRefundPriceDiff.getApplyCompAmt().compareTo(belowPayAmt.add(shareDeductAmt)) != 0){
-                    throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
-                }
             }
 
             //遍历补差价明细进行校验和信息补全
@@ -795,7 +788,7 @@ public class CompensateServiceImpl implements CompensateService {
                             if (i != 1) {
                                 throw new ProcessException("更新返回数据失败");
                             }
-                            if (null != stringObjectMap.get("allPayStaus") && String.valueOf(stringObjectMap.get("allPayStaus")).equals("1")) {
+                            if (!submitFlag && null != stringObjectMap.get("allPayStatus") && String.valueOf(stringObjectMap.get("allPayStatus")).equals("1")) {
                                 //记录sn
                                 paidSN += refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + ",";
                                 //更改状态
@@ -815,7 +808,7 @@ public class CompensateServiceImpl implements CompensateService {
                     BigDecimal sumCalPrice = new BigDecimal(0);
                     for (ORefundPriceDiffDetail row : refundPriceDiffDetailList) {
                         if(StringUtils.isNotBlank(row.getActivityRealId())) {
-                            BigDecimal calPrice = compensateService.calculatePriceDiff(row.getBeginSn(),row.getEndSn(),row.getActivityFrontId(), row.getActivityRealId(), row.getChangeCount(), agentVo.getoRefundPriceDiff());
+                            BigDecimal calPrice = compensateService.calculatePriceDiff(row.getBeginSn(),row.getEndSn(),row.getActivityFrontId(), row.getActivityRealId(), row.getChangeCount(), oRefundPriceDiff);
                             sumCalPrice = sumCalPrice.add(calPrice);
                         }
                     }
@@ -905,7 +898,7 @@ public class CompensateServiceImpl implements CompensateService {
                             if(i!=1){
                                 throw new ProcessException("更新返回数据失败");
                             }
-                            if (null != stringObjectMap.get("allPayStaus") && String.valueOf(stringObjectMap.get("allPayStaus")).equals("1")) {
+                            if (!submitFlag && null != stringObjectMap.get("allPayStatus") && stringObjectMap.get("allPayStatus").toString().equals("1")) {
                                 //记录sn
                                 paidSN += refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + ",";
                                 //更改状态
@@ -925,7 +918,7 @@ public class CompensateServiceImpl implements CompensateService {
                     BigDecimal sumCalPrice = new BigDecimal(0);
                     for (ORefundPriceDiffDetail row : refundPriceDiffDetailList) {
                         if(StringUtils.isNotBlank(row.getActivityRealId())) {
-                            BigDecimal calPrice = compensateService.calculatePriceDiff(row.getBeginSn(),row.getEndSn(),row.getActivityFrontId(), row.getActivityRealId(), row.getChangeCount(), agentVo.getoRefundPriceDiff());
+                            BigDecimal calPrice = compensateService.calculatePriceDiff(row.getBeginSn(),row.getEndSn(),row.getActivityFrontId(), row.getActivityRealId(), row.getChangeCount(), oRefundPriceDiff);
                             sumCalPrice = sumCalPrice.add(calPrice);
                         }
                     }
@@ -938,6 +931,14 @@ public class CompensateServiceImpl implements CompensateService {
                         log.info("插入补退差价申请表异常");
                         throw new ProcessException("保存失败");
                     }
+                }
+            }
+
+            //代理商打款，代理商打款不能小于活动差价。
+            if (null != oRefundPriceDiff.getApplyCompType() && oRefundPriceDiff.getApplyCompType().equals("1")) {
+                //状态为1说明代理商要打款
+                if (oRefundPriceDiff.getApplyCompAmt().compareTo(belowPayAmt.add(shareDeductAmt)) != 0){
+                    throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
                 }
             }
 

@@ -9,10 +9,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.AttachmentRelMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.machine.service.ImsTermMachineService;
 import com.ryx.credit.machine.service.TermMachineService;
@@ -102,6 +99,10 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     private OsnOperateService osnOperateService;
     @Autowired
     private OrderOffsetService orderOffsetService;
+    @Autowired
+    private CompensateService compensateService;
+    @Autowired
+    private PlatFormMapper platFormMapper;
 
     /**
      * 解析提交过来的sn,
@@ -247,9 +248,11 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                                          AgentVo agentVo)throws Exception{
 
         try {
+            //pos提交标志，ture第二次提交,false是第一次提交
+            boolean submitFlag = (null != agentVo.getPosPaidFlag() && agentVo.getPosPaidFlag().equals("1"));
             if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
                 if(refundPriceDiffFile.size()==0){
-                    boolean ispz = false;
+                    Boolean ispz = false;
                     for (OCashReceivablesVo oCashReceivablesVo : oCashReceivablesVoList) {
                         if(oCashReceivablesVo.getPayType().equals(PayType.YHHK.getValue())){
                             ispz = true;
@@ -290,21 +293,15 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     shareDeductAmt = shareDeductAmt.add(oCashReceivablesVo.getAmount());
                 }
             }
-            //pos平台重新请求后，说明机具是已付状态，仅支持划拨，不支持换活动。
-            if(null != agentVo.getPosPaidFlag() && agentVo.getPosPaidFlag().equals("1")) {
-                oRefundPriceDiff.setBelowPayAmt(new BigDecimal(0));
-                oRefundPriceDiff.setShareDeductAmt(new BigDecimal(0));
-                oRefundPriceDiff.setRelCompAmt(new BigDecimal(0));
-                oRefundPriceDiff.setApplyCompAmt(new BigDecimal(0));
-            } else {
-                oRefundPriceDiff.setRelCompAmt(oRefundPriceDiff.getApplyCompAmt());
-                oRefundPriceDiff.setBelowPayAmt(belowPayAmt);
-                oRefundPriceDiff.setShareDeductAmt(shareDeductAmt);
-            }
-            int refundDiffInsert = refundPriceDiffMapper.insert(oRefundPriceDiff);
-            if(refundDiffInsert!=1){
-                log.info("插入补退差价申请表异常");
-                throw new MessageException("保存失败");
+            oRefundPriceDiff.setBelowPayAmt(belowPayAmt);
+            oRefundPriceDiff.setShareDeductAmt(shareDeductAmt);
+
+            if (!submitFlag) {
+                int refundDiffInsert = refundPriceDiffMapper.insert(oRefundPriceDiff);
+                if(refundDiffInsert!=1){
+                    log.info("插入补退差价申请表异常");
+                    throw new MessageException("保存失败");
+                }
             }
 
             //添加新的附件
@@ -335,12 +332,10 @@ public class OldCompensateServiceImpl implements OldCompensateService {
 
             Set<String> setOldOrgId = new HashSet<>();
             Set<String> setPlatform = new HashSet<>();
-            //POS平台换活动或者划拨标志
-            boolean posExecuteFalg = false;
             for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
-
                 //pos平台重新请求后，说明机具是已付状态，仅支持划拨，不支持换活动。
-                if(null != agentVo.getPosPaidFlag() && agentVo.getPosPaidFlag().equals("1")) {
+                String oldActivityId = redisService.getValue(refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + "_BCJ");
+                if (StringUtils.isNotBlank(oldActivityId) && refundPriceDiffDetail.getActivityFrontId().equals(oldActivityId)) {
                     refundPriceDiffDetail.setActivityRealId(refundPriceDiffDetail.getActivityFrontId());
                 }
                 if(StringUtils.isBlank(refundPriceDiffDetail.getOldOrgId())){
@@ -380,13 +375,6 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 }
                 OProduct product  = productService.findById(newActivity.getProductId());
 
-//                //检查目标活动和代理商平台码是否一致
-//                if(oldActivity.getPlatform().equals(newActivity.getPlatform())){
-//                    //活动没有跨平台，平台号也不允许跨平台
-//                    if(!refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())) {
-//                        throw new MessageException("原平台编号与目标平台编号不一致");
-//                    }
-//                }
                 //检查目标活动和代理商平台码是否一致
                 if(refundPriceDiffDetail.getNewOrgId().equals(refundPriceDiffDetail.getOldOrgId())){
                     //平台号没有跨平台，活动也不允许跨平台
@@ -442,6 +430,28 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     } else {
                         throw new ProcessException("目标机构S码有误，未找到业务平台编码！");
                     }
+                } else if (PlatformType.SSPOS.getValue().equals(platForm.getPlatformType())) {
+                    List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",refundPriceDiffDetail.getOldOrgId()));
+                    List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",refundPriceDiffDetail.getNewOrgId()));
+                    if (null == oldPlatForm || oldPlatForm.size() != 1 || null == oldPlatForm.get(0).getBusplatform()) {
+                        throw new ProcessException("未找到原目标业务平台，请核查原目标业务平台！");
+                    }
+                    if (null == newPlatForm || newPlatForm.size() != 1 || null == newPlatForm.get(0).getBusplatform()) {
+                        throw new ProcessException("未找到目标业务平台，请核查目标业务平台！");
+                    }
+                    refundPriceDiffDetail.setOldBrandCode(oldPlatForm.get(0).getBusplatform());
+                    refundPriceDiffDetail.setNewBrandCode(newPlatForm.get(0).getBusplatform());
+                } else if (PlatformType.POS.getValue().equals(platForm.getPlatformType())) {
+                    List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",refundPriceDiffDetail.getOldOrgId()));
+                    List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",refundPriceDiffDetail.getNewOrgId()));
+                    if (null == oldPlatForm || oldPlatForm.size() != 1 || null == oldPlatForm.get(0).getBusplatform()) {
+                        throw new ProcessException("未找到原目标业务平台，请核查原目标业务平台！");
+                    }
+                    if (null == newPlatForm || newPlatForm.size() != 1 || null == newPlatForm.get(0).getBusplatform()) {
+                        throw new ProcessException("未找到目标业务平台，请核查目标业务平台！");
+                    }
+                    refundPriceDiffDetail.setOldBrandCode(oldPlatForm.get(0).getBusplatform());
+                    refundPriceDiffDetail.setNewBrandCode(newPlatForm.get(0).getBusplatform());
                 }
 
                 Map<String,String> par = new HashedMap();
@@ -457,7 +467,6 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 }
                 setPlatform.add(refundPriceDiffDetail.getPlatformType());
                 setOldOrgId.add(refundPriceDiffDetail.getOldOrgId());
-                if (!newActivity.getId().equals(oldActivity.getId())) posExecuteFalg = true;
             }
 
             if(setPlatform.size()>1){
@@ -476,21 +485,11 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 throw new ProcessException(synOrVerifyResult.getMsg());
             }
 
-            //代理商打款，代理商打款不能小于活动差价。
-            if (null != oRefundPriceDiff.getApplyCompType() && oRefundPriceDiff.getApplyCompType().equals("1")) {
-                //状态为1说明代理商要打款
-                if (oRefundPriceDiff.getApplyCompAmt().compareTo(belowPayAmt.add(shareDeductAmt)) != 0){
-                    throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
-                }
-            }
-
             String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
             if (PlatformType.whetherPOS(platformType)) {
+                String paidSN = "";
+                boolean paidFlag = false;
                 JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
-                //POS平台allPayStaus为1说明已付执行划拨，不执行换活动
-                if (posExecuteFalg && null !=resData.getString("allPayStaus") && resData.getString("allPayStaus").equals("1")) {
-                    throw new ProcessException("POSTIPS","SN为已付，不允许换活动，本次支持划拨。点击确认后，执行下一步流程！");
-                }
                 List<Map<String,Object>> resultList = (List<Map<String,Object>>)resData.get("resultList");
                 for (Map<String, Object> stringObjectMap : resultList) {
                     String serialNumber = String.valueOf(stringObjectMap.get("serialNumber"));
@@ -526,7 +525,38 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                             if(i!=1){
                                 throw new ProcessException("更新返回数据失败");
                             }
+                            if (!submitFlag && null != stringObjectMap.get("allPayStatus") && String.valueOf(stringObjectMap.get("allPayStatus")).equals("1")) {
+                                //记录sn
+                                paidSN += refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + ",";
+                                //更改状态
+                                paidFlag = true;
+                                //存储redis第二次提交使用
+                                redisService.setValue(refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + "_BCJ", refundPriceDiffDetail.getActivityFrontId(), 60 * 60 * 24L);
+                            }
                         }
+                    }
+                }
+                //第一次提交，已付。提示用户
+                if (paidFlag && !submitFlag) {
+                    throw new ProcessException("POSTIPS", "SN:" + paidSN + "为已付，不允许换活动，本次支持划拨。点击确认后，执行下一步流程！");
+                }
+                //第二次校验接口，说明活动中存在的活动有变动，更新钱相关
+                if (submitFlag) {
+                    BigDecimal sumCalPrice = new BigDecimal(0);
+                    for (ORefundPriceDiffDetail row : refundPriceDiffDetailList) {
+                        if(StringUtils.isNotBlank(row.getActivityRealId())) {
+                            BigDecimal calPrice = compensateService.calculatePriceDiff(row.getBeginSn(),row.getEndSn(),row.getActivityFrontId(), row.getActivityRealId(), row.getChangeCount(), agentVo.getoRefundPriceDiff());
+                            sumCalPrice = sumCalPrice.add(calPrice);
+                        }
+                    }
+                    String sumCalPriceStr = String.valueOf(sumCalPrice);
+                    oRefundPriceDiff.setApplyCompType(sumCalPriceStr.contains("-")?PriceDiffType.DETAIN_AMT.getValue():PriceDiffType.REPAIR_AMT.getValue());
+                    oRefundPriceDiff.setApplyCompAmt(sumCalPriceStr.contains("-")?new BigDecimal(sumCalPriceStr.substring(1)):new BigDecimal(sumCalPriceStr));
+                    oRefundPriceDiff.setRelCompType(sumCalPriceStr.contains("-")?PriceDiffType.DETAIN_AMT.getValue():PriceDiffType.REPAIR_AMT.getValue());
+                    oRefundPriceDiff.setRelCompAmt(sumCalPriceStr.contains("-")?new BigDecimal(sumCalPriceStr.substring(1)):new BigDecimal(sumCalPriceStr));
+                    if(1 != refundPriceDiffMapper.insert(oRefundPriceDiff)){
+                        log.info("插入补退差价申请表异常");
+                        throw new ProcessException("保存失败");
                     }
                 }
             } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
@@ -567,50 +597,95 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     }
                 }
             } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
-            JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
-            //POS平台allPayStaus为1说明已付执行划拨，不执行换活动
-            if (posExecuteFalg && null != resData.getString("allPayStaus") && resData.getString("allPayStaus").equals("1")) {
-                throw new ProcessException("POSTIPS","SN为已付，不允许换活动，本次支持划拨。点击确认后，执行下一步流程！");
-            }
-            List<Map<String,Object>> resultList = (List<Map<String,Object>>)resData.get("resultList");
-            for (Map<String, Object> stringObjectMap : resultList) {
-                String serialNumber = String.valueOf(stringObjectMap.get("serialNumber"));
-                for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
-                    if(serialNumber.equals(refundPriceDiffDetail.getId())){
-                        Map<String, Object> oldOrganMap = JsonUtil.objectToMap(stringObjectMap.get("oldOrgan"));
-                        Map<String, Object> newOrganMap = JsonUtil.objectToMap(stringObjectMap.get("newOrgan"));
-                        String oldSupDorgId = String.valueOf(oldOrganMap.get("oldSupDorgId"));
-                        String oldSupDorgName = String.valueOf(oldOrganMap.get("oldSupDorgName"));
-                        String newSupDorgId = String.valueOf(newOrganMap.get("newSupDorgId"));
-                        String newSupDorgName = String.valueOf(newOrganMap.get("newSupDorgName"));
-                        String newOrgName = String.valueOf(newOrganMap.get("newOrgName"));
-                        String oldOrgName = String.valueOf(oldOrganMap.get("oldOrgName"));
-                        if(StringUtils.isNotBlank(oldSupDorgId) && !oldSupDorgId.equals("null")) {
-                            refundPriceDiffDetail.setOldSupdOrgId(oldSupDorgId);
-                        }
-                        if(StringUtils.isNotBlank(oldSupDorgName) && !oldSupDorgName.equals("null")) {
-                            refundPriceDiffDetail.setOldSupdOrgName(oldSupDorgName);
-                        }
-                        if(StringUtils.isNotBlank(newSupDorgId) && !newSupDorgId.equals("null")) {
-                            refundPriceDiffDetail.setNewSupdOrgId(newSupDorgId);
-                        }
-                        if(StringUtils.isNotBlank(newSupDorgName) && !newSupDorgName.equals("null")) {
-                            refundPriceDiffDetail.setNewSupdOrgName(newSupDorgName);
-                        }
-                        if(StringUtils.isNotBlank(newOrgName) && !newOrgName.equals("null")) {
-                            refundPriceDiffDetail.setNewOrgName(newOrgName);
-                        }
-                        if(StringUtils.isNotBlank(oldOrgName) && !oldOrgName.equals("null")) {
-                            refundPriceDiffDetail.setOldOrgName(oldOrgName);
-                        }
-                        int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
-                        if(i!=1){
-                            throw new ProcessException("更新返回数据失败");
+                String paidSN = "";
+                boolean paidFlag = false;
+                JSONObject resData =  (JSONObject)synOrVerifyResult.getData();
+                List<Map<String,Object>> resultList = (List<Map<String,Object>>)resData.get("resultList");
+                for (Map<String, Object> stringObjectMap : resultList) {
+                    String serialNumber = String.valueOf(stringObjectMap.get("serialNumber"));
+                    for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
+                        if(serialNumber.equals(refundPriceDiffDetail.getId())){
+                            Map<String, Object> oldOrganMap = JsonUtil.objectToMap(stringObjectMap.get("oldOrgan"));
+                            Map<String, Object> newOrganMap = JsonUtil.objectToMap(stringObjectMap.get("newOrgan"));
+                            String oldSupDorgId = String.valueOf(oldOrganMap.get("oldSupDorgId"));
+                            String oldSupDorgName = String.valueOf(oldOrganMap.get("oldSupDorgName"));
+                            String newSupDorgId = String.valueOf(newOrganMap.get("newSupDorgId"));
+                            String newSupDorgName = String.valueOf(newOrganMap.get("newSupDorgName"));
+                            String newOrgName = String.valueOf(newOrganMap.get("newOrgName"));
+                            String oldOrgName = String.valueOf(oldOrganMap.get("oldOrgName"));
+                            if(StringUtils.isNotBlank(oldSupDorgId) && !oldSupDorgId.equals("null")) {
+                                refundPriceDiffDetail.setOldSupdOrgId(oldSupDorgId);
+                            }
+                            if(StringUtils.isNotBlank(oldSupDorgName) && !oldSupDorgName.equals("null")) {
+                                refundPriceDiffDetail.setOldSupdOrgName(oldSupDorgName);
+                            }
+                            if(StringUtils.isNotBlank(newSupDorgId) && !newSupDorgId.equals("null")) {
+                                refundPriceDiffDetail.setNewSupdOrgId(newSupDorgId);
+                            }
+                            if(StringUtils.isNotBlank(newSupDorgName) && !newSupDorgName.equals("null")) {
+                                refundPriceDiffDetail.setNewSupdOrgName(newSupDorgName);
+                            }
+                            if(StringUtils.isNotBlank(newOrgName) && !newOrgName.equals("null")) {
+                                refundPriceDiffDetail.setNewOrgName(newOrgName);
+                            }
+                            if(StringUtils.isNotBlank(oldOrgName) && !oldOrgName.equals("null")) {
+                                refundPriceDiffDetail.setOldOrgName(oldOrgName);
+                            }
+                            int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
+                            if(i!=1){
+                                throw new ProcessException("更新返回数据失败");
+                            }
+                            if (!submitFlag && null != stringObjectMap.get("allPayStatus") && String.valueOf(stringObjectMap.get("allPayStatus")).equals("1")) {
+                                //记录sn
+                                paidSN += refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + ",";
+                                //更改状态
+                                paidFlag = true;
+                                //存储redis第二次提交使用
+                                redisService.setValue(refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + "_BCJ", refundPriceDiffDetail.getActivityFrontId(), 60 * 60 * 24L);
+                            }
                         }
                     }
                 }
+                //第一次提交，已付。提示用户
+                if (paidFlag && !submitFlag) {
+                    throw new ProcessException("POSTIPS", "SN:" + paidSN + "为已付，不允许换活动，本次支持划拨。点击确认后，执行下一步流程！");
+                }
+                //第二次校验接口，说明活动中存在的活动有变动，更新钱相关
+                if (submitFlag) {
+                    BigDecimal sumCalPrice = new BigDecimal(0);
+                    for (ORefundPriceDiffDetail row : refundPriceDiffDetailList) {
+                        if(StringUtils.isNotBlank(row.getActivityRealId())) {
+                            BigDecimal calPrice = compensateService.calculatePriceDiff(row.getBeginSn(),row.getEndSn(),row.getActivityFrontId(), row.getActivityRealId(), row.getChangeCount(), agentVo.getoRefundPriceDiff());
+                            sumCalPrice = sumCalPrice.add(calPrice);
+                        }
+                    }
+                    String sumCalPriceStr = String.valueOf(sumCalPrice);
+                    oRefundPriceDiff.setApplyCompType(sumCalPriceStr.contains("-")?PriceDiffType.DETAIN_AMT.getValue():PriceDiffType.REPAIR_AMT.getValue());
+                    oRefundPriceDiff.setApplyCompAmt(sumCalPriceStr.contains("-")?new BigDecimal(sumCalPriceStr.substring(1)):new BigDecimal(sumCalPriceStr));
+                    oRefundPriceDiff.setRelCompType(sumCalPriceStr.contains("-")?PriceDiffType.DETAIN_AMT.getValue():PriceDiffType.REPAIR_AMT.getValue());
+                    oRefundPriceDiff.setRelCompAmt(sumCalPriceStr.contains("-")?new BigDecimal(sumCalPriceStr.substring(1)):new BigDecimal(sumCalPriceStr));
+                    if(1 != refundPriceDiffMapper.insert(oRefundPriceDiff)){
+                        log.info("插入补退差价申请表异常");
+                        throw new ProcessException("保存失败");
+                    }
+                }
             }
-        }
+
+            //代理商打款，代理商打款不能小于活动差价。
+            if (null != oRefundPriceDiff.getApplyCompType() && oRefundPriceDiff.getApplyCompType().equals("1")) {
+                //状态为1说明代理商要打款
+                if (oRefundPriceDiff.getApplyCompAmt().compareTo(belowPayAmt.add(shareDeductAmt)) != 0){
+                    throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
+                }
+            }
+
+            //代理商打款，代理商打款不能小于活动差价。
+            if (null != oRefundPriceDiff.getApplyCompType() && oRefundPriceDiff.getApplyCompType().equals("1")) {
+                //状态为1说明代理商要打款
+                if (oRefundPriceDiff.getApplyCompAmt().compareTo(belowPayAmt.add(shareDeductAmt)) != 0){
+                    throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
+                }
+            }
 
             return AgentResult.ok(priceDiffId);
         } catch (MessageException e) {
