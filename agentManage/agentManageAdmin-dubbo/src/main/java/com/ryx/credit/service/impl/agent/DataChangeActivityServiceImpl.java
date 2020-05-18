@@ -385,6 +385,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             db_agent.setAgRegArea(voAgent.getAgRegArea());
                             db_agent.setBusRiskEmail(voAgent.getBusRiskEmail());
                             db_agent.setBusContactEmail(voAgent.getBusContactEmail());
+                            db_agent.setAgRunAdd(voAgent.getAgRunAdd());
+                            db_agent.setAgLegalCerdate(voAgent.getAgLegalCerdate());
                             if (1 != agentMapper.updateByPrimaryKeySelective(db_agent)) {
                                 throw new ProcessException("代理商信息更新失败");
                             }else{
