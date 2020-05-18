@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -931,6 +932,23 @@ public class AgentServiceImpl implements AgentService {
     public List<Agent> queryByIds(List ids) {
         List<Agent> agents = agentMapper.selectByPrimaryKeys(ids);
         return agents;
+    }
+
+    @Override
+    public List<Agent> queryAgentByIds(List ids) {
+        List<Agent> list = new ArrayList<>();
+        if(null!=ids || ids.size()>0){
+            for (Object id : ids) {
+                AgentExample agentExample = new AgentExample();
+                AgentExample.Criteria criteria = agentExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(String.valueOf(id));
+                List<Agent> agentList= agentMapper.selectByExample(agentExample);
+                if (null!=agentList &&agentList.size()>0 ) {
+                    Agent a_agent = agentList.get(0);
+                    list.add(a_agent);
+                }
+            }
+        }
+        return list;
     }
 
     @Override
