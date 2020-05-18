@@ -679,14 +679,6 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 }
             }
 
-            //代理商打款，代理商打款不能小于活动差价。
-            if (null != oRefundPriceDiff.getApplyCompType() && oRefundPriceDiff.getApplyCompType().equals("1")) {
-                //状态为1说明代理商要打款
-                if (oRefundPriceDiff.getApplyCompAmt().compareTo(belowPayAmt.add(shareDeductAmt)) != 0){
-                    throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
-                }
-            }
-
             return AgentResult.ok(priceDiffId);
         } catch (MessageException e) {
             log.info("活动调整保存失败");
