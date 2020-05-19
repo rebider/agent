@@ -333,11 +333,6 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             Set<String> setOldOrgId = new HashSet<>();
             Set<String> setPlatform = new HashSet<>();
             for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
-                //pos平台重新请求后，说明机具是已付状态，仅支持划拨，不支持换活动。
-                String oldActivityId = redisService.getValue(refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + "_BCJ");
-                if (StringUtils.isNotBlank(oldActivityId) && refundPriceDiffDetail.getActivityFrontId().equals(oldActivityId)) {
-                    refundPriceDiffDetail.setActivityRealId(refundPriceDiffDetail.getActivityFrontId());
-                }
                 if(StringUtils.isBlank(refundPriceDiffDetail.getOldOrgId())){
                     throw new MessageException("原机构编号不能为空");
                 }
@@ -460,10 +455,13 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 if(!termMachineService.checkModleIsEq(par,refundPriceDiffDetail.getPlatformType())){
                     throw new MessageException(refundPriceDiffDetail.getBeginSn()+"--"+refundPriceDiffDetail.getEndSn()+":("+oldActivity.getActivityName()+")不支持互换("+newActivity.getActivityName()+")");
                 }
-                int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
-                if(priceDiffDetailInsert!=1){
-                    log.info("插入补退差价详情表异常");
-                    throw new MessageException("保存失败");
+                //pos平台第二次提交的时候再进行插入
+                if (!submitFlag) {
+                    int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
+                    if(priceDiffDetailInsert!=1){
+                        log.info("插入补退差价详情表异常");
+                        throw new MessageException("保存失败");
+                    }
                 }
                 setPlatform.add(refundPriceDiffDetail.getPlatformType());
                 setOldOrgId.add(refundPriceDiffDetail.getOldOrgId());
@@ -542,6 +540,35 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 }
                 //第二次校验接口，说明活动中存在的活动有变动，更新钱相关
                 if (submitFlag) {
+                    for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
+                        //pos平台重新请求后，说明机具是已付状态，仅支持划拨，不支持换活动。
+                        String oldActivityId = redisService.getValue(refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + "_BCJ");
+                        if (StringUtils.isNotBlank(oldActivityId) && refundPriceDiffDetail.getActivityFrontId().equals(oldActivityId)) {
+                            refundPriceDiffDetail.setActivityRealId(refundPriceDiffDetail.getActivityFrontId());
+                        }
+                        OActivity newActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
+                        if(newActivity==null){
+                            throw new MessageException("新活动不存在");
+                        }
+                        OProduct product  = productService.findById(newActivity.getProductId());
+                        refundPriceDiffDetail.setProId(product.getId());
+                        refundPriceDiffDetail.setProName(product.getProName());
+                        refundPriceDiffDetail.setPrice(newActivity.getPrice());
+
+                        refundPriceDiffDetail.setActivityName(newActivity.getActivityName());
+                        refundPriceDiffDetail.setActivityWay(newActivity.getActivityWay());
+                        refundPriceDiffDetail.setActivityRule(newActivity.getActivityRule());
+                        refundPriceDiffDetail.setPrice(newActivity.getPrice());
+                        refundPriceDiffDetail.setVender(newActivity.getVender());
+                        refundPriceDiffDetail.setProModel(newActivity.getProModel());
+                        refundPriceDiffDetail.setNewMachineId(newActivity.getBusProCode());
+
+                        if(refundPriceDiffDetailMapper.insert(refundPriceDiffDetail)  != 1){
+                            log.info("插入补退差价详情表异常");
+                            throw new MessageException("保存失败");
+                        }
+                    }
+
                     BigDecimal sumCalPrice = new BigDecimal(0);
                     for (ORefundPriceDiffDetail row : refundPriceDiffDetailList) {
                         if(StringUtils.isNotBlank(row.getActivityRealId())) {
@@ -652,6 +679,35 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 }
                 //第二次校验接口，说明活动中存在的活动有变动，更新钱相关
                 if (submitFlag) {
+                    for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
+                        //pos平台重新请求后，说明机具是已付状态，仅支持划拨，不支持换活动。
+                        String oldActivityId = redisService.getValue(refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + "_BCJ");
+                        if (StringUtils.isNotBlank(oldActivityId) && refundPriceDiffDetail.getActivityFrontId().equals(oldActivityId)) {
+                            refundPriceDiffDetail.setActivityRealId(refundPriceDiffDetail.getActivityFrontId());
+                        }
+                        OActivity newActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
+                        if(newActivity==null){
+                            throw new MessageException("新活动不存在");
+                        }
+                        OProduct product  = productService.findById(newActivity.getProductId());
+                        refundPriceDiffDetail.setProId(product.getId());
+                        refundPriceDiffDetail.setProName(product.getProName());
+                        refundPriceDiffDetail.setPrice(newActivity.getPrice());
+
+                        refundPriceDiffDetail.setActivityName(newActivity.getActivityName());
+                        refundPriceDiffDetail.setActivityWay(newActivity.getActivityWay());
+                        refundPriceDiffDetail.setActivityRule(newActivity.getActivityRule());
+                        refundPriceDiffDetail.setPrice(newActivity.getPrice());
+                        refundPriceDiffDetail.setVender(newActivity.getVender());
+                        refundPriceDiffDetail.setProModel(newActivity.getProModel());
+                        refundPriceDiffDetail.setNewMachineId(newActivity.getBusProCode());
+
+                        if(refundPriceDiffDetailMapper.insert(refundPriceDiffDetail)  != 1){
+                            log.info("插入补退差价详情表异常");
+                            throw new MessageException("保存失败");
+                        }
+                    }
+
                     BigDecimal sumCalPrice = new BigDecimal(0);
                     for (ORefundPriceDiffDetail row : refundPriceDiffDetailList) {
                         if(StringUtils.isNotBlank(row.getActivityRealId())) {
