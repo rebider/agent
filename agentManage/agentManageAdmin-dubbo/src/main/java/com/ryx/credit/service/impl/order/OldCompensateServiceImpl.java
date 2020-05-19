@@ -969,12 +969,10 @@ public class OldCompensateServiceImpl implements OldCompensateService {
         //审批通过处理缴款信息
         if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
             agentResult = cashReceivablesService.finishProcing(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getcUser());
-        }
-        if(!agentResult.isOK()){
-            throw new ProcessException("更新打款记录失败");
-        }
-        //审批通过调用接口
-        if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+            if(!agentResult.isOK()){
+                throw new ProcessException("更新打款记录失败");
+            }
+
             ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
             ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
             criteria.andRefundPriceDiffIdEqualTo(rel.getBusId());
@@ -992,6 +990,29 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     }
                     row.setOldMachineId(activity_old.getBusProCode());
                     row.setNewMachineId(activity_new.getBusProCode());
+                    //变更后活动
+                    OActivity newActivity = activityMapper.selectByPrimaryKey(row.getActivityRealId());
+                    if (null == newActivity) throw new ProcessException("查询新活动失败");
+                    //变更前活动
+                    OActivity oldActivity = activityMapper.selectByPrimaryKey(row.getActivityFrontId());
+                    if (oldActivity == null) throw new ProcessException("查询新活动失败");
+                    //业务平台
+                    PlatForm platForm = platFormService.selectByPlatformNum(oldActivity.getPlatform());
+                    if (platForm == null) throw new ProcessException("未找到:" + oldActivity.getPlatform() + "业务平台");
+
+                    //封装不同平台所需的不同参数
+                    if (PlatformType.whetherPOS(platForm.getPlatformType()) || PlatformType.SSPOS.getValue().equals(platForm.getPlatformType())){
+                        List<PlatForm> oldPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",row.getOldOrgId()));
+                        List<PlatForm> newPlatForm =  platFormMapper.queryPlatFormByMap(FastMap.fastMap("platformType", platForm.getPlatformType()).putKeyV("busNum",row.getNewOrgId()));
+                        if (null == oldPlatForm || oldPlatForm.size() != 1 || null == oldPlatForm.get(0).getBusplatform()) {
+                            throw new ProcessException("未找到原目标业务平台，请核查原目标业务平台！");
+                        }
+                        if (null == newPlatForm || newPlatForm.size() != 1 || null == newPlatForm.get(0).getBusplatform()) {
+                            throw new ProcessException("未找到目标业务平台，请核查目标业务平台！");
+                        }
+                        row.setOldBrandCode(oldPlatForm.get(0).getBusplatform());
+                        row.setNewBrandCode(newPlatForm.get(0).getBusplatform());
+                    }
                 }catch (ProcessException e) {
                     e.printStackTrace();
                     throw new ProcessException(e.getMessage());
