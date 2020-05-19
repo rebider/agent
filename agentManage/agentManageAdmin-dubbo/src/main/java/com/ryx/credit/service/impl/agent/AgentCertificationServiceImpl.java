@@ -73,57 +73,96 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
         logger.info("添加待认证代理商信息");
         StringBuffer resStr = new StringBuffer();
         try {
-           List<AgentCertification> agentCertifications = new ArrayList<>();
-
-           agents.forEach((cer)->{
-
-               FastMap par = FastMap.fastMap("id",cer.getId());
-               AgentCertification agentCertification = agentCertificationMapper.queryCers(par);
-                if (agentCertification!=null){
-                    resStr.append(agentCertification.getOrgAgName()).append(",");
-                    return;
-                }
-               AgentCertification agentCer = new AgentCertification();
-               ZoneId zoneId = ZoneId.systemDefault();
-               ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
-               Date date = Date.from(zdt.toInstant());
-
-               agentCer.setId(idService.genIdInTran(TabId.a_agent_certification));
-               agentCer.setAgentId(cer.getId());
-               agentCer.setReqRegNo("");
-               agentCer.setReqEntName(cer.getAgName());
-               agentCer.setReqCerTm(date);
-               agentCer.setReqCerUser(String.valueOf(userId));
-               agentCer.setCerNum(new BigDecimal(agentCertificationMapper.queryAgentCerDetailsCount(par)+1));
-               agentCer.setCerProStat(Status.STATUS_0.status);
-               agentCer.setOrgAgName(cer.getAgName());
-               agentCer.setOrgAgNature(cer.getAgNature());
-               agentCer.setOrgAgCapital(cer.getAgCapital());
-               agentCer.setOrgAgBusLic(cer.getAgBusLic());
-               agentCer.setOrgAgBusLicb(cer.getAgBusLicb());
-               agentCer.setOrgAgBusLice(cer.getAgBusLice());
-               agentCer.setOrgAgLegal(cer.getAgLegal());
-               agentCer.setOrgAgRegAdd(cer.getAgRegAdd());
-               agentCer.setOrgAgBusScope(cer.getAgBusScope());
-               agentCertifications.add(agentCer);
-           });
-           if (agentCertifications.size()>0){
-               int insertBatch = agentCertificationMapper.insertBatch(agentCertifications);
-               if (insertBatch > 0){
-                   if ("".equals(resStr.toString())||null==resStr)
-                       return AgentResult.ok();
-                   return new AgentResult(200,"存在未处理完成信息:"+resStr.toString()+"未再次添加",null);
-               }else {
-                   return AgentResult.fail("未添加认证数据");
+            long currentTimeMillis = System.currentTimeMillis();
+            List<String> list=new ArrayList<>();
+           if (null!=agents && agents.size()>0){
+               for (Agent agent : agents) {
+                   list.add(agent.getId());
                }
-           }else {
-               return new AgentResult(200,"存在未处理完成信息:"+resStr.toString()+"未再次添加",null);
            }
+            List<AgentCertification> agentCertifications = new ArrayList<>();
+            List<AgentCertification> agentCertificationList = agentCertificationMapper.queryCersByAgent(list);
+            if(null!=agentCertificationList && agentCertificationList.size()>0){
+                for (AgentCertification agentCertification : agentCertificationList) {
+                    resStr.append(agentCertification.getOrgAgName()).append(",");
+                    continue;
+                }
+            }
+            agents.forEach((cer)->{
+                FastMap par = FastMap.fastMap("id",cer.getId());
+                AgentCertification agentCer = new AgentCertification();
+                ZoneId zoneId = ZoneId.systemDefault();
+                ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
+                Date date = Date.from(zdt.toInstant());
 
-       }catch (Exception e){
+                agentCer.setId(idService.genIdInTran(TabId.a_agent_certification));
+                agentCer.setAgentId(cer.getId());
+                agentCer.setReqRegNo("");
+                agentCer.setReqEntName(cer.getAgName());
+                agentCer.setReqCerTm(date);
+                agentCer.setReqCerUser(String.valueOf(userId));
+                agentCer.setCerNum(new BigDecimal(agentCertificationMapper.queryAgentCerDetailsCount(par)+1));
+                agentCer.setCerProStat(Status.STATUS_0.status);
+                agentCer.setOrgAgName(cer.getAgName());
+                agentCer.setOrgAgNature(cer.getAgNature());
+                agentCer.setOrgAgCapital(cer.getAgCapital());
+                agentCer.setOrgAgBusLic(cer.getAgBusLic());
+                agentCer.setOrgAgBusLicb(cer.getAgBusLicb());
+                agentCer.setOrgAgBusLice(cer.getAgBusLice());
+                agentCer.setOrgAgLegal(cer.getAgLegal());
+                agentCer.setOrgAgRegAdd(cer.getAgRegAdd());
+                agentCer.setOrgAgBusScope(cer.getAgBusScope());
+                agentCertifications.add(agentCer);
+            });
+            long currentTimeMillis1 = System.currentTimeMillis();
+            logger.info("用时："+(currentTimeMillis1-currentTimeMillis));
+            //分批添加
+            if (null!= agentCertifications && agentCertifications.size()>0){
+                int dataList=300;
+                int size = agentCertifications.size();
+                if (dataList<size){
+                    int part= size/dataList;
+                    logger.info("共有:"+size+"条,分为:"+part);
+                    int insertBatch=0;
+                    for(int i=0;i<part;i++){
+                        List<AgentCertification> agent_Certifications = agentCertifications.subList(0, dataList);
+                        insertBatch= agentCertificationMapper.insertBatch(agent_Certifications);
+                        agentCertifications.subList(0, dataList).clear();
+                    }
+                    if(!agentCertifications.isEmpty()){
+                         insertBatch = agentCertificationMapper.insertBatch(agentCertifications);
+                        if (insertBatch > 0){
+                            if ("".equals(resStr.toString())||null==resStr)
+                                return AgentResult.ok();
+                            return new AgentResult(200,"存在未处理完成信息:"+resStr.toString()+"未再次添加",null);
+                        }else {
+                            return AgentResult.fail("未添加认证数据");
+                        }
+                    }
+                    if (insertBatch > 0){
+                        if ("".equals(resStr.toString())||null==resStr)
+                            return AgentResult.ok();
+                        return new AgentResult(200,"存在未处理完成信息:"+resStr.toString()+"未再次添加",null);
+                    }else {
+                        return AgentResult.fail("未添加认证数据");
+                    }
+                }else{
+                    int insertBatch = agentCertificationMapper.insertBatch(agentCertifications);
+                    if (insertBatch > 0){
+                        if ("".equals(resStr.toString())||null==resStr)
+                            return AgentResult.ok();
+                        return new AgentResult(200,"存在未处理完成信息:"+resStr.toString()+"未再次添加",null);
+                    }else {
+                        return AgentResult.fail("未添加认证数据");
+                    }
+                }
+            }else {
+                return new AgentResult(200,"存在未处理完成信息:"+resStr.toString()+"未再次添加",null);
+            }
+        }catch (Exception e){
             logger.error(e.toString());
-          return  new AgentResult(500, "系统异常", e.toString());
-       }
+            return  new AgentResult(500, "系统异常", e.toString());
+        }
 
     }
 

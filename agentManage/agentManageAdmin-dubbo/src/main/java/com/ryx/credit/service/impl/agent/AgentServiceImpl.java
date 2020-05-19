@@ -936,19 +936,11 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public List<Agent> queryAgentByIds(List ids) {
-        List<Agent> list = new ArrayList<>();
-        if(null!=ids || ids.size()>0){
-            for (Object id : ids) {
-                AgentExample agentExample = new AgentExample();
-                AgentExample.Criteria criteria = agentExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(String.valueOf(id));
-                List<Agent> agentList= agentMapper.selectByExample(agentExample);
-                if (null!=agentList &&agentList.size()>0 ) {
-                    Agent a_agent = agentList.get(0);
-                    list.add(a_agent);
-                }
-            }
-        }
-        return list;
+        long currentTimeMillis = System.currentTimeMillis();
+        List<Agent> agents = agentMapper.queryAgentByIds(ids);
+        long currentTimeMillis1 = System.currentTimeMillis();
+        logger.info("用时："+(currentTimeMillis1-currentTimeMillis));
+        return agents;
     }
 
     @Override

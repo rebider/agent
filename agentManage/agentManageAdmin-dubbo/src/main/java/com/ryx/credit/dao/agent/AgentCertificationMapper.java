@@ -1,6 +1,7 @@
 package com.ryx.credit.dao.agent;
 
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentCertification;
 import com.ryx.credit.pojo.admin.agent.AgentCertificationExample;
 import com.ryx.credit.pojo.admin.vo.AgentCertifiVo;
@@ -48,4 +49,5 @@ public interface AgentCertificationMapper {
 
     AgentCertification queryCers(@Param("map") Map<String,Object> map);
 
+    List<AgentCertification> queryCersByAgent(List ids);
 }

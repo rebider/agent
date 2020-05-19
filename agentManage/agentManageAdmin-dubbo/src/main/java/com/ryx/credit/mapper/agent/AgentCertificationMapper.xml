@@ -1173,4 +1173,26 @@
     </if>
 
   </select>
+
+  <select id="queryCersByAgent" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from a_agent_certification
+    where (CER_PRO_STAT = '0' or CER_PRO_STAT = '1')
+    <if test="list != null and list.size > 0">
+      AND AGENT_ID IN
+      <!-- 处理in的集合超过1000条时Oracle不支持的情况 -->
+      <trim suffixOverrides=" OR AGENT_ID IN()">	<!-- 表示删除最后一个条件 -->
+        <foreach collection="list" item="agentId" index="index" open="(" close=")">
+          <if test="index != 0">
+            <choose>
+              <when test="index % 1000 == 999">) OR AGENT_ID IN (</when>
+              <otherwise>,</otherwise>
+            </choose>
+          </if>
+          #{agentId}
+        </foreach>
+      </trim>
+    </if>
+  </select>
 </mapper>
