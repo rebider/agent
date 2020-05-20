@@ -108,6 +108,8 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
     private OrderAdjAccountMapper orderAdjAccountMapper;
     @Autowired
     private AgentQueryService agentQueryService;
+    @Autowired
+    private TaskApprovalService taskApprovalService;
 
     @Override
     public AgentResult refreshPaymentDetail(String orderId) {
@@ -1120,6 +1122,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 reqMap.put("party",startPar.get("party"));
             }
             OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderUpModelVo.getId());
+            // 业务部处理
             if (orderUpModelVo.getSid().equals("sid-C911F512-9E63-44CC-9E6E-763484FA0E5B")&& orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
                 if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
                     throw new MessageException("该任务审批状态异常!");
@@ -1195,23 +1198,23 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
                     throw new MessageException("该任务审批状态异常!");
                 }
-                //挂账审批通过
-                if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
-                    orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
-                    orderAdj.setRealRefundAmo(BigDecimal.ZERO);
-                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
-                    orderAdj.setRefundStat(RefundStat.UNREFUND.key);
-                    reqMap.put("remit",false);
-                }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
-                    orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
-                    orderAdj.setSettleAmount(BigDecimal.ZERO);
-                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
-                    orderAdj.setRefundStat(RefundStat.REFUNDING.key);
-                    reqMap.put("remit",true);
-                }
-                if(!approvalTaskSettle(orderAdj).isOK()){
-                    throw new MessageException("更新订单调整记录失败!");
-                };
+//                //挂账审批通过
+//                if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
+//                    orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
+//                    orderAdj.setRealRefundAmo(BigDecimal.ZERO);
+//                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+//                    orderAdj.setRefundStat(RefundStat.UNREFUND.key);
+//                    reqMap.put("remit",false);
+//                }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+//                    orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
+//                    orderAdj.setSettleAmount(BigDecimal.ZERO);
+//                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+//                    orderAdj.setRefundStat(RefundStat.REFUNDING.key);
+//                    reqMap.put("remit",true);
+//                }
+//                if(!approvalTaskSettle(orderAdj).isOK()){
+//                    throw new MessageException("更新订单调整记录失败!");
+//                };
             }
             //完成任务
             Map resultMap = activityService.completeTask(orderUpModelVo.getTaskId(), reqMap);
@@ -1271,10 +1274,41 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             }
             orderAdj.setReviewsStat(AgStatus.Approved.status);
             orderAdj.setReviewsDate(new Date());
-            //订单调整更新
+            // 订单调整更新
             if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
                 throw new MessageException("订单调整数据更新异常！");
             }
+            String workId = dictOptionsService.getApproveVersion("OrderAdjustRefund");
+            Map startMap = new HashMap<>();
+            // 获取公私 类型
+            startMap.put("settlementCardDg","1");
+            startMap.put("settlementCardDs","1");
+            // 启动审批
+            String proce = activityService.createDeloyFlow(null, workId, null, null, startMap);
+            if (proce == null) {
+                throw new MessageException("审批流启动失败!");
+            }
+            //添加审批关系
+            BusActRel record = new BusActRel();
+            record.setBusId(orderAdj.getId());
+            record.setActivId(proce);
+            record.setcTime(Calendar.getInstance().getTime());
+            record.setcUser(busActRel.getcUser());
+            record.setStatus(Status.STATUS_1.status);
+            record.setBusType(BusActRelBusType.cashierApprove.name());
+            record.setActivStatus(AgStatus.Approving.name());
+            record.setAgentId(orderAdj.getAgentId());
+            record.setAgentName(busActRel.getAgentName());
+            record.setNetInBusType(busActRel.getNetInBusType());// 数据权限
+            record.setDataShiro(BusActRelBusType.cashierApprove.key);
+            record.setAgDocPro(busActRel.getAgDocPro());
+            record.setAgDocDistrict(busActRel.getAgDocDistrict());
+
+            if (1 != busActRelMapper.insertSelective(record)) {
+                logger.info("出纳申请提交审批，启动审批异常，添加审批关系失败{}:{}", orderAdj.getId(), proce);
+                throw new MessageException("出纳审批流启动失败：添加审批关系失败！");
+            }
+
             if (orderAdj.getRealRefundAmo().compareTo(BigDecimal.ZERO)>0){
                 logger.info("暂时不发送瑞大宝免税额度");
                 logger.info("订单调整审批通过,有退款,信息开始发送到kafka:{}",orderAdj.getId());
