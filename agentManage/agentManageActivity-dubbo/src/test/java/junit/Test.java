@@ -233,11 +233,17 @@ public class Test {
     @org.junit.Test
     public void testStartProcess(){
         RuntimeService runtimeService = processEngineConfiguration.buildProcessEngine().getRuntimeService();
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("test_bingxing_back",
-                FastMap.fastMap("v",1)
-                .putKeyV("res","pass")
-                        .putKeyV("user1","pass")
-                        .putKeyV("user2","reject"));
+//        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("test_bingxing_back",
+//                FastMap.fastMap("v",1)
+//                .putKeyV("res","pass")
+//                        .putKeyV("user1","pass")
+//                        .putKeyV("user2","reject"));
+//        System.out.println(processInstance.getId());
+//        System.out.println(processInstance.getDeploymentId());
+//        System.out.println(processInstance.getBusinessKey());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("OrderAdjustRefund_2.4",
+                FastMap.fastMap("settlementCardDs",1)
+                        .putKeyV("settlementCardDg","0"));
         System.out.println(processInstance.getId());
         System.out.println(processInstance.getDeploymentId());
         System.out.println(processInstance.getBusinessKey());
@@ -248,11 +254,11 @@ public class Test {
     @org.junit.Test
     public void completTask(){
         TaskService taskService = processEngineConfiguration.buildProcessEngine().getTaskService();
-//        taskService.complete("4472509");
-        taskService.complete("4475005",FastMap.fastMap("v",1)
-                .putKeyV("user1","pass"));
-        taskService.complete("4475007",FastMap.fastMap("v",1)
-                .putKeyV("user2","pass"));
+        taskService.complete("5145007");
+//        taskService.complete("4475005",FastMap.fastMap("v",1)
+//                .putKeyV("user1","pass"));
+//        taskService.complete("4475007",FastMap.fastMap("v",1)
+//                .putKeyV("user2","pass"));
         System.out.println("任务完成");
     }
 
