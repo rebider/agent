@@ -44,7 +44,7 @@ public class OrderAdjustRefundTaskExecutionListener extends BaseTaskListener imp
             if ("finish_end".equals(activityName)) {
                 logger.info("=========OrderAdjustRefundTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
                 AgentResult res = orderService.approveFinishOrderAdjustRefund(delegateExecution.getProcessInstanceId(), activityName);
-                logger.info("=========OrderAdjustRefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
+//                logger.info("=========OrderAdjustRefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
 
             }
         } else if ("take".equals(eventName)) {
