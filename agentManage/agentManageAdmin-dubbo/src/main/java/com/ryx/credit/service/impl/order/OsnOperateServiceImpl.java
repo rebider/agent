@@ -333,8 +333,8 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                                 //单批次处理成功
                                 logger.info("物流明细发送业务系统处理成功,ID:{},批次:{}", id, batch);
                             } else {
-                                //单批次处理失败
-                                logger.info("物流明细发送业务系统处理成功,ID:{},批次:{}", id, batch);
+                                ///单批次处理失败
+                                logger.info("物流明细发送业务系统处理失败,具体请查看明细,ID:{},批次:{}", id, batch);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -1171,8 +1171,17 @@ public class OsnOperateServiceImpl implements OsnOperateService {
             reqMap.put("createPerson", AppConfig.getProperty("rjpos.agent.name"));//创建人
             if (null != oActivity_plan.getPosType() && (oActivity_plan.getPosType().equals("1") || oActivity_plan.getPosType().equals("2"))) {
                 reqMap.put("posType", oActivity_plan.getPosType());//机具类型
-                if (null == oActivity_plan.getPosSpePrice() || null == oActivity_plan.getStandTime())
-                    return FastMap.fastMap("code", "2").putKeyV("msg", "活动对应的特价机[押金]或[达标时间]不能为空!");
+                if (null == oActivity_plan.getPosSpePrice() || null == oActivity_plan.getStandTime()){
+                    logger.info("下发物流接口调用失败：物流编号:{},批次编号:{},时间:{},信息:{},平台:{}", logcId, batch, DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss"), "活动对应的特价机[押金]或[达标时间]不能为空!", platForm.getPlatformType());
+                    listOLogisticsDetailSn.forEach(detail -> {
+                        detail.setSendStatus(LogisticsDetailSendStatus.send_fail.code);
+                        detail.setSbusMsg("活动对应的特价机[押金]或[达标时间]不能为空!");
+                        detail.setuTime(date);
+                        oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
+                    });
+                    retMap.put("code", "2");
+                    return retMap;
+                }
                 reqMap.put("posSpePrice", oActivity_plan.getPosSpePrice().toString());//押金
                 reqMap.put("standTime", oActivity_plan.getStandTime().toString());//达标时间
             } else if (null == oActivity_plan.getPosType() || oActivity_plan.getPosType().equals("0")) {
