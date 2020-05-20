@@ -19,7 +19,8 @@ public enum FreeCause {
     HTDJ("HTDJ","合同冻结"),
     RZDJ("RZDJ","认证冻结"),
     QTDJ("QTDJ","其他原因"),
-    XXQS("XXQS","基本信息缺失");
+    XXQS("XXQS","基本信息缺失"),
+    JSKBG("JSKBG","结算卡变更冻结");
 
     public String code;
 
