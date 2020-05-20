@@ -40,6 +40,7 @@ public enum BusActRelBusType {
     thawAgentByBusiness("/BusActRelBusType/thawAgentByBusiness","代理商月分润解冻业务申请"),
     profitTempalteApply("/BusActRelBusType/profitTempalteApply","分润模板线上申请"),
     orderAdjust("/BusActRelBusType/orderAdj","机具数量调整申请"),
+    cashierApprove("/BusActRelBusType/cashierApprove","财务调整出纳申请"),
     cardRenew("/BusActRelBusType/cardRenew","物联网卡续费申请"),
     cardLogout("/BusActRelBusType/cardLogout","物联网卡注销申请");
 
