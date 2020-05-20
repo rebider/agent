@@ -8,8 +8,12 @@ import java.util.Map;
  */
 public enum UnfreeCause {
 
+    // "XXBL","SPJS" 作废
+    // 基础信息缺失冻结、结算卡变更冻结  解冻原因都为：系统解冻
+
     XXBL("XXBL","信息补录解冻"),
-    SPJS("RRDJ","审批结束解冻");
+    SPJS("RRDJ","审批结束解冻"),
+    XTJD("XTJD","系统解冻");
 
     public String code;
 

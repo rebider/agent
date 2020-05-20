@@ -44,4 +44,6 @@ public interface AgentFreezeService {
     AgentResult checkAgentFreezeExists(String agentId, String freeCause, BigDecimal freeType);
 
     AgentResult checkAgentUnFreezeExists(String agentId, String freeCause, BigDecimal freeType);
+
+    AgentResult queryAgentIdByFreezeNum(String agentId, String freeNum);
 }
