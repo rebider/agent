@@ -955,7 +955,7 @@ public class AgentServiceImpl implements AgentService {
     public List<AgentCaVo> exportAgentCa(Map map) {
 
         List<AgentCaVo> list = agentMapper.expoerCaList(map);
-        List<Dict> caStatus = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CERTIFICATION_STATUS.name());
+        List<Dict> caStatus = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CER_RES_STATUS.name());
         if (null != list && list.size() > 0)
             list.forEach(agent->{
                 if (null!=agent.getCaStatus()) {

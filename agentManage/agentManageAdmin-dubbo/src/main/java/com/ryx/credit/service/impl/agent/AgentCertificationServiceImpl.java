@@ -339,7 +339,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
 
     @Override
     public List<AgentCertifiVo> exportAgentCertifications(Map map) {
-        List<Dict> caStatus = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CERTIFICATION_STATUS.name());
+        List<Dict> caStatus = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CER_RES_STATUS.name());
         List<AgentCertifiVo> agentCertifiVos = agentCertificationMapper.exportAgentcertifis(map);
 
 
@@ -487,6 +487,11 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
     public int updateCertifi(AgentCertification agentCertification) {
         int i = agentCertificationMapper.updateByPrimaryKeySelective(agentCertification);
         return i;
+    }
+
+    @Override
+    public List<AgentCertification> queryCersByAgent(List ids) {
+        return agentCertificationMapper.queryCersByAgent(ids);
     }
 
     /**

@@ -34,4 +34,6 @@ public interface AgentCertificationService {
     AgentCertification  getMaxId(Map map);
 
     int updateCertifi(AgentCertification agentCertification);
+
+    List<AgentCertification> queryCersByAgent(List ids);
 }

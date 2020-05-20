@@ -1178,7 +1178,7 @@
     select
     <include refid="Base_Column_List" />
     from a_agent_certification
-    where (CER_PRO_STAT = '0' or CER_PRO_STAT = '1')
+    where CER_PRO_STAT  in (0,1)
     <if test="list != null and list.size > 0">
       AND AGENT_ID IN
       <!-- 处理in的集合超过1000条时Oracle不支持的情况 -->
