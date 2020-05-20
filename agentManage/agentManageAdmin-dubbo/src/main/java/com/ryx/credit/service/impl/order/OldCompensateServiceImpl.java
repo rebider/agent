@@ -523,6 +523,9 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                                 paidSN += refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + ",";
                                 paidFlag = true;
                                 refundPriceDiffDetail.setPayStatus("1");
+                                if (refundPriceDiffDetail.getNewBrandCode().equals(refundPriceDiffDetail.getOldBrandCode())) {
+                                    throw new ProcessException("SN"+refundPriceDiffDetail.getBeginSn()+"-"+refundPriceDiffDetail.getEndSn()+"已付状态下不允许转活动");
+                                }
                             }
                             if(refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail) != 1){
                                 throw new ProcessException("更新返回数据失败");
@@ -610,6 +613,9 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                                 paidSN += refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + ",";
                                 paidFlag = true;
                                 refundPriceDiffDetail.setPayStatus("1");
+                                if (refundPriceDiffDetail.getNewBrandCode().equals(refundPriceDiffDetail.getOldBrandCode())) {
+                                    throw new ProcessException("SN"+refundPriceDiffDetail.getBeginSn()+"-"+refundPriceDiffDetail.getEndSn()+"已付状态下不允许转活动");
+                                }
                             }
                             if(refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail) != 1){
                                 throw new ProcessException("更新返回数据失败");
