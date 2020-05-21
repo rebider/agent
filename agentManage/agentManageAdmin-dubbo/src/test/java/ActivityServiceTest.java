@@ -45,8 +45,8 @@ public class ActivityServiceTest extends BaseSpringTest {
     @Test
     public void b() throws MessageException {
         Agent agent = new Agent();
-        agent.setId("AG20181121000000000014557");
-        agentCertificationService.processData(agent,"AC20200518000000000001414",null);
+        agent.setId("AG20181121000000000011045");
+        agentCertificationService.processData(agent,"AC20200521000000000173883",null);
 //        AgentResult agentResult = businessCAService.agentBusinessCA("恩施银合网络科技有限公司", "0");
     }
 

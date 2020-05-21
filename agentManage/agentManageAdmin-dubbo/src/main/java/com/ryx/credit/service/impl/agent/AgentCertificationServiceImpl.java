@@ -201,7 +201,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
         Agent agent = agentMapper.selectByAgent(orgagent);
         AgentCertification agentCertification = agentCertificationMapper.selectByPrimaryKey(id);
         if(agent==null){
-            orgagent.setCaStatus(Status.STATUS_0.status);//工商认证状态
+            orgagent.setCaStatus(CerResStatus.NORECORD.status);//工商认证状态
             agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程--处理成功
             agentCertification.setCerRes(CerResStatus.NORECORD.status);//认证结果---查询无记录
             if(1==agentMapper.updateByPrimaryKeySelective(orgagent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
@@ -223,11 +223,11 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
             if(StringUtils.isBlank(agent.getAgBusLic())){ //营业执照
                 remark+="营业执照缺失;";
             }
-            if(StringUtils.isBlank(agent.getAgLegal())){//法人证件号
-                remark+="法人证件号缺失;";
-            }
-            if(StringUtils.isBlank(agent.getAgLegalCernum())){//法人姓名
+            if(StringUtils.isBlank(agent.getAgLegal())){//法人姓名
                 remark+="法人姓名缺失;";
+            }
+            if(StringUtils.isBlank(agent.getAgLegalCernum())){//法人证件号
+                remark+="法人证件号缺失;";
             }
             if(null==agent.getAgBusLicb()){//经营开始日期
                 remark+="经营开始日期缺失;";
@@ -252,7 +252,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
         if(agentResult.isOK()||(405==agentResult.getStatus())){
             JSONObject dataObj = (JSONObject)agentResult.getData();
             if ("1".equals((String) dataObj.getString("isTest"))){
-                agent.setCaStatus(Status.STATUS_2.status);
+                agent.setCaStatus(CerResStatus.FAIL.status);
                 agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
                 agentCertification.setCerRes(CerResStatus.FAIL.status);//测试环境不认证
                 if(1==agentMapper.updateByPrimaryKeySelective(agent) && 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
@@ -264,8 +264,8 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
 //                如果与系统中的字段不一致  则进行冻结
                 if(!agent.getAgLegal().equals(dataObj.getString("frName")) ||
                         !agent.getAgName().equals(dataObj.getString("enterpriseName")) ||
-                        !agent.getAgBusLicb().equals(dataObj.getString("openFrom"))||
-                        !agent.getAgBusLice().equals(dataObj.getString("openTo")) ||
+                         agent.getAgBusLicb().compareTo(dataObj.getDate("openFrom"))!=0||
+                         agent.getAgBusLice().compareTo(dataObj.getDate("openTo"))!=0 ||
                         !agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
                     logger.info("认证成功，与本地信息不符",agentCertification.getId());
                     cerResStatus = CerResStatus.INCONFORMITY.status;
@@ -275,8 +275,8 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                     return  AgentfreezeShare(agent,agentCertification,map);
                 }else if(agent.getAgLegal().equals(dataObj.getString("frName")) &&
                         agent.getAgName().equals(dataObj.getString("enterpriseName")) &&
-                        agent.getAgBusLicb().equals(dataObj.getString("openFrom"))&&
-                        agent.getAgBusLice().equals(dataObj.getString("openTo")) &&
+                        agent.getAgBusLicb().compareTo(dataObj.getDate("openFrom"))==0&&
+                        agent.getAgBusLice().compareTo(dataObj.getDate("openTo"))==0 &&
                         agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
 //                    一致则解冻 为认证通过
                     logger.info("认证成功,开始解冻",agentCertification.getId());
@@ -289,7 +289,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
             }else if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")) && !dataObj.getString("enterpriseStatus").startsWith("在营")){
                 logger.info("非在营状态,进行冻结操作",dataObj.getString("enterpriseStatus"));
                 //非在营状态则冻结该代理商
-                agent.setCaStatus(Status.STATUS_2.status);
+                agent.setCaStatus(CerResStatus.FAIL.status);
                 agentCertification.setCerRes(CerResStatus.FAIL.status);//认证结果;1-成功,2-失败
                 agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
                 if(1==agentMapper.updateByPrimaryKeySelective(agent)&& 1 == agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
@@ -323,7 +323,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
             return AgentResult.ok();
         }else{
             //工商认证失败
-            agent.setCaStatus(Status.STATUS_2.status);
+            agent.setCaStatus(CerResStatus.FAIL.status);
             agentCertification.setCerProStat(Status.STATUS_3.status);
             agentCertification.setCerRes(CerResStatus.FAIL.status);
             ZoneId zoneId = ZoneId.systemDefault();
@@ -501,9 +501,9 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
      * @throws MessageException
      */
     private AgentResult AgentfreezeShare(Agent agent,AgentCertification agentCertification,Map map)throws MessageException {
-        agent.setCaStatus(Status.STATUS_2.status);
         if(null!=map && null!=(BigDecimal) map.get("cerResStatus")){
             agentCertification.setCerRes((BigDecimal) map.get("cerResStatus"));//“认证通过” "认证失败","信息缺失"，“认证成功，与本地信息不符“
+            agent.setCaStatus((BigDecimal) map.get("cerResStatus"));
         }
         agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
         if(1!=agentMapper.updateByPrimaryKeySelective(agent) && 1 != agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
@@ -569,10 +569,10 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
         if(StringUtils.isBlank(agent.getAgHead())){
             agent.setAgHead(agent.getAgLegal());
         }
-        agent.setCaStatus(Status.STATUS_1.status);
         //更新认证信息表实体
         if(null!=map && null!=(BigDecimal) map.get("cerResStatus")){
             agentCertification.setCerRes((BigDecimal) map.get("cerResStatus"));//“认证通过” "认证失败","信息缺失"，“认证成功，与本地信息不符“
+            agent.setCaStatus((BigDecimal) map.get("cerResStatus"));
         }
         agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
         if(1!=agentMapper.updateByPrimaryKeySelective(agent)&& 1 != agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
