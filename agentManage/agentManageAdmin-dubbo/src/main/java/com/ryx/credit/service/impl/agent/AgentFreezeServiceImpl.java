@@ -60,7 +60,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             reqMap.put("id",agentFreeze.getId());
         }
         if(StringUtils.isNotBlank(agentFreeze.getAgentId())){
-            reqMap.put("agentId",agentFreeze.getAgentId());
+            String agentIdS = String.valueOf(agentFreeze.getAgentId());
+            String[] split = agentIdS.split(",");
+            reqMap.put("agentId",split);
         }
         if(StringUtils.isNotBlank(agentFreeze.getAgentName())){
             reqMap.put("agentName",agentFreeze.getAgentName());
@@ -220,6 +222,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             }
             if(StringUtils.isBlank(agentFreezePort.getUnfreezeCause())){
                 return AgentResult.fail("解冻原因必填");
+            }
+            if (null == agentFreezePort.getFreeType()){
+                agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
             }
             for (BigDecimal freeType:agentFreezePort.getFreeType()){
                 AgentFreezeExample freezeExample = new AgentFreezeExample();
