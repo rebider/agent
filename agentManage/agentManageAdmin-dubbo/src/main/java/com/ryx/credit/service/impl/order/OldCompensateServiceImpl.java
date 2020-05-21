@@ -455,6 +455,8 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 Map<String,String> par = new HashedMap();
                 par.put("oldMerid",refundPriceDiffDetail.getOldMachineId());
                 par.put("newMerId",refundPriceDiffDetail.getNewMachineId());
+                par.put("newMerType",platFormMapper.selectPlatType(newActivity.getPlatform()));
+                par.put("oldMerType",platFormMapper.selectPlatType(oldActivity.getPlatform()));
                 if(!termMachineService.checkModleIsEq(par,refundPriceDiffDetail.getPlatformType())){
                     throw new MessageException(refundPriceDiffDetail.getBeginSn()+"--"+refundPriceDiffDetail.getEndSn()+":("+oldActivity.getActivityName()+")不支持互换("+newActivity.getActivityName()+")");
                 }
