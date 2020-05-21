@@ -15,6 +15,7 @@ import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentExample;
 import com.ryx.credit.pojo.admin.agent.AgentFreeze;
 import com.ryx.credit.pojo.admin.agent.AgentFreezeExample;
+import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.pojo.admin.vo.AgentFreezeVo;
 import com.ryx.credit.service.IUserService;
@@ -490,6 +491,49 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     @Override
     public AgentResult queryAgentBasicLack(String userId) {
         List<AgentFreezeVo> agentFreezeVoList = agentFreezeMapper.queryAgentBasicLackData();
+        // 校验字段是否为空
+        List<Map> stringList = verifyFieldEmpty(agentFreezeVoList);
+        try {
+            if (stringList.size()>0 && stringList!=null) { // 基本信息缺失的代理商id
+                for (Map map : stringList) {
+                    String agent_id = String.valueOf(map.get("agent_id"));
+                    String str_remark = String.valueOf(map.get("str_remark"));
+                    if (StringUtils.isNotBlank(str_remark)) {
+                        String freeze_cause = FreeCause.XXQS.getValue();
+                        BigDecimal freeze_type = FreeType.AGNET.code;
+                        // 调用冻结接口前，检查冻结表是否存在同一AG码同一冻结类型的冻结数据，存在则无需调接口
+                        AgentResult resultCheck = checkAgentFreezeExists(agent_id, freeze_cause, freeze_type);
+                        if (!resultCheck.isOK()) {
+                            // 调用冻结接口
+                            AgentFreezePort agentFreezePort = new AgentFreezePort();
+                            agentFreezePort.setAgentId(agent_id);
+                            agentFreezePort.setFreezeCause(FreeCause.XXQS.getValue());
+                            agentFreezePort.setOperationPerson(userId);
+                            agentFreezePort.setFreezeNum(agent_id);
+                            agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+                            agentFreezePort.setRemark(str_remark);
+                            AgentResult agentResult = agentFreeze(agentFreezePort);
+                            if (!agentResult.isOK()) {
+                                throw new ProcessException(agentResult.getMsg());
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMsg());
+        }
+        return AgentResult.ok();
+    }
+
+    /**
+     * 校验字段是否为空
+     * @param agentFreezeVoList
+     * @return
+     */
+    @Override
+    public List<Map> verifyFieldEmpty(List<AgentFreezeVo> agentFreezeVoList) {
         List<Map> stringList = new ArrayList<Map>();
         if (agentFreezeVoList.size()>0 && agentFreezeVoList!=null) {
             for (AgentFreezeVo agentFreezeVo : agentFreezeVoList) {
@@ -539,38 +583,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             }
             log.info("基础信息缺失代理商:{}", JsonUtil.objectToJson(stringList));
         }
-        try {
-            if (stringList.size()>0 && stringList!=null) { // 基本信息缺失的代理商id
-                for (Map map : stringList) {
-                    String agent_id = String.valueOf(map.get("agent_id"));
-                    String str_remark = String.valueOf(map.get("str_remark"));
-                    if (StringUtils.isNotBlank(str_remark)) {
-                        String freeze_cause = FreeCause.XXQS.getValue();
-                        BigDecimal freeze_type = FreeType.AGNET.code;
-                        // 调用冻结接口前，检查冻结表是否存在同一AG码同一冻结类型的冻结数据，存在则无需调接口
-                        AgentResult resultCheck = checkAgentFreezeExists(agent_id, freeze_cause, freeze_type);
-                        if (!resultCheck.isOK()) {
-                            // 调用冻结接口
-                            AgentFreezePort agentFreezePort = new AgentFreezePort();
-                            agentFreezePort.setAgentId(agent_id);
-                            agentFreezePort.setFreezeCause(FreeCause.XXQS.getValue());
-                            agentFreezePort.setOperationPerson(userId);
-                            agentFreezePort.setFreezeNum(agent_id);
-                            agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-                            agentFreezePort.setRemark(str_remark);
-                            AgentResult agentResult = agentFreeze(agentFreezePort);
-                            if (!agentResult.isOK()) {
-                                throw new ProcessException(agentResult.getMsg());
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (MessageException e) {
-            e.printStackTrace();
-            throw new ProcessException(e.getMsg());
-        }
-        return AgentResult.ok();
+        return stringList;
     }
 
     /**
@@ -652,6 +665,51 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             return AgentResult.okMap(resultMap);
         }
         return AgentResult.fail();
+    }
+
+    /**
+     * 结算卡审批通过校验信息缺失字段是否补充完整
+     * @param agent
+     * @param agentColinfoVo
+     * @return
+     */
+    @Override
+    public List<Map> approvedVerify(Agent agent, AgentColinfoVo agentColinfoVo) {
+        List<AgentFreezeVo> agentFreezeVoList = new ArrayList<>();
+        AgentFreezeVo agentFreezeVo = new AgentFreezeVo();
+        agentFreezeVo.setAgId(agent.getId());
+        agentFreezeVo.setAgName(agent.getAgName());
+        agentFreezeVo.setAgNature(String.valueOf(agent.getAgNature()));
+        agentFreezeVo.setAgCapital(String.valueOf(agent.getAgCapital()));
+        agentFreezeVo.setAgBusLic(agent.getAgBusLic());
+        agentFreezeVo.setAgBusLicb(String.valueOf(agent.getAgBusLicb()));
+        agentFreezeVo.setAgBusLice(String.valueOf(agent.getAgBusLice()));
+        agentFreezeVo.setAgLegal(agent.getAgLegal());
+        agentFreezeVo.setAgLegalCertype(String.valueOf(agent.getAgLegalCertype()));
+        agentFreezeVo.setAgLegalCernum(agent.getAgLegalCernum());
+        agentFreezeVo.setAgLegalMobile(agent.getAgLegalMobile());
+        agentFreezeVo.setAgHead(agent.getAgHead());
+        agentFreezeVo.setAgHeadMobile(agent.getAgHeadMobile());
+        agentFreezeVo.setAgRegArea(agent.getAgRegArea());
+        agentFreezeVo.setAgRegAdd(agent.getAgRegAdd());
+        agentFreezeVo.setAgBusScope(agent.getAgBusScope());
+        agentFreezeVo.setBusContactEmail(agent.getBusContactEmail());
+        agentFreezeVo.setBusRiskEmail(agent.getBusRiskEmail());
+        agentFreezeVo.setAcId(agentColinfoVo.getId());
+        agentFreezeVo.setCloType(String.valueOf(agentColinfoVo.getCloType()));
+        agentFreezeVo.setCloRealname(agentColinfoVo.getCloRealname());
+        agentFreezeVo.setCloBankAccount(agentColinfoVo.getCloBankAccount());
+        agentFreezeVo.setCloBank(agentColinfoVo.getCloBank());
+        agentFreezeVo.setBankRegion(agentColinfoVo.getBankRegion());
+        agentFreezeVo.setCloBankBranch(agentColinfoVo.getCloBankBranch());
+        agentFreezeVo.setAllLineNum(agentColinfoVo.getAllLineNum());
+        agentFreezeVo.setBranchLineNum(agentColinfoVo.getBranchLineNum());
+        agentFreezeVo.setCloTaxPoint(String.valueOf(agentColinfoVo.getCloTaxPoint()));
+        agentFreezeVo.setCloInvoice(String.valueOf(agentColinfoVo.getCloInvoice()));
+        agentFreezeVo.setAcAgLegalCernum(agentColinfoVo.getAgLegalCernum());
+        agentFreezeVoList.add(agentFreezeVo);
+        List<Map> mapList = verifyFieldEmpty(agentFreezeVoList);
+        return mapList;
     }
 
 }
