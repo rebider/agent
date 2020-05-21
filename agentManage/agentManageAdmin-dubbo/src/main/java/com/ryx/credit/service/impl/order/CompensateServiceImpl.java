@@ -791,8 +791,7 @@ public class CompensateServiceImpl implements CompensateService {
                                     throw new ProcessException("SN"+refundPriceDiffDetail.getBeginSn()+"-"+refundPriceDiffDetail.getEndSn()+"已付状态下不允许转活动");
                                 }
                             }
-                            int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
-                            if (i != 1) {
+                            if (refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail) != 1) {
                                 throw new ProcessException("更新返回数据失败");
                             }
                         }
@@ -874,17 +873,16 @@ public class CompensateServiceImpl implements CompensateService {
                             if(StringUtils.isNotBlank(oldOrgName) && !oldOrgName.equals("null")) {
                                 refundPriceDiffDetail.setOldOrgName(oldOrgName);
                             }
-                            int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail);
-                            if(i!=1){
-                                throw new ProcessException("更新返回数据失败");
-                            }
-                            if (!submitFlag && null != stringObjectMap.get("allPayStatus") && stringObjectMap.get("allPayStatus").toString().equals("1")) {
+                            if (null != stringObjectMap.get("allPayStatus") && stringObjectMap.get("allPayStatus").toString().equals("1")) {
                                 paidSN += refundPriceDiffDetail.getBeginSn() + "-" + refundPriceDiffDetail.getEndSn() + ",";
                                 paidFlag = true;
                                 refundPriceDiffDetail.setPayStatus("1");
                                 if (refundPriceDiffDetail.getNewBrandCode().equals(refundPriceDiffDetail.getOldBrandCode())) {
                                     throw new ProcessException("SN"+refundPriceDiffDetail.getBeginSn()+"-"+refundPriceDiffDetail.getEndSn()+"已付状态下不允许转活动");
                                 }
+                            }
+                            if(refundPriceDiffDetailMapper.updateByPrimaryKeySelective(refundPriceDiffDetail) != 1){
+                                throw new ProcessException("更新返回数据失败");
                             }
                         }
                     }
@@ -1379,10 +1377,13 @@ public class CompensateServiceImpl implements CompensateService {
                         throw new ProcessException("活动调整数据完成失败");
                     }
                     OActivity activity;
+                    String proName;
                     if (null != row.getPayStatus() && row.getPayStatus().equals("1")) {
                         activity = orderActivityService.findById(row.getActivityFrontId());
+                        proName = row.getFrontProName();
                     } else {
                         activity = orderActivityService.findById(row.getActivityRealId());
+                        proName = row.getProName();
                     }
                     OActivity activityOld = orderActivityService.findById(row.getActivityFrontId());
 
@@ -1399,7 +1400,7 @@ public class CompensateServiceImpl implements CompensateService {
                             oLogisticsDetail.setOptId(row.getId());
                             oLogisticsDetail.setOptType(OLogisticsDetailOptType.BCJ.code);
                             oLogisticsDetail.setProId(activity.getProductId());
-                            oLogisticsDetail.setProName(row.getProName());
+                            oLogisticsDetail.setProName(proName);
                             oLogisticsDetail.setActivityId(activity.getId());
                             oLogisticsDetail.setActivityName(activity.getActivityName());
                             oLogisticsDetail.setgTime(activity.getgTime());

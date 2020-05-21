@@ -46,6 +46,7 @@
     <result column="DELIVERY_TIME_TYPE" jdbcType="VARCHAR" property="deliveryTimeType" />
     <result column="OLD_ORG_NAME" jdbcType="VARCHAR" property="oldOrgName" />
     <result column="NEW_ORG_NAME" jdbcType="VARCHAR" property="newOrgName" />
+    <result column="PAY_STATUS" jdbcType="CHAR" property="payStatus" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -83,7 +84,7 @@
     STATUS, VERSION, ORDER_ID, SEND_STATUS, SEND_MSG, ORDER_TYPE, FRONT_PRO_ID, FRONT_PRO_NAME,
     PLATFORM_TYPE, OLD_ORG_ID, NEW_ORG_ID, DELIVERY_TIME, APP_TIME, OLD_SUPD_ORG_ID,
     OLD_SUPD_ORG_NAME, NEW_SUPD_ORG_ID, NEW_SUPD_ORG_NAME, DELAY_DAY, DELIVERY_TIME_TYPE,
-    OLD_ORG_NAME, NEW_ORG_NAME
+    OLD_ORG_NAME, NEW_ORG_NAME, PAY_STATUS
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -559,6 +560,9 @@
       </if>
       <if test="newOrgName != null">
         NEW_ORG_NAME = #{newOrgName,jdbcType=VARCHAR},
+      </if>
+      <if test="payStatus != null">
+        PAY_STATUS = #{payStatus,jdbcType=CHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
