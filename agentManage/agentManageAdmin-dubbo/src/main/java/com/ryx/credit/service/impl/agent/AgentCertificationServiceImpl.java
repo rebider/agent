@@ -4,12 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.DateUtil;
-import com.ryx.credit.common.util.FastMap;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentCertificationMapper;
+import com.ryx.credit.dao.agent.AgentFreezeMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentCertifiVo;
@@ -25,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -54,7 +53,8 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
     private AgentMapper agentMapper;
     @Autowired
     private DictOptionsService dictOptionsService;
-
+    @Autowired
+    private AgentFreezeMapper agentFreezeMapper;
     @Override
     public PageInfo agentCertifiDetails(Page page, Map map) {
         PageInfo pageInfo = new PageInfo();
@@ -296,29 +296,44 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                     logger.info("工商认证成功，认证代理商{}状态为{},不进行信息同步",agent.getId(),dataObj.getString("enterpriseStatus"));
                 }
             //非在营状态则冻结该代理商
-                AgentResult agentResultFreeze = queryAgentFreeze(agent.getId());
-                logger.info("代理商:{},查询冻结解冻状态{}",agent.getId(),agentResultFreeze.getData());
-                if (agentResultFreeze.isOK()){
-                    Map<String,Object> resultFreezeData = (Map<String,Object>)agentResultFreeze.getData();
-                    if (FreeStatus.JD.getValue().toString().equals(resultFreezeData.get("freeStatus").toString())){
-                        AgentFreezePort agentFreezePort = new AgentFreezePort();
-                        agentFreezePort.setAgentId(agent.getId());
-                        agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
-                        agentFreezePort.setFreezeNum(agentCertification.getId());
-                        agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
-                        agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-                        agentFreezePort.setRemark("认证结果非在营");
-                        logger.info("代理商{}开始冻结",agent.getId());
-                            AgentResult agentFreeze = agentFreeze(agentFreezePort);
-                            if (agentFreeze.isOK()){
-                                logger.info("代理商{}冻结成功",agent.getId());
-                            }else {
-                                logger.info("代理商{}冻结失败{}",agent.getId(),agentFreeze.getMsg());
-                            }
-
-                    }
-
-                }
+//                AgentResult agentResultFreeze = queryAgentFreeze(agent.getId());
+                      try {
+                          AgentFreezePort agentFreezePort = new AgentFreezePort();
+                          agentFreezePort.setAgentId(agent.getId());
+                          agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
+                          agentFreezePort.setFreezeNum(agentCertification.getId());
+                          agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
+                          agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+                          agentFreezePort.setRemark("认证结果非在营");
+                          logger.info("代理商{}开始冻结",agent.getId());
+                          AgentResult agentFreeze = agentFreeze(agentFreezePort);
+                          if (agentFreeze.isOK()){
+                              logger.info("代理商{}冻结成功",agent.getId());
+                          }else {
+                              logger.info("代理商{}冻结失败{}",agent.getId(),agentFreeze.getMsg());
+                          }
+                      }catch (MessageException e) {
+                          AgentFreezeExample agentFreezeExample = new AgentFreezeExample();
+                          agentFreezeExample.createCriteria().andAgentIdEqualTo(agent.getId())
+                                  .andFreezeCauseEqualTo(FreeCause.RZDJ.code)
+                                  .andStatusEqualTo(Status.STATUS_1.status)
+                                  .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                          List<AgentFreeze> agentFreezeList = agentFreezeMapper.selectByExample(agentFreezeExample);
+                          if(null!=agentFreezeList && agentFreezeList.size()>0){
+                              AgentFreeze agentFreeze = agentFreezeList.get(0);
+                              if(null!=map && StringUtils.isNotBlank(String.valueOf(map.get("remark")))){
+                                  agentFreeze.setRemark(String.valueOf(map.get("remark")));
+                              }
+                              if(1!=agentFreezeMapper.updateByPrimaryKeySelective(agentFreeze)){
+                                  logger.info("代理商{}冻结失败{}",agent.getId(),e.getMsg());
+                              }
+                          }
+                          logger.info("代理商{}冻结失败{}",agent.getId(),e.getMsg());
+                          return AgentResult.fail(e.getMsg());
+                      }catch (Exception e) {
+                          logger.info("代理商{}",agent.getId());
+                          return AgentResult.fail("认证失败");
+                      }
             }
             return AgentResult.ok();
         }else{
@@ -510,34 +525,48 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
             logger.info(("基础信息更改失败"));
             return AgentResult.fail("基础信息更改失败");
         }
-        AgentResult agentResultFreeze = queryAgentFreeze(agent.getId());
-        logger.info("代理商:{},查询冻结解冻状态{}",agent.getId(),agentResultFreeze.getData());
-        if (agentResultFreeze.isOK()){
-            Map<String,Object> resultFreezeData = (Map<String,Object>)agentResultFreeze.getData();
-            if (FreeStatus.JD.getValue().toString().equals(resultFreezeData.get("freeStatus").toString())){
-                AgentFreezePort agentFreezePort = new AgentFreezePort();
-                agentFreezePort.setAgentId(agent.getId());
-                agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
-                agentFreezePort.setFreezeNum(agentCertification.getId());
-                agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
-                agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-                if(null!=map && StringUtils.isNotBlank(String.valueOf(map.get("remark")))){
-                    agentFreezePort.setRemark(String.valueOf(map.get("remark")));
-                }
-                logger.info("代理商{}开始冻结",agent.getId());
-                AgentResult agentFreeze = agentFreeze(agentFreezePort);
-                if (agentFreeze.isOK()){
-                    logger.info("代理商{}冻结成功",agent.getId());
-                    return AgentResult.ok("冻结成功");
-                }else {
-                    logger.info("代理商{}冻结失败{}",agent.getId(),agentFreeze.getMsg());
-                    return AgentResult.fail("冻结失败");
-                }
+             try {
+                 AgentFreezePort agentFreezePort = new AgentFreezePort();
+                 agentFreezePort.setAgentId(agent.getId());
+                 agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
+                 agentFreezePort.setFreezeNum(agentCertification.getId());
+                 agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
+                 agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+                 if(null!=map && StringUtils.isNotBlank(String.valueOf(map.get("remark")))){
+                     agentFreezePort.setRemark(String.valueOf(map.get("remark")));
+                 }
+                 logger.info("代理商{}开始冻结",agent.getId());
+                 AgentResult agentFreeze = agentFreeze(agentFreezePort);
+                 if (agentFreeze.isOK()){
+                     logger.info("代理商{}冻结成功",agent.getId());
+                     return AgentResult.ok("冻结成功");
+                 }else {
+                     logger.info("代理商{}冻结失败{}",agent.getId(),agentFreeze.getMsg());
+                     return AgentResult.fail("冻结失败");
+                 }
+             }catch (MessageException e) {
+                 AgentFreezeExample agentFreezeExample = new AgentFreezeExample();
+                 agentFreezeExample.createCriteria().andAgentIdEqualTo(agent.getId())
+                         .andFreezeCauseEqualTo(FreeCause.RZDJ.code)
+                         .andStatusEqualTo(Status.STATUS_1.status)
+                         .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                 List<AgentFreeze> agentFreezeList = agentFreezeMapper.selectByExample(agentFreezeExample);
+                 if(null!=agentFreezeList && agentFreezeList.size()>0){
+                     AgentFreeze agentFreeze = agentFreezeList.get(0);
+                     if(null!=map && StringUtils.isNotBlank(String.valueOf(map.get("remark")))){
+                         agentFreeze.setRemark(String.valueOf(map.get("remark")));
+                     }
+                     if(1!=agentFreezeMapper.updateByPrimaryKeySelective(agentFreeze)){
+                         logger.info("代理商{}冻结失败{}",agent.getId(),e.getMsg());
+                     }
+                 }
+                 logger.info("代理商{}冻结失败{}",agent.getId(),e.getMsg());
+                 return AgentResult.fail(e.getMsg());
+               }catch (Exception e) {
+                 logger.info("代理商{}", agent.getId());
+                 return AgentResult.fail("冻结失败");
+             }
 
-            }
-
-        }
-        return AgentResult.ok("冻结成功");
     }
 
 
@@ -579,34 +608,32 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
             logger.info("工商认证失败，认证代理商{}状态为{},同步信息失败",agent.getId(),dataObj.getString("enterpriseStatus"));
             return AgentResult.fail("工商认证失败，认证代理商{}:"+agent.getId());
         }
-
-        AgentResult agentResultFreeze =  queryAgentFreeze(agent.getId());
-        logger.info("代理商:{},查询冻结解冻状态{}",agent.getId(),agentResultFreeze.getData());
-        if (agentResultFreeze.isOK()){
-            Map<String,Object> resultFreezeData = (Map<String,Object>)agentResultFreeze.getData();
-            if (FreeStatus.DJ.getValue().toString().equals((String) resultFreezeData.get("freeStatus").toString())){
-                AgentFreezePort agentFreezePort = new AgentFreezePort();
-                agentFreezePort.setAgentId(agent.getId());
-                agentFreezePort.setUnfreezeCause(FreeCause.RZDJ.code);
-                agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
-                agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
-                if(null!=map && StringUtils.isNotBlank(String.valueOf(map.get("remark")))){
-                    agentFreezePort.setRemark(String.valueOf(map.get("remark")));
-                }
-                AgentResult agentUnFreeze = null;
-                logger.info("代理商{}开始解冻",agent.getId());
-                agentUnFreeze =  agentUnFreeze(agentFreezePort);
-                if (agentUnFreeze.isOK()){
-                    logger.info("代理商{},解冻成功",agent.getId());
-                    return AgentResult.ok("解冻成功");
-                }else {
-                    logger.info("代理商{},解冻失败:{}",agent.getId(),agentResultFreeze.getMsg());
-                    return AgentResult.fail("解冻失败");
-                }
-
-            }
-
-        }
-        return AgentResult.ok("解冻成功");
+//        AgentResult agentResultFreeze =  queryAgentFreeze(agent.getId());
+               try {
+                   AgentFreezePort agentFreezePort = new AgentFreezePort();
+                   agentFreezePort.setAgentId(agent.getId());
+                   agentFreezePort.setUnfreezeCause(FreeCause.RZDJ.code);
+                   agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
+                   agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
+                   if(null!=map && StringUtils.isNotBlank(String.valueOf(map.get("remark")))){
+                       agentFreezePort.setRemark(String.valueOf(map.get("remark")));
+                   }
+                   AgentResult agentUnFreeze = null;
+                   logger.info("代理商{}开始解冻",agent.getId());
+                   agentUnFreeze =  agentUnFreeze(agentFreezePort);
+                   if (agentUnFreeze.isOK()){
+                       logger.info("代理商{},解冻成功",agent.getId());
+                       return AgentResult.ok("解冻成功");
+                   }else {
+                       logger.info("代理商{},解冻失败:{}",agent.getId());
+                       return AgentResult.fail("解冻失败");
+                   }
+               }catch (MessageException e) {
+                   logger.info("代理商{}解冻失败{}",agent.getId(),e.getMsg());
+                   return AgentResult.fail(e.getMsg());
+               }catch (Exception e) {
+                   logger.info("代理商{}",agent.getId());
+                   return AgentResult.fail("解冻失败");
+               }
     }
 }
