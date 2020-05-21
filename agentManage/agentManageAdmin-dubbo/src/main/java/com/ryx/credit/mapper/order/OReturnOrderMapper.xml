@@ -573,7 +573,7 @@
       oa.act_code,
       suborder.pro_type,
       subact.pro_model,
-      subact.vender
+      oa.vender
     from o_return_order_detail orderdetail
       left join o_sub_order suborder on orderdetail.order_id=suborder.order_id and orderdetail.pro_id=suborder.pro_id and suborder.status=1
       left join o_sub_order_activity subact on subact.sub_order_id=suborder.id and subact.status=1
