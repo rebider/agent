@@ -110,6 +110,8 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
     private AgentQueryService agentQueryService;
     @Autowired
     private TaskApprovalService taskApprovalService;
+    @Autowired
+    private OrderAdjustService orderAdjustService;
 
     @Override
     public AgentResult refreshPaymentDetail(String orderId) {
@@ -1079,19 +1081,11 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
         return orderAdj;
     }
 
-    /**
-     * 订单调整审批处理
-     * @param orderUpModelVo
-     * @param userId
-     * @return
-     * @throws Exception
-     */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentResult approvalTaskOrderAdjust(OrderUpModelVo orderUpModelVo, String userId) throws Exception {
-        try {
-            //处理审批数据
-            logger.info("订单调整提交审批，完成任务{}:{}：{}", orderUpModelVo.getTaskId(), userId, JSONObject.toJSONString(orderUpModelVo));
+    public Map<String, Object> approvalTaskOrderAdjustBusiness(OrderUpModelVo orderUpModelVo, String userId) throws Exception {
+        //处理审批数据
+        logger.info("订单调整提交审批，完成任务{}:{}：{}", orderUpModelVo.getTaskId(), userId, JSONObject.toJSONString(orderUpModelVo));
 //            //只有通过才处理业务
 //            if (orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
 //                AgentResult busres = orderService.approvalTaskBussiData(orderUpModelVo, userId);
@@ -1099,105 +1093,105 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
 //                    return busres;
 //                }
 //            }
-            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
-            if(orgCodeRes==null && orgCodeRes.size()!=1){
-                throw new MessageException("部门参数为空");
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            throw new MessageException("部门参数为空");
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        //完成任务
+        AgentResult result = new AgentResult(500, "系统异常", "");
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("rs", orderUpModelVo.getApprovalResult());
+        reqMap.put("approvalOpinion", orderUpModelVo.getApprovalOpinion());
+        reqMap.put("approvalPerson", userId);
+        reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
+        reqMap.put("taskId", orderUpModelVo.getTaskId());
+        //下一个节点参数
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(orderUpModelVo.getOrderAdjAprDept()))
+            reqMap.put("dept", orderUpModelVo.getOrderAdjAprDept());
+        //传递部门信息
+        Map startPar = agentEnterService.startPar(userId);
+        if (null != startPar) {
+            reqMap.put("party",startPar.get("party"));
+        }
+        OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderUpModelVo.getId());
+        // 业务部处理
+        if (orderUpModelVo.getSid().equals("sid-C911F512-9E63-44CC-9E6E-763484FA0E5B")&& orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
+            if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
+                throw new MessageException("该任务审批状态异常!");
             }
-            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
-            //完成任务
-            AgentResult result = new AgentResult(500, "系统异常", "");
-            Map<String, Object> reqMap = new HashMap<>();
-            reqMap.put("rs", orderUpModelVo.getApprovalResult());
-            reqMap.put("approvalOpinion", orderUpModelVo.getApprovalOpinion());
-            reqMap.put("approvalPerson", userId);
-            reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
-            reqMap.put("taskId", orderUpModelVo.getTaskId());
-            //下一个节点参数
-            if (org.apache.commons.lang.StringUtils.isNotEmpty(orderUpModelVo.getOrderAdjAprDept()))
-                reqMap.put("dept", orderUpModelVo.getOrderAdjAprDept());
-            //传递部门信息
-            Map startPar = agentEnterService.startPar(userId);
-            if (null != startPar) {
-                reqMap.put("party",startPar.get("party"));
-            }
-            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderUpModelVo.getId());
-            // 业务部处理
-            if (orderUpModelVo.getSid().equals("sid-C911F512-9E63-44CC-9E6E-763484FA0E5B")&& orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
-                if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
-                    throw new MessageException("该任务审批状态异常!");
+            //应该退款金额
+            BigDecimal amount = orderAdj.getRefundAmount() == null ? new BigDecimal(0) : orderAdj.getRefundAmount();
+            //手续费
+            BigDecimal proRefundAmo = orderAdj.getProRefundAmount() == null ? BigDecimal.ZERO : orderAdj.getProRefundAmount();
+            //机具已抵扣金额
+            BigDecimal takeout_amount = orderAdj.getOffsetAmount() == null ? new BigDecimal(0) : orderAdj.getOffsetAmount();
+            if (amount.subtract(proRefundAmo).subtract(takeout_amount).compareTo(BigDecimal.ZERO) == 1){
+                logger.info("退款金额大于0,进行抵扣入库;应退金额:"+amount+",手续费:"+proRefundAmo+"已抵扣金额:"+takeout_amount);
+                List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(orderAdj.getAgentId(), AdjustType.ORDER_ADJ.adjustType, orderAdj.getId());
+                AgentResult agentResult= orderOffsetService.OffsetArrears(paymentDetails, amount.subtract(proRefundAmo).subtract(takeout_amount), DDTZ.code, orderAdj.getId());
+                if (agentResult.isOK()){
+                    BigDecimal residue =  (BigDecimal) agentResult.getMapData().get("residueAmt");
+                    orderAdj.setOffsetAmount(amount.subtract(proRefundAmo).subtract(takeout_amount).subtract(residue));
+                    orderAdj.setRealRefundAmo(amount.subtract(proRefundAmo).subtract(takeout_amount).subtract(orderAdj.getOffsetAmount()));
+                    if(!approvalTaskSettle(orderAdj).isOK()){
+                        throw new MessageException("更新订单调整记录失败!");
+                    };
                 }
-                //应该退款金额
-                BigDecimal amount = orderAdj.getRefundAmount() == null ? new BigDecimal(0) : orderAdj.getRefundAmount();
-                //手续费
-                BigDecimal proRefundAmo = orderAdj.getProRefundAmount() == null ? BigDecimal.ZERO : orderAdj.getProRefundAmount();
-                //机具已抵扣金额
-                BigDecimal takeout_amount = orderAdj.getOffsetAmount() == null ? new BigDecimal(0) : orderAdj.getOffsetAmount();
-                if (amount.subtract(proRefundAmo).subtract(takeout_amount).compareTo(BigDecimal.ZERO) == 1){
-                    logger.info("退款金额大于0,进行抵扣入库;应退金额:"+amount+",手续费:"+proRefundAmo+"已抵扣金额:"+takeout_amount);
-                    List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(orderAdj.getAgentId(), AdjustType.ORDER_ADJ.adjustType, orderAdj.getId());
-                    AgentResult agentResult= orderOffsetService.OffsetArrears(paymentDetails, amount.subtract(proRefundAmo).subtract(takeout_amount), DDTZ.code, orderAdj.getId());
-                    if (agentResult.isOK()){
-                        BigDecimal residue =  (BigDecimal) agentResult.getMapData().get("residueAmt");
-                        orderAdj.setOffsetAmount(amount.subtract(proRefundAmo).subtract(takeout_amount).subtract(residue));
-                        orderAdj.setRealRefundAmo(amount.subtract(proRefundAmo).subtract(takeout_amount).subtract(orderAdj.getOffsetAmount()));
-                        if(!approvalTaskSettle(orderAdj).isOK()){
-                            throw new MessageException("更新订单调整记录失败!");
-                        };
-                    }
-                }
             }
-            //财务审批
+        }
+        //财务审批
 
-            if(orgCode.equals("finance") && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
-                if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
-                    throw new MessageException("该任务审批状态异常!");
-                }
-                //第一个财务节点,挂账-无退款
-                if(orderUpModelVo.getSid().equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")){
-                    logger.info("财务审批进行分期变更");
-                    //挂账审批通过
-                    if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
-                        logger.info("财务选择挂账:"+orderUpModelVo.getId());
-                        orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
-                        orderAdj.setRealRefundAmo(BigDecimal.ZERO);
-                        orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
-                        orderAdj.setRefundStat(RefundStat.UNREFUND.key);
-                        reqMap.put("remit",false);
-                    }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
-                        logger.info("财务选择线下退款");
-                        orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
-                        orderAdj.setSettleAmount(BigDecimal.ZERO);
-                        orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
-                        orderAdj.setRefundStat(RefundStat.REFUNDING.key);
-                        reqMap.put("remit",true);
-                    }
-                    AgentResult agentResultcheck = adjustCheckAmo(orderUpModelVo);
-                    if (!agentResultcheck.isOK()){
-                        throw new MessageException(agentResultcheck.getMsg());
-                    }
-                    AgentResult agentResult1 = saveAdjAccounts(orderUpModelVo);
-                    if (!agentResult1.isOK()){
-                        throw new MessageException(agentResult1.getMsg());
-                    }
-                    AgentResult agentResult = adjustDoPayPlan(orderAdj.getId(),orderAdj);
-                    if (agentResult.isOK()){
-                        Map<String, Object> mapData = agentResult.getMapData();
-                        if (null!= mapData.get("refundAmount")
-                                && ((BigDecimal)mapData.get("refundAmount")).compareTo(BigDecimal.ZERO)<0
-                                && String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
-                            reqMap.put("remit",false);
-                        };
-                    }else {
-                        throw new MessageException("执行抵扣失败!");
-                    }
-                    //第二个财务节点,线下退款-完成
-                }
+        if(orgCode.equals("finance") && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
+            if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
+                throw new MessageException("该任务审批状态异常!");
             }
-            if ("boss".equals(orgCode) && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue()) ){
-                if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
-                    throw new MessageException("该任务审批状态异常!");
+            //第一个财务节点,挂账-无退款
+            if(orderUpModelVo.getSid().equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")){
+                logger.info("财务审批进行分期变更");
+                //挂账审批通过
+                if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
+                    logger.info("财务选择挂账:"+orderUpModelVo.getId());
+                    orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
+                    orderAdj.setRealRefundAmo(BigDecimal.ZERO);
+                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+                    orderAdj.setRefundStat(RefundStat.UNREFUND.key);
+                    reqMap.put("remit",false);
+                }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+                    logger.info("财务选择线下退款");
+                    orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
+                    orderAdj.setSettleAmount(BigDecimal.ZERO);
+                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+                    orderAdj.setRefundStat(RefundStat.REFUNDING.key);
+                    reqMap.put("remit",true);
                 }
+                AgentResult agentResultcheck = adjustCheckAmo(orderUpModelVo);
+                if (!agentResultcheck.isOK()){
+                    throw new MessageException(agentResultcheck.getMsg());
+                }
+                AgentResult agentResult1 = saveAdjAccounts(orderUpModelVo);
+                if (!agentResult1.isOK()){
+                    throw new MessageException(agentResult1.getMsg());
+                }
+                AgentResult agentResult = adjustDoPayPlan(orderAdj.getId(),orderAdj);
+                if (agentResult.isOK()){
+                    Map<String, Object> mapData = agentResult.getMapData();
+                    if (null!= mapData.get("refundAmount")
+                            && ((BigDecimal)mapData.get("refundAmount")).compareTo(BigDecimal.ZERO)<0
+                            && String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+                        reqMap.put("remit",false);
+                    };
+                }else {
+                    throw new MessageException("执行抵扣失败!");
+                }
+                //第二个财务节点,线下退款-完成
+            }
+        }
+        if ("boss".equals(orgCode) && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue()) ){
+            if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
+                throw new MessageException("该任务审批状态异常!");
+            }
 //                //挂账审批通过
 //                if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
 //                    orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
@@ -1215,7 +1209,21 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
 //                if(!approvalTaskSettle(orderAdj).isOK()){
 //                    throw new MessageException("更新订单调整记录失败!");
 //                };
-            }
+        }
+        return reqMap;
+    }
+    /**
+     * 订单调整审批处理
+     * @param orderUpModelVo
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public AgentResult approvalTaskOrderAdjust(OrderUpModelVo orderUpModelVo, String userId) throws Exception {
+        try {
+            Map<String, Object> reqMap = orderAdjustService.approvalTaskOrderAdjustBusiness(orderUpModelVo, userId);
             //完成任务
             Map resultMap = activityService.completeTask(orderUpModelVo.getTaskId(), reqMap);
             if (resultMap == null) {
@@ -1284,12 +1292,12 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             settleAC.or().andAdjIdEqualTo(orderAdj.getId());
             List<OrderAdjAccount> settlementList =  orderAdjAccountMapper.selectByExample(settleAC);
             for (OrderAdjAccount orderAdjAccount : settlementList) {
-                if(orderAdjAccount.getType().equals(2)){
+                if(orderAdjAccount.getType().compareTo(new BigDecimal(2)) == 0){
                     startMap.put("settlementCardDs","1");// 生成对私记录 值1
                 }else{// 对私
                     startMap.put("settlementCardDs","0");
                 }
-                if(orderAdjAccount.getType().equals(1)){
+                if(orderAdjAccount.getType().compareTo(new BigDecimal(1)) == 0){
                     startMap.put("settlementCardDg","1");// 生成对公记录 值1
                 }else{// 对公
                     startMap.put("settlementCardDg","0");

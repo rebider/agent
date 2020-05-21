@@ -57,6 +57,15 @@ public interface OrderAdjustService {
     AgentResult approvalTaskOrderAdjust(OrderUpModelVo orderUpModelVo, String userId) throws Exception;
 
     /**
+     * 订单调整审批业务处理
+     * @param orderUpModelVo
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> approvalTaskOrderAdjustBusiness(OrderUpModelVo orderUpModelVo, String userId) throws Exception;
+
+    /**
      * 订单调整审批通过
      * @param insid
      * @param actname
