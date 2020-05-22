@@ -723,6 +723,7 @@
     O_REFUND_PRICE_DIFF_DETAIL.DELIVERY_TIME_TYPE,
     O_REFUND_PRICE_DIFF_DETAIL.OLD_ORG_NAME,
     O_REFUND_PRICE_DIFF_DETAIL.NEW_ORG_NAME,
+    O_REFUND_PRICE_DIFF_DETAIL.PAY_STATUS,
     pre_activity.activity_name as pre_activity_activityName,
     pre_activity.act_code as pre_activity_act_code,
     pre_activity.bus_pro_code as pre_activity_bus_pro_code,
