@@ -2716,7 +2716,40 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
 
     @Override
     public AgentResult approveFinishOrderAdjustRefund(String insid, String actname) throws Exception {
-        return null;
+        logger.info("订单调整出纳审批完成:{},{}", insid, actname);
+        //审批流关系
+        BusActRel busActRel = busActRelService.findById(insid);
+        if (actname.equals("finish_end")) { //审批完成
+            logger.info("订单调整出纳审批完成,审批通过{}", busActRel.getBusId());
+            busActRel.setActivStatus(AgStatus.Approved.name());
+            if (1 != busActRelService.updateByPrimaryKey(busActRel)) {
+                throw new MessageException("请重新提交！");
+            }
+            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(busActRel.getBusId());
+            if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
+                throw new MessageException("该任务审批状态异常!");
+            }
+            // 订单状态修改 ？
+        } else if(actname.equals("reject_end")) { //审批拒绝
+            logger.info("订单调整出纳审批完审批拒绝{}", busActRel.getBusId());
+            busActRel.setActivStatus(AgStatus.Refuse.name());
+            if (1 != busActRelService.updateByPrimaryKey(busActRel)) {
+                throw new MessageException("请重新提交！");
+            }
+            //订单调整数据
+            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(busActRel.getBusId());
+            if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
+                throw new MessageException("该任务审批状态异常!");
+            }
+
+            //订单调整更新
+//            if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+//                throw new MessageException("订单调整数据更新异常！");
+//            }
+            logger.info("订单调整出纳审批完审批拒绝结束", busActRel.getBusId());
+        }
+        logger.info("订单调整出纳审批结束", busActRel.getBusId());
+        return AgentResult.ok();
     }
 
     @Override
@@ -2738,11 +2771,12 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             }
             OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderUpModelVo.getId());
             List<OrderAdjAccountVo> OrderAdjAccountVoList = orderUpModelVo.getAccounts();
-            for (OrderAdjAccountVo orderAdjAccountVo : OrderAdjAccountVoList) {
+            for (OrderAdjAccountVo orderAdjAccountVo : OrderAdjAccountVoList) {// 日期和附件 以账户绑定
+                // 保存打款日期
                 String oaacId = orderAdjAccountVo.getId();
                 OrderAdjAccount orderAdjAccount = orderAdjAccountMapper.selectByPrimaryKey(oaacId);
                 orderAdjAccount.setRefundTm(orderAdjAccountVo.getRefundTm());
-
+                // 保存打款附件
                 List<String> attFiles = orderAdjAccountVo.getTkattachmentsFiles();
                 AttachmentRel recordAtt = new AttachmentRel();
                 if (attFiles.size()>0){
@@ -2762,21 +2796,6 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                     });
                 }
             }
-            OrderAdjAccountExample  orderAdjAccountExample = new OrderAdjAccountExample();
-            orderAdjAccountExample.createCriteria().andAdjIdEqualTo(orderUpModelVo.getId());
-            List<OrderAdjAccount> orderAdjAccountList = orderAdjAccountMapper.selectByExample(orderAdjAccountExample);
-            if(orderAdjAccountList!= null && orderAdjAccountList.size()!=1){
-                throw  new MessageException("订单调整不能存在或重复，调整编号："+ orderUpModelVo.getId());
-            }
-            // 保存打款日期
-            OrderAdjAccount orderAdjAccount = orderAdjAccountList.get(0);
-            orderAdjAccount.setRefundTm(orderUpModelVo.getRefundTm());
-            int status = orderAdjAccountMapper.updateByPrimaryKeySelective(orderAdjAccount);
-            // 保存打款附件
-            if(status != 1 ){
-                throw  new MessageException("打款日期保存失败，调整编号："+ orderUpModelVo.getId());
-            }
-
 
             reqMap.put( "remit", true);
             //完成任务
@@ -2796,6 +2815,5 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
         } catch (Exception e) {
             throw e;
         }
-        return null;
     }
 }
