@@ -623,12 +623,14 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
             agent.setAgHead(agent.getAgLegal());
         }
         //更新认证信息表实体
+        Agent a_agent = agentMapper.selectByAgent(agent);
         if(null!=map && null!=(BigDecimal) map.get("cerResStatus")){
             agentCertification.setCerRes((BigDecimal) map.get("cerResStatus"));//“认证通过” "认证失败","信息缺失"，“认证成功，与本地信息不符“
-            agent.setCaStatus((BigDecimal) map.get("cerResStatus"));
+            a_agent.setCaStatus((BigDecimal) map.get("cerResStatus"));
         }
+        agentCertification.setCerSuccessTm(new Date());
         agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
-        if(1!=agentMapper.updateByPrimaryKeySelective(agent)&& 1 != agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
+        if(1!=agentMapper.updateByPrimaryKeySelective(a_agent) || 1 != agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
             logger.info("工商认证失败，认证代理商{}状态为{},同步信息失败",agent.getId(),dataObj.getString("enterpriseStatus"));
             return AgentResult.fail("工商认证失败，认证代理商{}:"+agent.getId());
         }
