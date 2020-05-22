@@ -3108,62 +3108,52 @@ public class InvoiceApplyExample {
             return (Criteria) this;
         }
 
-        public Criteria andBatchNoEqualTo(String value) {
+        public Criteria andBatchNoEqualTo(BigDecimal value) {
             addCriterion("BATCH_NO =", value, "batchNo");
             return (Criteria) this;
         }
 
-        public Criteria andBatchNoNotEqualTo(String value) {
+        public Criteria andBatchNoNotEqualTo(BigDecimal value) {
             addCriterion("BATCH_NO <>", value, "batchNo");
             return (Criteria) this;
         }
 
-        public Criteria andBatchNoGreaterThan(String value) {
+        public Criteria andBatchNoGreaterThan(BigDecimal value) {
             addCriterion("BATCH_NO >", value, "batchNo");
             return (Criteria) this;
         }
 
-        public Criteria andBatchNoGreaterThanOrEqualTo(String value) {
+        public Criteria andBatchNoGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("BATCH_NO >=", value, "batchNo");
             return (Criteria) this;
         }
 
-        public Criteria andBatchNoLessThan(String value) {
+        public Criteria andBatchNoLessThan(BigDecimal value) {
             addCriterion("BATCH_NO <", value, "batchNo");
             return (Criteria) this;
         }
 
-        public Criteria andBatchNoLessThanOrEqualTo(String value) {
+        public Criteria andBatchNoLessThanOrEqualTo(BigDecimal value) {
             addCriterion("BATCH_NO <=", value, "batchNo");
             return (Criteria) this;
         }
 
-        public Criteria andBatchNoLike(String value) {
-            addCriterion("BATCH_NO like", value, "batchNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andBatchNoNotLike(String value) {
-            addCriterion("BATCH_NO not like", value, "batchNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andBatchNoIn(List<String> values) {
+        public Criteria andBatchNoIn(List<BigDecimal> values) {
             addCriterion("BATCH_NO in", values, "batchNo");
             return (Criteria) this;
         }
 
-        public Criteria andBatchNoNotIn(List<String> values) {
+        public Criteria andBatchNoNotIn(List<BigDecimal> values) {
             addCriterion("BATCH_NO not in", values, "batchNo");
             return (Criteria) this;
         }
 
-        public Criteria andBatchNoBetween(String value1, String value2) {
+        public Criteria andBatchNoBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("BATCH_NO between", value1, value2, "batchNo");
             return (Criteria) this;
         }
 
-        public Criteria andBatchNoNotBetween(String value1, String value2) {
+        public Criteria andBatchNoNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("BATCH_NO not between", value1, value2, "batchNo");
             return (Criteria) this;
         }

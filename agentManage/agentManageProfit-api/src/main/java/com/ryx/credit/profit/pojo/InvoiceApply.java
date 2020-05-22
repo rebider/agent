@@ -91,7 +91,7 @@ public class InvoiceApply implements Serializable {
     /*导入批次*/
     private String importBatch;
     /*导入序号*/
-    private String batchNo;
+    private BigDecimal batchNo;
     /*代理商导入状态*/
     private String agentImport;
     /*财务导入状态*/
@@ -441,12 +441,12 @@ public class InvoiceApply implements Serializable {
         this.importBatch = importBatch == null ? null : importBatch.trim();
     }
 
-    public String getBatchNo() {
+    public BigDecimal getBatchNo() {
         return batchNo;
     }
 
-    public void setBatchNo(String batchNo) {
-        this.batchNo = batchNo == null ? null : batchNo.trim();
+    public void setBatchNo(BigDecimal batchNo) {
+        this.batchNo = batchNo;
     }
 
     public String getAgentImport() {
