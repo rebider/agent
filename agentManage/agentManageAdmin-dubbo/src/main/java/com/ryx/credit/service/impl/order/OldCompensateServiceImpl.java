@@ -245,7 +245,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                                          List<String> refundPriceDiffFile,
                                          String cUser,
                                          List<OCashReceivablesVo> oCashReceivablesVoList,
-                                         AgentVo agentVo)throws Exception{
+                                         AgentVo agentVo)throws ProcessException{
 
         try {
             //pos提交标志，ture第二次提交,false是第一次提交
@@ -634,10 +634,18 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             return AgentResult.ok(priceDiffId);
         } catch (MessageException e) {
             log.info("活动调整保存失败");
-            throw new MessageException(e.getMessage());
+            throw new ProcessException(e.getMessage());
+        }catch (ProcessException e) {
+            e.printStackTrace();
+            log.info("活动调整保存失败");
+            if (null != e.getCode() && e.getCode().equals("POSTIPS")) {
+                throw new ProcessException(e.getCode(), e.getMsg());
+            } else {
+                throw new ProcessException(e.getMessage());
+            }
         } catch (Exception e) {
             log.info("活动调整保存失败");
-            throw new Exception(e.getMessage());
+            throw new ProcessException(e.getMessage());
         }
     }
 
