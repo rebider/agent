@@ -321,15 +321,25 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                           List<AgentFreeze> agentFreezeList = agentFreezeMapper.selectByExample(agentFreezeExample);
                           if(null!=agentFreezeList && agentFreezeList.size()>0){
                               AgentFreeze agentFreeze = agentFreezeList.get(0);
-                              if(null!=map && StringUtils.isNotBlank(String.valueOf(map.get("remark")))){
-                                  agentFreeze.setRemark(String.valueOf(map.get("remark")));
-                              }
+                              agentFreeze.setRemark("认证结果非在营");
+                              agentFreeze.setFreezeDate(new Date());
                               if(1!=agentFreezeMapper.updateByPrimaryKeySelective(agentFreeze)){
                                   logger.info("代理商{}冻结失败{}",agent.getId(),e.getMsg());
                               }
+                              Agent a_agent = agentMapper.selectByAgent(agent);
+                              AgentCertification agent_crtification = new AgentCertification();
+                              agent_crtification.setId(agentCertification.getId());
+                              agent.setCaStatus(CerResStatus.FAIL.status);
+                              agentCertification.setCerRes(CerResStatus.FAIL.status);//认证结果;1-成功,2-失败
+                              agentCertification.setCerProStat(Status.STATUS_2.status);
+                              agent_crtification.setCerSuccessTm(new Date());
+                              if(1!=agentMapper.updateByPrimaryKeySelective(a_agent) || 1 != agentCertificationMapper.updateByPrimaryKeySelective(agent_crtification)){
+                                  logger.info(("基础信息更改失败"));
+                                  return AgentResult.fail("基础信息更改失败");
+                              }
                           }
-                          logger.info("代理商{}冻结失败{}",agent.getId(),e.getMsg());
-                          return AgentResult.fail(e.getMsg());
+                          logger.info("代理商{}冻结成功{}",agent.getId(),e.getMsg());
+                          return AgentResult.ok("冻结成功");
                       }catch (Exception e) {
                           logger.info("代理商{}",agent.getId());
                           return AgentResult.fail("认证失败");
@@ -556,12 +566,26 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                      if(null!=map && StringUtils.isNotBlank(String.valueOf(map.get("remark")))){
                          agentFreeze.setRemark(String.valueOf(map.get("remark")));
                      }
+                     agentFreeze.setFreezeDate(new Date());
                      if(1!=agentFreezeMapper.updateByPrimaryKeySelective(agentFreeze)){
                          logger.info("代理商{}冻结失败{}",agent.getId(),e.getMsg());
                      }
+                     Agent a_agent = agentMapper.selectByAgent(agent);
+                     AgentCertification agent_crtification = new AgentCertification();
+                     agent_crtification.setId(agentCertification.getId());
+                     if(null!=map && null!=(BigDecimal) map.get("cerResStatus")){
+                         agent_crtification.setCerRes((BigDecimal) map.get("cerResStatus"));//“认证通过” "认证失败","信息缺失"，“认证成功，与本地信息不符“
+                         a_agent.setCaStatus((BigDecimal) map.get("cerResStatus"));
+                     }
+                     agent_crtification.setCerSuccessTm(new Date());
+                     agent_crtification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
+                     if(1!=agentMapper.updateByPrimaryKeySelective(a_agent) || 1 != agentCertificationMapper.updateByPrimaryKeySelective(agent_crtification)){
+                         logger.info(("基础信息更改失败"));
+                         return AgentResult.fail("基础信息更改失败");
+                     }
                  }
-                 logger.info("代理商{}冻结失败{}",agent.getId(),e.getMsg());
-                 return AgentResult.fail(e.getMsg());
+                 logger.info("代理商{}冻结成功{}",agent.getId(),e.getMsg());
+                 return AgentResult.ok("冻结成功");
                }catch (Exception e) {
                  logger.info("代理商{}", agent.getId());
                  return AgentResult.fail("冻结失败");
