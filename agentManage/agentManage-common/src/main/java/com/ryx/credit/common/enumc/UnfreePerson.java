@@ -1,5 +1,6 @@
 package com.ryx.credit.common.enumc;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,13 +9,13 @@ import java.util.Map;
  */
 public enum UnfreePerson {
 
-    XTJD("XTJD","系统解冻");
+    XTJD(new BigDecimal("0"),"系统解冻");
 
-    public String code;
+    public BigDecimal code;
 
     public String msg;
 
-    UnfreePerson(String c, String m) {
+    UnfreePerson(BigDecimal c, String m) {
         this.code = c;
         this.msg = m;
     }
@@ -24,10 +25,10 @@ public enum UnfreePerson {
      * @param value
      * @return
      */
-    public static String getContentByValue(String value) {
+    public static String getContentByValue(BigDecimal value) {
         UnfreePerson[] unfreePerson = UnfreePerson.values();
         for (UnfreePerson cc : unfreePerson) {
-            if (cc.code.equals(value)) {
+            if (cc.code.compareTo(value)==0) {
                 return cc.msg;
             }
         }
@@ -47,7 +48,7 @@ public enum UnfreePerson {
      * 取得枚举对象值
      * @return 枚举对象值
      */
-    public String getValue() {
+    public BigDecimal getValue() {
         return this.code;
     }
 

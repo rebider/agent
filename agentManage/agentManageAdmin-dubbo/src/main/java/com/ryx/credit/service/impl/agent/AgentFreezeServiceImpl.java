@@ -116,8 +116,8 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 }
             }
             if(StringUtils.isNotBlank(resultMap.get("UNFREEZE_PERSON"))){
-                if(resultMap.get("UNFREEZE_PERSON").equals(UnfreePerson.XTJD.getValue())){
-                    resultMap.put("UNFREEZE_PERSON_MSG",UnfreePerson.getContentByValue(resultMap.get("UNFREEZE_PERSON")));
+                if(resultMap.get("UNFREEZE_PERSON").equals(String.valueOf(UnfreePerson.XTJD.getValue()))){
+                    resultMap.put("UNFREEZE_PERSON_MSG",UnfreePerson.getContentByValue(new BigDecimal(resultMap.get("UNFREEZE_PERSON"))));
                 }else{
                     CUser cUser1 = userService.selectById(Long.valueOf(resultMap.get("UNFREEZE_PERSON")));
                     if(null!=cUser1){
