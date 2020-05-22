@@ -1280,53 +1280,64 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 logger.info("订单调整审批完成:已审批过:{}", orderAdj.getId());
                 return AgentResult.ok();
             }
-            orderAdj.setReviewsStat(AgStatus.Approved.status);
-            orderAdj.setReviewsDate(new Date());
-            // 订单调整更新
-            if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
-                throw new MessageException("订单调整数据更新异常！");
+            // TODO 判断是否有退款  有： 生成出纳审批  没有 ： 不生成审批
+            OrderAdjAccountExample orderAdjAccountExample = new OrderAdjAccountExample();
+            orderAdjAccountExample.or().andAdjIdEqualTo(orderAdj.getId());
+            List<OrderAdjAccount> orderAdjAccountList = orderAdjAccountMapper.selectByExample(orderAdjAccountExample);
+            BigDecimal countSum = new BigDecimal(0);
+            for (OrderAdjAccount orderAdjAccount : orderAdjAccountList) {
+                countSum.add(orderAdjAccount.getRefundAmo());
             }
-            String workId = dictOptionsService.getApproveVersion("OrderAdjustRefund");
-            Map startMap = new HashMap<>();
-            OrderAdjAccountExample settleAC = new OrderAdjAccountExample();
-            settleAC.or().andAdjIdEqualTo(orderAdj.getId());
-            List<OrderAdjAccount> settlementList =  orderAdjAccountMapper.selectByExample(settleAC);
-            for (OrderAdjAccount orderAdjAccount : settlementList) {
-                if(orderAdjAccount.getType().compareTo(new BigDecimal(2)) == 0){
-                    startMap.put("settlementCardDs","1");// 生成对私记录 值1
-                }else{// 对私
-                    startMap.put("settlementCardDs","0");
+            if(countSum.compareTo(new BigDecimal(0))==0){// 无需退款
+                orderAdj.setReviewsStat(AgStatus.Approved.status);
+                orderAdj.setReviewsDate(new Date());
+                // 订单调整更新
+                if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+                    throw new MessageException("订单调整数据更新异常！");
                 }
-                if(orderAdjAccount.getType().compareTo(new BigDecimal(1)) == 0){
-                    startMap.put("settlementCardDg","1");// 生成对公记录 值1
-                }else{// 对公
-                    startMap.put("settlementCardDg","0");
+            }else{// 有退款 申请出纳审批流
+                String workId = dictOptionsService.getApproveVersion("OrderAdjustRefund");
+                Map startMap = new HashMap<>();
+                OrderAdjAccountExample settleAC = new OrderAdjAccountExample();
+                settleAC.or().andAdjIdEqualTo(orderAdj.getId());
+                List<OrderAdjAccount> settlementList =  orderAdjAccountMapper.selectByExample(settleAC);
+                for (OrderAdjAccount orderAdjAccount : settlementList) {
+                    if(orderAdjAccount.getType().compareTo(new BigDecimal(2)) == 0){
+                        startMap.put("settlementCardDs","1");// 生成对私记录 值1
+                    }else{// 对私
+                        startMap.put("settlementCardDs","0");
+                    }
+                    if(orderAdjAccount.getType().compareTo(new BigDecimal(1)) == 0){
+                        startMap.put("settlementCardDg","1");// 生成对公记录 值1
+                    }else{// 对公
+                        startMap.put("settlementCardDg","0");
+                    }
                 }
-            }
-            // 启动审批
-            String proce = activityService.createDeloyFlow(null, workId, null, null, startMap);
-            if (proce == null) {
-                throw new MessageException("审批流启动失败!");
-            }
-            //添加审批关系
-            BusActRel record = new BusActRel();
-            record.setBusId(orderAdj.getId());
-            record.setActivId(proce);
-            record.setcTime(Calendar.getInstance().getTime());
-            record.setcUser(busActRel.getcUser());
-            record.setStatus(Status.STATUS_1.status);
-            record.setBusType(BusActRelBusType.cashierApprove.name());
-            record.setActivStatus(AgStatus.Approving.name());
-            record.setAgentId(orderAdj.getAgentId());
-            record.setAgentName(busActRel.getAgentName());
-            record.setNetInBusType(busActRel.getNetInBusType());// 数据权限
-            record.setDataShiro(BusActRelBusType.cashierApprove.key);
-            record.setAgDocPro(busActRel.getAgDocPro());
-            record.setAgDocDistrict(busActRel.getAgDocDistrict());
+                // 启动审批
+                String proce = activityService.createDeloyFlow(null, workId, null, null, startMap);
+                if (proce == null) {
+                    throw new MessageException("审批流启动失败!");
+                }
+                //添加审批关系
+                BusActRel record = new BusActRel();
+                record.setBusId(orderAdj.getId());
+                record.setActivId(proce);
+                record.setcTime(Calendar.getInstance().getTime());
+                record.setcUser(busActRel.getcUser());
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(BusActRelBusType.cashierApprove.name());
+                record.setActivStatus(AgStatus.Approving.name());
+                record.setAgentId(orderAdj.getAgentId());
+                record.setAgentName(busActRel.getAgentName());
+                record.setNetInBusType(busActRel.getNetInBusType());// 数据权限
+                record.setDataShiro(BusActRelBusType.cashierApprove.key);
+                record.setAgDocPro(busActRel.getAgDocPro());
+                record.setAgDocDistrict(busActRel.getAgDocDistrict());
 
-            if (1 != busActRelMapper.insertSelective(record)) {
-                logger.info("出纳申请提交审批，启动审批异常，添加审批关系失败{}:{}", orderAdj.getId(), proce);
-                throw new MessageException("出纳审批流启动失败：添加审批关系失败！");
+                if (1 != busActRelMapper.insertSelective(record)) {
+                    logger.info("出纳申请提交审批，启动审批异常，添加审批关系失败{}:{}", orderAdj.getId(), proce);
+                    throw new MessageException("出纳审批流启动失败：添加审批关系失败！");
+                }
             }
 
             if (orderAdj.getRealRefundAmo().compareTo(BigDecimal.ZERO)>0){
@@ -2719,17 +2730,24 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
         logger.info("订单调整出纳审批完成:{},{}", insid, actname);
         //审批流关系
         BusActRel busActRel = busActRelService.findById(insid);
+        OrderAdj orderAdj = null;
         if (actname.equals("finish_end")) { //审批完成
             logger.info("订单调整出纳审批完成,审批通过{}", busActRel.getBusId());
             busActRel.setActivStatus(AgStatus.Approved.name());
             if (1 != busActRelService.updateByPrimaryKey(busActRel)) {
                 throw new MessageException("请重新提交！");
             }
-            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(busActRel.getBusId());
+            orderAdj = orderAdjMapper.selectByPrimaryKey(busActRel.getBusId());
+            if(orderAdj==null ){
+                throw new MessageException("没有此订单调整!"+ orderAdj.getId());
+            }
             if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
                 throw new MessageException("该任务审批状态异常!");
             }
-            // 订单状态修改 ？
+
+            orderAdj.setReviewsStat(AgStatus.Approved.status);
+            orderAdj.setReviewsDate(new Date());
+
         } else if(actname.equals("reject_end")) { //审批拒绝
             logger.info("订单调整出纳审批完审批拒绝{}", busActRel.getBusId());
             busActRel.setActivStatus(AgStatus.Refuse.name());
@@ -2737,15 +2755,18 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 throw new MessageException("请重新提交！");
             }
             //订单调整数据
-            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(busActRel.getBusId());
+            orderAdj = orderAdjMapper.selectByPrimaryKey(busActRel.getBusId());
+            if(orderAdj==null ){
+                throw new MessageException("没有此订单调整!"+ orderAdj.getId());
+            }
             if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
                 throw new MessageException("该任务审批状态异常!");
             }
 
-            //订单调整更新
-//            if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
-//                throw new MessageException("订单调整数据更新异常！");
-//            }
+            // 订单调整更新
+            if ( 1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+                throw new MessageException("订单调整数据更新异常！");
+            }
             logger.info("订单调整出纳审批完审批拒绝结束", busActRel.getBusId());
         }
         logger.info("订单调整出纳审批结束", busActRel.getBusId());
