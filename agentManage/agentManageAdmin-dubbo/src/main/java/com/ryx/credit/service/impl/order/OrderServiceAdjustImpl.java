@@ -1286,7 +1286,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             List<OrderAdjAccount> orderAdjAccountList = orderAdjAccountMapper.selectByExample(orderAdjAccountExample);
             BigDecimal countSum = new BigDecimal(0);
             for (OrderAdjAccount orderAdjAccount : orderAdjAccountList) {
-                countSum.add(orderAdjAccount.getRefundAmo());
+                countSum = countSum.add(orderAdjAccount.getRefundAmo());
             }
             if(countSum.compareTo(new BigDecimal(0))==0){// 无需退款
                 orderAdj.setReviewsStat(AgStatus.Approved.status);
