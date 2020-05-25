@@ -1138,7 +1138,7 @@
       AND to_char(AGENT.C_INCOM_TIME,'YYYY-MM-dd')=#{map.time}
     </if>
     <if test="map.caStatus!=null and map.caStatus!=''">
-      AND AGENT.CA_STATUS = #{map.caStatus}
+      AND agentcer.CER_RES = #{map.caStatus}
     </if>
     <if test="map.agBusLicb!=null and map.agBusLicb!=''">
       AND to_char( AGENT.AG_BUS_LICB,'YYYY-MM-dd')=#{map.agBusLicb}
