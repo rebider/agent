@@ -1297,7 +1297,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 }
             }else{// 有退款 申请出纳审批流
                 String workId = dictOptionsService.getApproveVersion("OrderAdjustRefund");
-                Map startMap = new HashMap<>();
+                Map<String,String> startMap = new HashMap<String,String>();
                 OrderAdjAccountExample settleAC = new OrderAdjAccountExample();
                 settleAC.or().andAdjIdEqualTo(orderAdj.getId());
                 List<OrderAdjAccount> settlementList =  orderAdjAccountMapper.selectByExample(settleAC);
@@ -1305,12 +1305,16 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                     if(orderAdjAccount.getType().compareTo(new BigDecimal(2)) == 0){
                         startMap.put("settlementCardDs","1");// 生成对私记录 值1
                     }else{// 对私
-                        startMap.put("settlementCardDs","0");
+                        if(startMap.get("settlementCardDs") == null || (!startMap.get("settlementCardDs").equals("1"))){
+                            startMap.put("settlementCardDs","0");
+                        }
                     }
                     if(orderAdjAccount.getType().compareTo(new BigDecimal(1)) == 0){
                         startMap.put("settlementCardDg","1");// 生成对公记录 值1
                     }else{// 对公
-                        startMap.put("settlementCardDg","0");
+                        if(startMap.get("settlementCardDg") == null || (!startMap.get("settlementCardDg").equals("1"))){
+                            startMap.put("settlementCardDg","0");
+                        }
                     }
                 }
                 // 启动审批
