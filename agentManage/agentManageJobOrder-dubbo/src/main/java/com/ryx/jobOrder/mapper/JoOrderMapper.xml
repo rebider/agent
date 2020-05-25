@@ -628,7 +628,7 @@
       <if test="map.cOrganizations!=null and map.cOrganizations.size > 0">
         and jo.launch_branch_id in
         <foreach collection="map.cOrganizations" item="cOrganizationItem" open="(" separator="," close=")">
-            #{cOrganizationItem.id}
+            #{cOrganizationItem.code}
         </foreach>
       </if>
     </where>
