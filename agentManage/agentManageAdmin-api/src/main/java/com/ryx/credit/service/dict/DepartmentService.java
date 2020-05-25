@@ -38,4 +38,11 @@ public interface DepartmentService {
 
 
     List<COrganization> selectCityRegion(Long cUser);
+
+    /**
+     * 查询下级部门列表
+     * @param pid
+     * @return
+     */
+    List<COrganization> selectNextChildsRegion(Long pid);
 }
