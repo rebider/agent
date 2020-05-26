@@ -293,7 +293,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             }
 
             List<String> accountFile = adjAccount.getAccountFile();
-            if (null != accountFile || accountFile.size()>0){
+            if (null != accountFile && accountFile.size()>0){
                 for (String s : accountFile) {
                     AttachmentRel recordAccountAtt = new AttachmentRel();
                     recordAccountAtt.setAttId(s);
