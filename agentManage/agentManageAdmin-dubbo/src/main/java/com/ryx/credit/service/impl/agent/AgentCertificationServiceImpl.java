@@ -261,30 +261,45 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                 return AgentResult.ok(dataObj);
             }
             if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")) && dataObj.getString("enterpriseStatus").startsWith("在营")){
-//                如果与系统中的字段不一致  则进行冻结
-                if(!agent.getAgLegal().equals(dataObj.getString("frName")) ||
-                        !agent.getAgName().equals(dataObj.getString("enterpriseName")) ||
-                         agent.getAgBusLicb().compareTo(dataObj.getDate("openFrom"))!=0||
-                         agent.getAgBusLice().compareTo(dataObj.getDate("openTo"))!=0 ||
-                        !agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
-                    logger.info("认证成功，与本地信息不符",agentCertification.getId());
-                    cerResStatus = CerResStatus.INCONFORMITY.status;
-                    remark+="认证成功，与本地信息不符";
-                    map.put("remark",remark);
-                    map.put("cerResStatus",cerResStatus);
-                    return  AgentfreezeShare(agent,agentCertification,map);
-                }else if(agent.getAgLegal().equals(dataObj.getString("frName")) &&
-                        agent.getAgName().equals(dataObj.getString("enterpriseName")) &&
-                        agent.getAgBusLicb().compareTo(dataObj.getDate("openFrom"))==0&&
-                        agent.getAgBusLice().compareTo(dataObj.getDate("openTo"))==0 &&
-                        agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
+                if(StringUtils.isNotBlank(dataObj.getString("frName")) &&
+                        StringUtils.isNotBlank(dataObj.getString("enterpriseName")) &&
+                        StringUtils.isNotBlank(dataObj.getString("openFrom")) &&
+                        StringUtils.isNotBlank(dataObj.getString("openTo")) &&
+                        StringUtils.isNotBlank(dataObj.getString("creditCode")) ){
+                    Date date=new Date();
+                    if(StringUtils.isNotBlank(dataObj.getString("openTo")) && dataObj.getString("openTo").equals("长期")){
+                        date =DateUtil.format("2099-12-31","yyyy-MM-dd");
+                    }else if(StringUtils.isNotBlank(dataObj.getString("openTo"))){
+                        date =DateUtil.format(dataObj.getString("openTo"),"yyyy-MM-dd");
+                    }
+                    //                如果与系统中的字段不一致  则进行冻结
+                    if(!agent.getAgLegal().equals(dataObj.getString("frName")) ||
+                            !agent.getAgName().equals(dataObj.getString("enterpriseName")) ||
+                            agent.getAgBusLicb().compareTo(dataObj.getDate("openFrom"))!=0||
+                            agent.getAgBusLice().compareTo(date)!=0 ||
+                            !agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
+                        logger.info("认证成功，与本地信息不符",agentCertification.getId());
+                        cerResStatus = CerResStatus.INCONFORMITY.status;
+                        remark+="认证成功，与本地信息不符";
+                        map.put("remark",remark);
+                        map.put("cerResStatus",cerResStatus);
+                        return  AgentfreezeShare(agent,agentCertification,map);
+                    }else if(agent.getAgLegal().equals(dataObj.getString("frName")) &&
+                            agent.getAgName().equals(dataObj.getString("enterpriseName")) &&
+                            agent.getAgBusLicb().compareTo(dataObj.getDate("openFrom"))==0&&
+                            agent.getAgBusLice().compareTo(date)==0 &&
+                            agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
 //                    一致则解冻 为认证通过
-                    logger.info("认证成功,开始解冻",agentCertification.getId());
-                    cerResStatus = CerResStatus.SUCCESS.status;
-                    remark+="认证成功";
-                    map.put("remark",remark);
-                    map.put("cerResStatus",cerResStatus);
-                    return agentUnFreeze(agent,agentCertification,dataObj,map);
+                        logger.info("认证成功,开始解冻",agentCertification.getId());
+                        cerResStatus = CerResStatus.SUCCESS.status;
+                        remark+="认证成功";
+                        map.put("remark",remark);
+                        map.put("cerResStatus",cerResStatus);
+                        return agentUnFreeze(agent,agentCertification,dataObj,map);
+                    }
+                }else{
+                    logger.info("接口有为空的数据");
+                    return AgentResult.fail("接口有为空的数据");
                 }
             }else if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("enterpriseStatus")) && !dataObj.getString("enterpriseStatus").startsWith("在营")){
                 logger.info("非在营状态,进行冻结操作",dataObj.getString("enterpriseStatus"));
@@ -647,13 +662,8 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                    AgentResult agentUnFreeze = null;
                    logger.info("代理商{}开始解冻",agent.getId());
                    agentUnFreeze =  agentUnFreeze(agentFreezePort);
-                   if (agentUnFreeze.isOK()){
-                       logger.info("代理商{},解冻成功",agent.getId());
-                       return AgentResult.ok("解冻成功");
-                   }else {
-                       logger.info("代理商{},解冻失败:{}",agent.getId());
-                       return AgentResult.fail("解冻失败");
-                   }
+                   logger.info("代理商{},解冻成功:{}",agent.getId(),agentUnFreeze.getMsg());
+                   return AgentResult.fail("解冻成功");
                }catch (MessageException e) {
                    logger.info("代理商{}解冻失败{}",agent.getId(),e.getMsg());
                    return AgentResult.fail(e.getMsg());

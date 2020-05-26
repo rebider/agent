@@ -10,6 +10,7 @@ import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentCertification;
 import com.ryx.credit.service.agent.AgentCertificationService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.BusinessCAService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,8 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
     private static Logger logger = LoggerFactory.getLogger(UpdateAgentCertifiDetailJob.class);
     @Autowired
     private AgentCertificationService agentCertificationService;
+    @Autowired
+    private AgentService agentService;
 
     @Override
     public List<AgentCertification> fetchData(ShardingContext shardingContext) {
@@ -75,6 +78,9 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
                     cer.setCerProStat(Status.STATUS_2.status);
                     cer.setCerRes(CerResStatus.FAIL.status);
                     cer.setCerSuccessTm(date);
+                    Agent a_agent = agentService.getAgentById(cer.getAgentId());
+                    if(null!=a_agent)
+                        agentService.updateByPrimaryKeySelective(a_agent);
                     agentCertificationService.updateCertifi(cer);
                 }
             }catch (Exception e){
@@ -82,6 +88,9 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
                 cer.setCerProStat(Status.STATUS_2.status);
                 cer.setCerRes(CerResStatus.FAIL.status);
                 cer.setCerSuccessTm(date);
+                Agent a_agent = agentService.getAgentById(cer.getAgentId());
+                if(null!=a_agent)
+                    agentService.updateByPrimaryKeySelective(a_agent);
                 agentCertificationService.updateCertifi(cer);
                 logger.error("认证任务执行出错!商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());
             }
