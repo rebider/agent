@@ -1297,7 +1297,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 }
             }else{// 有退款 申请出纳审批流
                 String workId = dictOptionsService.getApproveVersion("OrderAdjustRefund");
-                Map<String,String> startMap = new HashMap<String,String>();
+                Map<String,Object> startMap = new HashMap<String,Object>();
                 OrderAdjAccountExample settleAC = new OrderAdjAccountExample();
                 settleAC.or().andAdjIdEqualTo(orderAdj.getId());
                 List<OrderAdjAccount> settlementList =  orderAdjAccountMapper.selectByExample(settleAC);
