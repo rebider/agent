@@ -238,6 +238,16 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
             remark = remark.substring(0,remark.length() - 1);
             map.put("remark",remark);
             map.put("cerResStatus",cerResStatus);
+            if(null!=map && null!=(BigDecimal) map.get("cerResStatus")){
+                agentCertification.setCerRes((BigDecimal) map.get("cerResStatus"));//“认证通过” "认证失败","信息缺失"，“认证成功，与本地信息不符“
+                agent.setCaStatus((BigDecimal) map.get("cerResStatus"));
+            }
+            agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
+            agentCertification.setCerSuccessTm(new Date());
+            if(1!=agentMapper.updateByPrimaryKeySelective(agent) || 1 != agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
+                logger.info(("基础信息更改失败"));
+                return AgentResult.fail("基础信息更改失败");
+            }
             return AgentfreezeShare(agent, agentCertification, map);
         }
         agentCertification = copyOrgAgentToCertifi(agent,agentCertification);
@@ -283,6 +293,15 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                         remark+="认证成功，与本地信息不符";
                         map.put("remark",remark);
                         map.put("cerResStatus",cerResStatus);
+                        if(null!=map && null!=(BigDecimal) map.get("cerResStatus")){
+                            agentCertification.setCerRes((BigDecimal) map.get("cerResStatus"));//“认证通过” "认证失败","信息缺失"，“认证成功，与本地信息不符“
+                            agent.setCaStatus((BigDecimal) map.get("cerResStatus"));
+                        }
+                        agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
+                        if(1!=agentMapper.updateByPrimaryKeySelective(agent) || 1 != agentCertificationMapper.updateByPrimaryKeySelective(saveAgentCertification(dataObj,agentCertification))){
+                            logger.info("认证成功，与本地信息不符，认证代理商{}状态为{},信息同步失败",agent.getId(),dataObj.getString("enterpriseStatus"));
+                            return AgentResult.fail("认证成功,与本地信息不符,认证代理商信息同步失败");
+                        }
                         return  AgentfreezeShare(agent,agentCertification,map);
                     }else if(agent.getAgLegal().equals(dataObj.getString("frName")) &&
                             agent.getAgName().equals(dataObj.getString("enterpriseName")) &&
@@ -541,15 +560,6 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
      * @throws MessageException
      */
     private AgentResult AgentfreezeShare(Agent agent,AgentCertification agentCertification,Map map)throws MessageException {
-        if(null!=map && null!=(BigDecimal) map.get("cerResStatus")){
-            agentCertification.setCerRes((BigDecimal) map.get("cerResStatus"));//“认证通过” "认证失败","信息缺失"，“认证成功，与本地信息不符“
-            agent.setCaStatus((BigDecimal) map.get("cerResStatus"));
-        }
-        agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
-        if(1!=agentMapper.updateByPrimaryKeySelective(agent) || 1 != agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
-            logger.info(("基础信息更改失败"));
-            return AgentResult.fail("基础信息更改失败");
-        }
              try {
                  AgentFreezePort agentFreezePort = new AgentFreezePort();
                  agentFreezePort.setAgentId(agent.getId());
@@ -583,7 +593,8 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                      }
                      agentFreeze.setFreezeDate(new Date());
                      if(1!=agentFreezeMapper.updateByPrimaryKeySelective(agentFreeze)){
-                         logger.info("代理商{}冻结失败{}",agent.getId(),e.getMsg());
+                         logger.info("代理商{}重复冻结失败{}",agent.getId(),e.getMsg());
+                         return AgentResult.fail("代理商重复冻结失败");
                      }
                      Agent a_agent = agentMapper.selectByAgent(agent);
                      AgentCertification agent_crtification = new AgentCertification();
