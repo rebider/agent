@@ -549,7 +549,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         InvoiceApplyExample example = new InvoiceApplyExample();
         InvoiceApplyExample.Criteria criteria = example.createCriteria();
         setValueExample(criteria,map);
-        example.setOrderByClause("substr(CREATE_DATE,0,10) desc,IMPORT_BATCH desc , BATCH_NO asc");
+        example.setOrderByClause("substr(CREATE_DATE,0,10) desc,IMPORT_BATCH desc , BATCH_NO desc");
         List<Map<String,Object>> list = invoiceApplyMapper.exports(example);
         return list;
     }
