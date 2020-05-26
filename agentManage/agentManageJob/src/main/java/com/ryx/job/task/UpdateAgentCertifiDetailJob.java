@@ -80,6 +80,7 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
                     cer.setCerSuccessTm(date);
                     Agent a_agent = agentService.getAgentById(cer.getAgentId());
                     if(null!=a_agent)
+                        a_agent.setCaStatus(CerResStatus.FAIL.status);
                         agentService.updateByPrimaryKeySelective(a_agent);
                     agentCertificationService.updateCertifi(cer);
                 }
@@ -90,6 +91,7 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
                 cer.setCerSuccessTm(date);
                 Agent a_agent = agentService.getAgentById(cer.getAgentId());
                 if(null!=a_agent)
+                    a_agent.setCaStatus(CerResStatus.FAIL.status);
                     agentService.updateByPrimaryKeySelective(a_agent);
                 agentCertificationService.updateCertifi(cer);
                 logger.error("认证任务执行出错!商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());

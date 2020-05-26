@@ -662,8 +662,13 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                    AgentResult agentUnFreeze = null;
                    logger.info("代理商{}开始解冻",agent.getId());
                    agentUnFreeze =  agentUnFreeze(agentFreezePort);
-                   logger.info("代理商{},解冻成功:{}",agent.getId(),agentUnFreeze.getMsg());
-                   return AgentResult.fail("解冻成功");
+                   if (agentUnFreeze.isOK()){
+                       logger.info("代理商{},解冻成功",agent.getId());
+                       return AgentResult.ok("解冻成功");
+                   }else {
+                       logger.info("代理商{},解冻成功:{}",agent.getId(),agentUnFreeze.getMsg());
+                       return AgentResult.ok("解冻成功");
+                   }
                }catch (MessageException e) {
                    logger.info("代理商{}解冻失败{}",agent.getId(),e.getMsg());
                    return AgentResult.fail(e.getMsg());
