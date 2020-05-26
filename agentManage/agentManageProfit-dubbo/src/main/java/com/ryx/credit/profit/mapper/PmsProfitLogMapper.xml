@@ -10,42 +10,10 @@
     <result column="UPLOAD_TIME" jdbcType="VARCHAR" property="uploadTime" />
     <result column="UPLOAD_USER" jdbcType="VARCHAR" property="uploadUser" />
     <result column="STATUS" jdbcType="VARCHAR" property="status" />
+    <result column="MONTH" jdbcType="VARCHAR" property="month" />
+    <result column="IMPORT_TYPE" jdbcType="VARCHAR" property="importType" />
     <result column="NOTE" jdbcType="VARCHAR" property="note" />
-    <result column="MONTH" jdbcType="VARCHAR" property="month" />
   </resultMap>
-
-
-  <resultMap id="BaseResultMap2" type="com.ryx.credit.profit.pojo.PmsProfit">
-    <id column="ID" jdbcType="VARCHAR" property="id" />
-    <result column="MONTH" jdbcType="VARCHAR" property="month" />
-    <result column="UNIQUE_FLAG" jdbcType="VARCHAR" property="uniqueFlag" />
-    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
-    <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
-    <result column="BUS_NAME" jdbcType="VARCHAR" property="busName" />
-    <result column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
-    <result column="SHEET_COLUMN" jdbcType="DECIMAL" property="sheetColumn" />
-    <result column="SHEET_HEAD" property="sheetHead" jdbcType="UNDEFINED"  javaType = "java.lang.String"  typeHandler ="com.ryx.credit.common.util.OracleXMLTypeHandler" />
-    <result column="SHEET_DATA" property="sheetData" jdbcType="UNDEFINED"   javaType = "java.lang.String"  typeHandler ="com.ryx.credit.common.util.OracleXMLTypeHandler" />
-    <result column="PROFIT_TYPE" jdbcType="VARCHAR" property="profitType" />
-    <result column="PROFIT_HZ" jdbcType="VARCHAR" property="profitHz" />
-    <result column="PAY_CONDITION" jdbcType="VARCHAR" property="payCondition" />
-    <result column="STATUS" jdbcType="VARCHAR" property="status" />
-    <result column="FREE_REASON" jdbcType="VARCHAR" property="freeReason" />
-    <result column="PAY_TRAN_MONEY" jdbcType="DECIMAL" property="payTranMoney" />
-    <result column="IMPORT_TIME" jdbcType="VARCHAR" property="importTime" />
-    <result column="IMPORT_PERSON" jdbcType="VARCHAR" property="importPerson" />
-    <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
-    <result column="UPDATE_PERSON" jdbcType="VARCHAR" property="updatePerson" />
-    <result column="FREE_TIME" jdbcType="VARCHAR" property="freeTime" />
-    <result column="PAY_TIME" jdbcType="VARCHAR" property="payTime" />
-    <result column="SHEET_ORDER" jdbcType="DECIMAL" property="sheetOrder" />
-    <result column="ORDER_NUMBER" jdbcType="DECIMAL" property="orderNumber" />
-    <result column="PROFIT_AMT" property="profitAmt" jdbcType="VARCHAR" />
-  </resultMap>
-
-
-
-
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -76,10 +44,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    BATCH_NO, UPLOAD_PATH, UPLOAD_NAME, RESULT_PATH, RESULT_NAME, UPLOAD_TIME, UPLOAD_USER, 
-    STATUS, NOTE, MONTH
+    BATCH_NO, UPLOAD_PATH, UPLOAD_NAME, RESULT_PATH, RESULT_NAME, UPLOAD_TIME, UPLOAD_USER,
+    STATUS, MONTH, IMPORT_TYPE, NOTE
   </sql>
-
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitLogExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
@@ -97,7 +64,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from PMS_PROFIT_LOG
     where BATCH_NO = #{batchNo,jdbcType=VARCHAR}
@@ -109,14 +76,14 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PmsProfitLog">
-    insert into PMS_PROFIT_LOG (BATCH_NO, UPLOAD_PATH, UPLOAD_NAME, 
-      RESULT_PATH, RESULT_NAME, UPLOAD_TIME, 
-      UPLOAD_USER, STATUS, NOTE, 
-      MONTH)
-    values (#{batchNo,jdbcType=VARCHAR}, #{uploadPath,jdbcType=VARCHAR}, #{uploadName,jdbcType=VARCHAR}, 
-      #{resultPath,jdbcType=VARCHAR}, #{resultName,jdbcType=VARCHAR}, #{uploadTime,jdbcType=VARCHAR}, 
-      #{uploadUser,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, 
-      #{month,jdbcType=VARCHAR})
+    insert into PMS_PROFIT_LOG (BATCH_NO, UPLOAD_PATH, UPLOAD_NAME,
+      RESULT_PATH, RESULT_NAME, UPLOAD_TIME,
+      UPLOAD_USER, STATUS, MONTH,
+      IMPORT_TYPE, NOTE)
+    values (#{batchNo,jdbcType=VARCHAR}, #{uploadPath,jdbcType=VARCHAR}, #{uploadName,jdbcType=VARCHAR},
+      #{resultPath,jdbcType=VARCHAR}, #{resultName,jdbcType=VARCHAR}, #{uploadTime,jdbcType=VARCHAR},
+      #{uploadUser,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{month,jdbcType=VARCHAR},
+      #{importType,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PmsProfitLog">
     insert into PMS_PROFIT_LOG
@@ -145,11 +112,14 @@
       <if test="status != null">
         STATUS,
       </if>
-      <if test="note != null">
-        NOTE,
-      </if>
       <if test="month != null">
         MONTH,
+      </if>
+      <if test="importType != null">
+        IMPORT_TYPE,
+      </if>
+      <if test="note != null">
+        NOTE,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -177,11 +147,14 @@
       <if test="status != null">
         #{status,jdbcType=VARCHAR},
       </if>
-      <if test="note != null">
-        #{note,jdbcType=VARCHAR},
-      </if>
       <if test="month != null">
         #{month,jdbcType=VARCHAR},
+      </if>
+      <if test="importType != null">
+        #{importType,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null">
+        #{note,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -215,11 +188,14 @@
       <if test="status != null">
         STATUS = #{status,jdbcType=VARCHAR},
       </if>
-      <if test="note != null">
-        NOTE = #{note,jdbcType=VARCHAR},
-      </if>
       <if test="month != null">
         MONTH = #{month,jdbcType=VARCHAR},
+      </if>
+      <if test="importType != null">
+        IMPORT_TYPE = #{importType,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null">
+        NOTE = #{note,jdbcType=VARCHAR},
       </if>
     </set>
     where BATCH_NO = #{batchNo,jdbcType=VARCHAR}
@@ -233,13 +209,14 @@
       UPLOAD_TIME = #{uploadTime,jdbcType=VARCHAR},
       UPLOAD_USER = #{uploadUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=VARCHAR},
-      NOTE = #{note,jdbcType=VARCHAR},
-      MONTH = #{month,jdbcType=VARCHAR}
+      MONTH = #{month,jdbcType=VARCHAR},
+      IMPORT_TYPE = #{importType,jdbcType=VARCHAR},
+      NOTE = #{note,jdbcType=VARCHAR}
     where BATCH_NO = #{batchNo,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -255,6 +232,43 @@
 
 
   <!--=================================================以上自动生成============================================================-->
+  <resultMap id="BaseResultMap2" type="com.ryx.credit.profit.pojo.PmsProfit">
+    <id column="BALANCE_ID" jdbcType="VARCHAR" property="balanceId"/>
+    <result column="SETTLE_MONTH" jdbcType="VARCHAR" property="settleMonth"/>
+    <result column="UNIQUE_FLAG" jdbcType="VARCHAR" property="uniqueFlag"/>
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName"/>
+    <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode"/>
+    <result column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName"/>
+    <result column="SHEET_COLUMN" jdbcType="DECIMAL" property="sheetColumn"/>
+    <result column="SHEET_HEAD" jdbcType="VARCHAR" property="sheetHead"/>
+    <result column="SHEET_DATA" jdbcType="VARCHAR" property="sheetData"/>
+    <result column="PROFIT_TYPE" jdbcType="VARCHAR" property="profitType"/>
+    <result column="BILL_STATUS" jdbcType="VARCHAR" property="billStatus"/>
+    <result column="BALANCE_AMT" jdbcType="DECIMAL" property="balanceAmt"/>
+    <result column="IMPORT_TIME" jdbcType="VARCHAR" property="importTime"/>
+    <result column="IMPORT_PERSON" jdbcType="VARCHAR" property="importPerson"/>
+    <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime"/>
+    <result column="UPDATE_PERSON" jdbcType="VARCHAR" property="updatePerson"/>
+    <result column="SHEET_ORDER" jdbcType="DECIMAL" property="sheetOrder"/>
+    <result column="ORDER_NUMBER" jdbcType="DECIMAL" property="orderNumber"/>
+    <result column="BATCH_NO" jdbcType="VARCHAR" property="batchNo"/>
+    <result column="REMIT_FAIL_REASON" jdbcType="VARCHAR" property="remitFailReason"/>
+    <result column="BALANCE_BANK_NO" jdbcType="VARCHAR" property="balanceBankNo"/>
+    <result column="BALANCE_BANK_NAME" jdbcType="VARCHAR" property="balanceBankName"/>
+    <result column="BALANCE_ACCT_NAME" jdbcType="VARCHAR" property="balanceAcctName"/>
+    <result column="BALANCE_ACCT_NO" jdbcType="VARCHAR" property="balanceAcctNo"/>
+    <result column="SUNBMIT_CHECK_TIME" jdbcType="VARCHAR" property="sunbmitCheckTime"/>
+    <result column="SUNBMIT_REMIT_TIME" jdbcType="VARCHAR" property="sunbmitRemitTime"/>
+    <result column="SETTLE_DATE" jdbcType="VARCHAR" property="settleDate"/>
+    <result column="IMPORT_BATCH" jdbcType="VARCHAR" property="importBatch"/>
+    <result column="REALITY_AG_ID" jdbcType="VARCHAR" property="realityAgId"/>
+    <result column="REALITY_AG_NAME" jdbcType="VARCHAR" property="realityAgName"/>
+  </resultMap>
+
+
+
+
+
 
 
   <select id="checkoutData" parameterType="java.lang.String" resultType="java.util.Map">
@@ -265,7 +279,7 @@
       and aa.ID = #{agentId,jdbcType=VARCHAR}
     </if>
     <if test="busCode != null and busCode != ''">
-      and aa.BUS_PLATFORM = #{busCode,jdbcType=VARCHAR}
+      and bb.BUS_PLATFORM = #{busCode,jdbcType=VARCHAR}
     </if>
   </select>
 
@@ -276,20 +290,35 @@
 
 
     <insert id="save" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
-		insert into pms_profit (MONTH, UNIQUE_FLAG, AGENT_NAME, BUS_CODE,SHEET_NAME,
+		insert into pms_profit (SETTLE_MONTH, UNIQUE_FLAG, AGENT_NAME, BUS_CODE,SHEET_NAME,
 		SHEET_COLUMN, SHEET_HEAD, SHEET_DATA, PROFIT_TYPE,
-		PAY_CONDITION, PAY_TRAN_MONEY, IMPORT_TIME,
-		IMPORT_PERSON, UPDATE_TIME, UPDATE_PERSON, sheet_Order,order_number,ID)
-		values (#{month,jdbcType=VARCHAR},#{ uniqueFlag,jdbcType=VARCHAR},#{
+		BILL_STATUS, BALANCE_AMT, IMPORT_TIME,IMPORT_PERSON,IMPORT_BATCH,REALITY_AG_ID,REALITY_AG_NAME,
+		UPDATE_TIME, UPDATE_PERSON, sheet_Order,order_number,BALANCE_ID)
+		values (#{settleMonth,jdbcType=VARCHAR},#{ uniqueFlag,jdbcType=VARCHAR},#{
 		agentName,jdbcType=VARCHAR},#{busCode,jdbcType=VARCHAR},#{ sheetName,jdbcType=VARCHAR},#{
 		sheetColumn,jdbcType=INTEGER}, xmlType((
-		select sheet_head from PMS_PROFIT_temp where ID=#{id,jdbcType=VARCHAR}
+		select sheet_head from PMS_PROFIT_temp where ID=#{balanceId,jdbcType=VARCHAR}
 		 )), xmlType((
-		select sheet_data from PMS_PROFIT_temp where ID=#{id,jdbcType=VARCHAR}
-		 )),#{ profitType,jdbcType=VARCHAR},#{ payCondition,jdbcType=VARCHAR},#{
-		payTranMoney,jdbcType=VARCHAR},#{ importTime,jdbcType=VARCHAR},#{
-		importPerson,jdbcType=VARCHAR},#{ updateTime,jdbcType=VARCHAR},#{
-		updatePerson,jdbcType=VARCHAR},#{sheetOrder,jdbcType=INTEGER},#{orderNumber,jdbcType=INTEGER},#{ id,jdbcType=VARCHAR})
+		select sheet_data from PMS_PROFIT_temp where ID=#{balanceId,jdbcType=VARCHAR}
+		 )),#{ profitType,jdbcType=VARCHAR},#{billStatus,jdbcType=VARCHAR},#{
+		balanceAmt,jdbcType=VARCHAR},#{ importTime,jdbcType=VARCHAR},#{importPerson,jdbcType=VARCHAR},#{importBatch,jdbcType=VARCHAR}
+		,#{realityAgId,jdbcType=VARCHAR},#{realityAgName,jdbcType=VARCHAR},#{updateTime,jdbcType=VARCHAR},#{
+		updatePerson,jdbcType=VARCHAR},#{sheetOrder,jdbcType=INTEGER},#{orderNumber,jdbcType=INTEGER},#{balanceId,jdbcType=VARCHAR})
 	</insert>
+
+
+  <select id="btnIsNo" resultType="java.util.Map">
+    select * from P_BUTTON_SET
+    where MONTH = #{MONTH,jdbcType=VARCHAR}
+  </select>
+
+  <select id="btnInsert" parameterType="java.util.Map" resultType="java.util.Map">
+     insert into P_BUTTON_SET (MONTH,BUTTON_1)
+    values ( #{MONTH,jdbcType=VARCHAR},#{BUTTON_1,jdbcType=VARCHAR})
+  </select>
+
+  <select id="btnUpdate" parameterType="java.util.Map" resultType="java.util.Map">
+      update P_BUTTON_SET set BUTTON_2 = #{BUTTON_2,jdbcType=VARCHAR} where MONTH = #{MONTH,jdbcType=VARCHAR}
+  </select>
 
 </mapper>

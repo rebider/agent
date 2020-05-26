@@ -19,11 +19,11 @@ public class PmsProfitLog implements Serializable {
 
     private String status;
 
-    private String note;
-
     private String month;
 
     private String importType;
+
+    private String note;
 
     public String getBatchNo() {
         return batchNo;
@@ -89,14 +89,6 @@ public class PmsProfitLog implements Serializable {
         this.status = status == null ? null : status.trim();
     }
 
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note == null ? null : note.trim();
-    }
-
     public String getMonth() {
         return month;
     }
@@ -111,5 +103,13 @@ public class PmsProfitLog implements Serializable {
 
     public void setImportType(String importType) {
         this.importType = importType == null ? null : importType.trim();
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note == null ? null : note.trim();
     }
 }

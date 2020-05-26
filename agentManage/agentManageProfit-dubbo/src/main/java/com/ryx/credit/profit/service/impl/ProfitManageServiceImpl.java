@@ -3,6 +3,7 @@ package com.ryx.credit.profit.service.impl;
 import com.ryx.credit.common.enumc.BillStatus;
 import com.ryx.credit.common.enumc.FreeCause;
 import com.ryx.credit.common.enumc.FreeStatus;
+import com.ryx.credit.common.enumc.ProfitDataImportType;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.dao.PmsProfitMapper;
@@ -66,10 +67,11 @@ public class ProfitManageServiceImpl implements IProfitManageService {
         }
         pmsProfits.forEach(pmsProfit -> {
             if(BillStatus.WCK.key.equals(String.valueOf(pmsProfit.get("BILL_STATUS")))||BillStatus.CKSB.key.equals(String.valueOf(pmsProfit.get("BILL_STATUS")))||BillStatus.SPSB.key.equals(String.valueOf(pmsProfit.get("BILL_STATUS")))){
-                pmsProfit.put("BALANCE_ID_ID", pmsProfit.get("pmsProfit"));
+                pmsProfit.put("BALANCE_ID_ID", pmsProfit.get("BALANCE_ID"));
             }
             pmsProfit.put("FREESTATUS_MSG", FreeStatus.getContentByValue(new BigDecimal(String.valueOf(pmsProfit.get("FREESTATUS")))));
             pmsProfit.put("BILL_STATUS_MSG", BillStatus.getContentByValue(String.valueOf(pmsProfit.get("BILL_STATUS"))));
+            pmsProfit.put("PROFIT_TYPE_MSG", ProfitDataImportType.getContentByValue(String.valueOf(pmsProfit.get("PROFIT_TYPE"))));
             if (String.valueOf(pmsProfit.get("FREESTATUS")).equals(String.valueOf(FreeStatus.DJ.code))) {
                 List<Map<String, Object>> queryFrezzeCauseMap = pmsProfitMapper.queryFrezzeCause(FastMap.fastMap("AGENT_ID", pmsProfit.get("UNIQUE_FLAG")).putKeyV("FREEZE_STATUS", pmsProfit.get("FREESTATUS")));
                 for (Map<String, Object> stringObjectMap : queryFrezzeCauseMap) {
@@ -101,7 +103,7 @@ public class ProfitManageServiceImpl implements IProfitManageService {
                 if (t.getSheetHead() == null) {
                     continue;
                 }
-                /*resultLists.add(t.getSheetHead());*/
+                resultLists.add(t.getSheetHead());
             }
         }
         return resultLists;

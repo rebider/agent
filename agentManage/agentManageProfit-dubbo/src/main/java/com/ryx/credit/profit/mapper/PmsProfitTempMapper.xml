@@ -11,6 +11,8 @@
     <result column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
     <result column="ORDER_NUMBER" jdbcType="DECIMAL" property="orderNumber" />
     <result column="IMPORT_PERSON" jdbcType="VARCHAR" property="importPerson" />
+    <result column="IMPORT_TYPE" jdbcType="VARCHAR" property="importType" />
+    <result column="IMPORT_BATCH" jdbcType="VARCHAR" property="importBatch" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ryx.credit.profit.pojo.PmsProfitTempWithBLOBs">
     <result column="SHEET_HEAD" jdbcType="CLOB" property="sheetHead" />
@@ -47,7 +49,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, MONTH, UNIQUE_FLAG, AGENT_NAME, BUS_CODE, BUS_NAME, SHEET_NAME, ORDER_NUMBER,
-    IMPORT_PERSON
+    IMPORT_PERSON, IMPORT_TYPE, IMPORT_BATCH
   </sql>
   <sql id="Blob_Column_List">
     SHEET_HEAD, SHEET_DATA
@@ -102,11 +104,13 @@
     insert into PMS_PROFIT_TEMP (ID, MONTH, UNIQUE_FLAG,
       AGENT_NAME, BUS_CODE, BUS_NAME,
       SHEET_NAME, ORDER_NUMBER, IMPORT_PERSON,
-      SHEET_HEAD, SHEET_DATA)
+      IMPORT_TYPE, IMPORT_BATCH, SHEET_HEAD,
+      SHEET_DATA)
     values (#{id,jdbcType=VARCHAR}, #{month,jdbcType=VARCHAR}, #{uniqueFlag,jdbcType=VARCHAR},
       #{agentName,jdbcType=VARCHAR}, #{busCode,jdbcType=VARCHAR}, #{busName,jdbcType=VARCHAR},
       #{sheetName,jdbcType=VARCHAR}, #{orderNumber,jdbcType=DECIMAL}, #{importPerson,jdbcType=VARCHAR},
-      #{sheetHead,jdbcType=CLOB}, #{sheetData,jdbcType=CLOB})
+      #{importType,jdbcType=VARCHAR}, #{importBatch,jdbcType=VARCHAR}, #{sheetHead,jdbcType=CLOB},
+      #{sheetData,jdbcType=CLOB})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PmsProfitTempWithBLOBs">
     insert into PMS_PROFIT_TEMP
@@ -137,6 +141,12 @@
       </if>
       <if test="importPerson != null">
         IMPORT_PERSON,
+      </if>
+      <if test="importType != null">
+        IMPORT_TYPE,
+      </if>
+      <if test="importBatch != null">
+        IMPORT_BATCH,
       </if>
       <if test="sheetHead != null">
         SHEET_HEAD,
@@ -172,6 +182,12 @@
       </if>
       <if test="importPerson != null">
         #{importPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="importType != null">
+        #{importType,jdbcType=VARCHAR},
+      </if>
+      <if test="importBatch != null">
+        #{importBatch,jdbcType=VARCHAR},
       </if>
       <if test="sheetHead != null">
         #{sheetHead,jdbcType=CLOB},
@@ -214,6 +230,12 @@
       <if test="importPerson != null">
         IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR},
       </if>
+      <if test="importType != null">
+        IMPORT_TYPE = #{importType,jdbcType=VARCHAR},
+      </if>
+      <if test="importBatch != null">
+        IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR},
+      </if>
       <if test="sheetHead != null">
         SHEET_HEAD = #{sheetHead,jdbcType=CLOB},
       </if>
@@ -233,11 +255,12 @@
       SHEET_NAME = #{sheetName,jdbcType=VARCHAR},
       ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL},
       IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR},
+      IMPORT_TYPE = #{importType,jdbcType=VARCHAR},
+      IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR},
       SHEET_HEAD = #{sheetHead,jdbcType=CLOB},
       SHEET_DATA = #{sheetData,jdbcType=CLOB}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PmsProfitTemp">
     update PMS_PROFIT_TEMP
     set MONTH = #{month,jdbcType=VARCHAR},
@@ -247,7 +270,9 @@
       BUS_NAME = #{busName,jdbcType=VARCHAR},
       SHEET_NAME = #{sheetName,jdbcType=VARCHAR},
       ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL},
-      IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR}
+      IMPORT_PERSON = #{importPerson,jdbcType=VARCHAR},
+      IMPORT_TYPE = #{importType,jdbcType=VARCHAR},
+      IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

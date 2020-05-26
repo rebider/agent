@@ -64,6 +64,8 @@ public class PmsProfit implements Serializable {
 
     private String realityAgName;
 
+    private String remark;
+
     public String getBalanceId() {
         return balanceId;
     }
@@ -302,5 +304,13 @@ public class PmsProfit implements Serializable {
 
     public void setRealityAgName(String realityAgName) {
         this.realityAgName = realityAgName == null ? null : realityAgName.trim();
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
     }
 }

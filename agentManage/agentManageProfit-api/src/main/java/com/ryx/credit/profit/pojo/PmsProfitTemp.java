@@ -22,6 +22,10 @@ public class PmsProfitTemp implements Serializable {
 
     private String importPerson;
 
+    private String importType;
+
+    private String importBatch;
+
     public String getId() {
         return id;
     }
@@ -92,5 +96,21 @@ public class PmsProfitTemp implements Serializable {
 
     public void setImportPerson(String importPerson) {
         this.importPerson = importPerson == null ? null : importPerson.trim();
+    }
+
+    public String getImportType() {
+        return importType;
+    }
+
+    public void setImportType(String importType) {
+        this.importType = importType == null ? null : importType.trim();
+    }
+
+    public String getImportBatch() {
+        return importBatch;
+    }
+
+    public void setImportBatch(String importBatch) {
+        this.importBatch = importBatch == null ? null : importBatch.trim();
     }
 }

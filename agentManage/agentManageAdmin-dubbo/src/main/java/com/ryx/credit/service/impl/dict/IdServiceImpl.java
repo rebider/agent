@@ -108,7 +108,6 @@ public class IdServiceImpl implements IdService {
 
     /**
      * PMS_PROFIT_TEMP生成出款流水
-     * @param tablename
      * @return
      */
     @Override

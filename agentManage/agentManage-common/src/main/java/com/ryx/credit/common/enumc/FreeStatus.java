@@ -12,7 +12,7 @@ import java.util.Map;
 public enum FreeStatus {
 
     DJ(new BigDecimal("0"),"冻结"),
-    JD(new BigDecimal("1"),"解冻");
+    JD(new BigDecimal("1"),"正常");
 
     public BigDecimal code;
 

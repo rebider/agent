@@ -2,11 +2,12 @@ package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PmsProfitTempExample {
+public class PmsProfitTempExample implements Serializable {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -754,6 +755,146 @@ public class PmsProfitTempExample {
 
         public Criteria andImportPersonNotBetween(String value1, String value2) {
             addCriterion("IMPORT_PERSON not between", value1, value2, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeIsNull() {
+            addCriterion("IMPORT_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeIsNotNull() {
+            addCriterion("IMPORT_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeEqualTo(String value) {
+            addCriterion("IMPORT_TYPE =", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotEqualTo(String value) {
+            addCriterion("IMPORT_TYPE <>", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeGreaterThan(String value) {
+            addCriterion("IMPORT_TYPE >", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("IMPORT_TYPE >=", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeLessThan(String value) {
+            addCriterion("IMPORT_TYPE <", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeLessThanOrEqualTo(String value) {
+            addCriterion("IMPORT_TYPE <=", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeLike(String value) {
+            addCriterion("IMPORT_TYPE like", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotLike(String value) {
+            addCriterion("IMPORT_TYPE not like", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeIn(List<String> values) {
+            addCriterion("IMPORT_TYPE in", values, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotIn(List<String> values) {
+            addCriterion("IMPORT_TYPE not in", values, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeBetween(String value1, String value2) {
+            addCriterion("IMPORT_TYPE between", value1, value2, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotBetween(String value1, String value2) {
+            addCriterion("IMPORT_TYPE not between", value1, value2, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchIsNull() {
+            addCriterion("IMPORT_BATCH is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchIsNotNull() {
+            addCriterion("IMPORT_BATCH is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchEqualTo(String value) {
+            addCriterion("IMPORT_BATCH =", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotEqualTo(String value) {
+            addCriterion("IMPORT_BATCH <>", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchGreaterThan(String value) {
+            addCriterion("IMPORT_BATCH >", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchGreaterThanOrEqualTo(String value) {
+            addCriterion("IMPORT_BATCH >=", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchLessThan(String value) {
+            addCriterion("IMPORT_BATCH <", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchLessThanOrEqualTo(String value) {
+            addCriterion("IMPORT_BATCH <=", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchLike(String value) {
+            addCriterion("IMPORT_BATCH like", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotLike(String value) {
+            addCriterion("IMPORT_BATCH not like", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchIn(List<String> values) {
+            addCriterion("IMPORT_BATCH in", values, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotIn(List<String> values) {
+            addCriterion("IMPORT_BATCH not in", values, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchBetween(String value1, String value2) {
+            addCriterion("IMPORT_BATCH between", value1, value2, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotBetween(String value1, String value2) {
+            addCriterion("IMPORT_BATCH not between", value1, value2, "importBatch");
             return (Criteria) this;
         }
     }
