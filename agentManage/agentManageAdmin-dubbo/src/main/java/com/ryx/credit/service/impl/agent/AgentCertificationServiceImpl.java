@@ -546,7 +546,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
             agent.setCaStatus((BigDecimal) map.get("cerResStatus"));
         }
         agentCertification.setCerProStat(Status.STATUS_2.status);//认证流程状态:0-未处理,1-处理中,2-处理成功,3-处理失败;
-        if(1!=agentMapper.updateByPrimaryKeySelective(agent) && 1 != agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
+        if(1!=agentMapper.updateByPrimaryKeySelective(agent) || 1 != agentCertificationMapper.updateByPrimaryKeySelective(agentCertification)){
             logger.info(("基础信息更改失败"));
             return AgentResult.fail("基础信息更改失败");
         }
