@@ -34,21 +34,21 @@ public interface PmsProfitLogMapper {
      * @param MONTH
      * @return
      */
-    Map<String, Objects> btnIsNo(@Param("MONTH") String MONTH);
+    Map<String, Object> btnIsNo(@Param("MONTH") String MONTH);
 
     /**
      * 按钮插入表
      * @param param
      * @return
      */
-    Map<String, Objects> btnInsert(Map<String, String> param);
+    Map<String, Object> btnInsert(Map<String, String> param);
 
     /**
      * 按钮修改表
      * @param param
      * @return
      */
-    Map<String, Objects> btnUpdate(Map<String, String> param);
+    Map<String, Object> btnUpdate(Map<String, String> param);
 
 
 

@@ -464,17 +464,17 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     }
 
     @Override
-    public Map<String, Objects> btnIsNo(String MONTH) {
+    public Map<String, Object> btnIsNo(String MONTH) {
         return pmsProfitLogMapper.btnIsNo(MONTH);
     }
 
     @Override
-    public Map<String, Objects> btnInsert(Map<String, String> param) {
+    public Map<String, Object> btnInsert(Map<String, String> param) {
         return pmsProfitLogMapper.btnInsert(param);
     }
 
     @Override
-    public Map<String, Objects> btnUpdate(Map<String, String> param) {
+    public Map<String, Object> btnUpdate(Map<String, String> param) {
         return pmsProfitLogMapper.btnUpdate(param);
     }
 
