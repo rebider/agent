@@ -11,7 +11,7 @@
                         http://www.dangdang.com/schema/ddframe/job/job.xsd
                         ">
 
-    <job:simple id="settleErrCardNoticeJob"
+    <!--<job:simple id="settleErrCardNoticeJob"
                 job-ref="settleErrCardNoticeJob"
                 registry-center-ref="regCenter"
                 cron="0/10 * * * * ?"
@@ -21,6 +21,6 @@
                 sharding-item-parameters="0=A"
                 misfire="false"
                 disabled="${job.settleErrCardNoticeJob}"
-    />
+    />-->
 
 </beans>
