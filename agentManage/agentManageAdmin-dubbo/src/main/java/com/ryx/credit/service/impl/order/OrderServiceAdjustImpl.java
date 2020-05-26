@@ -292,21 +292,25 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 throw new ProcessException("保存账户信息失败");
             }
 
-            String accountFile = adjAccount.getAccountFile();
-            if (null != accountFile){
-                AttachmentRel recordAccountAtt = new AttachmentRel();
-                recordAccountAtt.setAttId(accountFile);
-                recordAccountAtt.setSrcId(account.getId());
-                recordAccountAtt.setcUser(orderAdj.getAdjUserId());
-                recordAccountAtt.setcTime(orderAdj.getAdjTm());
-                recordAccountAtt.setStatus(Status.STATUS_1.status);
-                recordAccountAtt.setBusType(AttachmentRelType.orderAdjustDk.name());
-                recordAccountAtt.setId(idService.genId(TabId.a_attachment_rel));
-                logger.info("添加订单调整附件关系,订单调整ID{},打款附件ID{}",orderAdj.getId(),accountFile);
-                if (1 != attachmentRelMapper.insertSelective(recordAccountAtt)) {
-                    logger.info("订单调整:{}", "添加订单调整打款附件关系失败");
-                    throw new ProcessException("添加订单调整打款附件关系失败");
+            List<String> accountFile = adjAccount.getAccountFile();
+            if (null != accountFile || accountFile.size()>0){
+                for (String s : accountFile) {
+                    AttachmentRel recordAccountAtt = new AttachmentRel();
+                    recordAccountAtt.setAttId(s);
+                    recordAccountAtt.setSrcId(account.getId());
+                    recordAccountAtt.setcUser(orderAdj.getAdjUserId());
+                    recordAccountAtt.setcTime(orderAdj.getAdjTm());
+                    recordAccountAtt.setStatus(Status.STATUS_1.status);
+                    recordAccountAtt.setBusType(AttachmentRelType.orderAdjustDk.name());
+                    recordAccountAtt.setId(idService.genId(TabId.a_attachment_rel));
+                    logger.info("添加订单调整附件关系,订单调整ID{},打款附件ID{}",orderAdj.getId(),accountFile);
+                    if (1 != attachmentRelMapper.insertSelective(recordAccountAtt)) {
+                        logger.info("订单调整:{}", "添加订单调整打款附件关系失败");
+                        throw new ProcessException("添加订单调整打款附件关系失败");
+                    }
                 }
+            }else {
+                throw new MessageException("未上传打款附件");
             }
 
         }
@@ -601,12 +605,10 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
 
 
             for (OrderAdjAccountVo orderAdjAccount:orderAdjAccounts){
-                String accountFile = orderAdjAccount.getAccountFile();
-                if (null != accountFile){
-                    List<Attachment> attachments = agentQueryService.accessoryQuery(accountFile, AttachmentRelType.orderAdjustDk.name());
-                    orderAdjAccount.setAttachments(attachments);
-                }
-
+                List<Attachment> attachments = agentQueryService.accessoryQuery(orderAdjAccount.getId(), AttachmentRelType.orderAdjustDk.name());
+                orderAdjAccount.setAttachments(attachments);
+                List<Attachment> attachmentsrefund = agentQueryService.accessoryQuery(orderAdjAccount.getId(), AttachmentRelType.orderAdjust_refund.name());
+                orderAdjAccount.setTkattachments(attachmentsrefund);
             }
             res.putKeyV("accounts",orderAdjAccounts);
             OPaymentExample oPaymentExample = new OPaymentExample();
@@ -844,24 +846,28 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             account.setVersion(Status.STATUS_1.status);
             if (1 !=orderAdjAccountMapper.insert(account) ){
                 logger.info("订单调整:{}", "保存账户信息失败");
-                throw new ProcessException("保存账户信息失败");
+                throw new MessageException("保存账户信息失败");
             }
 
-            String accountFile = adjAccount.getAccountFile();
-            if (null != accountFile){
-                AttachmentRel recordAccountAtt = new AttachmentRel();
-                recordAccountAtt.setAttId(accountFile);
-                recordAccountAtt.setSrcId(account.getId());
-                recordAccountAtt.setcUser(orderAdj.getAdjUserId());
-                recordAccountAtt.setcTime(orderAdj.getAdjTm());
-                recordAccountAtt.setStatus(Status.STATUS_1.status);
-                recordAccountAtt.setBusType(AttachmentRelType.orderAdjustDk.name());
-                recordAccountAtt.setId(idService.genId(TabId.a_attachment_rel));
-                logger.info("添加订单调整附件关系,订单调整ID{},打款附件ID{}",orderAdj.getId(),accountFile);
-                if (1 != attachmentRelMapper.insertSelective(recordAccountAtt)) {
-                    logger.info("订单调整:{}", "添加订单调整打款附件关系失败");
-                    throw new ProcessException("添加订单调整打款附件关系失败");
+            List<String> accountFile = adjAccount.getAccountFile();
+            if (null != accountFile&&accountFile.size()>0){
+                for (String s : accountFile) {
+                    AttachmentRel recordAccountAtt = new AttachmentRel();
+                    recordAccountAtt.setAttId(s);
+                    recordAccountAtt.setSrcId(account.getId());
+                    recordAccountAtt.setcUser(orderAdj.getAdjUserId());
+                    recordAccountAtt.setcTime(orderAdj.getAdjTm());
+                    recordAccountAtt.setStatus(Status.STATUS_1.status);
+                    recordAccountAtt.setBusType(AttachmentRelType.orderAdjustDk.name());
+                    recordAccountAtt.setId(idService.genId(TabId.a_attachment_rel));
+                    logger.info("添加订单调整附件关系,订单调整ID{},打款附件ID{}",orderAdj.getId(),accountFile);
+                    if (1 != attachmentRelMapper.insertSelective(recordAccountAtt)) {
+                        logger.info("订单调整:{}", "添加订单调整打款附件关系失败");
+                        throw new ProcessException("添加订单调整打款附件关系失败");
+                    }
                 }
+            }else {
+                throw new MessageException("未上传打款附件");
             }
 
         }
@@ -871,10 +877,6 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
         List<OPayment> payments = paymentMapper.selectByExample(oPaymentExample);
         //生成自定义分期
         OPayment payment = payments.get(0);
-        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-        oPaymentDetailExample.or().andOrderIdEqualTo(orderUpModelVo.getOrderId()).andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code).andStatusEqualTo(Status.STATUS_1.status);
-        oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
-        List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
 
         String paymentMethod = payment.getPayMethod();
         List<String> data = orderUpModelVo.getCustomStagingUser();
@@ -1147,68 +1149,71 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
                 throw new MessageException("该任务审批状态异常!");
             }
-            //第一个财务节点,挂账-无退款
-            if(orderUpModelVo.getSid().equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")){
-                logger.info("财务审批进行分期变更");
-                //挂账审批通过
-                if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
-                    logger.info("财务选择挂账:"+orderUpModelVo.getId());
-                    orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
-                    orderAdj.setRealRefundAmo(BigDecimal.ZERO);
-                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
-                    orderAdj.setRefundStat(RefundStat.UNREFUND.key);
-                    reqMap.put("remit",false);
-                }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
-                    logger.info("财务选择线下退款");
-                    orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
-                    orderAdj.setSettleAmount(BigDecimal.ZERO);
-                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
-                    orderAdj.setRefundStat(RefundStat.REFUNDING.key);
-                    reqMap.put("remit",true);
-                }
-                AgentResult agentResultcheck = adjustCheckAmo(orderUpModelVo);
-                if (!agentResultcheck.isOK()){
-                    throw new MessageException(agentResultcheck.getMsg());
-                }
-                AgentResult agentResult1 = saveAdjAccounts(orderUpModelVo);
-                if (!agentResult1.isOK()){
-                    throw new MessageException(agentResult1.getMsg());
-                }
+            //财务节点,挂账-无退款
+            logger.info("财务审批进行分期变更");
+            //挂账审批通过
+            if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
+                logger.info("财务选择挂账:"+orderUpModelVo.getId());
+                orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
+                orderAdj.setRealRefundAmo(BigDecimal.ZERO);
+                orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+                orderAdj.setRefundStat(RefundStat.UNREFUND.key);
+                reqMap.put("remit",false);
                 AgentResult agentResult = adjustDoPayPlan(orderAdj.getId(),orderAdj);
                 if (agentResult.isOK()){
                     Map<String, Object> mapData = agentResult.getMapData();
                     if (null!= mapData.get("refundAmount")
                             && ((BigDecimal)mapData.get("refundAmount")).compareTo(BigDecimal.ZERO)<0
                             && String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
-                        reqMap.put("remit",false);
-                    };
+                    }
                 }else {
                     throw new MessageException("执行抵扣失败!");
                 }
-                //第二个财务节点,线下退款-完成
+                orderAdj.setReviewsStat(AgStatus.Approved.status);
+                orderAdj.setReviewsDate(new Date());
+                // 订单调整更新
+                if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+                    throw new MessageException("订单调整数据更新异常！");
+                }
+            }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+                logger.info("财务选择线下退款");
+                orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
+                orderAdj.setSettleAmount(BigDecimal.ZERO);
+                orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+                orderAdj.setRefundStat(RefundStat.REFUNDING.key);
+                reqMap.put("remit",true);
             }
+            AgentResult agentResultcheck = adjustCheckAmo(orderUpModelVo);
+            if (!agentResultcheck.isOK()){
+                throw new MessageException(agentResultcheck.getMsg());
+            }
+            AgentResult agentResult1 = saveAdjAccounts(orderUpModelVo);
+            if (!agentResult1.isOK()){
+                throw new MessageException(agentResult1.getMsg());
+            }
+
         }
         if ("boss".equals(orgCode) && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue()) ){
             if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
                 throw new MessageException("该任务审批状态异常!");
             }
-//                //挂账审批通过
-//                if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
-//                    orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
-//                    orderAdj.setRealRefundAmo(BigDecimal.ZERO);
-//                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
-//                    orderAdj.setRefundStat(RefundStat.UNREFUND.key);
-//                    reqMap.put("remit",false);
-//                }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
-//                    orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
-//                    orderAdj.setSettleAmount(BigDecimal.ZERO);
-//                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
-//                    orderAdj.setRefundStat(RefundStat.REFUNDING.key);
-//                    reqMap.put("remit",true);
-//                }
-//                if(!approvalTaskSettle(orderAdj).isOK()){
-//                    throw new MessageException("更新订单调整记录失败!");
-//                };
+            AgentResult agentResult = adjustDoPayPlan(orderAdj.getId(),orderAdj);
+            if (agentResult.isOK()){
+                Map<String, Object> mapData = agentResult.getMapData();
+                if (null!= mapData.get("refundAmount")
+                        && ((BigDecimal)mapData.get("refundAmount")).compareTo(BigDecimal.ZERO)<0
+                        && String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+                    reqMap.put("remit",false);
+                };
+            }else {
+                throw new MessageException("执行抵扣失败!");
+            }
+            orderAdj.setReviewsStat(AgStatus.Approved.status);
+            orderAdj.setReviewsDate(new Date());
+            // 订单调整更新
+            if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+                throw new MessageException("订单调整数据更新异常！");
+            }
         }
         return reqMap;
     }
@@ -1223,7 +1228,118 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
     @Override
     public AgentResult approvalTaskOrderAdjust(OrderUpModelVo orderUpModelVo, String userId) throws Exception {
         try {
-            Map<String, Object> reqMap = orderAdjustService.approvalTaskOrderAdjustBusiness(orderUpModelVo, userId);
+//            Map<String, Object> reqMap = orderAdjustService.approvalTaskOrderAdjustBusiness(orderUpModelVo, userId);
+            //处理审批数据
+            logger.info("订单调整提交审批，完成任务{}:{}：{}", orderUpModelVo.getTaskId(), userId, JSONObject.toJSONString(orderUpModelVo));
+//            //只有通过才处理业务
+//            if (orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
+//                AgentResult busres = orderService.approvalTaskBussiData(orderUpModelVo, userId);
+//                if (!busres.isOK()) {
+//                    return busres;
+//                }
+//            }
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                throw new MessageException("部门参数为空");
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            //完成任务
+            AgentResult result = new AgentResult(500, "系统异常", "");
+            Map<String, Object> reqMap = new HashMap<>();
+            reqMap.put("rs", orderUpModelVo.getApprovalResult());
+            reqMap.put("approvalOpinion", orderUpModelVo.getApprovalOpinion());
+            reqMap.put("approvalPerson", userId);
+            reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
+            reqMap.put("taskId", orderUpModelVo.getTaskId());
+            //下一个节点参数
+            if (org.apache.commons.lang.StringUtils.isNotEmpty(orderUpModelVo.getOrderAdjAprDept()))
+                reqMap.put("dept", orderUpModelVo.getOrderAdjAprDept());
+            //传递部门信息
+            Map startPar = agentEnterService.startPar(userId);
+            if (null != startPar) {
+                reqMap.put("party",startPar.get("party"));
+            }
+            OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderUpModelVo.getId());
+            // 业务部处理
+            if (orderUpModelVo.getSid().equals("sid-C911F512-9E63-44CC-9E6E-763484FA0E5B")&& orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
+                if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
+                    throw new MessageException("该任务审批状态异常!");
+                }
+                //应该退款金额
+                BigDecimal amount = orderAdj.getRefundAmount() == null ? new BigDecimal(0) : orderAdj.getRefundAmount();
+                //手续费
+                BigDecimal proRefundAmo = orderAdj.getProRefundAmount() == null ? BigDecimal.ZERO : orderAdj.getProRefundAmount();
+                //机具已抵扣金额
+                BigDecimal takeout_amount = orderAdj.getOffsetAmount() == null ? new BigDecimal(0) : orderAdj.getOffsetAmount();
+                if (amount.subtract(proRefundAmo).subtract(takeout_amount).compareTo(BigDecimal.ZERO) == 1){
+                    logger.info("退款金额大于0,进行抵扣入库;应退金额:"+amount+",手续费:"+proRefundAmo+"已抵扣金额:"+takeout_amount);
+                    List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(orderAdj.getAgentId(), AdjustType.ORDER_ADJ.adjustType, orderAdj.getId());
+                    AgentResult agentResult= orderOffsetService.OffsetArrears(paymentDetails, amount.subtract(proRefundAmo).subtract(takeout_amount), DDTZ.code, orderAdj.getId());
+                    if (agentResult.isOK()){
+                        BigDecimal residue =  (BigDecimal) agentResult.getMapData().get("residueAmt");
+                        orderAdj.setOffsetAmount(amount.subtract(proRefundAmo).subtract(takeout_amount).subtract(residue));
+                        orderAdj.setRealRefundAmo(amount.subtract(proRefundAmo).subtract(takeout_amount).subtract(orderAdj.getOffsetAmount()));
+                        if(!approvalTaskSettle(orderAdj).isOK()){
+                            throw new MessageException("更新订单调整记录失败!");
+                        };
+                    }
+                }
+            }
+            //财务审批
+
+            if(orgCode.equals("finance") && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
+                if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
+                    throw new MessageException("该任务审批状态异常!");
+                }
+                //财务节点,挂账-无退款
+                logger.info("财务审批进行分期变更");
+                //挂账审批通过
+                if(String.valueOf(OrderAdjRefundType.CDFQ_GZ.code).equals(orderUpModelVo.getRefundType()) ){
+                    logger.info("财务选择挂账:"+orderUpModelVo.getId());
+                    orderAdj.setSettleAmount(new BigDecimal(orderUpModelVo.getRefundAmount()));
+                    orderAdj.setRealRefundAmo(BigDecimal.ZERO);
+                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+                    orderAdj.setRefundStat(RefundStat.UNREFUND.key);
+                    reqMap.put("remit",false);
+                    //完成任务
+                    Map resultMap = activityService.completeTask(orderUpModelVo.getTaskId(), reqMap);
+                    if (resultMap == null) {
+                        throw new MessageException("catch工作流处理任务异常！");
+                    }
+                    Boolean rs = (Boolean) resultMap.get("rs");
+                    String msg = String.valueOf(resultMap.get("msg"));
+                    if (!rs) {
+                        throw new MessageException("catch工作流处理任务异常！");
+                    }
+                    return AgentResult.ok(null);
+                }else if(String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+                    logger.info("财务选择线下退款");
+                    orderAdj.setRealRefundAmo(new BigDecimal(orderUpModelVo.getRefundAmount()));
+                    orderAdj.setSettleAmount(BigDecimal.ZERO);
+                    orderAdj.setRefundType(new BigDecimal(orderUpModelVo.getRefundType()));
+                    orderAdj.setRefundStat(RefundStat.REFUNDING.key);
+                    // 订单调整更新
+                    if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+                        throw new MessageException("订单调整数据更新异常！");
+                    }
+                    reqMap.put("remit",true);
+                }
+                AgentResult agentResultcheck = adjustCheckAmo(orderUpModelVo);
+                if (!agentResultcheck.isOK()){
+                    throw new MessageException(agentResultcheck.getMsg());
+                }
+                AgentResult agentResult1 = saveAdjAccounts(orderUpModelVo);
+                if (!agentResult1.isOK()){
+                    throw new MessageException(agentResult1.getMsg());
+                }
+
+            }
+            if ("boss".equals(orgCode) && orderUpModelVo.getApprovalResult().equals(ApprovalType.PASS.getValue()) ){
+                if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
+                    throw new MessageException("该任务审批状态异常!");
+                }
+            }
             //完成任务
             Map resultMap = activityService.completeTask(orderUpModelVo.getTaskId(), reqMap);
             if (resultMap == null) {
@@ -1266,6 +1382,16 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
                 throw new MessageException("该任务审批状态异常!");
             }
+            AgentResult adjustResult = adjustDoPayPlan(orderAdj.getId(),orderAdj);
+            if (adjustResult.isOK()){
+//                Map<String, Object> mapData = agentResult.getMapData();
+//                if (null!= mapData.get("refundAmount")
+//                        && ((BigDecimal)mapData.get("refundAmount")).compareTo(BigDecimal.ZERO)<0
+//                        && String.valueOf(OrderAdjRefundType.CDFQ_XXTK.code).equals(orderUpModelVo.getRefundType())){
+//                };
+            }else {
+                throw new MessageException("执行抵扣失败!");
+            }
             //应该退款金额
             BigDecimal amount = orderAdj.getRefundAmount() == null ? new BigDecimal(0) : orderAdj.getRefundAmount();
             //手续费
@@ -1276,10 +1402,10 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                     throw new MessageException("订单调整数据更新异常！");
                 }
             }
-            if (orderAdj.getReviewsStat().compareTo(AgStatus.Approved.status) == 0) {
-                logger.info("订单调整审批完成:已审批过:{}", orderAdj.getId());
-                return AgentResult.ok();
-            }
+//            if (orderAdj.getReviewsStat().compareTo(AgStatus.Approved.status) == 0) {
+//                logger.info("订单调整审批完成:已审批过:{}", orderAdj.getId());
+//                return AgentResult.ok();
+//            }
             // TODO 判断是否有退款  有： 生成出纳审批  没有 ： 不生成审批
             OrderAdjAccountExample orderAdjAccountExample = new OrderAdjAccountExample();
             orderAdjAccountExample.or().andAdjIdEqualTo(orderAdj.getId());
@@ -1289,33 +1415,29 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 countSum = countSum.add(orderAdjAccount.getRefundAmo());
             }
             if(countSum.compareTo(new BigDecimal(0))==0){// 无需退款
-                orderAdj.setReviewsStat(AgStatus.Approved.status);
-                orderAdj.setReviewsDate(new Date());
-                // 订单调整更新
-                if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
-                    throw new MessageException("订单调整数据更新异常！");
-                }
+//                orderAdj.setReviewsStat(AgStatus.Approved.status);
+//                orderAdj.setReviewsDate(new Date());
+//                // 订单调整更新
+//                if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+//                    throw new MessageException("订单调整数据更新异常！");
+//                }
             }else{// 有退款 申请出纳审批流
                 String workId = dictOptionsService.getApproveVersion("OrderAdjustRefund");
-                Map<String,String> startMap = new HashMap<String,String>();
+                Map startMap = new HashMap<>();
                 OrderAdjAccountExample settleAC = new OrderAdjAccountExample();
                 settleAC.or().andAdjIdEqualTo(orderAdj.getId());
                 List<OrderAdjAccount> settlementList =  orderAdjAccountMapper.selectByExample(settleAC);
                 for (OrderAdjAccount orderAdjAccount : settlementList) {
                     if(orderAdjAccount.getType().compareTo(new BigDecimal(2)) == 0){
                         startMap.put("settlementCardDs","1");// 生成对私记录 值1
-                    }else{// 对私
-                        if(startMap.get("settlementCardDs") == null || (!startMap.get("settlementCardDs").equals("1"))){
+                    }else if(startMap.get("settlementCardDs") == null || (!startMap.get("settlementCardDs").equals("1"))){
                             startMap.put("settlementCardDs","0");
                         }
-                    }
                     if(orderAdjAccount.getType().compareTo(new BigDecimal(1)) == 0){
                         startMap.put("settlementCardDg","1");// 生成对公记录 值1
-                    }else{// 对公
-                        if(startMap.get("settlementCardDg") == null || (!startMap.get("settlementCardDg").equals("1"))){
+                    }else if(startMap.get("settlementCardDg") == null || (!startMap.get("settlementCardDg").equals("1"))){
                             startMap.put("settlementCardDg","0");
                         }
-                    }
                 }
                 // 启动审批
                 String proce = activityService.createDeloyFlow(null, workId, null, null, startMap);
@@ -1342,8 +1464,20 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                     logger.info("出纳申请提交审批，启动审批异常，添加审批关系失败{}:{}", orderAdj.getId(), proce);
                     throw new MessageException("出纳审批流启动失败：添加审批关系失败！");
                 }
-            }
 
+//                orderAdj.setReviewsStat(AgStatus.Approved.status);
+//                orderAdj.setReviewsDate(new Date());
+//                // 订单调整更新
+//                if (1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+//                    throw new MessageException("订单调整数据更新异常！");
+//                }
+
+            }
+            OOrderExample oOrderExample = new OOrderExample();
+            oOrderExample.or().andIdEqualTo(orderAdj.getOrderId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OOrder> oOrders = orderMapper.selectByExample(oOrderExample);
+            oOrders.get(0).setOrderStatus(OrderStatus.ENABLE.status);
+            orderMapper.updateByPrimaryKeySelective(oOrders.get(0));
             if (orderAdj.getRealRefundAmo().compareTo(BigDecimal.ZERO)>0){
                 logger.info("暂时不发送瑞大宝免税额度");
                 logger.info("订单调整审批通过,有退款,信息开始发送到kafka:{}",orderAdj.getId());
@@ -1529,7 +1663,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             BigDecimal refundAmount = orderAdj.getRefundAmount().subtract(orderAdj.getProRefundAmount()).subtract(orderAdj.getOffsetAmount());
             if (refundAmount.compareTo(BigDecimal.ZERO)>=0){
                 logger.info(orderAdj.getId()+"订单调整,退款金额大于0");
-                if (orderAdj.getRefundType().compareTo(OrderAdjRefundType.CDFQ_XXTK.code)==0){
+                if (orderAdj.getRefundType() != null && orderAdj.getRefundType().compareTo(OrderAdjRefundType.CDFQ_XXTK.code)==0){
                     orderAdj.setRealRefundAmo(refundAmount);
                     orderAdj.setSettleAmount(BigDecimal.ZERO);
                     orderAdj.setRefundStat(RefundStat.REFUNDING.key);
@@ -1578,6 +1712,8 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
         orderAdj.setoAmo(order.getoAmo());
         orderAdj.setIncentiveAmo(order.getIncentiveAmo());
         orderAdj.setPayAmo(order.getPayAmo());
+        orderAdj.setReviewsStat(AgStatus.Approved.status);
+        orderAdj.setReviewsDate(new Date());
         if (isZero) {
             if (StringUtils.isBlank(order.getRemark())){
                 order.setRemark("有退款");
@@ -1585,7 +1721,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 order.setRemark(order.getRemark() + "有退款");
             }
         }
-        order.setOrderStatus(OrderStatus.ENABLE.status);
+//        order.setOrderStatus(OrderStatus.ENABLE.status);
         if( 1 != orderMapper.updateByPrimaryKeySelective(order)){
             logger.error("更新订单失败!订单表id{}",order.getId());
             throw new MessageException("更新订单失败");
@@ -2590,8 +2726,8 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             String settleAmount = orderUpModelVo.getSettleAmount();//挂账金额
             BigDecimal proRefundAmount = orderAdj.getProRefundAmount();//退货手续费
             BigDecimal offsetAmount = orderAdj.getOffsetAmount();//抵扣欠款金额
-            if (realRefundAmo.compareTo(new BigDecimal(settleAmount).add(offsetAmount).add(proRefundAmount)) != 0) {
-                return AgentResult.fail("打款金额与应退金额不一致");
+            if (realRefundAmo.compareTo(new BigDecimal(settleAmount)/*.add(offsetAmount).add(proRefundAmount)*/) != 0) {
+                return AgentResult.fail("出款金额与应退金额不一致");
             }
         }
         return AgentResult.ok();
@@ -2745,13 +2881,15 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             if(orderAdj==null ){
                 throw new MessageException("没有此订单调整!"+ orderAdj.getId());
             }
-            if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
+            if (orderAdj.getReviewsStat().compareTo(AgStatus.Approved.status) != 0){
                 throw new MessageException("该任务审批状态异常!");
             }
-
-            orderAdj.setReviewsStat(AgStatus.Approved.status);
-            orderAdj.setReviewsDate(new Date());
-
+            orderAdj.setRefundStat(RefundStat.REFUNED.key);
+            orderAdj.setRefundTm(new Date());
+            // 订单调整更新
+            if ( 1 != orderAdjMapper.updateByPrimaryKeySelective(orderAdj)) {
+                throw new MessageException("订单调整数据更新异常！");
+            }
         } else if(actname.equals("reject_end")) { //审批拒绝
             logger.info("订单调整出纳审批完审批拒绝{}", busActRel.getBusId());
             busActRel.setActivStatus(AgStatus.Refuse.name());
@@ -2801,6 +2939,10 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 String oaacId = orderAdjAccountVo.getId();
                 OrderAdjAccount orderAdjAccount = orderAdjAccountMapper.selectByPrimaryKey(oaacId);
                 orderAdjAccount.setRefundTm(orderAdjAccountVo.getRefundTm());
+                if (1 !=orderAdjAccountMapper.updateByPrimaryKeySelective(orderAdjAccount)){
+                    logger.info("订单调整保存打款时间失败:{}", orderAdjAccount.getId());
+                    throw new ProcessException("订单调整保存打款时间失败");
+                }
                 // 保存打款附件
                 List<String> attFiles = orderAdjAccountVo.getTkattachmentsFiles();
                 AttachmentRel recordAtt = new AttachmentRel();
@@ -2815,14 +2957,15 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                         recordAtt.setId(idService.genId(TabId.a_attachment_rel));
                         logger.info("添加订单调整退款附件关系,订单调整ID{},附件ID{}",orderAdj.getId(),attfile);
                         if (1 != attachmentRelMapper.insertSelective(recordAtt)) {
-                            logger.info("订单调整图款:{}", "添加订单调整退款附件关系失败");
+                            logger.info("订单调整退款:{}", "添加订单调整退款附件关系失败");
                             throw new ProcessException("添加订单调整退款附件关系失败");
                         }
                     });
+                }else {
+                    throw new MessageException("请上传打款截图！");
                 }
             }
 
-            reqMap.put( "remit", true);
             //完成任务
             Map resultMap = activityService.completeTask(orderUpModelVo.getTaskId(), reqMap);
             if (resultMap == null) {
