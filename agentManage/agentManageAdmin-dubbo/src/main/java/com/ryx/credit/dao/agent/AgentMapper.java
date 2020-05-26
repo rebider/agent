@@ -57,4 +57,15 @@ public interface AgentMapper {
     List<Map<String,Object>> queryEchartDataList(@Param("map") Map<String,Object> map,@Param("page") Page page);
 
     int queryEchartDataCount(@Param("map") Map<String,Object> map);
+
+    /**
+     * 查询代理商信息及冻结信息
+     * @param par
+     * @return
+     */
+    List<Map<String,Object>> queryAgentFreezeInfo(Map<String,Object> par);
+
+    int queryAgentRiskCount(@Param("map") Map<String, Object> map);
+    List<Map<String, Object>> queryAgentRiskView(@Param("map") Map<String, Object> map,@Param("page") Page page);
+    List<AgentoutVo> exportAgentRisk(@Param("map") Map<String, Object> map);
 }

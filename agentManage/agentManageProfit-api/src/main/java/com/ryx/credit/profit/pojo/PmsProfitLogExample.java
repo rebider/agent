@@ -835,6 +835,76 @@ public class PmsProfitLogExample {
             addCriterion("IMPORT_TYPE not between", value1, value2, "importType");
             return (Criteria) this;
         }
+
+        public Criteria andImportTypeIsNull() {
+            addCriterion("IMPORT_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeIsNotNull() {
+            addCriterion("IMPORT_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeEqualTo(String value) {
+            addCriterion("IMPORT_TYPE =", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotEqualTo(String value) {
+            addCriterion("IMPORT_TYPE <>", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeGreaterThan(String value) {
+            addCriterion("IMPORT_TYPE >", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("IMPORT_TYPE >=", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeLessThan(String value) {
+            addCriterion("IMPORT_TYPE <", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeLessThanOrEqualTo(String value) {
+            addCriterion("IMPORT_TYPE <=", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeLike(String value) {
+            addCriterion("IMPORT_TYPE like", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotLike(String value) {
+            addCriterion("IMPORT_TYPE not like", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeIn(List<String> values) {
+            addCriterion("IMPORT_TYPE in", values, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotIn(List<String> values) {
+            addCriterion("IMPORT_TYPE not in", values, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeBetween(String value1, String value2) {
+            addCriterion("IMPORT_TYPE between", value1, value2, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotBetween(String value1, String value2) {
+            addCriterion("IMPORT_TYPE not between", value1, value2, "importType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

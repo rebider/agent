@@ -321,4 +321,56 @@
       update P_BUTTON_SET set BUTTON_2 = #{BUTTON_2,jdbcType=VARCHAR} where MONTH = #{MONTH,jdbcType=VARCHAR}
   </select>
 
+  <select id="selectByMap" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="selectRecord_unionSql"/>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+
+  <sql id="selectRecord_unionSql">
+    select
+        pr.BATCH_NO ,pr.UPLOAD_PATH ,pr.UPLOAD_NAME ,pr.UPLOAD_TIME ,
+        pr.STATUS ,to_char(pr.NOTE) NOTE ,pr.MONTH ,cu.NAME  ,pr.IMPORT_TYPE
+    from PMS_PROFIT_LOG pr
+    left join C_USER cu on pr.UPLOAD_USER=cu.ID
+    where 1 = 1
+    <if test="param.month != '' and param.month != null">
+      and pr.MONTH = #{param.month}
+    </if>
+    <if test="param.batchNo != '' and param.batchNo != null">
+      and pr.BATCH_NO = #{param.batchNo}
+    </if>
+    <if test="param.updateTime != '' and param.updateTime != null">
+      and pr.UPLOAD_TIME = #{param.uploadTime}
+    </if>
+    <if test="param.status != '' and param.status != null">
+      and pr.STATUS = #{param.status}
+    </if>
+    <if test="param.userCode != '' and param.userCode != null">
+      and cu.ID  = #{param.userCode}
+    </if>
+    <choose>
+      <when test="param.importType != '' and  param.importType != null">
+        <if test="param.importType == '00'.toString()">
+          and pr.IMPORT_TYPE is null
+        </if>
+        <if test="param.importType != '00'.toString()">
+          and pr.IMPORT_TYPE = #{param.importType}
+        </if>
+      </when>
+    </choose>
+    order by pr.UPLOAD_TIME desc
+  </sql>
+
+  <select id="getCountByMap" resultType="java.lang.Long">
+    select count(1) from(
+    <include refid="selectRecord_unionSql"/>
+    )
+  </select>
+
+  <update id="updataNoteAndStatusByBatchCode">
+    update PMS_PROFIT_LOG set status = #{status,jdbcType=VARCHAR} , note = #{note,jdbcType=VARCHAR}
+    where BATCH_NO = #{batchCode,jdbcType=VARCHAR}
+  </update>
+
 </mapper>

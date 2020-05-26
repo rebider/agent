@@ -29,14 +29,12 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
 /**
@@ -84,7 +82,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
 
            agents.forEach((cer)->{
 
-               FastMap par = FastMap.fastMap("id",cer.getAgUniqNum());
+               FastMap par = FastMap.fastMap("id",cer.getId());
                AgentCertification agentCertification = agentCertificationMapper.queryCers(par);
                 if (agentCertification!=null){
                     resStr.append(agentCertification.getOrgAgName()).append(",");
@@ -96,7 +94,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                Date date = Date.from(zdt.toInstant());
 
                agentCer.setId(idService.genIdInTran(TabId.a_agent_certification));
-               agentCer.setAgentId(cer.getAgUniqNum());
+               agentCer.setAgentId(cer.getId());
                agentCer.setReqRegNo("");
                agentCer.setReqEntName(cer.getAgName());
                agentCer.setReqCerTm(date);
@@ -271,6 +269,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                         agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
                         agentFreezePort.setFreezeNum(agentCertification.getId());
                         agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
+                        agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
                         logger.info("代理商{}开始冻结",agent.getId());
                             AgentResult agentFreeze = agentFreeze(agentFreezePort);
                             if (agentFreeze.isOK()){

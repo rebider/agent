@@ -46,6 +46,14 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     @Autowired
     IdService idService;
 
+    @Override
+    public PageInfo selectByMap(Map<String,String> param,Page page){
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(pmsProfitLogMapper.selectByMap(param,page));
+        pageInfo.setTotal((int) pmsProfitLogMapper.getCountByMap(param));
+        return pageInfo;
+    }
+
 
     @Override
     public long countByExample(PmsProfitLogExample example) {

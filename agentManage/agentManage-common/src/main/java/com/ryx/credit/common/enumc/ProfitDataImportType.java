@@ -1,4 +1,5 @@
 package com.ryx.credit.common.enumc;
+<<<<<<< HEAD
 
 import java.math.BigDecimal;
 
@@ -8,6 +9,8 @@ import java.math.BigDecimal;
  * @Version 1.0
  */
 public enum ProfitDataImportType {
+    FRSJDR("00","分润数据导入"),
+    FXSJDR("01","返现数据导入"),
     DYDL("77","一次请款"),
     DEDL("88","二次请款"),
     DSDL("99","补出款");
@@ -35,5 +38,4 @@ public enum ProfitDataImportType {
             }
         }
         return "";
-    }
 }

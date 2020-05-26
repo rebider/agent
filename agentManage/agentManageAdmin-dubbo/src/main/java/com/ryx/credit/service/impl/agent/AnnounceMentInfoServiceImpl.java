@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -301,6 +302,109 @@ public class AnnounceMentInfoServiceImpl implements AnnounceMentInfoService {
     @Override
     public List<Attachment> queryAttByAnnoid(String id,String busType) {
         return attachmentMapper.accessoryQuery(id, busType);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    public ResultVO updateAnnInfo(AnnounceMentInfoVo announceMentInfoVo) throws MessageException {
+        ZoneId zoneId = ZoneId.systemDefault();
+        ZonedDateTime zdt = LocalDateTime.now().atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
+        Date date = Date.from(zdt.toInstant());
+        AnnounceMentInfo announceMentInfo = announceMentInfoMapper.selectByPrimaryKey(announceMentInfoVo.getAnnId());
+        if (null == announceMentInfo){
+            return ResultVO.fail("公告不存在!");
+        }
+        announceMentInfoVo.setAnnoStat(AnnoStat.WAIT.code);
+        announceMentInfoVo.setCreateTm(date);
+        try {
+            if (1 != announceMentInfoMapper.updateByPrimaryKeyWithBLOBs(announceMentInfoVo)){
+                return ResultVO.fail("未更新公告!");
+            }
+        }catch (Exception e){
+            logger.error("更新公告表异常");
+            return ResultVO.fail("更新公告失败!");
+        }
+
+        AnnoPlatformRelaExample annoPlatformRelaExample = new AnnoPlatformRelaExample();
+        annoPlatformRelaExample.or().andAnnoIdEqualTo(announceMentInfoVo.getAnnId());
+        try {
+            annoPlatformRelaMapper.deleteByExample(annoPlatformRelaExample);
+        }catch (Exception e){
+            throw new MessageException("删除关联平台信息失败");
+        }
+
+
+        String orgs = announceMentInfoVo.getOrgs();
+        List<AnnoPlatformRela> ralas = new ArrayList<>();
+        String relaId = idService.genIdInTran(TabId.A_ANNO_PLATFORM_RELA);
+        AnnoPlatformRela organnoPlatformRela = new AnnoPlatformRela();
+        organnoPlatformRela.setId(relaId);
+        organnoPlatformRela.setAnnoId(announceMentInfoVo.getAnnId());
+        organnoPlatformRela.setRangType(RangType.org.code);
+        organnoPlatformRela.setRangValue(orgs.toString());
+        ralas.add(organnoPlatformRela);
+        List<String> plats = announceMentInfoVo.getPlats();
+
+        plats.forEach((plat)->{
+            logger.info("添加平台{}",plat);
+            AnnoPlatformRela platRela = new AnnoPlatformRela();
+            platRela.setId(idService.genIdInTran(TabId.A_ANNO_PLATFORM_RELA));
+            platRela.setAnnoId(announceMentInfoVo.getAnnId());
+            platRela.setRangType(RangType.plat.code);
+            platRela.setRangValue(plat);
+            ralas.add(platRela);
+        });
+
+        List<String> busTypes = announceMentInfoVo.getBusTypes();
+        busTypes.forEach((busType)->{
+            logger.info("添加业务{}",busType);
+            AnnoPlatformRela platRela = new AnnoPlatformRela();
+            platRela.setId(idService.genIdInTran(TabId.A_ANNO_PLATFORM_RELA));
+            platRela.setAnnoId(announceMentInfoVo.getAnnId());
+            platRela.setRangType(RangType.bustype.code);
+            platRela.setRangValue(busType);
+            ralas.add(platRela);
+        });
+        logger.info("添加关联表{}",ralas.toString());
+        try {
+            annoPlatformRelaService.batchSave(ralas);
+        }catch (Exception e){
+            logger.error("保存公告关联表异常[修改]");
+            return ResultVO.fail("修改公告失败,关联表异常!");
+        }
+
+        AttachmentRelExample recorddel = new AttachmentRelExample();
+        recorddel.or().andSrcIdEqualTo(announceMentInfoVo.getAnnId());
+        attachmentRelMapper.deleteByExample(recorddel);
+
+        List<String> attFiles = announceMentInfoVo.getAttFiles();
+        if(attFiles!=null){
+            attFiles.forEach(attfile->{
+
+                if (StringUtils.isEmpty(attfile)) return;
+
+                Attachment attachment = attachmentMapper.selectByPrimaryKey(attfile);
+//            if(attachment!=null){
+//                if(AttDataTypeStatic.GGFJ.code.equals(attachment.getAttDataType()+"")){
+//                    isHaveYYZZ = true;
+//                }
+//            }
+                AttachmentRel record = new AttachmentRel();
+                record.setAttId(attfile);
+                record.setSrcId(announceMentInfoVo.getAnnId());
+                record.setcUser(announceMentInfoVo.getPublisher());
+                record.setcTime(announceMentInfoVo.getCreateTm());
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(AttachmentRelType.AnnounceMent.name());
+                record.setId(idService.genId(TabId.a_attachment_rel));
+                logger.info("添加公告附件关系,公告ID{},附件ID{}",announceMentInfoVo.getAnnId(),attfile);
+                if (1 != attachmentRelMapper.insertSelective(record)) {
+                    logger.info("公告添加:{}", "添加公告附件关系失败");
+                    throw new ProcessException("添加公告附件关系失败");
+                }
+            });
+        }
+        return ResultVO.success("修改公告保存成功!");
     }
 
 }

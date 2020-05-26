@@ -14,7 +14,8 @@ public class OrderoutVo implements Serializable{
     private String num;//单号
     private String payAmo;//总金额
     private String apytime;//订单日期
-    private String agUniqNum;//唯一码
+    private String agentId;//代理商唯一编码
+    private String agUniqNum;//自编唯一码
     private String agName;//代理商名称
     private String platformName;//平台
     private String platformType;//平台
@@ -23,7 +24,7 @@ public class OrderoutVo implements Serializable{
     private String downPaymentUser;//付款人
     private String comName;//收款地方
     private BigDecimal actualReceipt;//付款金额
-    private String xxAmount;//付款金额
+    private String xxAmount;//首付款金额
     private Date actualReceiptDate;//收款日期
     private String actualTime;
     private String oinuretime;//审批时间
@@ -43,12 +44,12 @@ public class OrderoutVo implements Serializable{
     private BigDecimal ykfrAmt;//应扣分润金额
     private String downPaymentDate;//分润扣款开始月份
     private BigDecimal downPaymentCount;//分期扣分润期数
-    private BigDecimal downPayment;//首付金额
-    private BigDecimal mqykAmt;//每期应扣分润金额
+    private BigDecimal downPayment;////首付款合计
+    private String mqykAmt;//每期应扣分润金额
     private BigDecimal skfrAmt;//实扣分润金额
     private BigDecimal fqdkAmt;//分期打款金额
     private BigDecimal frdkCount;//分期打款期数
-    private BigDecimal sjdkAmt;//实际打款金额
+    private BigDecimal sjdkAmt;//实际还款金额
     private BigDecimal syqkAmt;//剩余欠款
 
     private String proRelPrice;//单价
@@ -57,13 +58,13 @@ public class OrderoutVo implements Serializable{
     private String orgName;//顶级机构
 
     private String payUser;//打款人
-    private String realRecTime;//打款时间
+    private String realRecTime;//实际到账日期
     private String checkDate;//核款日期
     private String remark;//备注
 
     private String busNum;//业务平台编码
     private String mqydkAmt;//每期应打款金额
-    private String profitMouth;//是否扣存量
+    private String profitMouth;//存量分润
     private String profitForm;//分润形式
 
     private String toPickNum;//待配货
@@ -77,6 +78,13 @@ public class OrderoutVo implements Serializable{
     private String proCode;//商品编号
     private String proName;//商品名称
 
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
 
     public String getPlatformType() {
         return platformType;
@@ -278,11 +286,11 @@ public class OrderoutVo implements Serializable{
         this.downPayment = downPayment;
     }
 
-    public BigDecimal getMqykAmt() {
+    public String getMqykAmt() {
         return mqykAmt;
     }
 
-    public void setMqykAmt(BigDecimal mqykAmt) {
+    public void setMqykAmt(String mqykAmt) {
         this.mqykAmt = mqykAmt;
     }
 

@@ -769,6 +769,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             String startSn = (String) map.get("startSn");
             String endSn = (String) map.get("endSn");
 
+            //检查sn是否在划拨，换活动，退货中
+            FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                    .fastMap("beginSN", startSn)
+                    .putKeyV("endSN", endSn)
+            );
+            if (!FastMap.isSuc(fastMap)) throw new ProcessException(fastMap.get("msg").toString());
+
             //生成退货明细
             OReturnOrderDetail returnOrderDetail = null;
             try {

@@ -1,11 +1,11 @@
 package com.ryx.credit.profit.dao;
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.profit.pojo.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public interface PmsProfitLogMapper {
     long countByExample(PmsProfitLogExample example);
@@ -27,6 +27,7 @@ public interface PmsProfitLogMapper {
     List<Map<String,Object>> checkoutData(@Param("agentId")  String agentId ,@Param("busCode") String busCode);
 
     Map<String,Object> getLoginName(@Param("userId")  String userId );
+
     int  save(PmsProfit record);
 
     /**
@@ -53,4 +54,9 @@ public interface PmsProfitLogMapper {
 
 
 
+    List<Map<String,Object>> selectByMap(@Param("param")Map<String,String>param,@Param("page") Page page);
+
+    long getCountByMap(@Param("param")Map<String,String>param);
+
+    int updataNoteAndStatusByBatchCode(@Param("batchCode") String batchCode, @Param("status") String status, @Param("note") String note);
 }

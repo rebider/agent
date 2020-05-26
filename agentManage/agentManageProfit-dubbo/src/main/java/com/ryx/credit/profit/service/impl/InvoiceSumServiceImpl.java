@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.ryx.credit.common.enumc.FreeType;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -134,7 +136,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 }
             }
             if (surplusAmt.compareTo(BigDecimal.ZERO) <= 0) {
-                invocationIntUnFreeze(invoiceSum.getAgentId(),param.get("user").toString(),"到票解冻");
+                //invocationIntUnFreeze(invoiceSum.getAgentId(),param.get("user").toString(),"到票解冻");
                 invoiceSum.setInvoiceStatus("99");
             }
         } catch (Exception e) {
@@ -372,10 +374,10 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                                         ));
                         if(invoiceSum.getOwnInvoice().compareTo(BigDecimal.ZERO) == 1){
                             invoiceSum.setInvoiceStatus("00");
-                            invocationIntFreeze(invoiceSum.getAgentId(),userId,invoiceSum.getId(),"欠票数据导入-冻结");
+                           // invocationIntFreeze(invoiceSum.getAgentId(),userId,invoiceSum.getId(),"欠票数据导入-冻结");
                         }else {
                             invoiceSum.setInvoiceStatus("99");
-                            invocationIntUnFreeze(invoiceSum.getAgentId(),userId,"欠票数据导入-解冻 ");
+                           // invocationIntUnFreeze(invoiceSum.getAgentId(),userId,"欠票数据导入-解冻 ");
                         }
                         invoiceSumMapper.insertSelective(invoiceSum);
                     }else{
@@ -393,10 +395,10 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                                        );
                         if(invoiceSum.getOwnInvoice().compareTo(BigDecimal.ZERO) == 1){
                             invoiceSum.setInvoiceStatus("00");
-                            invocationIntFreeze(invoiceSum.getAgentId(),userId,invoiceSum.getId(),"欠票数据导入-冻结");
+                           // invocationIntFreeze(invoiceSum.getAgentId(),userId,invoiceSum.getId(),"欠票数据导入-冻结");
                         }else {
                             invoiceSum.setInvoiceStatus("99");
-                            invocationIntUnFreeze(invoiceSum.getAgentId(),userId,"欠票数据导入-解冻");
+                           // invocationIntUnFreeze(invoiceSum.getAgentId(),userId,"欠票数据导入-解冻");
                         }
                         invoiceSumMapper.updateByPrimaryKeySelective(invoiceSum);
                     }
@@ -452,6 +454,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         agentFreezePort.setFreezeCause("QPDJ");
         agentFreezePort.setFreezeNum(agentId);
         agentFreezePort.setRemark(reason);
+        agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
         AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
         if("200".equals(agentResult.getStatus())){
             logger.info("欠票冻结："+agentId+",代理商冻结成功！");
