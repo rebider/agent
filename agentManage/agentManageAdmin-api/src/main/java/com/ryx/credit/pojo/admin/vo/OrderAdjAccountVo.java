@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 public class OrderAdjAccountVo extends OrderAdjAccount implements Serializable {
-    private String accountFile;
+    private List<String> accountFile;
 
     private List<Attachment> attachments;
 
@@ -17,11 +17,11 @@ public class OrderAdjAccountVo extends OrderAdjAccount implements Serializable {
 
     private List<Attachment> tkattachments;
 
-    public String getAccountFile() {
+    public List<String> getAccountFile() {
         return accountFile;
     }
 
-    public void setAccountFile(String accountFile) {
+    public void setAccountFile(List<String> accountFile) {
         this.accountFile = accountFile;
     }
 

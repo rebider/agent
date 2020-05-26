@@ -34,7 +34,6 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="REFUND_COMPANY" jdbcType="VARCHAR" property="refundCompany" />
-    <result column="ACCOUNTFILE" jdbcType="VARCHAR" property="accountFile"/>
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -303,10 +302,8 @@
   </sql>
   <select id="selectListByExample" resultMap="BaseResultVoMap" parameterType="com.ryx.credit.pojo.admin.order.OrderAdjAccount">
     select
-    ac.* ,
-    (select  LISTAGG(ar.src_id,',') WITHIN GROUP(ORDER BY ar.src_id)
-    from A_ATTACHMENT_REL ar where ar.SRC_ID = ac.ID )  as accountFile
-    from O_ORDER_ADJ_ACCOUNT ac left join A_ATTACHMENT_REL ar on ar.SRC_ID = ac.ID
+    ac.*
+    from O_ORDER_ADJ_ACCOUNT ac
     <where>
       <if test="adjId != null">
        and ac.ADJ_ID = #{adjId,jdbcType=VARCHAR}
