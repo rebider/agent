@@ -72,4 +72,6 @@ public interface IPmsProfitLogService {
      * @return
      */
     Map<String, Object> btnUpdate(Map<String, String> param);
+
+    PageInfo selectByMap(Map<String,String> param,Page page);
 }
