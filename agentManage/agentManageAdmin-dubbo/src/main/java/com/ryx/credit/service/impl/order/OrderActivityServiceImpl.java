@@ -840,7 +840,6 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     String machineManufName = String.valueOf(map.get("machineManufName"));
                     String machineId = String.valueOf(map.get("machineId"));
                     String posType = String.valueOf(map.get("posType"));
-                    String posActivityId = String.valueOf(map.get("posActivityId"));
                     Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
                     if (manufaName == null) {
                         throw new MessageException(machineManufName + "厂商不存在");
@@ -850,10 +849,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
                     activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
                     activityCriteria.andPosTypeEqualTo(posType);
-                    if (proModel.equals(PlatformType.POS.msg)) {
+                    if (null != map.get("posActivityId")) {
+                        activityCriteria.andBusProCodeEqualTo(String.valueOf(map.get("posActivityId")));
+                    } else {
                         activityCriteria.andBusProCodeEqualTo(machineId);
-                    } else if (proModel.equals(PlatformType.SSPOS.code)) {
-                        activityCriteria.andBusProCodeEqualTo(posActivityId);
                     }
 
                     List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
