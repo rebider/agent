@@ -1340,6 +1340,22 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                     throw new MessageException("该任务审批状态异常!");
                 }
             }
+            //退回时需取消抵扣记录
+            if( !"boss".equals(orgCode) && orderUpModelVo.getApprovalResult().equals(ApprovalType.BACK.getValue())){
+                if(orderAdj.getOffsetAmount().compareTo(BigDecimal.ZERO)>0&& orderAdj.getLogicalVersion()!=null && orderAdj.getLogicalVersion().compareTo(BigDecimal.ONE)==0){
+                    AgentResult agentResult = orderOffsetService.OffsetArrearsCancle(orderAdj.getOffsetAmount(), DDTZ.code, orderAdj.getId());
+                    if (!agentResult.isOK()){
+                        throw new MessageException("订单调整抵扣欠款数据更新异常！");
+                    }else {
+                        orderAdj.setOffsetAmount(BigDecimal.ZERO);
+                        orderAdj.setRealRefundAmo(BigDecimal.ZERO);
+                        orderAdj.setProRefundAmount(BigDecimal.ZERO);
+                        if(!approvalTaskSettle(orderAdj).isOK()){
+                            throw new MessageException("更新订单调整记录失败!");
+                        };
+                    }
+                }
+            }
             //完成任务
             Map resultMap = activityService.completeTask(orderUpModelVo.getTaskId(), reqMap);
             if (resultMap == null) {
