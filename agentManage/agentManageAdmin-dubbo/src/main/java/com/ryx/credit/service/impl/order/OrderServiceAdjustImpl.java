@@ -163,10 +163,12 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             agentResult.setMsg("该订单不存在!");
             return agentResult;
         }
-        List<OrderAdjAccountVo>  accounts = orderUpModelVo.getAccounts();
-        if (null == accounts || accounts.size() == 0){
-            agentResult.setMsg("请填写账户信息！");
-            return agentResult;
+        if (new BigDecimal(orderUpModelVo.getRefundAmount()).compareTo(BigDecimal.ZERO) != 0){
+            List<OrderAdjAccountVo>  accounts = orderUpModelVo.getAccounts();
+            if (null == accounts || accounts.size() == 0){
+                agentResult.setMsg("请填写账户信息！");
+                return agentResult;
+            }
         }
         order.setOrderStatus(OrderStatus.LOCK.status);
         if (orderMapper.updateByPrimaryKey(order)!=1){
@@ -736,7 +738,13 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             agentResult.setMsg(orderUpModelVo.getOrderId()+"-此订单不存在！");
             return agentResult;
         }
-
+        if (new BigDecimal(orderUpModelVo.getRefundAmount()).compareTo(BigDecimal.ZERO) != 0){
+            List<OrderAdjAccountVo>  accounts = orderUpModelVo.getAccounts();
+            if (null == accounts || accounts.size() == 0){
+                agentResult.setMsg("请填写账户信息！");
+                return agentResult;
+            }
+        }
         List<OrderAdjAccountVo>  accounts = orderUpModelVo.getAccounts();
         if (null == accounts || accounts.size() == 0){
             agentResult.setMsg("请填写账户信息！");
@@ -1350,6 +1358,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                         orderAdj.setOffsetAmount(BigDecimal.ZERO);
                         orderAdj.setRealRefundAmo(BigDecimal.ZERO);
                         orderAdj.setProRefundAmount(BigDecimal.ZERO);
+                        orderAdj.setRefundType(OrderAdjRefundType.CDFQ_GZ.code);
                         if(!approvalTaskSettle(orderAdj).isOK()){
                             throw new MessageException("更新订单调整记录失败!");
                         };
