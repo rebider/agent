@@ -95,8 +95,12 @@ public class AccountAuthServiceImpl implements AccountAuthService {
         criteria.andPlatformTypeEqualTo(platformType);
         criteria.andAuthCodeEndTimeGreaterThan(new Date());
         List<AuthSysCode> authSysCodes = authSysCodeMapper.selectByExample(authSysCodeExample);
-        if(authSysCodes.size()!=0){
-            throw new MessageException(AuthCode.AUTH_CODE_VALID.getContent());
+        if(authSysCodes.size()==1){
+            Map<String,Object> resultMap = new HashMap<>();
+            resultMap.put("authCode",authSysCodes.get(0).getAuthCode());
+            resultMap.put("authCodeBeginTime",authSysCodes.get(0).getAuthCodeBeginTime().getTime());
+            resultMap.put("authCodeEndTime",authSysCodes.get(0).getAuthCodeEndTime().getTime());
+            return resultMap;
         }
         AuthSysCodeExample authSysCodeExample1 = new AuthSysCodeExample();
         AuthSysCodeExample.Criteria criteria1 = authSysCodeExample1.createCriteria();
