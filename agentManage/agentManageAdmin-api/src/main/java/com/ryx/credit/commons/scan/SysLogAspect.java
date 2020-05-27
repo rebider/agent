@@ -77,7 +77,25 @@ public class SysLogAspect {
                     sysLog.setOptContent(strMessage);
                     sysLog.setCreateTime(new Date());
                     if (request != null) {
-                        sysLog.setClientIp(request.getRemoteAddr());
+                        String ip = request.getHeader("X-Real-IP");
+                        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                            ip = request.getHeader("X-Forwarded-For");
+                        }
+                        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                            ip = request.getHeader("Proxy-Client-IP");
+                        }
+                        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                            ip = request.getHeader("WL-Proxy-Client-IP");
+                        }
+                        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                            ip = request.getRemoteAddr();
+                        }
+                        // 处理多IP的情况（只取第一个IP）
+                        if (ip != null && ip.contains(",")) {
+                            String[] ipArray = ip.split(",");
+                            ip = ipArray[0];
+                        }
+                        sysLog.setClientIp(ip);
                     }
                     LOGGER.info(sysLog.toString());
                     sysLogService.insert(sysLog);
@@ -91,6 +109,9 @@ public class SysLogAspect {
     }
 
     private boolean isWriteLog(String method) {
+        if(1==1){
+            return true;
+        }
         String[] pattern = {"login", "logout", "add", "edit", "delete", "grant"};
         for (String s : pattern) {
             if (method.indexOf(s) > -1) {
