@@ -1252,6 +1252,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             reqMap.put("approvalPerson", userId);
             reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
             reqMap.put("taskId", orderUpModelVo.getTaskId());
+            reqMap.put("mySid", orderUpModelVo.getSid());
             //下一个节点参数
             if (org.apache.commons.lang.StringUtils.isNotEmpty(orderUpModelVo.getOrderAdjAprDept()))
                 reqMap.put("dept", orderUpModelVo.getOrderAdjAprDept());
