@@ -6,6 +6,9 @@ import com.ryx.credit.commons.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /***
@@ -23,7 +26,7 @@ public class ChinaMobileForJYHttpReq {
     private final static String ryxCode = "2001841663"; //集团编码
     private final static String version = "3.0"; //接口版本
     private final static String format = "json"; //通信报文格式
-    private final static String JY_MOBILE_CARD_URL = "http://120.197.89.173:8081/openapi/router";
+    private final static String JY_MOBILE_CARD_URL = "https://api.iot.gd.chinamobile.com/openapi/router";
 
     private static Logger log = LoggerFactory.getLogger(ChinaMobileForJYHttpReq.class);
 
@@ -59,7 +62,7 @@ public class ChinaMobileForJYHttpReq {
             paramMap.put("sign",sign);
             paramMap= ApiUtils.sortMap(paramMap);
             log.info("揭阳移动接口查询状态请求参数：iccids:{},transId:{}",iccids,transId);
-            String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
+            String result = doPost( paramMap);
             log.info("揭阳移动接口查询状态返回参数：result:{}",result);
             if(StringUtils.isBlank(result)){
                 AppConfig.sendEmails("接口请求错误：result："+result, "物联网移动接口请求异常,方法batchQueryCardStatus");
@@ -96,7 +99,7 @@ public class ChinaMobileForJYHttpReq {
             paramMap.put("sign",sign);
             paramMap= ApiUtils.sortMap(paramMap);
             log.info("揭阳移动接口批量号码停开机请求参数：msisdns:{},optType:{}",msisdns,optType);
-            String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
+            String result = doPost( paramMap );
             log.info("揭阳移动接口批量号码停开机返回参数：{}",result);
             String decrypt = DESUtils.decrypt(result, secretKey);
             log.info("揭阳移动接口批量号码停开机返回参数：{}",decrypt);
@@ -126,7 +129,7 @@ public class ChinaMobileForJYHttpReq {
             paramMap.put("sign",sign);
             paramMap= ApiUtils.sortMap(paramMap);
             log.info("揭阳移动接口根据订单号查询返回结果请求参数：orderNo:{}",orderNo);
-            String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
+            String result = doPost( paramMap );
             log.info("揭阳移动接口根据订单号查询返回结果返回参数：{}",result);
             String decrypt = DESUtils.decrypt(result, secretKey);
             log.info("揭阳移动接口根据订单号查询返回结果返回参数：{}",decrypt);
@@ -159,7 +162,7 @@ public class ChinaMobileForJYHttpReq {
             paramMap.put("sign",sign);
             paramMap= ApiUtils.sortMap(paramMap);
             log.info("揭阳移动接口单个码停开机请求参数：msisdn:{},optType:{},transId:{}",msisdn,optType,transId);
-            String result = HttpClientUtil.doPost(JY_MOBILE_CARD_URL, paramMap);
+            String result = doPost( paramMap );
             log.info("揭阳移动接口单个号码停开机返回参数：result:{}",result);
             if(StringUtils.isBlank(result)){
                 return "";
@@ -174,14 +177,24 @@ public class ChinaMobileForJYHttpReq {
         return "";
     }
 
+    public static String doPost(Map<String,String> paramMap) throws NoSuchAlgorithmException, KeyManagementException, IOException {
+        StringBuilder stringBuilder = new StringBuilder().append(JY_MOBILE_CARD_URL).append("?");
+        for (String key : paramMap.keySet()) {
+            stringBuilder.append(key).append("=").append(paramMap.get(key)).append("&");
+        }
+        stringBuilder.delete(stringBuilder.length()-1,stringBuilder.length());
+        String url = stringBuilder.toString();
+        byte[] resp = HttpsClientUtil.post(url , null);
+        return new String(resp,"UTF-8");
+    }
 
     public static void main(String[] args){
 //        queryByOrderNo("B_OI_CARDOFF_20191211105335");
 
 //        msisdnSwitch("1440420214213", JyMobileOptType.STOP.getValue());
-        msisdnSwitch("1440420214213", JyMobileOptType.OPEN.getValue());
+//        msisdnSwitch("1440420214213", JyMobileOptType.OPEN.getValue());
 
-//        batchQueryCardStatus("898604421919C0184213");
+        batchQueryCardStatus("898604421919C0184213");
     }
 
 
