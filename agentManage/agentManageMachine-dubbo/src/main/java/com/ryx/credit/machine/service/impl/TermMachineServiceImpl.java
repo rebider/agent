@@ -172,6 +172,8 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return mposTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
         } else if (PlatformType.RDBPOS.code.equals(platformType.name())){
             return rdbTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
+        } else if (PlatformType.SSPOS.code.equals(platformType.name())){
+            return sPosTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
         }
         return AgentResult.fail("未知业务平台");
     }

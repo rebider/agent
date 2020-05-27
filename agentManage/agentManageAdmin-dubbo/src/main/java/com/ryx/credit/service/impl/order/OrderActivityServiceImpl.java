@@ -815,7 +815,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 e.printStackTrace();
                 throw new MessageException("查询机具sn异常:" + e.getLocalizedMessage());
             }
-        } else if (proModel.equals(PlatformType.POS.msg)) {
+        } else if (proModel.equals(PlatformType.POS.code) || proModel.equals(PlatformType.SSPOS.code)) {
             try {
                 AgentResult agentResult = termMachineService.querySnMsg(PlatformType.POS, snStart, snEnd);
                 if (!agentResult.isOK()) {
@@ -840,6 +840,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     String machineManufName = String.valueOf(map.get("machineManufName"));
                     String machineId = String.valueOf(map.get("machineId"));
                     String posType = String.valueOf(map.get("posType"));
+                    String posActivityId = String.valueOf(map.get("posActivityId"));
                     Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
                     if (manufaName == null) {
                         throw new MessageException(machineManufName + "厂商不存在");
@@ -848,10 +849,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     OActivityExample oActivityExample = new OActivityExample();
                     OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
                     activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                    //activityCriteria.andVenderEqualTo(manufaValue);
-                    //activityCriteria.andProModelEqualTo(tmsModel);
                     activityCriteria.andPosTypeEqualTo(posType);
-                    activityCriteria.andBusProCodeEqualTo(machineId);
+                    if (proModel.equals(PlatformType.POS.msg)) {
+                        activityCriteria.andBusProCodeEqualTo(machineId);
+                    } else if (proModel.equals(PlatformType.SSPOS.code)) {
+                        activityCriteria.andBusProCodeEqualTo(posActivityId);
+                    }
+
                     List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
                     if (oActivities == null) {
                         throw new MessageException(posSn + "活动未找到");
