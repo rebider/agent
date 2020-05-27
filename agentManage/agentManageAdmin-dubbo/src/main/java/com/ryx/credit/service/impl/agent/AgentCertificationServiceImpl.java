@@ -81,8 +81,8 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                }
            }
            //无需再次查询处理中或者待处理的数据；
-           /* List<AgentCertification> agentCertifications = new ArrayList<>();
-            List<AgentCertification> agentCertificationList = agentCertificationMapper.queryCersByAgent(list);
+            List<AgentCertification> agentCertifications = new ArrayList<>();
+            /*List<AgentCertification> agentCertificationList = agentCertificationMapper.queryCersByAgent(list);
             if(null!=agentCertificationList && agentCertificationList.size()>0){
                 for (AgentCertification agentCertification : agentCertificationList) {
                     resStr.append(agentCertification.getOrgAgName()).append(",");
