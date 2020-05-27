@@ -80,14 +80,15 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                    list.add(agent.getId());
                }
            }
-            List<AgentCertification> agentCertifications = new ArrayList<>();
+           //无需再次查询处理中或者待处理的数据；
+           /* List<AgentCertification> agentCertifications = new ArrayList<>();
             List<AgentCertification> agentCertificationList = agentCertificationMapper.queryCersByAgent(list);
             if(null!=agentCertificationList && agentCertificationList.size()>0){
                 for (AgentCertification agentCertification : agentCertificationList) {
                     resStr.append(agentCertification.getOrgAgName()).append(",");
                     continue;
                 }
-            }
+            }*/
             agents.forEach((cer)->{
                 FastMap par = FastMap.fastMap("id",cer.getId());
                 AgentCertification agentCer = new AgentCertification();
@@ -551,6 +552,13 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
     @Override
     public List<AgentCertification> queryCersByAgent(List ids) {
         return agentCertificationMapper.queryCersByAgent(ids);
+    }
+
+    @Override
+    public long queryCertifiByCerPro() {
+        AgentCertificationExample example =new AgentCertificationExample();
+        AgentCertificationExample.Criteria criteria = example.or().andCerProStatIn(Arrays.asList(Status.STATUS_0.status, Status.STATUS_1.status));
+        return agentCertificationMapper.countByExample(example);
     }
 
     /**

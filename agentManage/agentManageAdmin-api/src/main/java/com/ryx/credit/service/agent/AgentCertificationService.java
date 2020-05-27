@@ -6,6 +6,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentCertification;
+import com.ryx.credit.pojo.admin.agent.AgentCertificationExample;
 import com.ryx.credit.pojo.admin.vo.AgentCertifiVo;
 
 import java.util.List;
@@ -36,4 +37,6 @@ public interface AgentCertificationService {
     int updateCertifi(AgentCertification agentCertification);
 
     List<AgentCertification> queryCersByAgent(List ids);
+
+    long queryCertifiByCerPro();
 }
