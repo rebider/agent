@@ -88,6 +88,11 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 						return new AgentResult(405,"认证名称不一致，请重新输入", dataMap);
 					}
 				}
+				if(StringUtils.isNotBlank(dataMap.getString("enterpriseStatus"))){
+					if(!dataMap.getString("enterpriseStatus").startsWith("在营")){
+						return new AgentResult(405,"非法营业状态", dataMap);
+					}
+				}
 				return AgentResult.ok(dataMap);
 			}
 		} catch (Exception e) {
