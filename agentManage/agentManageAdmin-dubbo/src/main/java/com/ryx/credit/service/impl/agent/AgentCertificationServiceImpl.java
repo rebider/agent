@@ -290,8 +290,24 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                             agent.getAgBusLice().compareTo(date)!=0 ||
                             !agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
                         logger.info("认证成功，与本地信息不符",agentCertification.getId());
+                        if(!agent.getAgLegal().equals(dataObj.getString("frName"))){
+                            remark+="法人姓名,";
+                        }
+                        if(!agent.getAgName().equals(dataObj.getString("enterpriseName"))){
+                            remark+="企业名称,";
+                        }
+                        if(!agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
+                            remark+="营业执照,";
+                        }
+                        if(agent.getAgBusLicb().compareTo(dataObj.getDate("openFrom"))!=0){
+                            remark+="经营开始日期,";
+                        }
+                        if( agent.getAgBusLice().compareTo(date)!=0){
+                            remark+="经营结束日期,";
+                        }
+                        remark = remark.substring(0,remark.length() - 1);
                         cerResStatus = CerResStatus.INCONFORMITY.status;
-                        remark+="认证成功，与本地信息不符";
+                        remark+="与本地信息不符";
                         map.put("remark",remark);
                         map.put("cerResStatus",cerResStatus);
                         if(null!=map && null!=(BigDecimal) map.get("cerResStatus")){
