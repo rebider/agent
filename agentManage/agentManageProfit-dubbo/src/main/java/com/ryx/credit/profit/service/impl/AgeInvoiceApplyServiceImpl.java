@@ -202,9 +202,12 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                         }
                     }
 
-                    //判断发票类型
+                    //判断发票类型 （税点0的普通纸质、所有专用纸质）
                     if("1".equals(invoiceApply.getYsResult())){
-                        if("4".equals(map.get("invoiceType").toString())){
+                        if("3".equals(map.get("invoiceType").toString())
+                                && BigDecimal.ZERO.equals(invoiceApply.getTax())){
+                            invoiceApply.setYsResult("1");
+                        }else if("4".equals(map.get("invoiceType").toString())){
                             invoiceApply.setYsResult("1");
                         }else{
                             invoiceApply.setYsResult("0");
@@ -266,7 +269,14 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                         BigDecimal invoiceTax = invoiceApply.getTax();
                         if(invoiceTax != null){
                             BigDecimal agentTax = invoiceApplyMapper.getAgentTaxByAgentId(agentId);
-                            if(invoiceTax.compareTo(agentTax) != 0){
+                            if(agentTax.compareTo(new BigDecimal("0.03")) == 0){
+                                if(invoiceTax.compareTo(new BigDecimal("0.03")) != 0
+                                        && invoiceTax.compareTo(new BigDecimal("0.01")) != 0
+                                        && invoiceTax.compareTo(BigDecimal.ZERO) != 0){
+                                    invoiceApply.setYsResult("0");
+                                    invoiceApply.setRev1("代理商税点为0.03时,只允许发票税点为(0.03、0.01、0)");
+                                }
+                            }else if(invoiceTax.compareTo(agentTax) != 0){
                                 invoiceApply.setYsResult("0");
                                 invoiceApply.setRev1("该发票税点和代理商税点不相同");
                             }
