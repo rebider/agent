@@ -18,7 +18,7 @@
                   sharding-total-count="1"
                   sharding-item-parameters="0=C"
                   streaming-process="false"
-                  description="机具数量调整，月末触发任务"
+                  description="月末触发任务"
                   overwrite="true"
                   disabled="${job.mothOfEndJobTrigger}"/>
 </beans>
