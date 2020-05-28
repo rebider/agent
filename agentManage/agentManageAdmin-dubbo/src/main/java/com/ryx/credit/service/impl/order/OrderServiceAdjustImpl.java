@@ -1705,12 +1705,14 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 orderAdj.setRefundType(OrderAdjRefundType.CDFQ_GZ.code);
                 orderAdj.setRealRefundAmo(BigDecimal.ZERO);
                 orderAdj.setSettleAmount(refundAmount);
+                orderAdj.setRefundStat(RefundStat.UNREFUND.key);
             }
         }else {
             logger.info(orderAdj.getId()+"订单调整,退款金额小于0");
             orderAdj.setRefundType(OrderAdjRefundType.CDFQ_GZ.code);
             orderAdj.setRealRefundAmo(BigDecimal.ZERO);
             orderAdj.setSettleAmount(BigDecimal.ZERO);
+            orderAdj.setRefundStat(RefundStat.UNREFUND.key);
         }
 
         Calendar orderdate = Calendar.getInstance();
