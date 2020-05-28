@@ -58,6 +58,9 @@ public class OrderServiceImpl implements OrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
+    private static String order_adjust_xhz_id = AppConfig.getProperty("order_adjust_xhz_id");
+    private static String order_adjust_finance_id = AppConfig.getProperty("order_adjust_finance_id");
+
     @Autowired
     private OOrderMapper orderMapper;
     @Autowired
@@ -4421,6 +4424,17 @@ public class OrderServiceImpl implements OrderService {
         if (null != refundStat){
             logger.error("退款状态为:"+RefundStat.getContentByValue(refundStat));
             return AgentResult.fail("该记录已执行分期变更!");
+        }
+        //增加校验。
+        Map<String, Object> taskInfo = busActRelMapper.queryActRuTaskByMap();
+        if (null != taskInfo && null != taskInfo.get("taskDefKey") && order_adjust_xhz_id.equals(taskInfo.get("taskDefKey").toString())) {
+            //1，线下退款，徐慧总节点不允许结束。
+
+            return AgentResult.fail("线下打款徐慧总节点，不结束");
+        } else if (null != taskInfo && null != taskInfo.get("taskDefKey") && order_adjust_finance_id.equals(taskInfo.get("taskDefKey").toString())) {
+            //2，不是线下退款，财务节点不允许结束。
+
+            return AgentResult.fail("非线下打款财务节点，不结束！");
         }
         logger.info("该记录可以结束,id:"+orderAdjId);
         return AgentResult.ok();

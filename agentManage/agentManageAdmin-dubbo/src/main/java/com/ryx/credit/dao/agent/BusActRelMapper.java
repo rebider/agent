@@ -5,8 +5,10 @@ import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.agent.BusActRelExample;
 import com.ryx.credit.pojo.admin.agent.BusActRelKey;
 import org.apache.ibatis.annotations.Param;
+import org.omg.CORBA.OBJ_ADAPTER;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BusActRelMapper {
     int countByExample(BusActRelExample example);
@@ -32,4 +34,6 @@ public interface BusActRelMapper {
     BusActRel findByBusId(String busId);
 
     BusActRel findByActivId(String activId);
+
+    Map<String, Object> queryActRuTaskByMap(Map<String, Object>);
 }
