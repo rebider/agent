@@ -54,7 +54,7 @@ public class ActBusRelScanServiceImpl implements ActBusRelScanView, ApplicationC
             try {
                 ActBusRelScanService service =   actBusRelScanServices.get(beanId);
                 if(service.checkEventSysAct(eventSysAct)){
-                   FastMap res =  service.dealEvent(eventSysAct);
+                    FastMap res =  service.dealEvent(eventSysAct);
                     logger.info("触发流程事件：{} {} 结果 {}",eventSysAct.getEventKey(),beanId,res.get("msg"));
                 }
             } catch (MessageException e) {
