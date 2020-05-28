@@ -4405,7 +4405,7 @@ public class OrderServiceImpl implements OrderService {
         }
         if (orderAdj.getReviewsStat().compareTo(AgStatus.Approving.status) != 0){
             logger.error("该记录非审批中,id:"+orderAdjId);
-         return AgentResult.fail("该记录非审批中!");
+            return AgentResult.fail("该记录非审批中!");
         }
         if (EnvironmentUtil.isProduction() ){
             List<Dict> dicts = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ADJ_ID.name());
