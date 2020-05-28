@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -936,6 +937,15 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
+    public List<Agent> queryAgentByIds(List ids) {
+        long currentTimeMillis = System.currentTimeMillis();
+        List<Agent> agents = agentMapper.queryAgentByIds(ids);
+        long currentTimeMillis1 = System.currentTimeMillis();
+        logger.info("用时："+(currentTimeMillis1-currentTimeMillis));
+        return agents;
+    }
+
+    @Override
     public PageInfo agentCaManageList(Page page, Map map) {
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentMapper.queryCaManagerList(map, page));
@@ -947,7 +957,7 @@ public class AgentServiceImpl implements AgentService {
     public List<AgentCaVo> exportAgentCa(Map map) {
 
         List<AgentCaVo> list = agentMapper.expoerCaList(map);
-        List<Dict> caStatus = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CERTIFICATION_STATUS.name());
+        List<Dict> caStatus = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CER_RES_STATUS.name());
         if (null != list && list.size() > 0)
             list.forEach(agent->{
                 if (null!=agent.getCaStatus()) {
