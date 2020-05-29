@@ -1522,7 +1522,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             }
             orderAdj.setReviewsStat(AgStatus.Refuse.status);
             orderAdj.setReviewsDate(new Date());
-            orderAdj.setRefundStat(null);
+            orderAdj.setRefundStat(RefundStat.UNREFUND.key);
             OOrderExample oOrderExample = new OOrderExample();
             oOrderExample.or().andIdEqualTo(orderAdj.getOrderId()).andStatusEqualTo(Status.STATUS_1.status);
             List<OOrder> oOrders = orderMapper.selectByExample(oOrderExample);
