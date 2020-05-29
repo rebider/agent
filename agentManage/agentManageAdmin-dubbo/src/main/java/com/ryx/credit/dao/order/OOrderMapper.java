@@ -47,6 +47,8 @@ public interface OOrderMapper {
 
     List<OrderoutVo> orderExcel(Map map);
 
+    List<OrderoutVo> excelOrderDetail(Map map);
+
     Long arrearageCount(Map<String, Object> param);
 
     List<Map<String,Object>> arrearageList(Map<String, Object> param);

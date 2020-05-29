@@ -173,4 +173,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         return cOrganizationMapper.selectCityRegion(cUser);
     }
 
+    @Override
+    public List<COrganization> selectNextChildsRegion(Long pid) {
+        List<COrganization> cOrganizations = cOrganizationMapper.selectByOrgPid(pid + "");
+        return cOrganizations;
+    }
+
+
 }

@@ -1447,13 +1447,18 @@ union
     a_agent_businfo a
     left join a_agent b on a.agent_id=b.id
     left join a_platform c on c.platform_num = a.bus_platform
-    LEFT JOIN D_DICT D ON c.platform_num = A.BUS_PLATFORM AND d.d_itemvalue=c.platform_type AND  D.D_GROUP=#{dictGroup} AND  D.D_ARTIFACT = #{dictItem}
+    LEFT JOIN D_DICT D ON c.platform_num = A.BUS_PLATFORM AND d.d_itemvalue=c.platform_type AND  D.D_GROUP=#{dictGroup}
+    <if test="dictItem != null">
+         AND  D.D_ARTIFACT = #{dictItem}
+    </if>
     <where>
-      c.platform_type in
-      (
+      <if test="dictItem != null">
+        c.platform_type in
+        (
         SELECT  dd.d_itemvalue FROM d_dict dd
         WHERE dd.d_group = #{dictGroup} AND dd.d_artifact = #{dictItem}
-      )
+        )
+      </if>
       and a.agent_id = #{agentId}
       <if test="busId != null"> and a.id = #{busId} </if>
       and c.status = 1

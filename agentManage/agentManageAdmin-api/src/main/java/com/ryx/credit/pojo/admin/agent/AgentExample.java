@@ -2177,6 +2177,456 @@ public class AgentExample {
             addCriterion("AG_REG_AREA not between", value1, value2, "agRegArea");
             return (Criteria) this;
         }
+
+        public Criteria andFreestatusIsNull() {
+            addCriterion("FREESTATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreestatusIsNotNull() {
+            addCriterion("FREESTATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreestatusEqualTo(BigDecimal value) {
+            addCriterion("FREESTATUS =", value, "freestatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreestatusNotEqualTo(BigDecimal value) {
+            addCriterion("FREESTATUS <>", value, "freestatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreestatusGreaterThan(BigDecimal value) {
+            addCriterion("FREESTATUS >", value, "freestatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreestatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("FREESTATUS >=", value, "freestatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreestatusLessThan(BigDecimal value) {
+            addCriterion("FREESTATUS <", value, "freestatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreestatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("FREESTATUS <=", value, "freestatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreestatusIn(List<BigDecimal> values) {
+            addCriterion("FREESTATUS in", values, "freestatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreestatusNotIn(List<BigDecimal> values) {
+            addCriterion("FREESTATUS not in", values, "freestatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreestatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FREESTATUS between", value1, value2, "freestatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFreestatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FREESTATUS not between", value1, value2, "freestatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailIsNull() {
+            addCriterion("BUS_RISK_EMAIL is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailIsNotNull() {
+            addCriterion("BUS_RISK_EMAIL is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailEqualTo(String value) {
+            addCriterion("BUS_RISK_EMAIL =", value, "busRiskEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailNotEqualTo(String value) {
+            addCriterion("BUS_RISK_EMAIL <>", value, "busRiskEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailGreaterThan(String value) {
+            addCriterion("BUS_RISK_EMAIL >", value, "busRiskEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_RISK_EMAIL >=", value, "busRiskEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailLessThan(String value) {
+            addCriterion("BUS_RISK_EMAIL <", value, "busRiskEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailLessThanOrEqualTo(String value) {
+            addCriterion("BUS_RISK_EMAIL <=", value, "busRiskEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailLike(String value) {
+            addCriterion("BUS_RISK_EMAIL like", value, "busRiskEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailNotLike(String value) {
+            addCriterion("BUS_RISK_EMAIL not like", value, "busRiskEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailIn(List<String> values) {
+            addCriterion("BUS_RISK_EMAIL in", values, "busRiskEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailNotIn(List<String> values) {
+            addCriterion("BUS_RISK_EMAIL not in", values, "busRiskEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailBetween(String value1, String value2) {
+            addCriterion("BUS_RISK_EMAIL between", value1, value2, "busRiskEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusRiskEmailNotBetween(String value1, String value2) {
+            addCriterion("BUS_RISK_EMAIL not between", value1, value2, "busRiskEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailIsNull() {
+            addCriterion("BUS_CONTACT_EMAIL is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailIsNotNull() {
+            addCriterion("BUS_CONTACT_EMAIL is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailEqualTo(String value) {
+            addCriterion("BUS_CONTACT_EMAIL =", value, "busContactEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailNotEqualTo(String value) {
+            addCriterion("BUS_CONTACT_EMAIL <>", value, "busContactEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailGreaterThan(String value) {
+            addCriterion("BUS_CONTACT_EMAIL >", value, "busContactEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_CONTACT_EMAIL >=", value, "busContactEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailLessThan(String value) {
+            addCriterion("BUS_CONTACT_EMAIL <", value, "busContactEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailLessThanOrEqualTo(String value) {
+            addCriterion("BUS_CONTACT_EMAIL <=", value, "busContactEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailLike(String value) {
+            addCriterion("BUS_CONTACT_EMAIL like", value, "busContactEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailNotLike(String value) {
+            addCriterion("BUS_CONTACT_EMAIL not like", value, "busContactEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailIn(List<String> values) {
+            addCriterion("BUS_CONTACT_EMAIL in", values, "busContactEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailNotIn(List<String> values) {
+            addCriterion("BUS_CONTACT_EMAIL not in", values, "busContactEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailBetween(String value1, String value2) {
+            addCriterion("BUS_CONTACT_EMAIL between", value1, value2, "busContactEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusContactEmailNotBetween(String value1, String value2) {
+            addCriterion("BUS_CONTACT_EMAIL not between", value1, value2, "busContactEmail");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportStatusIsNull() {
+            addCriterion("REPORT_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportStatusIsNotNull() {
+            addCriterion("REPORT_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportStatusEqualTo(BigDecimal value) {
+            addCriterion("REPORT_STATUS =", value, "reportStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportStatusNotEqualTo(BigDecimal value) {
+            addCriterion("REPORT_STATUS <>", value, "reportStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportStatusGreaterThan(BigDecimal value) {
+            addCriterion("REPORT_STATUS >", value, "reportStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("REPORT_STATUS >=", value, "reportStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportStatusLessThan(BigDecimal value) {
+            addCriterion("REPORT_STATUS <", value, "reportStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("REPORT_STATUS <=", value, "reportStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportStatusIn(List<BigDecimal> values) {
+            addCriterion("REPORT_STATUS in", values, "reportStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportStatusNotIn(List<BigDecimal> values) {
+            addCriterion("REPORT_STATUS not in", values, "reportStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REPORT_STATUS between", value1, value2, "reportStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REPORT_STATUS not between", value1, value2, "reportStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportTimeIsNull() {
+            addCriterion("REPORT_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportTimeIsNotNull() {
+            addCriterion("REPORT_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportTimeEqualTo(Date value) {
+            addCriterion("REPORT_TIME =", value, "reportTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportTimeNotEqualTo(Date value) {
+            addCriterion("REPORT_TIME <>", value, "reportTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportTimeGreaterThan(Date value) {
+            addCriterion("REPORT_TIME >", value, "reportTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("REPORT_TIME >=", value, "reportTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportTimeLessThan(Date value) {
+            addCriterion("REPORT_TIME <", value, "reportTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportTimeLessThanOrEqualTo(Date value) {
+            addCriterion("REPORT_TIME <=", value, "reportTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportTimeIn(List<Date> values) {
+            addCriterion("REPORT_TIME in", values, "reportTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportTimeNotIn(List<Date> values) {
+            addCriterion("REPORT_TIME not in", values, "reportTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportTimeBetween(Date value1, Date value2) {
+            addCriterion("REPORT_TIME between", value1, value2, "reportTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andReportTimeNotBetween(Date value1, Date value2) {
+            addCriterion("REPORT_TIME not between", value1, value2, "reportTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddIsNull() {
+            addCriterion("AG_RUN_ADD is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddIsNotNull() {
+            addCriterion("AG_RUN_ADD is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddEqualTo(String value) {
+            addCriterion("AG_RUN_ADD =", value, "agRunAdd");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddNotEqualTo(String value) {
+            addCriterion("AG_RUN_ADD <>", value, "agRunAdd");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddGreaterThan(String value) {
+            addCriterion("AG_RUN_ADD >", value, "agRunAdd");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddGreaterThanOrEqualTo(String value) {
+            addCriterion("AG_RUN_ADD >=", value, "agRunAdd");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddLessThan(String value) {
+            addCriterion("AG_RUN_ADD <", value, "agRunAdd");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddLessThanOrEqualTo(String value) {
+            addCriterion("AG_RUN_ADD <=", value, "agRunAdd");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddLike(String value) {
+            addCriterion("AG_RUN_ADD like", value, "agRunAdd");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddNotLike(String value) {
+            addCriterion("AG_RUN_ADD not like", value, "agRunAdd");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddIn(List<String> values) {
+            addCriterion("AG_RUN_ADD in", values, "agRunAdd");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddNotIn(List<String> values) {
+            addCriterion("AG_RUN_ADD not in", values, "agRunAdd");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddBetween(String value1, String value2) {
+            addCriterion("AG_RUN_ADD between", value1, value2, "agRunAdd");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRunAddNotBetween(String value1, String value2) {
+            addCriterion("AG_RUN_ADD not between", value1, value2, "agRunAdd");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCerdateIsNull() {
+            addCriterion("AG_LEGAL_CERDATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCerdateIsNotNull() {
+            addCriterion("AG_LEGAL_CERDATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCerdateEqualTo(Date value) {
+            addCriterion("AG_LEGAL_CERDATE =", value, "agLegalCerdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCerdateNotEqualTo(Date value) {
+            addCriterion("AG_LEGAL_CERDATE <>", value, "agLegalCerdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCerdateGreaterThan(Date value) {
+            addCriterion("AG_LEGAL_CERDATE >", value, "agLegalCerdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCerdateGreaterThanOrEqualTo(Date value) {
+            addCriterion("AG_LEGAL_CERDATE >=", value, "agLegalCerdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCerdateLessThan(Date value) {
+            addCriterion("AG_LEGAL_CERDATE <", value, "agLegalCerdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCerdateLessThanOrEqualTo(Date value) {
+            addCriterion("AG_LEGAL_CERDATE <=", value, "agLegalCerdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCerdateIn(List<Date> values) {
+            addCriterion("AG_LEGAL_CERDATE in", values, "agLegalCerdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCerdateNotIn(List<Date> values) {
+            addCriterion("AG_LEGAL_CERDATE not in", values, "agLegalCerdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCerdateBetween(Date value1, Date value2) {
+            addCriterion("AG_LEGAL_CERDATE between", value1, value2, "agLegalCerdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgLegalCerdateNotBetween(Date value1, Date value2) {
+            addCriterion("AG_LEGAL_CERDATE not between", value1, value2, "agLegalCerdate");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

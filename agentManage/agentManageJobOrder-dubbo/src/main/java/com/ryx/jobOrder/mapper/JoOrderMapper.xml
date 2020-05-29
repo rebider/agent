@@ -625,6 +625,12 @@
       <if test="map.launchBeginTime!=null and map.launchEndTime != null"> and  to_date(to_char(jo.launch_time,'yyyy-mm-dd hh24:mi:ss'), 'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(#{map.launchBeginTime}, 'yyyy-mm-dd hh24:mi:ss'), 'yyyy-mm-dd hh24:mi:ss')  and to_date(to_char(#{map.launchEndTime}, 'yyyy-mm-dd hh24:mi:ss'), 'yyyy-mm-dd hh24:mi:ss') </if>
       <if test="map.launchPersonId!=null and map.launchPersonId!=''"> and jo.launch_person_id = #{map.launchPersonId} </if>
       <if test="map.launchBranchId!=null and map.launchBranchId!=''"> and jo.launch_branch_id = #{map.launchBranchId} </if>
+      <if test="map.cOrganizations!=null and map.cOrganizations.size > 0">
+        and jo.launch_branch_id in
+        <foreach collection="map.cOrganizations" item="cOrganizationItem" open="(" separator="," close=")">
+            #{cOrganizationItem.code}
+        </foreach>
+      </if>
     </where>
     order by jo.launch_time desc
   </sql>

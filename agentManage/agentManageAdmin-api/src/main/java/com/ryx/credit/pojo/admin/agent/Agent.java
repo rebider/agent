@@ -95,6 +95,30 @@ public class Agent extends AgentExtends implements Serializable {
 
     private Date reportTime;
 
+    private String agRunAdd;
+
+    @JSONField(format="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonDeserialize(using = DateJsonDeserializer.class)
+    @JsonSerialize(using = DateJsonSerializer.class)
+    private Date agLegalCerdate;
+
+    public String getAgRunAdd() {
+        return agRunAdd;
+    }
+
+    public void setAgRunAdd(String agRunAdd) {
+        this.agRunAdd = agRunAdd;
+    }
+
+    public Date getAgLegalCerdate() {
+        return agLegalCerdate;
+    }
+
+    public void setAgLegalCerdate(Date agLegalCerdate) {
+        this.agLegalCerdate = agLegalCerdate;
+    }
+
     public String getBusRiskEmail() {
         return busRiskEmail;
     }

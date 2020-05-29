@@ -93,6 +93,8 @@ public enum DictGroup {
     EMAIL("邮件模块"),
     LOGISTICS_FAIL_EMAIL("物流失败邮件"),
     CERTIFICATION_STATUS("代理商工商认证"),
+    CER_RES_STATUS("认证状态"),
+    CER_PRO_STAT("认证流程状态"),
     DATA_SHIRO("流量卡内部续费数据权限"),
     ANN_ORG("公告运维机构"),
 

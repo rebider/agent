@@ -109,8 +109,6 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
                 joTaskVo.setJoStartTimeEnd(DateUtil.format(joStartTimeEndStr,DateUtil.DATE_FORMAT_1));
             }
         }
-        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(joTaskVo.getUserId());
-        joTaskVo.setPlatfromPerm(platfromPerm);
         List jotaskVolist = joTaskMapper.selectByJoTaskVo(joTaskVo, page);
         PageInfo pageInfo = new PageInfo();
         List jotaskVolist2 = joTaskMapper.selectByJoTaskVo(joTaskVo, null);

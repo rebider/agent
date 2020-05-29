@@ -1291,6 +1291,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	@Override
 	public List<Map> agentBusByDict(FastMap reqMap) {
+		if(reqMap.get("dictItem").equals("DLS")){
+			reqMap.putKeyV("dictItem",null);
+		}
 		List<Map> data = agentBusInfoMapper.queryTreeByBusInfoAndDict(reqMap);
 		for (Map datum : data) {
 			datum.put("BUS_TYPE_NAME",BusType.getContentByValue(String.valueOf(datum.get("BUS_TYPE"))));

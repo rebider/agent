@@ -1124,12 +1124,12 @@
     row_number() OVER(PARTITION BY t.agent_id ORDER BY t.agent_id, t.req_cer_tm desc) as row_flg
     from a_agent_certification t) AGENTCER,a_agent AGENT
     where AGENTCER.row_flg = '1' and
-    AGENTCER.AGENT_ID = AGENT.AG_UNIQ_NUM
+    ( agentcer.agent_id = agent.ag_uniq_num  or   agentcer.agent_id = agent.id)
     <if test="map.agBusLic!=null and map.agBusLic!=''">
       AND AGENT.AG_BUS_LIC = #{map.agBusLic}
     </if>
-    <if test="map.agUniqNum!=null and map.agUniqNum!=''">
-      AND AGENT.AG_UNIQ_NUM = #{map.agUniqNum}
+    <if test="map.agId!=null and map.agId!=''">
+      AND AGENT.id = #{map.agId}
     </if>
     <if test="map.agName!=null and map.agName!=''">
       AND AGENT.AG_NAME = #{map.agName}
@@ -1138,7 +1138,7 @@
       AND to_char(AGENT.C_INCOM_TIME,'YYYY-MM-dd')=#{map.time}
     </if>
     <if test="map.caStatus!=null and map.caStatus!=''">
-      AND AGENT.CA_STATUS = #{map.caStatus}
+      AND agentcer.CER_RES = #{map.caStatus}
     </if>
     <if test="map.agBusLicb!=null and map.agBusLicb!=''">
       AND to_char( AGENT.AG_BUS_LICB,'YYYY-MM-dd')=#{map.agBusLicb}
@@ -1172,5 +1172,27 @@
       and AGENTCER.Agent_Id = #{map.id}
     </if>
 
+  </select>
+
+  <select id="queryCersByAgent" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from a_agent_certification
+    where CER_PRO_STAT  in (0,1)
+    <if test="list != null and list.size > 0">
+      AND AGENT_ID IN
+      <!-- 处理in的集合超过1000条时Oracle不支持的情况 -->
+      <trim suffixOverrides=" OR AGENT_ID IN()">	<!-- 表示删除最后一个条件 -->
+        <foreach collection="list" item="agentId" index="index" open="(" close=")">
+          <if test="index != 0">
+            <choose>
+              <when test="index % 1000 == 999">) OR AGENT_ID IN (</when>
+              <otherwise>,</otherwise>
+            </choose>
+          </if>
+          #{agentId}
+        </foreach>
+      </trim>
+    </if>
   </select>
 </mapper>

@@ -222,6 +222,13 @@ public interface OrderService {
      */
     public List<OrderoutVo> exportOrderAll(Map map);
 
+    /**
+     * 订单商品明细导出
+     * @param map
+     * @return
+     */
+    public List<OrderoutVo> exportOrderDetail(Map map);
+
     public BigDecimal queryAgentDebt(String agentId);
 
     /**

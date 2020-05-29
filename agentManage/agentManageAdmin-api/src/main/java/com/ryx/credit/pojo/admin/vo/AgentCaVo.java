@@ -91,6 +91,8 @@ public class AgentCaVo implements Serializable {
 
     private String cerSuccessTm;
 
+    private String agentId;
+
     public String getId() {
         return id;
     }
@@ -401,5 +403,13 @@ public class AgentCaVo implements Serializable {
 
     public void setCerSuccessTm(String cerSuccessTm) {
         this.cerSuccessTm = cerSuccessTm;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
     }
 }
