@@ -174,8 +174,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public List<COrganization> selectNextChildsRegion(Long pid) {
-        List<COrganization> cOrganizations = cOrganizationMapper.selectByOrgPid(pid + "");
+    public List<COrganization> selectNextChildsRegion(String  code) {
+        List<COrganization> cOrganizations = cOrganizationMapper.selectByLikeCode(code);
         return cOrganizations;
     }
 

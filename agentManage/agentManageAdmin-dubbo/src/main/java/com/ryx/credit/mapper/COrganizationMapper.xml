@@ -180,4 +180,9 @@
             C.CODE LIKE 'region_%' OR C.CODE LIKE 'beijing%'
     </select>
 
+    <select id="selectByLikeCode" resultMap="BaseResultMap" parameterType="string" >
+        select
+        <include refid="Base_Column_List" />
+        from C_ORGANIZATION where code like CONCAT(#{code},'_%')
+    </select>
 </mapper>

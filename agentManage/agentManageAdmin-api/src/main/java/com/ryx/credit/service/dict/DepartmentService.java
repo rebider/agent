@@ -41,10 +41,10 @@ public interface DepartmentService {
 
     /**
      * 查询下级部门列表
-     * @param pid
+     * @param code
      * @return
      */
-    List<COrganization> selectNextChildsRegion(Long pid);
+    List<COrganization> selectNextChildsRegion(String code);
 
     /**
      * 根据loginName查询部门
