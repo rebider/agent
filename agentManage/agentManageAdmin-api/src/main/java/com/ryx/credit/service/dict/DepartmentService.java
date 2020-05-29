@@ -40,9 +40,16 @@ public interface DepartmentService {
     List<COrganization> selectCityRegion(Long cUser);
 
     /**
-     * 查询下级部门列表
-     * @param pid
+     * 查询自己及下级部门列表
+     * @param code
      * @return
      */
-    List<COrganization> selectNextChildsRegion(Long pid);
+    List<COrganization> selectNextChildsRegion(String code);
+
+    /**
+     * 根据loginName查询部门
+     * @param loginName
+     * @return
+     */
+    public COrganization getByLoginName(String loginName);
 }

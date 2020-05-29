@@ -48,4 +48,6 @@ public interface COrganizationMapper extends BaseMapper<COrganization> {
      * @return
      */
     List<Map<String, Object>> selectBranchList();
+
+    List<COrganization> selectByLikeCode(String code);
 }
