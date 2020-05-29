@@ -593,7 +593,7 @@
     select
     ro.id as return_order_id, bus.bus_num,
     aagent.ag_uniq_num, aagent.ag_name,
-    odetail.model as pro_model,odetail.pro_com as vender,, odetail.return_count,
+    odetail.model as pro_model,odetail.pro_com as vender,odetail.return_count,
     odetail.order_price as order_price, oso.activity_name,
     nvl(ro.cut_amo * (odetail.return_count * decode(ro.goods_return_amo,0,0,odetail.return_price / ro.goods_return_amo)),0) as cut_amo,
     rp.plan_num, rp.plan_pro_num as receive_send_num, rp.order_id as receive_order_id, agents.ag_uniq_num as receive_agent_id, agents.ag_name as receive_agent_name,
