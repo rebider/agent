@@ -2096,30 +2096,31 @@ public class CompensateServiceImpl implements CompensateService {
         try {
             AgentResult agentResult = termMachineService.queryCompensateResult(detail.getId(),detail.getPlatformType());
             if(agentResult.isOK()){
-                //成功
+                //调整结果，判断
                 if("00".equals(agentResult.getData())){
+                    //成功
                     detail.setSendStatus(LogisticsSendStatus.send_success.code);
                     detail.setSendMsg(agentResult.getMsg());
                     if(1!=refundPriceDiffDetailMapper.updateByPrimaryKeySelective(detail)){
                         log.info("活动调整异步查询 更新数据失败:{}",id);
                         throw new MessageException("更新数据失败");
                     }
-                //调整中
                 }else if("01".equals(agentResult.getData())){
-                        log.info("活动调整异步查询 调整中:{}",id);
-                //调整失败
+                    //调整中
+                    log.info("活动调整异步查询 调整中:{}",id);
                 }else if("02".equals(agentResult.getData())){
+                    //调整失败
                     detail.setSendStatus(LogisticsSendStatus.send_fail.code);
                     detail.setSendMsg(agentResult.getMsg());
                     if(1!=refundPriceDiffDetailMapper.updateByPrimaryKeySelective(detail)){
                         log.info("活动调整异步查询 更新数据失败:{}",id);
                         throw new MessageException("更新数据失败");
                     }
-                //未知结果
                 }else if("03".equals(agentResult.getData())){
+                    //未知结果
                     log.info("活动调整异步查询 未知结果:{}",id);
-                //未调整
                 }else if("04".equals(agentResult.getData())){
+                    //未调整
                     detail.setSendStatus(LogisticsSendStatus.dt_send.code);
                     detail.setSendMsg(agentResult.getMsg());
                     if(1!=refundPriceDiffDetailMapper.updateByPrimaryKeySelective(detail)){

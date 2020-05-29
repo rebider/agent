@@ -862,6 +862,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     if (oActivities.size() == 0) {
                         throw new MessageException(posSn + "活动未找到");
                     }
+                    boolean actVisible = true;
+                    for (OActivity oActivity : oActivities) {
+                        if(oActivity.getVisible().equals(VisibleStatus.TWO.getValue())){
+                            actVisible = false;
+                            break;
+                        }
+                    }
                     Set<BigDecimal> priceSet = new HashSet<>();
                     OActivity rActivity = null;
                     here:
@@ -892,7 +899,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                                     break here;
                                 }
                             }
-                        }else{
+                        } else if (actVisible) {
                             priceSet.add(oActivity.getPrice());
                         }
                     }
