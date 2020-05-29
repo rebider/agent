@@ -439,8 +439,8 @@
     odetail.return_count * odetail.return_price as return_price,
     odetail.order_price as order_price,
     odetail.begin_sn, odetail.end_sn, odetail.order_id,
-    agent.AG_UNIQ_NUM, agent.AG_NAME, os.pro_type,
-    oso.activity_name, oso.pro_model, oso.vender,
+    agent.AG_UNIQ_NUM, agent.AG_NAME, odetail.pro_type,
+    oso.activity_name,  odetail.model as pro_model,odetail.pro_com as vender,
     ro.take_out_amo * (odetail.return_count * decode(ro.goods_return_amo,0,0,odetail.return_price / ro.goods_return_amo)) as take_out_amo,
     ro.rel_return_amo * (odetail.return_count * decode(ro.goods_return_amo,0,0,odetail.return_price / ro.goods_return_amo)) as rel_return_amo,
     ro.cut_amo * (odetail.return_count * decode(ro.goods_return_amo,0,0,odetail.return_price / ro.goods_return_amo) ) as cut_amo,
@@ -523,8 +523,8 @@
     odetail.return_count * odetail.return_price as return_price,
     odetail.order_price as order_price,
     odetail.begin_sn, odetail.end_sn, odetail.order_id,
-    agent.AG_UNIQ_NUM, agent.AG_NAME, os.pro_type,
-    oso.activity_name, oso.pro_model, oso.vender,
+    agent.AG_UNIQ_NUM, agent.AG_NAME, odetail.pro_type,
+    oso.activity_name, odetail.model as pro_model,odetail.pro_com as vender,
     ro.take_out_amo * (odetail.return_count * decode(ro.goods_return_amo,0,0,odetail.return_price / ro.goods_return_amo)) as take_out_amo,
     ro.rel_return_amo * (odetail.return_count * decode(ro.goods_return_amo,0,0,odetail.return_price / ro.goods_return_amo)) as rel_return_amo,
     ro.cut_amo * (odetail.return_count * decode(ro.goods_return_amo,0,0,odetail.return_price / ro.goods_return_amo)) as cut_amo,
@@ -571,9 +571,8 @@
       orderdetail.id as O_RETURN_ORDER_DETAIL_ID,
       orderdetail.return_count,
       oa.act_code,
-      suborder.pro_type,
-      subact.pro_model,
-      oa.vender
+      odetail.model as pro_model,odetail.pro_com as vender,
+      odetail.pro_type
     from o_return_order_detail orderdetail
       left join o_sub_order suborder on orderdetail.order_id=suborder.order_id and orderdetail.pro_id=suborder.pro_id and suborder.status=1
       left join o_sub_order_activity subact on subact.sub_order_id=suborder.id and subact.status=1
@@ -594,7 +593,7 @@
     select
     ro.id as return_order_id, bus.bus_num,
     aagent.ag_uniq_num, aagent.ag_name,
-    oso.vender, oso.pro_model, odetail.return_count,
+    odetail.model as pro_model,odetail.pro_com as vender,, odetail.return_count,
     odetail.order_price as order_price, oso.activity_name,
     nvl(ro.cut_amo * (odetail.return_count * decode(ro.goods_return_amo,0,0,odetail.return_price / ro.goods_return_amo)),0) as cut_amo,
     rp.plan_num, rp.plan_pro_num as receive_send_num, rp.order_id as receive_order_id, agents.ag_uniq_num as receive_agent_id, agents.ag_name as receive_agent_name,
