@@ -16,7 +16,7 @@ public enum InternetCardStatus {
     NORMAL(new BigDecimal("1"),"正常"),
     NOACTIVATE(new BigDecimal("2"),"待激活"),
     STOP(new BigDecimal("3"),"停用"),  //停机可以启用
-    LOGOUT(new BigDecimal("4"),"注销"),  //注销不能在开机
+    LOGOUT(new BigDecimal("4"),"注销"),  //注销不能再开机
     UNKNOWN(new BigDecimal("0"),"未知"),
     //揭阳移动状态
     test(new BigDecimal("5"),"测试期"),

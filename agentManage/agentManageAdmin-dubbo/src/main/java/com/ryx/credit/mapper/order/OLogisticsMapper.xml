@@ -460,6 +460,9 @@
                 (to_char(L.SEND_DATE,'YYYY-MM-DD') between #{fhBeginTime} and #{fhEndTime})
             </if>
             <if test="snNum!=null and snNum!=''">and (L.SN_BEGIN_NUM &lt;=#{snNum} and L.SN_END_NUM &gt;= #{snNum})</if>
+            <if test="snNumStart!=null and snNumEnd!=''">and (L.SN_BEGIN_NUM between #{snNumStart} and #{snNumEnd}
+                or  L.SN_END_NUM between #{snNumStart} and #{snNumEnd})
+            </if>
         </where>
     </sql>
 

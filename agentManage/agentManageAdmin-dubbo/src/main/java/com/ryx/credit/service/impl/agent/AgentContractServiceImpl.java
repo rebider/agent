@@ -3,15 +3,15 @@ package com.ryx.credit.service.impl.agent;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentContractMapper;
 import com.ryx.credit.dao.agent.AssProtoColMapper;
 import com.ryx.credit.dao.agent.AttachmentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentContractVo;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentContractService;
@@ -325,6 +325,80 @@ public class AgentContractServiceImpl implements AgentContractService {
         pageInfo.setRows(agentContractMapper.getAgentContractList(map, page));
         pageInfo.setTotal(agentContractMapper.getAgentContractCount(map));
         return pageInfo;
+    }
+
+    @Override
+    public AgentContract queryByContact(String id) {
+        AgentContractExample agentContractExample = new AgentContractExample();
+        agentContractExample.or()
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andIdEqualTo(id);
+        List<AgentContract> agentContractList = agentContractMapper.selectByExample(agentContractExample);
+        if (agentContractList.size()!=0) {
+            AgentContract agentContract = agentContractList.get(0);
+            return agentContract;
+        }
+        return null;
+    }
+
+    @Override
+    public int contractStatusEdit(AgentContract agentContract, String userId) throws MessageException {
+        int updateContact = 0;
+        AgentContractExample agentContractExample = new AgentContractExample();
+        agentContractExample.or()
+                .andIdEqualTo(agentContract.getId())
+                .andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentContract> agentContractList = agentContractMapper.selectByExample(agentContractExample);
+        if (null!=agentContractList && agentContractList.size()>0) {
+            AgentContract agent_contract = agentContractList.get(0);
+            agent_contract.setCloReviewStatus(agentContract.getCloReviewStatus());
+            agent_contract.setcUser(userId);
+            agent_contract.setcUtime(Calendar.getInstance().getTime());
+            updateContact = agentContractMapper.updateByPrimaryKeySelective(agent_contract);
+        }
+        return updateContact;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public AgentResult saveAgentContract(AgentVo agentVo) throws ProcessException {
+        try {
+            Agent agent = agentVo.getAgent();
+            agent.setId(agentVo.getAgentId());
+            for (AgentContractVo itemVo : agentVo.getContractVoList()) {
+                if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
+                    itemVo.setcUser(agent.getcUser());
+                    itemVo.setAgentId(agent.getId());
+                    // 添加合同
+                    AgentContract agentContract = insertAgentContract(itemVo, itemVo.getContractTableFile(), agent.getcUser(),null);
+                    // 添加分管协议
+                    if (StringUtils.isNotBlank(itemVo.getAgentAssProtocol())) {
+                        AssProtoColRel assProtoColRel = new AssProtoColRel();
+                        assProtoColRel.setAgentBusinfoId(agentContract.getId());
+                        assProtoColRel.setAssProtocolId(itemVo.getAgentAssProtocol());
+                        AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(itemVo.getAgentAssProtocol());
+                        if (StringUtils.isNotBlank(itemVo.getProtocolRuleValue())) {
+                            String ruleReplace = assProtoCol.getProtocolRule().replace("{}", itemVo.getProtocolRuleValue());
+                            assProtoColRel.setProtocolRule(ruleReplace);
+                        } else {
+                            assProtoColRel.setProtocolRule(assProtoCol.getProtocolRule());
+                        }
+                        assProtoColRel.setProtocolRuleValue(itemVo.getProtocolRuleValue());
+                        int addProtocolRel = agentAssProtocolService.addProtocolRel(assProtoColRel, agent.getcUser());
+                        if (1 != addProtocolRel) {
+                            throw new ProcessException("业务分管协议添加失败！");
+                        }
+                    }
+                }
+            }
+            return AgentResult.ok(agentVo);
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMsg());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getLocalizedMessage());
+        }
     }
 
     @Override

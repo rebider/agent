@@ -1,5 +1,6 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
@@ -30,4 +31,6 @@ public interface  AnnounceMentInfoService {
 
     //查询附件
     List<Attachment> queryAttByAnnoid(String id,String busType);
+    //修改公告
+    ResultVO updateAnnInfo(AnnounceMentInfoVo announceMentInfoVo) throws MessageException;
 }

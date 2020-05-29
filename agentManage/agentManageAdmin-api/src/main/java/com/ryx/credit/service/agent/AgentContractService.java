@@ -1,6 +1,8 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
@@ -8,6 +10,7 @@ import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentContract;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentContractVo;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -54,6 +57,12 @@ public interface AgentContractService {
     public ResultVO updateAgentContractVo(List<AgentContractVo> list, Agent agent,String userId);
 
     PageInfo getAgentContractList(Page page, Map map, Long userId);
+
+    AgentContract queryByContact(String id);
+
+    int contractStatusEdit(AgentContract agentContract, String userId) throws MessageException;
+
+    AgentResult saveAgentContract(AgentVo agentVo) throws ProcessException;
 
     /**
      * 根据工作流id查询合同信息

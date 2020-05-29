@@ -949,7 +949,12 @@
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
-      <if test="platformType!=null and platformType!=''"> and c.platform_type = #{platformType} </if>
+      <if test="platformType!=null and platformType.size > 0">
+        and c.platform_type
+        <foreach collection="platformType" item="platformItem" open=" in(" close=")" separator=",">
+          #{platformItem}
+        </foreach>
+      </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
       <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
       <if test="platformList!=null and platformList.size > 0">
@@ -1088,7 +1093,12 @@
       <if test="agName!=null and agName!=''"> and b.ag_name like  CONCAT(CONCAT('%',#{agName}),'%') </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
       <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
-      <if test="platformType!=null and platformType!=''"> and c.platform_type = #{platformType} </if>
+      <if test="platformType!=null and platformType.size > 0">
+        and c.platform_type
+        <foreach collection="platformType" item="platformItem" open=" in(" close=")" separator=",">
+          #{platformItem}
+        </foreach>
+      </if>
       <if test="platformList!=null and platformList.size > 0">
         and c.PLATFORM_NUM
         <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
@@ -1220,7 +1230,7 @@
     dict.D_ITEMNAME as platformType,
     o.c_time as apytime,
     o.o_num as num,o.O_INURETIME,
-    b.ag_uniq_num,
+    b.ag_uniq_num,b.id as agent_id,
     aab.bus_num,
     c.platform_name,
     b.ag_name,
@@ -1243,7 +1253,7 @@
       left join o_order on o_sub_order.order_id = o_order.id
       left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.d_itemname = o_sub_order.pro_type
       where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
-    ),0) as pro_type,
+    ),'') as pro_type,
     (
       select LISTAGG(o_sub_order_activity.activity_name,',')
       WITHIN GROUP(ORDER BY o_sub_order.order_id)
@@ -1259,19 +1269,19 @@
       where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as model,
     nvl((
-      select LISTAGG(o_sub_order.pro_rel_price,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+      select LISTAGG(o_sub_order.pro_rel_price,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
       from o_sub_order
       left join o_order on o_sub_order.order_id = o_order.id
       where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_rel_price,
     nvl((
-      select LISTAGG(o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+      select LISTAGG(o_sub_order.pro_num,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
       from o_sub_order
       left join o_order on o_sub_order.order_id = o_order.id
       where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_num,
     nvl((
-      select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+      select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
       from o_sub_order
       left join o_order on o_sub_order.order_id = o_order.id
       where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
@@ -1299,8 +1309,9 @@
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as checkDate,
+    d.down_payment,
     nvl((
-      select LISTAGG(cr.amount,',') WITHIN GROUP (ORDER BY cr.src_id)
+      select LISTAGG(cr.amount,'/') WITHIN GROUP (ORDER BY cr.src_id)
       from o_cash_receivables cr
       where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),0) as xxAmount,
@@ -1315,12 +1326,20 @@
         else 0
       end
     ),0) as down_payment_count,
-    nvl((
-      select max(o_payment_detail.pay_amount)
-      from o_payment_detail
-      where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
-      and (o_payment_detail.pay_type='FRFQ' or o_payment_detail.pay_type='DKFQ')
-    ),0) as mqyk_amt,
+    (decode(d.custom_staging,'1',
+       nvl((
+         select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.plan_pay_time)
+         from o_payment_detail de
+         where de.payment_id = d.id and de.order_id = o.id and de.status = 1
+         and (de.pay_type='FRFQ' or de.pay_type='DKFQ')
+       ),0),
+       nvl((
+         select max(de.pay_amount)
+         from o_payment_detail de
+         where de.payment_id = d.id and de.order_id = o.id and de.status = 1
+         and (de.pay_type='FRFQ' or de.pay_type='DKFQ')
+       ),0))
+    ) as mqyk_amt,
     nvl((
       case d.pay_method
         when 'SF2' then d.pay_amount-d.down_payment
@@ -1335,18 +1354,25 @@
         else 0
       end
     ),0) as frdk_count,
-    nvl((
-      select max(o_payment_detail.pay_amount)
-      from o_payment_detail
-      where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
-      and (o_payment_detail.pay_type='FRFQ' or o_payment_detail.pay_type='DKFQ')
-    ),0) as mqydkAmt,
+    (decode(d.custom_staging,'1',
+       nvl((
+         select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.plan_pay_time)
+         from o_payment_detail de
+         where de.payment_id = d.id and de.order_id = o.id and de.status = 1
+         and de.pay_type='DKFQ'
+       ),0),
+       nvl((
+         select max(de.pay_amount)
+         from o_payment_detail de
+         where de.payment_id = d.id and de.order_id = o.id and de.status = 1
+         and de.pay_type='DKFQ'
+       ),0))
+    ) as mqydkAmt,
     nvl((
       select sum(o_payment_detail.real_pay_amount)
       from o_payment_detail
       where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
-      and (o_payment_detail.payment_status = 4 or o_payment_detail.payment_status = 6)
-      and (o_payment_detail.pay_type='DKFQ' or o_payment_detail.pay_type='FRFQ')
+      and (o_payment_detail.payment_status = 4 or o_payment_detail.payment_status = 2)
     ),0) as sjdk_amt,
     nvl(d.outstanding_amount,0) as syqk_amt,
     (
@@ -1356,9 +1382,15 @@
       where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as to_pick_num,
     nvl((
-      select sum(plans.plan_pro_num) from o_receipt_plan plans where plans.order_id = o.id and plans.status = 1
+      select sum(plans.plan_pro_num)
+      from o_receipt_plan plans
+      where plans.order_id = o.id and plans.status = 1
     ),0) as is_plan_num,
-    nvl((select sum(o_receipt_pro.pro_num)-sum(o_receipt_pro.send_num)from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0) as toPlanNum,
+    nvl((
+      select sum(pro.pro_num) - sum(pro.send_num)
+      from o_receipt_pro pro
+      where pro.orderid = o.id and pro.status=1 and pro.receipt_pro_status in (1,2)
+    ),0) as toPlanNum,
     o.review_status,
     to_char(o.o_inuretime,'yyyy-MM-dd hh24:mi:ss') as oinuretime,
     orging.name as ag_doc_district,
@@ -1392,7 +1424,12 @@
       <if test="agName!=null and agName!=''"> and b.ag_name like CONCAT(CONCAT('%',#{agName}),'%')  </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
       <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
-      <if test="platformType!=null and platformType!=''"> and c.platform_type = #{platformType} </if>
+      <if test="platformType!=null and platformType.size > 0">
+        and c.platform_type
+        <foreach collection="platformType" item="platformItem" open=" in(" close=")" separator=",">
+          #{platformItem}
+        </foreach>
+      </if>
       <if test="platformList!=null and platformList.size > 0">
         and c.PLATFORM_NUM
         <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
@@ -1459,7 +1496,7 @@
     select
     o.c_time as apytime,
     o.o_num as num,  o.o_inuretime,
-    b.ag_uniq_num,
+    b.ag_uniq_num,b.id as agent_id,
     aab.bus_num,
     c.platform_name,
     b.ag_name,
@@ -1497,19 +1534,19 @@
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as model,
     nvl((
-    select LISTAGG(o_sub_order.pro_rel_price,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+    select LISTAGG(o_sub_order.pro_rel_price,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
     from o_sub_order
     left join o_order on o_sub_order.order_id = o_order.id
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_rel_price,
     nvl((
-    select LISTAGG(o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+    select LISTAGG(o_sub_order.pro_num,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
     from o_sub_order
     left join o_order on o_sub_order.order_id = o_order.id
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_num,
     nvl((
-    select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+    select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
     from o_sub_order
     left join o_order on o_sub_order.order_id = o_order.id
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
@@ -1538,7 +1575,7 @@
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as checkDate,
     nvl((
-    select LISTAGG(cr.amount,',') WITHIN GROUP (ORDER BY cr.src_id)
+    select LISTAGG(cr.amount,'/') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),0) as xxAmount,
@@ -1661,7 +1698,7 @@
     select
     o.c_time as apytime,
     o.o_num as num,  o.o_inuretime ,
-    b.ag_uniq_num,
+    b.ag_uniq_num,b.id as agent_id,
     aab.bus_num,
     c.platform_name,
     b.ag_name,
@@ -1699,19 +1736,19 @@
     where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
     ) as model,
     nvl((
-    select LISTAGG(o_sub_order.pro_rel_price,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+    select LISTAGG(o_sub_order.pro_rel_price,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
     from o_sub_order
     left join o_order on o_sub_order.order_id = o_order.id
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_rel_price,
     nvl((
-    select LISTAGG(o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+    select LISTAGG(o_sub_order.pro_num,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
     from o_sub_order
     left join o_order on o_sub_order.order_id = o_order.id
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
     ),0) as pro_num,
     nvl((
-    select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)
+    select LISTAGG(o_sub_order.pro_rel_price*o_sub_order.pro_num,'/') WITHIN GROUP( ORDER BY o_sub_order.order_id)
     from o_sub_order
     left join o_order on o_sub_order.order_id = o_order.id
     where o_sub_order.status=1 and o_order.status=1 and o_sub_order.order_id = o.id
@@ -1740,7 +1777,7 @@
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),'') as checkDate,
     nvl((
-    select LISTAGG(cr.amount,',') WITHIN GROUP (ORDER BY cr.src_id)
+    select LISTAGG(cr.amount,'/') WITHIN GROUP (ORDER BY cr.src_id)
     from o_cash_receivables cr
     where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
     ),0) as xxAmount,
@@ -1862,10 +1899,246 @@
     order by apytime desc
   </select>
 
+  <!--订单商品明细导出-->
+  <select id="excelOrderDetail" parameterType="map" resultMap="OrderoutVo">
+    (
+    select
+    dict.D_ITEMNAME as platformType,
+    o.c_time as apytime,
+    o.o_num as num,o.O_INURETIME,
+    b.id as agent_id,
+    b.ag_uniq_num,
+    aab.bus_num,
+    c.platform_name,
+    b.ag_name,
+    oorganization.ORG_NICK as orgName,
+    os.pro_code,
+    os.pro_name,
+    nvl((
+      select os.pro_type
+      from d_dict dict
+      where dict.d_group = 'ORDER' and dict.d_artifact = 'MODEL_TYPE' and dict.d_status = 1
+      and dict.d_itemvalue = os.pro_type and os.status = 1 and dict.d_status = 1
+    ),'') as pro_type,
+    oso.activity_name,
+    oso.pro_model as model,
+    os.pro_rel_price,
+    os.pro_num,
+    nvl(os.pro_rel_price * os.pro_num,0) as pay_amo,
+    o.payment_method as pay_method,
+    nvl((
+      select LISTAGG(comp.com_name,',') WITHIN GROUP (ORDER BY comp.id)
+      from a_pay_comp comp
+      left join o_cash_receivables cr on cr.cashpay_type='PAYMENT' and cr.status = 1
+      where comp.id = cr.collect_company and d.id = cr.src_id
+    ),'') as com_name,
+    nvl((
+      select LISTAGG(cr.pay_user,',') WITHIN GROUP (ORDER BY cr.src_id)
+      from o_cash_receivables cr
+      where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
+    ),'') as pay_user,
+    nvl((
+      select LISTAGG(to_char(cr.real_rec_time,'YYYY-MM-DD'),',') WITHIN GROUP (ORDER BY cr.src_id)
+      from o_cash_receivables cr
+      where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
+    ),'') as realRecTime,
+    d.nuclear_user,
+    nvl((
+      select LISTAGG(to_char(cr.check_date,'YYYY-MM-DD'),',') WITHIN GROUP (ORDER BY cr.src_id)
+      from o_cash_receivables cr
+      where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
+    ),'') as checkDate,
+    d.down_payment,
+    nvl((
+      select LISTAGG(cr.amount,'/') WITHIN GROUP (ORDER BY cr.src_id)
+      from o_cash_receivables cr
+      where cr.src_id = d.id and cr.cashpay_type='PAYMENT' and cr.status = 1
+    ),0) as xxAmount,
+    d.profit_mouth,
+    d.profit_form,
+    nvl((d.outstanding_amount),0) as ykfr_amt,
+    to_char(d.down_payment_date,'YYYY-MM') as down_payment_date,
+    nvl((
+      case d.pay_method
+        when 'SF1' then d.down_payment_count
+        when 'FRFQ' then d.down_payment_count
+        else 0
+      end
+    ),0) as down_payment_count,
+    (decode(d.custom_staging,'1',
+      nvl((
+        select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.plan_pay_time)
+        from o_payment_detail de
+        where de.payment_id = d.id and de.order_id = o.id and de.status = 1
+        and de.pay_type='FRFQ'
+      ),0),
+      nvl((
+        select max(de.pay_amount)
+        from o_payment_detail de
+        where de.payment_id = d.id and de.order_id = o.id and de.status = 1
+        and de.pay_type='FRFQ'
+      ),0))
+    ) as mqyk_amt,
+    nvl((
+      case d.pay_method
+        when 'SF2' then d.pay_amount-d.down_payment
+        when 'FKFQ' then d.pay_amount
+        else 0
+      end
+    ),0) as fqdk_amt,
+    nvl((
+      case d.pay_method
+        when 'SF2' then d.down_payment_count
+        when 'FKFQ' then d.down_payment_count
+        else 0
+      end
+    ),0) as frdk_count,
+    (decode(d.custom_staging,'1',
+      nvl((
+        select LISTAGG(de.pay_amount,'/') WITHIN GROUP (ORDER BY de.plan_pay_time)
+        from o_payment_detail de
+        where de.payment_id = d.id and de.order_id = o.id and de.status = 1
+        and de.pay_type='DKFQ'
+      ),0),
+      nvl((
+        select max(de.pay_amount)
+        from o_payment_detail de
+        where de.payment_id = d.id and de.order_id = o.id and de.status = 1
+        and de.pay_type='DKFQ'
+      ),0))
+    ) as mqydkAmt,
+    nvl((
+      select sum(o_payment_detail.real_pay_amount)
+      from o_payment_detail
+      where o_payment_detail.payment_id = d.id and o_payment_detail.order_id = o.id and o_payment_detail.status = 1
+      and (o_payment_detail.payment_status = 4 or o_payment_detail.payment_status = 2)
+    ),0) as sjdk_amt,
+    nvl(d.outstanding_amount,0) as syqk_amt,
+    (
+      nvl(os.pro_num,0)
+      -
+      nvl((select sum(pro.pro_num) from o_receipt_pro pro
+      left join o_receipt_order ro on ro.id = pro.receipt_id
+      where pro.orderid = o.id and pro.status = 1 and ro.status = 1 and os.pro_id = pro.pro_id and pro.receipt_pro_status in (1,2)),0)
+    )as to_pick_num,
+    nvl((
+      select sum(pro.pro_num)
+      from o_receipt_pro pro
+      left join o_receipt_order ro on ro.id = pro.receipt_id
+      where pro.orderid = o.id and pro.status = 1 and ro.status = 1 and os.pro_id = pro.pro_id and pro.receipt_pro_status in (1,2)),
+    0) as is_plan_num,
+    nvl((
+      select sum(pro.pro_num) - sum(pro.send_num)
+      from o_receipt_pro pro
+      left join o_receipt_order ro on ro.id = pro.receipt_id
+      where pro.orderid = o.id and pro.status = 1 and ro.status = 1 and os.pro_id = pro.pro_id and pro.receipt_pro_status in (1,2)
+    ),0) as toPlanNum,
+    o.review_status,
+    to_char(o.o_inuretime,'yyyy-MM-dd hh24:mi:ss') as oinuretime,
+    orging.name as ag_doc_district,
+    org.name as ag_doc_pro,
+    o.user_id as order_user,
+    nvl((
+      select oan.org_name
+      from o_organization oan
+      where oan.org_id = aab.organ_num and oan.status = 1
+    ),'') as org_name,
+    to_char(o.o_apytime,'yyyy-MM-dd hh24:mi:ss') as orderDate,
+    o.remark
+    from o_order o
+    left join a_agent b on o.agent_id = b.id
+    left join a_agent_businfo aab on aab.id = o.bus_id and aab.agent_id = o.agent_id
+    left join a_platform c on c.platform_num = o.order_platform
+    left join o_payment d on d.order_id = o.id and d.status=1
+    left join c_organization org on org.id = aab.ag_doc_pro
+    left join c_organization orging on orging.id = aab.ag_doc_district
+    left join o_organization oorganization on aab.ORGAN_NUM = oorganization.ORG_ID
+    left join d_dict dict on dict.d_itemvalue = c.platform_type AND dict.d_group = 'ORDER' AND dict.d_artifact = 'PLATFROM_TYPE' AND dict.d_status=1
+    left join o_sub_order os on os.order_id = o.id
+    left join o_sub_order_activity oso on oso.sub_order_id = os.id
+    <where>
+      <if test="1==1"> and o.status = 1 and b.status = 1 and aab.status = 1 and os.status = 1 and oso.status = 1 </if>
+      <if test="nuclearUser!=null and nuclearUser!=''"> and d.nuclear_user = #{nuclearUser} </if>
+      <if test="oNum!=null and oNum!=''"> and o.o_num = #{oNum} </if>
+      <if test="id!=null and id!=''"> and o.id = #{id} </if>
+      <if test="agentId!=null and agentId!=''"> and o.agent_id = #{agentId} </if>
+      <if test="ag!=null and ag!=''"> and b.id = #{ag} </if>
+      <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform = #{orderPlatform} </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like CONCAT(CONCAT('%',#{agName}),'%')  </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'yyyy-mm-dd hh24:mi:ss') between #{beginTime} and #{endTime}) </if>
+      <if test="creatTimeFirst!=null and creatTimeLast!=''"> and (to_char(o.O_INURETIME,'yyyy-mm-dd hh24:mi:ss') between #{creatTimeFirst} and #{creatTimeLast}) </if>
+      <if test="platformType!=null and platformType.size > 0">
+        and c.platform_type
+        <foreach collection="platformType" item="platformItem" open=" in(" close=")" separator=",">
+          #{platformItem}
+        </foreach>
+      </if>
+      <if test="platformList!=null and platformList.size > 0">
+        and c.PLATFORM_NUM
+        <foreach collection="platformList" item="platform" open=" in(" close=")" separator=",">
+          #{platform}
+        </foreach>
+      </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="proTypeList!=null and proTypeList.size>0">
+        and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1
+        and PRO_TYPE
+        <foreach collection="proTypeList" item="proType" open=" in(" close=")" separator=",">
+          #{proType}
+        </foreach>
+        )
+      </if>
+      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and model=#{model} and o.id=ORDER_ID) </if>
+      <if test="payMethodList!=null and payMethodList.size>0">
+        and d.PAY_METHOD
+        <foreach collection="payMethodList" item="payMethod" open=" in(" close=")" separator=",">
+          #{payMethod}
+        </foreach>
+      </if>
+      <if test="venderList!=null and venderList.size>0 ">
+        and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+        where os.order_id=o.id and soa.VENDER
+        <foreach collection="venderList" item="vender" open=" in(" close=")" separator=",">
+          #{vender}
+        </foreach>
+        )
+      </if>
+      <if test="activityName!=null and activityName!=''">
+        and EXISTS (select * from o_sub_order_activity soa
+        left join o_sub_order os on soa.SUB_ORDER_ID = os.id and os.status = 1 and os.status = 1
+        where os.order_id = o.id and soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+      </if>
+      <if test="reviewStatusList!=null and reviewStatusList.size>0">
+        and o.review_status
+        <foreach collection="reviewStatusList" item="reviewStatus" open=" in(" close=")" separator=",">
+          #{reviewStatus}
+        </foreach>
+      </if>
+      <if test="agDocDistrict!=null and agDocDistrict!=''">
+        and (b.ag_doc_pro = #{agDocDistrict} or and b.ag_doc_district = #{agDocDistrict})
+      </if>
+      <if test="agDocPro!=null and agDocPro!=''"> and b.ag_doc_pro = #{agDocPro} </if>
+      <if test="busNum!=null and busNum!=''"> and aab.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
+      <if test="organizationCode!=null and organizationCode!=''">
+        and (orging.CODE like concat(#{organizationCode},'%') or org.CODE like concat(#{organizationCode},'%') )
+      </if>
+      <if test="platfromPerm!=null and platfromPerm.size>0">
+        and o.order_platform in
+        <foreach collection="platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+      </if>
+    </where>
+    )
+    order by o.c_time desc
+  </select>
+
   <!--订单导出VO-->
   <resultMap id="OrderoutVo" type="com.ryx.credit.pojo.admin.vo.OrderoutVo">
     <result column="o_apytime" property="apytime" jdbcType="TIMESTAMP"/>
     <result column="o_num" property="num" jdbcType="VARCHAR"/>
+    <result column="agent_id" property="agentId" jdbcType="VARCHAR"/>
     <result column="ag_uniq_num" property="agUniqNum" jdbcType="VARCHAR"/>
     <result column="bus_num" property="busNum" jdbcType="VARCHAR"/>
     <result column="platform_name" property="platformName" jdbcType="VARCHAR"/>
@@ -1884,13 +2157,14 @@
     <result column="real_rec_time" property="realRecTime" jdbcType="TIMESTAMP"/>
     <result column="nuclear_user" property="nuclearUser" jdbcType="VARCHAR"/>
     <result column="check_date" property="checkDate" jdbcType="TIMESTAMP"/>
+    <result column="down_payment" property="downPayment" jdbcType="VARCHAR"/>
     <result column="xxAmount" property="xxAmount" jdbcType="VARCHAR"/>
     <result column="profit_mouth" property="profitMouth" jdbcType="VARCHAR"/>
     <result column="profit_form" property="profitForm" jdbcType="VARCHAR"/>
     <result column="ykfr_amt" property="ykfrAmt" jdbcType="DECIMAL"/>
     <result column="down_payment_date" property="downPaymentDate" jdbcType="TIMESTAMP"/>
     <result column="down_payment_count" property="downPaymentCount" jdbcType="DECIMAL"/>
-    <result column="mqyk_amt" property="mqykAmt" jdbcType="DECIMAL"/>
+    <result column="mqyk_amt" property="mqykAmt" jdbcType="VARCHAR"/>
     <result column="fqdk_amt" property="fqdkAmt" jdbcType="DECIMAL"/>
     <result column="frdk_count" property="frdkCount" jdbcType="DECIMAL"/>
     <result column="mqydk_amt" property="mqydkAmt" jdbcType="VARCHAR"/>
@@ -1907,6 +2181,7 @@
     <result column="org_name" property="orgName" jdbcType="VARCHAR"/>
     <result column="order_date" property="orderDate" jdbcType="TIMESTAMP"/>
     <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    <result column="agent_id" property="agentId" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--欠款查询 -->
@@ -1936,7 +2211,7 @@
 
   <select id="arrearageList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    select a.*,a_platform.platform_name,agent.ag_name,agent.AG_UNIQ_NUM from
+    select a.*,a_platform.platform_name,agent.ag_name,agent.AG_UNIQ_NUM,agent.id as agId from
     (
     select
     to_char(o_payment_detail.plan_pay_time,'yyyy-mm') as tm,businfo.agent_id,businfo.bus_platform,
@@ -1962,6 +2237,7 @@
 
   <sql id="BASE_WHERE_SQL">
     <if test="agUniqNum!=null and agUniqNum!=''"> and agent.AG_UNIQ_NUM=#{agUniqNum} </if>
+    <if test="agId!=null and agId!=''"> and agent.id=#{agId} </if>
     <if test="agName !=null and agName !='' ">
       and  agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')
     </if>

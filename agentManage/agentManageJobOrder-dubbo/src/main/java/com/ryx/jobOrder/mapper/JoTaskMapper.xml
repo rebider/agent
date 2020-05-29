@@ -415,7 +415,7 @@
         and jt.deal_group_id = #{example.joDealGroupId}
       </if>
       <if test="example.secondDealGroup != null and example.secondDealGroup != ''">
-        and jt.second_deal_group = #{example.secondDealGroup}
+        and jt.second_deal_group like CONCAT(#{example.secondDealGroup},'%')
       </if>
       <if test="example.joTaskStatus != null and example.joTaskStatus != ''">
         and jt.jo_task_status = #{example.joTaskStatus}

@@ -219,6 +219,15 @@
             <!--overwrite="true"-->
             <!--disabled="true"/>-->
 
+    <job:simple id="agentDebitCardFileJob"
+                job-ref="agentDebitCardFileJob"
+                registry-center-ref="regCenter"
+                cron="0 0 12 * * ?"
+                overwrite="true"
+                description="智慧POS/PLUS的一级代理商的结算卡信息，放置对账文件的FTP,一天一次"
+                sharding-total-count="1"
+                sharding-item-parameters="0=Server0"
+                disabled="${job.agentDebitCardFileJob}"/>
 
    <import resource="spring-elastic-order.xml"/>
    <import resource="spring-elastic-card.xml"/>

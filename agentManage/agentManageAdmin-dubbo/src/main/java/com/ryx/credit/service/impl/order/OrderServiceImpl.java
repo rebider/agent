@@ -3285,7 +3285,7 @@ public class OrderServiceImpl implements OrderService {
         OPaymentDetailExample example = new OPaymentDetailExample();
         example.or().andOrderIdEqualTo(orderId)
                 .andStatusEqualTo(Status.STATUS_1.status)
-                .andPaymentStatusIn(Arrays.asList(PaymentStatus.DF.code, PaymentStatus.BF.code, PaymentStatus.YQ.code))
+                .andPaymentStatusIn(Arrays.asList(PaymentStatus.DF.code,PaymentStatus.BF.code, PaymentStatus.YQ.code))
                 .andAgentIdEqualTo(agentId);
         example.setOrderByClause(" plan_pay_time asc ");
         List<OPaymentDetail> paymentDetails = oPaymentDetailMapper.selectByExample(example);
@@ -3762,7 +3762,7 @@ public class OrderServiceImpl implements OrderService {
                         if (orderoutVo.getPayMethod().equals("首付+分润分期") || orderoutVo.getPayMethod().equals("分润分期")) {
                             orderoutVo.setMqydkAmt(String.valueOf(BigDecimal.ZERO));
                         } else if (orderoutVo.getPayMethod().equals("首付+打款分期") || orderoutVo.getPayMethod().equals("付款分期")) {
-                            orderoutVo.setMqykAmt(BigDecimal.ZERO);
+                            orderoutVo.setMqykAmt(String.valueOf(BigDecimal.ZERO));
                         }
                     }
                 }
@@ -3828,25 +3828,25 @@ public class OrderServiceImpl implements OrderService {
         List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.SETTLEMENT_TYPE.name());
         List<Dict> capitalType = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
 
-        if (null!=orderoutList  && orderoutList.size()>0){
+        if (null!=orderoutList && orderoutList.size()>0) {
             for (OrderoutVo orderoutVo : orderoutList) {
                 if (StringUtils.isNotBlank(orderoutVo.getPayMethod()) && !orderoutVo.getPayMethod().equals("null")) {
                     for (Dict dict : dictList) {
-                        if (null!=dict  &&  orderoutVo.getPayMethod().equals(dict.getdItemvalue())){
+                        if (null!=dict && orderoutVo.getPayMethod().equals(dict.getdItemvalue())) {
                             orderoutVo.setPayMethod(dict.getdItemname());
                             break;
                         }
                     }
                 }
-                if (StringUtils.isNotBlank(orderoutVo.getDeductionType()) && !orderoutVo.getDeductionType().equals("null")){
+                if (StringUtils.isNotBlank(orderoutVo.getDeductionType()) && !orderoutVo.getDeductionType().equals("null")) {
                     for (Dict dict : capitalType) {
-                        if (null!=dict && orderoutVo.getDeductionType().equals(dict.getdItemvalue())){
+                        if (null!=dict && orderoutVo.getDeductionType().equals(dict.getdItemvalue())) {
                             orderoutVo.setDeductionType(dict.getdItemname());
-                            BigDecimal deductionAmount=new BigDecimal(0);
-                            if (null!=orderoutVo.getDeductionAmount()){
-                                deductionAmount= orderoutVo.getDeductionAmount();
+                            BigDecimal deductionAmount = new BigDecimal(0);
+                            if (null != orderoutVo.getDeductionAmount()) {
+                                deductionAmount = orderoutVo.getDeductionAmount();
                             }
-                            orderoutVo.setAmount(orderoutVo.getDeductionType()+":"+orderoutVo.getDeductionAmount());
+                            orderoutVo.setAmount(orderoutVo.getDeductionType() + ":" + orderoutVo.getDeductionAmount());
                             break;
                         }
                     }
@@ -3856,7 +3856,7 @@ public class OrderServiceImpl implements OrderService {
                         if (orderoutVo.getPayMethod().equals("首付+分润分期") || orderoutVo.getPayMethod().equals("分润分期")) {
                             orderoutVo.setMqydkAmt(String.valueOf(BigDecimal.ZERO));
                         } else if (orderoutVo.getPayMethod().equals("首付+打款分期") || orderoutVo.getPayMethod().equals("付款分期")) {
-                            orderoutVo.setMqykAmt(BigDecimal.ZERO);
+                            orderoutVo.setMqykAmt(String.valueOf(BigDecimal.ZERO));
                         }
                     }
                 }
@@ -3884,15 +3884,16 @@ public class OrderServiceImpl implements OrderService {
                         }
                     }
                 }
-                if(StringUtils.isNotBlank(orderoutVo.getNuclearUser())){
+                if (StringUtils.isNotBlank(orderoutVo.getNuclearUser())) {
                     CUser cUser = iUserService.selectById(orderoutVo.getNuclearUser());
-                    if(null!=cUser)
+                    if (null != cUser)
                         orderoutVo.setNuclearUser(cUser.getName());
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getOrderUser())) {
                     CUser cUser = iUserService.selectById(orderoutVo.getOrderUser());
-                    if(null != cUser)
+                    if(null != cUser) {
                         orderoutVo.setOrderUser(cUser.getName());
+                    }
                 }
                 if (StringUtils.isNotBlank(orderoutVo.getReviewStatus()) && !orderoutVo.getReviewStatus().equals("null")) {
                     String agStatusByValue = AgStatus.getMsg(new BigDecimal(orderoutVo.getReviewStatus()));
@@ -3903,6 +3904,141 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return orderoutList;
+    }
+
+    /**
+     * 订单商品明细导出
+     * @param map
+     * @return
+     */
+    @Override
+    public List<OrderoutVo> exportOrderDetail(Map map) {
+        if (null != map.get("userId")) {
+            Long userId = (Long) map.get("userId");
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            map.put("platfromPerm", platfromPerm);
+        }
+
+        List<OrderoutVo> orderoutVoList = orderMapper.excelOrderDetail(map);
+        List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.SETTLEMENT_TYPE.name());
+        List<Dict> capitalType = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
+
+        if (null!=orderoutVoList && orderoutVoList.size()>0) {
+            Map<String, Object> orderDetailMap = new HashMap<>();
+            for (OrderoutVo orderoutVo : orderoutVoList) {
+                if (orderDetailMap.get(orderoutVo.getNum()) == null) {
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getPayMethod());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getComName());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getPayUser());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getRealRecTime());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getNuclearUser());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getCheckDate());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getXxAmount());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getProfitMouth());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getProfitForm());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getYkfrAmt());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getDownPaymentDate());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getDownPaymentCount());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getMqykAmt());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getFqdkAmt());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getFrdkCount());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getMqydkAmt());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getSjdkAmt());
+                    orderDetailMap.put(orderoutVo.getNum(), orderoutVo.getSyqkAmt());
+                } else {
+                    orderoutVo.setPayMethod("");
+                    orderoutVo.setComName("");
+                    orderoutVo.setPayUser("");
+                    orderoutVo.setRealRecTime("");
+                    orderoutVo.setNuclearUser("");
+                    orderoutVo.setCheckDate("");
+                    orderoutVo.setXxAmount("");
+                    orderoutVo.setProfitMouth("");
+                    orderoutVo.setProfitForm("");
+                    orderoutVo.setYkfrAmt(null);
+                    orderoutVo.setDownPaymentDate("");
+                    orderoutVo.setDownPaymentCount(null);
+                    orderoutVo.setMqykAmt("");
+                    orderoutVo.setFqdkAmt(null);
+                    orderoutVo.setFrdkCount(null);
+                    orderoutVo.setMqydkAmt("");
+                    orderoutVo.setSjdkAmt(null);
+                    orderoutVo.setSyqkAmt(null);
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getPayMethod()) && !orderoutVo.getPayMethod().equals("null")) {
+                    for (Dict dict : dictList) {
+                        if (null!=dict && orderoutVo.getPayMethod().equals(dict.getdItemvalue())) {
+                            orderoutVo.setPayMethod(dict.getdItemname());
+                            break;
+                        }
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getDeductionType()) && !orderoutVo.getDeductionType().equals("null")) {
+                    for (Dict dict : capitalType) {
+                        if (null!=dict && orderoutVo.getDeductionType().equals(dict.getdItemvalue())) {
+                            orderoutVo.setDeductionType(dict.getdItemname());
+                            BigDecimal deductionAmount = new BigDecimal(0);
+                            if (null != orderoutVo.getDeductionAmount()) {
+                                deductionAmount = orderoutVo.getDeductionAmount();
+                            }
+                            orderoutVo.setAmount(orderoutVo.getDeductionType() + ":" + orderoutVo.getDeductionAmount());
+                            break;
+                        }
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getMqydkAmt()) && !orderoutVo.getMqydkAmt().equals("null")) {
+                    if (StringUtils.isNotBlank(orderoutVo.getPayMethod())) {
+                        if (orderoutVo.getPayMethod().equals("首付+分润分期") || orderoutVo.getPayMethod().equals("分润分期")) {
+                            orderoutVo.setMqydkAmt(String.valueOf(BigDecimal.ZERO));
+                        } else if (orderoutVo.getPayMethod().equals("首付+打款分期") || orderoutVo.getPayMethod().equals("付款分期")) {
+                            orderoutVo.setMqykAmt(String.valueOf(BigDecimal.ZERO));
+                        }
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getProfitMouth()) && !orderoutVo.getProfitMouth().equals("null")) {
+                    if (orderoutVo.getProfitMouth().equals("1")) {
+                        orderoutVo.setProfitMouth("是");
+                    } else if (orderoutVo.getProfitMouth().equals("0")) {
+                        orderoutVo.setProfitMouth("否");
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getProfitForm()) && !orderoutVo.getProfitForm().equals("null")) {
+                    String valueProfit = "";
+                    String[] profitForm = orderoutVo.getProfitForm().split(",");
+                    for (String item : profitForm) {
+                        String profitFormValue = ProfitForm.getContentByValue(new BigDecimal(item));
+                        StringBuffer buffer = new StringBuffer();
+                        StringBuffer appendStr = buffer.append(profitFormValue);
+                        if (null != appendStr) {
+                            if ("".equals(valueProfit)) {
+                                valueProfit = String.valueOf(appendStr);
+                            } else {
+                                valueProfit += "," + appendStr;
+                            }
+                            orderoutVo.setProfitForm(String.valueOf(valueProfit));
+                        }
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getNuclearUser())) {
+                    CUser cUser = iUserService.selectById(orderoutVo.getNuclearUser());
+                    if (null != cUser)
+                        orderoutVo.setNuclearUser(cUser.getName());
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getOrderUser())) {
+                    CUser cUser = iUserService.selectById(orderoutVo.getOrderUser());
+                    if(null != cUser) {
+                        orderoutVo.setOrderUser(cUser.getName());
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getReviewStatus()) && !orderoutVo.getReviewStatus().equals("null")) {
+                    String agStatusByValue = AgStatus.getMsg(new BigDecimal(orderoutVo.getReviewStatus()));
+                    if (null != agStatusByValue) {
+                        orderoutVo.setReviewStatus(agStatusByValue);
+                    }
+                }
+            }
+        }
+        return orderoutVoList;
     }
 
     @Override
@@ -4424,6 +4560,63 @@ public class OrderServiceImpl implements OrderService {
 //        }
         logger.info("该记录可以结束,id:"+orderAdjId);
         return AgentResult.ok();
+    }
+
+    @Override
+    public PageInfo queryAgentUpModelDetailList(Map par, Page page) {
+        PageInfo pageInfo = new PageInfo();
+        if (par == null) return pageInfo;
+        if (par.get("proName") != null && StringUtils.isNotBlank((String)par.get("proName"))){
+            par.put("proName",Arrays.asList(((String)par.get("proName")).split(",")));
+        }else {
+            par.put("proName",new  ArrayList<String>());
+        }
+        if(null!=par.get("userId")) {
+            Long userId = (Long) par.get("userId");
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            par.put("platfromPerm", platfromPerm);
+        }
+        par.put("page", page);
+        Map<String,Object> orderMap = new HashMap<>();
+        List<OrderAdjustVo> list = orderAdjMapper.selectOrderAdjustDetailAll(par, page);
+        for (OrderAdjustVo orderAdjustVo:list){
+            if (orderMap.get(orderAdjustVo.getAdjId()) == null){
+                orderMap.put(orderAdjustVo.getAdjId(),orderAdjustVo.getProRefundAmount());
+            }else {
+                orderAdjustVo.setProRefundAmount("0");
+            }
+        }
+        pageInfo.setTotal(orderAdjMapper.selectOrderAdjustDetailAllCount(par));
+        pageInfo.setRows(list);
+        return pageInfo;
+    }
+
+    @Override
+    public List<OrderAdjustVo> excelOrderAdjustDetailAll(Map map) {
+
+        if(null!=map.get("userId")) {
+            Long userId = (Long) map.get("userId");
+            List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+            map.put("platfromPerm", platfromPerm);
+        }
+        List<OrderAdjustVo> orderAdjVoList = orderAdjMapper.excelOrderAdjustDetailAll(map);
+        if (null!=orderAdjVoList && orderAdjVoList.size()>0) {
+            for (OrderAdjustVo orderAdjustVo : orderAdjVoList) {
+                if (StringUtils.isNotBlank(orderAdjustVo.getReviewsStat()) && !orderAdjustVo.getReviewsStat().equals("null")) {
+                    String reviewsStatusByValue = AgStatus.getMsg(new BigDecimal(orderAdjustVo.getReviewsStat()));
+                    if (null != reviewsStatusByValue) {
+                        orderAdjustVo.setReviewsStat(reviewsStatusByValue);
+                    }
+                }
+                if (StringUtils.isNotBlank(orderAdjustVo.getRefundStat()) && !orderAdjustVo.getRefundStat().equals("null")) {
+                    Dict refundStatusByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.REFUND_STAT.name(), orderAdjustVo.getRefundStat());
+                    if (null != refundStatusByValue) {
+                        orderAdjustVo.setRefundStat(refundStatusByValue.getdItemname());
+                    }
+                }
+            }
+        }
+        return orderAdjVoList;
     }
 
 

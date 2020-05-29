@@ -291,8 +291,8 @@
 
   <sql id="queryAgentContract">
     select
-    ac.agent_id, aa.ag_name, aa.ag_status,
-    ac.cont_type, ac.cont_num,
+    ac.agent_id, aa.ag_uniq_num, aa.ag_name, aa.ag_status,
+    ac.id, ac.cont_type, ac.cont_num, ac.clo_review_status,
     to_char(ac.cont_date,'YYYY-MM-DD') as cont_date,
     to_char(ac.cont_end_date,'YYYY-MM-DD') as cont_end_date,
     ac.append_agree, ac.remark
@@ -311,6 +311,7 @@
         and (org.code like concat(#{map.organizationCode},'%') or orging.code like concat(#{map.organizationCode},'%'))
       </if>
       <if test="map.agentId!=null and map.agentId!=''"> and ac.agent_id = #{map.agentId} </if>
+      <if test="map.agUniqNum!=null and map.agUniqNum!=''"> and aa.ag_uniq_num = #{map.agUniqNum} </if>
       <if test="map.agName!=null and map.agName!=''"> and aa.ag_name like concat(concat('%',#{map.agName}),'%') </if>
       <if test="map.agStatus!=null and map.agStatus!=''"> and aa.ag_status = #{map.agStatus} </if>
       <if test="map.contType!=null and map.contType!=''"> and ac.cont_type = #{map.contType} </if>

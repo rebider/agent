@@ -173,7 +173,7 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
 
     @Override
     public PageInfo jobOrderQueryLaunchList(Map map, Page page) {
-        logger.info("------我发起的工单列表查询------");
+        logger.info("------我发起的工单列表查询------{}",map);
         String joAcceptTimeBeginStr = (String) map.get("launchBeginTime");
         String joAcceptTimeEndStr = (String) map.get("launchEndTime");
         if((StringUtils.isNotBlank(joAcceptTimeBeginStr) && StringUtils.isNotBlank(joAcceptTimeEndStr))){

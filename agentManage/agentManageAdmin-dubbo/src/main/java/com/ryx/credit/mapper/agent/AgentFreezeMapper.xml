@@ -15,6 +15,7 @@
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="FREEZE_TYPE" jdbcType="DECIMAL" property="freezeType" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -47,7 +48,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, AGENT_ID, FREEZE_STATUS, FREEZE_PERSON, FREEZE_DATE, FREEZE_CAUSE, UNFREEZE_PERSON, 
-    UNFREEZE_DATE, UNFREEZE_CAUSE, FREEZE_NUM, REMARK, STATUS, VERSION
+    UNFREEZE_DATE, UNFREEZE_CAUSE, FREEZE_NUM, REMARK, STATUS, VERSION, FREEZE_TYPE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreezeExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -82,12 +83,12 @@
       FREEZE_PERSON, FREEZE_DATE, FREEZE_CAUSE, 
       UNFREEZE_PERSON, UNFREEZE_DATE, UNFREEZE_CAUSE, 
       FREEZE_NUM, REMARK, STATUS, 
-      VERSION)
+      VERSION, FREEZE_TYPE)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{freezeStatus,jdbcType=VARCHAR}, 
       #{freezePerson,jdbcType=VARCHAR}, #{freezeDate,jdbcType=TIMESTAMP}, #{freezeCause,jdbcType=VARCHAR}, 
       #{unfreezePerson,jdbcType=VARCHAR}, #{unfreezeDate,jdbcType=TIMESTAMP}, #{unfreezeCause,jdbcType=VARCHAR}, 
       #{freezeNum,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL})
+      #{version,jdbcType=DECIMAL}, #{freezeType,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreeze">
     insert into A_AGENT_FREEZE
@@ -131,6 +132,9 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="freezeType != null">
+        FREEZE_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -171,6 +175,9 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="freezeType != null">
+        #{freezeType,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -219,6 +226,9 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="freezeType != null">
+        FREEZE_TYPE = #{freezeType,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -235,7 +245,8 @@
       FREEZE_NUM = #{freezeNum,jdbcType=VARCHAR},
       REMARK = #{remark,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      FREEZE_TYPE = #{freezeType,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -261,15 +272,23 @@
     )
   </select>
   <sql id="queryAgentFreezeSql">
-      select t.*,a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS
+      select t.ID,t.AGENT_ID,t.FREEZE_STATUS,t.FREEZE_PERSON,
+             t.FREEZE_DATE,t.FREEZE_CAUSE,t.UNFREEZE_PERSON,
+             t.UNFREEZE_DATE,t.UNFREEZE_CAUSE,t.FREEZE_NUM,
+             t.REMARK,t.STATUS,t.VERSION,nvl(t.FREEZE_TYPE,'1') as FREEZE_TYPE,
+             a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS
       from a_agent_freeze t
       left join a_agent a on a.id=t.agent_id
       <where>
+        <if test="1==1"> and t.status = 1 and a.status = 1 </if>
         <if test="map.id!=null and map.agentId != ''">
            and t.id = #{map.id,jdbcType=VARCHAR}
         </if>
         <if test="map.agentId != null and map.agentId != '' ">
-          and t.agent_Id = #{map.agentId,jdbcType=VARCHAR}
+          and t.agent_Id in
+        <foreach collection="map.agentId" item="listItem" open="(" close=")" separator="," >
+            #{listItem}
+        </foreach>
         </if>
         <if test="map.agentName != null and map.agentName != '' ">
           and a.ag_name LIKE CONCAT(CONCAT('%',#{map.agentName}),'%')
@@ -305,4 +324,90 @@
       order by t.agent_id,t.freeze_date desc
   </sql>
 
+  <select id="queryAgentBasicLackData" parameterType="map" resultMap="AgentFreezeVo">
+    <include refid="queryAgentBasicLackSql"/>
+  </select>
+  <sql id="queryAgentBasicLackSql">
+    select * from (
+      select
+      aa.id as ag_id,
+      aa.ag_name,
+      aa.ag_nature,
+      aa.ag_capital,
+      aa.ag_bus_lic,
+      aa.ag_bus_licb,
+      aa.ag_bus_lice,
+      aa.ag_legal,
+      aa.ag_legal_certype,
+      aa.ag_legal_cernum,
+      aa.ag_legal_mobile,
+      aa.ag_head,
+      aa.ag_head_mobile,
+      aa.ag_reg_area,
+      aa.ag_reg_add,
+      aa.ag_bus_scope,
+      aa.bus_contact_email,
+      aa.bus_risk_email,
+      aa.ag_status,
+      to_char(aa.c_time,'yyyy-MM-dd hh24:mi:ss') as c_time,
+      to_char(aa.c_incom_time,'yyyy-MM-dd hh24:mi:ss') as c_incom_time,
+      ac.id as ac_id,
+      ac.clo_type,
+      ac.clo_realname,
+      ac.clo_bank_account,
+      ac.clo_bank,
+      ac.bank_region,
+      ac.clo_bank_branch,
+      ac.all_line_num,
+      ac.branch_line_num,
+      ac.clo_tax_point,
+      ac.clo_invoice,
+      ac.ag_legal_cernum as ac_ag_legal_cernum,
+      ac.clo_review_status
+      from a_agent aa
+      left join a_agent_colinfo ac on ac.agent_id = aa.id and ac.status = '1' and ac.clo_review_status = '3'
+      where aa.status = '1' and aa.ag_status = 'Approved'
+      and exists (
+        select ab.id from a_agent_businfo ab
+        where ab.agent_id = aa.id and ab.status = '1' and ab.clo_review_status = '3' and ab.bus_status in (0,1,2,3)
+      )
+    )
+    a order by c_time desc
+  </sql>
+  <resultMap id="AgentFreezeVo" type="com.ryx.credit.pojo.admin.vo.AgentFreezeVo">
+    <id column="ag_id" property="agId" jdbcType="VARCHAR"/>
+    <result column="ag_name" property="agName" jdbcType="VARCHAR"/>
+    <result column="ag_nature" property="agNature" jdbcType="VARCHAR"/>
+    <result column="ag_capital" property="agCapital" jdbcType="VARCHAR"/>
+    <result column="ag_bus_lic" property="agBusLic" jdbcType="VARCHAR"/>
+    <result column="ag_bus_licb" property="agBusLicb" jdbcType="VARCHAR"/>
+    <result column="ag_bus_lice" property="agBusLice" jdbcType="VARCHAR"/>
+    <result column="ag_legal" property="agLegal" jdbcType="VARCHAR"/>
+    <result column="ag_legal_certype" property="agLegalCertype" jdbcType="VARCHAR"/>
+    <result column="ag_legal_cernum" property="agLegalCernum" jdbcType="VARCHAR"/>
+    <result column="ag_legal_mobile" property="agLegalMobile" jdbcType="VARCHAR"/>
+    <result column="ag_head" property="agHead" jdbcType="VARCHAR"/>
+    <result column="ag_head_mobile" property="agHeadMobile" jdbcType="VARCHAR"/>
+    <result column="ag_reg_area" property="agRegArea" jdbcType="VARCHAR"/>
+    <result column="ag_reg_add" property="agRegAdd" jdbcType="VARCHAR"/>
+    <result column="ag_bus_scope" property="agBusScope" jdbcType="VARCHAR"/>
+    <result column="bus_contact_email" property="busContactEmail" jdbcType="VARCHAR"/>
+    <result column="bus_risk_email" property="busRiskEmail" jdbcType="DECIMAL"/>
+    <result column="ag_status" property="agStatus" jdbcType="VARCHAR"/>
+    <result column="c_time" property="cTime" jdbcType="VARCHAR"/>
+    <result column="c_incom_time" property="cIncomTime" jdbcType="VARCHAR"/>
+    <result column="ac_id" property="acId" jdbcType="VARCHAR"/>
+    <result column="clo_type" property="cloType" jdbcType="VARCHAR"/>
+    <result column="clo_realname" property="cloRealname" jdbcType="VARCHAR"/>
+    <result column="clo_bank_account" property="cloBankAccount" jdbcType="VARCHAR"/>
+    <result column="clo_bank" property="cloBank" jdbcType="VARCHAR"/>
+    <result column="bank_region" property="bankRegion" jdbcType="VARCHAR"/>
+    <result column="clo_bank_branch" property="cloBankBranch" jdbcType="VARCHAR" />
+    <result column="all_line_num" property="allLineNum" jdbcType="VARCHAR"/>
+    <result column="branch_line_num" property="branchLineNum" jdbcType="VARCHAR"/>
+    <result column="clo_tax_point" property="cloTaxPoint" jdbcType="VARCHAR"/>
+    <result column="clo_invoice" property="cloInvoice" jdbcType="VARCHAR"/>
+    <result column="ac_ag_legal_cernum" property="acAgLegalCernum" jdbcType="VARCHAR"/>
+    <result column="clo_review_status" property="cloReviewStatus" jdbcType="VARCHAR"/>
+  </resultMap>
 </mapper>

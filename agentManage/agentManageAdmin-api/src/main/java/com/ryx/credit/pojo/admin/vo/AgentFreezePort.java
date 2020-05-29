@@ -1,6 +1,8 @@
 package com.ryx.credit.pojo.admin.vo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
 
 /***
  * @Author liudh
@@ -17,6 +19,7 @@ public class AgentFreezePort implements Serializable{
     private String freezeNum;
     private String remark;
     private String unfreezeCause;
+    private List<BigDecimal> freeType;
 
     public String getUnfreezeCause() {
         return unfreezeCause;
@@ -66,4 +69,11 @@ public class AgentFreezePort implements Serializable{
         this.operationPerson = operationPerson;
     }
 
+    public List<BigDecimal> getFreeType() {
+        return freeType;
+    }
+
+    public void setFreeType(List<BigDecimal> freeType) {
+        this.freeType = freeType;
+    }
 }

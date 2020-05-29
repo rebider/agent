@@ -16,6 +16,7 @@ import com.ryx.credit.pojo.admin.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentCaVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.ICuserAgentService;
 import com.ryx.credit.service.IResourceService;
@@ -34,9 +35,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -377,6 +380,8 @@ public class AgentServiceImpl implements AgentService {
         db_agent.setAgRegArea(agent.getAgRegArea());
         db_agent.setBusRiskEmail(agent.getBusRiskEmail());
         db_agent.setBusContactEmail(agent.getBusContactEmail());
+        db_agent.setAgRunAdd(agent.getAgRunAdd());
+        db_agent.setAgLegalCerdate(agent.getAgLegalCerdate());
         if (1 != agentMapper.updateByPrimaryKeySelective(db_agent)) {
             throw new ProcessException("代理商信息更新失败");
         }else{
@@ -932,6 +937,15 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
+    public List<Agent> queryAgentByIds(List ids) {
+        long currentTimeMillis = System.currentTimeMillis();
+        List<Agent> agents = agentMapper.queryAgentByIds(ids);
+        long currentTimeMillis1 = System.currentTimeMillis();
+        logger.info("用时："+(currentTimeMillis1-currentTimeMillis));
+        return agents;
+    }
+
+    @Override
     public PageInfo agentCaManageList(Page page, Map map) {
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentMapper.queryCaManagerList(map, page));
@@ -943,7 +957,7 @@ public class AgentServiceImpl implements AgentService {
     public List<AgentCaVo> exportAgentCa(Map map) {
 
         List<AgentCaVo> list = agentMapper.expoerCaList(map);
-        List<Dict> caStatus = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CERTIFICATION_STATUS.name());
+        List<Dict> caStatus = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CER_RES_STATUS.name());
         if (null != list && list.size() > 0)
             list.forEach(agent->{
                 if (null!=agent.getCaStatus()) {
@@ -981,5 +995,45 @@ public class AgentServiceImpl implements AgentService {
         return list;
     }
 
+    /**
+     * 风控服务-代理商列表查询
+     * @param page
+     * @param map
+     * @return
+     */
+    @Override
+    public PageInfo queryAgentRiskList(Page page, Map map) {
+        Long userId = (Long) map.get("userId");
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        map.put("platfromPerm", platfromPerm);
+        PageInfo pageInfo = new PageInfo();
+        List<Map<String, Object>> agentRiskView = agentMapper.queryAgentRiskView(map, page);
+        int agentRiskCount = agentMapper.queryAgentRiskCount(map);
+        pageInfo.setRows(agentRiskView);
+        pageInfo.setTotal(agentRiskCount);
+        return pageInfo;
+    }
+
+    /**
+     * 风控服务-代理商列表导出
+     * @param map
+     * @return
+     * @throws ParseException
+     */
+    @Override
+    public List<AgentoutVo> exportAgentRisk(Map map) throws ParseException {
+        Long userId = (Long) map.get("userId");
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        map.put("platfromPerm", platfromPerm);
+        List<AgentoutVo> agentoutVoList = agentMapper.exportAgentRisk(map);
+        if (null==agentoutVoList && agentoutVoList.size()<1) {
+            return null;
+        }
+//        if (null != agentoutVos && agentoutVos.size() > 0) {
+//            for (AgentoutVo agentoutVo : agentoutVos) {
+//            }
+//        }
+        return agentoutVoList;
+    }
 
 }

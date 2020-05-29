@@ -157,7 +157,7 @@
     <dubbo:reference interface="com.ryx.credit.service.ActRuTaskService" id="actRuTaskService"  timeout="1200000" registry="myGroup" check="false" />
 
     <dubbo:service interface="com.ryx.credit.service.agent.AgentDebitCardService" ref="agentDebitCardService"  timeout="1200000" registry="myGroup"/>
-
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentDebitCardFileService" ref="agentDebitCardFileService"  timeout="1200000" registry="myGroup"/>
     <!-- 退货-->
     <dubbo:service interface="com.ryx.credit.service.order.OsnOperateReturnService" ref="osnOperateReturnService"  timeout="1200000" registry="myGroup" />
     <dubbo:service interface="com.ryx.credit.service.agent.AgentFreezeService" ref="agentFreezeService"  timeout="1200000" registry="myGroup" />

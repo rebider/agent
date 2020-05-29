@@ -433,7 +433,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
         }
 
         //检验流量卡(流量卡直接)
-        if (oActivity != null && StringUtils.isNotBlank(oActivity.getActCode()) && ("2204".equals(oActivity.getActCode()) || "2004".equals(oActivity.getActCode()))) {
+        List<String> actCodeList = dictOptionsService.dictValueList("AGENT", "ACTCODE");
+        if (oActivity != null && StringUtils.isNotBlank(oActivity.getActCode()) && (actCodeList.contains(oActivity.getActCode()))) {
             //更新物流,后续优化
             return AgentResult.ok();
         }
@@ -1088,7 +1089,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         OLogisticsDetailExample.Criteria criteria = oLogisticsDetailExample.createCriteria();
         criteria.andLogisticsIdEqualTo(oLogistics.getId())
                 .andRecordStatusIn(Arrays.asList(OLogisticsDetailStatus.RECORD_STATUS_VAL.code, OLogisticsDetailStatus.RECORD_STATUS_HIS.code))
-                .andOptTypeEqualTo("ORDER");
+                .andOptTypeEqualTo(OLogisticsDetailOptType.ORDER.code);
         List<OLogisticsDetail> oLogisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
         if (oLogistics.getSendNum().intValue() != oLogisticsDetails.size()){
             throw new MessageException("物流明细异常！");
@@ -1106,6 +1107,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         updateLogistics.setVersion(oLogistics.getVersion());
         updateLogistics.setwNumber(oLogistics.getwNumber() + "_" + (new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())));
         updateLogistics.setcUser(userId);
+        updateLogistics.setSendMsg("物流已删除！");
         if (1 != oLogisticsMapper.updateByPrimaryKeySelective(updateLogistics)) {
             logger.info("物流删除操作，更新数据库失败:{},{},{}", oLogistics.getId(), oLogistics.getSnBeginNum(), oLogistics.getSnEndNum());
             throw new MessageException("更新物流状态异常！");

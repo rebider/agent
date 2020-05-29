@@ -3,6 +3,7 @@ package com.ryx.credit.dao.agent;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.agent.AgentFreeze;
 import com.ryx.credit.pojo.admin.agent.AgentFreezeExample;
+import com.ryx.credit.pojo.admin.vo.AgentFreezeVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -28,4 +29,6 @@ public interface AgentFreezeMapper {
     List<Map<String,String>> queryAgentFreezeList(@Param("map")Map<String,Object> map,@Param("page") Page page);
 
     int queryAgentFreezeCount(@Param("map")Map<String,Object> map);
+
+    List<AgentFreezeVo> queryAgentBasicLackData();
 }

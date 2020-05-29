@@ -109,8 +109,6 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
                 joTaskVo.setJoStartTimeEnd(DateUtil.format(joStartTimeEndStr,DateUtil.DATE_FORMAT_1));
             }
         }
-        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(joTaskVo.getUserId());
-        joTaskVo.setPlatfromPerm(platfromPerm);
         List jotaskVolist = joTaskMapper.selectByJoTaskVo(joTaskVo, page);
         PageInfo pageInfo = new PageInfo();
         List jotaskVolist2 = joTaskMapper.selectByJoTaskVo(joTaskVo, null);
@@ -235,12 +233,10 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         String oldContent = StringUtils.isBlank(joTaskOld.getJoTaskContent())?"":joTaskOld.getJoTaskContent();
         if("0".equals(dealCode)){
             joTaskOld.setJoTaskContent(oldContent
-                    +" 转发到发起人:"+
-                    content.substring(content.indexOf(":")+1, content.length()));
+                    + " 转发到发起人:" + content);
         }else{
             joTaskOld.setJoTaskContent(oldContent
-                    +" 转发到" + joTask.getDealGroup()+":"+
-            content.substring(content.indexOf(":")+1, content.length()));
+                    + " 转发到" + joTask.getDealGroup()+":" + content);
         }
         // 结束工单任务
         endJoTask( joTaskOld );
