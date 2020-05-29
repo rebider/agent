@@ -35,5 +35,4 @@ public interface BusActRelMapper {
 
     BusActRel findByActivId(String activId);
 
-    Map<String, Object> queryActRuTaskByMap(Map<String, Object> paramMap);
 }
