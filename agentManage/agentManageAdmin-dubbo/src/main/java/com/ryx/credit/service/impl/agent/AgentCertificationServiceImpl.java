@@ -275,8 +275,14 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                 if(StringUtils.isNotBlank(dataObj.getString("frName")) &&
                         StringUtils.isNotBlank(dataObj.getString("enterpriseName")) &&
                         StringUtils.isNotBlank(dataObj.getString("openFrom")) &&
-                        StringUtils.isNotBlank(dataObj.getString("openTo")) &&
-                        StringUtils.isNotBlank(dataObj.getString("creditCode")) ){
+                        StringUtils.isNotBlank(dataObj.getString("openTo"))
+                        ){
+                    String creditCode="";
+                    if(StringUtils.isNotBlank(dataObj.getString("creditCode")) ){
+                        creditCode=dataObj.getString("creditCode");
+                    }else if(StringUtils.isNotBlank(dataObj.getString("regNo"))){
+                        creditCode=dataObj.getString("regNo");
+                    }
                     Date date=new Date();
                     if(StringUtils.isNotBlank(dataObj.getString("openTo")) && dataObj.getString("openTo").equals("长期")){
                         date =DateUtil.format("2099-12-31","yyyy-MM-dd");
@@ -288,7 +294,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                             !agent.getAgName().equals(dataObj.getString("enterpriseName")) ||
                             agent.getAgBusLicb().compareTo(dataObj.getDate("openFrom"))!=0||
                             agent.getAgBusLice().compareTo(date)!=0 ||
-                            !agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
+                            !agent.getAgBusLic().equals(creditCode)){
                         logger.info("认证成功，与本地信息不符",agentCertification.getId());
                         if(!agent.getAgLegal().equals(dataObj.getString("frName"))){
                             remark+="法人姓名,";
@@ -296,7 +302,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                         if(!agent.getAgName().equals(dataObj.getString("enterpriseName"))){
                             remark+="企业名称,";
                         }
-                        if(!agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
+                        if(!agent.getAgBusLic().equals(creditCode)){
                             remark+="营业执照,";
                         }
                         if(agent.getAgBusLicb().compareTo(dataObj.getDate("openFrom"))!=0){
@@ -324,7 +330,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                             agent.getAgName().equals(dataObj.getString("enterpriseName")) &&
                             agent.getAgBusLicb().compareTo(dataObj.getDate("openFrom"))==0&&
                             agent.getAgBusLice().compareTo(date)==0 &&
-                            agent.getAgBusLic().equals(dataObj.getString("creditCode"))){
+                            agent.getAgBusLic().equals(creditCode)){
 //                    一致则解冻 为认证通过
                         logger.info("认证成功,开始解冻",agentCertification.getId());
                         cerResStatus = CerResStatus.SUCCESS.status;
@@ -668,6 +674,8 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
             agent.setAgBusScope(dataObj.getString("operateScope"));//经营范围
         if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("creditCode")))
             agent.setAgBusLic(dataObj.getString("creditCode"));//营业执照
+        else if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(dataObj.getString("regNo")))
+            agent.setAgBusLic(dataObj.getString("regNo"));//营业执照
         //如果负责人没有，采用工商认证后的法人
         if(StringUtils.isBlank(agent.getAgHead())){
             agent.setAgHead(agent.getAgLegal());
