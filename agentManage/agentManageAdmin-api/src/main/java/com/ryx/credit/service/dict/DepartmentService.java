@@ -45,4 +45,11 @@ public interface DepartmentService {
      * @return
      */
     List<COrganization> selectNextChildsRegion(Long pid);
+
+    /**
+     * 根据loginName查询部门
+     * @param loginName
+     * @return
+     */
+    public COrganization getByLoginName(String loginName);
 }

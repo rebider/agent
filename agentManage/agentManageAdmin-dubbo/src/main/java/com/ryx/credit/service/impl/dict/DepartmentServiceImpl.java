@@ -179,5 +179,18 @@ public class DepartmentServiceImpl implements DepartmentService {
         return cOrganizations;
     }
 
+    @Override
+    public COrganization getByLoginName(String loginName) {
+        List<UserVo> userVoList = cUserMapper.selectListByLogin(loginName);
+        if(userVoList!=null && userVoList.size()>0){
+            UserVo userVo = userVoList.get(0);
+            COrganization organization = cOrganizationMapper.selectByPrimaryKey(userVo.getOrganizationId());
+            if(organization!=null){
+                return organization;
+            }
+        }
+        return null;
+    }
+
 
 }
