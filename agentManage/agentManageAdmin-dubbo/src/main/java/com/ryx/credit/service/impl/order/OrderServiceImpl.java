@@ -4426,14 +4426,16 @@ public class OrderServiceImpl implements OrderService {
             return AgentResult.fail("该记录已执行分期变更!");
         }
         //增加校验。
-        Map<String, Object> taskInfo = busActRelMapper.queryActRuTaskByMap();
-        if (null != taskInfo && null != taskInfo.get("taskDefKey") && order_adjust_xhz_id.equals(taskInfo.get("taskDefKey").toString())) {
-            //1，线下退款，徐慧总节点不允许结束。
-
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("activStatus", AgStatus.Approving.name());
+        paramMap.put("busType", BusActRelBusType.orderAdjust.name());
+        paramMap.put("busId", orderAdj.getId());
+        Map<String, Object> taskInfo = busActRelMapper.queryActRuTaskByMap(paramMap);
+        if (null != taskInfo && null != taskInfo.get("taskDefKey") && order_adjust_xhz_id.equals(taskInfo.get("taskDefKey").toString()) && orderAdj.getRefundType().compareTo(new BigDecimal(1)) == 0) {
+            //1，线下退款，徐慧总节点不允许结束
             return AgentResult.fail("线下打款徐慧总节点，不结束");
-        } else if (null != taskInfo && null != taskInfo.get("taskDefKey") && order_adjust_finance_id.equals(taskInfo.get("taskDefKey").toString())) {
-            //2，不是线下退款，财务节点不允许结束。
-
+        } else if (null != taskInfo && null != taskInfo.get("taskDefKey") && order_adjust_finance_id.equals(taskInfo.get("taskDefKey").toString()) && orderAdj.getRefundType().compareTo(new BigDecimal(0)) == 0) {
+            //2，不是线下退款，财务节点不允许结束
             return AgentResult.fail("非线下打款财务节点，不结束！");
         }
         logger.info("该记录可以结束,id:"+orderAdjId);

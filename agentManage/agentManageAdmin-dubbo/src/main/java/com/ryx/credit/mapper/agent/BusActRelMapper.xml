@@ -292,10 +292,10 @@
         art.task_def_key_ as taskDefKey
     FROM
         A_BUS_ACT_REL bar
-      LEFT JOIN act_ru_task art ON bar.activ_id = art.execution_id_
+        LEFT JOIN act_ru_task art ON bar.activ_id = art.execution_id_
     WHERE
-        bar.activ_status = 'Approving'
-        AND bar.bus_type = 'orderAdjust'
-        AND bar.bus_id = 'AD20200528000000000001310';
+        bar.activ_status = #{activStatus, jdbcType=VARCHAR}
+        AND bar.bus_type = #{busType, jdbcType=VARCHAR}
+        AND bar.bus_id = #{busId, jdbcType=VARCHAR}
   </select>
 </mapper>
