@@ -40,7 +40,7 @@ public interface DepartmentService {
     List<COrganization> selectCityRegion(Long cUser);
 
     /**
-     * 查询下级部门列表
+     * 查询自己及下级部门列表
      * @param code
      * @return
      */

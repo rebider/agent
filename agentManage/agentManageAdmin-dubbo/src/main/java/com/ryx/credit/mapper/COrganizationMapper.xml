@@ -183,6 +183,6 @@
     <select id="selectByLikeCode" resultMap="BaseResultMap" parameterType="string" >
         select
         <include refid="Base_Column_List" />
-        from C_ORGANIZATION where code like CONCAT(#{code},'_%')
+        from C_ORGANIZATION where code like CONCAT(#{code},'%')
     </select>
 </mapper>
