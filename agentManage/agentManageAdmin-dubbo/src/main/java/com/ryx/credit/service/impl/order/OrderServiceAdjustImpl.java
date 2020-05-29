@@ -2968,6 +2968,9 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
             OrderAdj orderAdj = orderAdjMapper.selectByPrimaryKey(orderUpModelVo.getId());
             List<OrderAdjAccountVo> OrderAdjAccountVoList = orderUpModelVo.getAccounts();
             for (OrderAdjAccountVo orderAdjAccountVo : OrderAdjAccountVoList) {// 日期和附件 以账户绑定
+                if (null == orderAdjAccountVo.getRefundTm()){
+                    throw new MessageException("请输入打款时间!");
+                }
                 // 保存打款日期
                 String oaacId = orderAdjAccountVo.getId();
                 OrderAdjAccount orderAdjAccount = orderAdjAccountMapper.selectByPrimaryKey(oaacId);
