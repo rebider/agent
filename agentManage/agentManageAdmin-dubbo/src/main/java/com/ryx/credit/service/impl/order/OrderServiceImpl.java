@@ -4417,11 +4417,11 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
         }
-        BigDecimal refundStat = orderAdj.getRefundStat();
-        if (null != refundStat){
-            logger.error("退款状态为:"+RefundStat.getContentByValue(refundStat));
-            return AgentResult.fail("该记录已执行分期变更!");
-        }
+//        BigDecimal refundStat = orderAdj.getRefundStat();
+//        if (null != refundStat){
+//            logger.error("退款状态为:"+RefundStat.getContentByValue(refundStat));
+//            return AgentResult.fail("该记录已执行分期变更!");
+//        }
         logger.info("该记录可以结束,id:"+orderAdjId);
         return AgentResult.ok();
     }
