@@ -61,6 +61,8 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 				httpResult = industryAuthRequest(agentBusinfoName,isCache);
 			}else{	//测试环境不作工商认证
 				httpResult = "{'respType':'TEST','data':{'isTest':'1'}}";
+//				httpResult = "{\"respCode\":\"000000\",\"respDate\":\"20200428090310\",\"data\":{\"tranDate\":\"20190403\",\"apprDate\":\"2017-09-04\",\"industryName\":\"研究和试验发展\",\"regOrg\":\"大连市西岗区市场监督管理局\",\"historyNameList\":\"[]\",\"city\":\"大连市\",\"startTime\":\"20190403114944\",\"isCache\":\"1\",\"province\":\"辽宁\",\"enterpriseStatus\":\"在营（开业）\",\"operateScope\":\"计算机软件技术开发与技术服务；电子商务；电子产品销售；经济信息咨询（依法须经批准的项目，经相关部门批准>后方可开展经营活动。）\",\"county\":\"西岗区\",\"usci\":\"MA0TX3FC5\",\"keyRegNo\":\"91210204MA0TX3FC5N\",\"regCap\":\"10.00\",\"creditCode\":\"91210204MA0TX3FC5N\",\"ancheYear\":\"2017\",\"esDate\":\"2017-03-14\",\"frName\":\"崔志勇\",\"industryCode\":\"7300\",\"regCapCur\":\"人民币\",\"industryPhyName\":\"科学研究和技术服务业\",\"enterpriseType\":\"有限责任公司（自然人独资）\",\"openFrom\":\"2017-03-14\",\"ancheDate\":\"2018-03-13\",\"tranTime\":\"114944\",\"areaCode\":\"210204\",\"enterpriseName\":\"大连一和凯明科技有限公司\",\"openTo\":\"2027-03-13\",\"industryPhyCode\":\"M\",\"address\":\"辽宁省大连市西岗区长江路728号1单元23层1>号\",\"regNo\":\"210204000187293\"},\"respMsg\":\"处理成功\",\"respType\":\"S\",\"msgType\":\"02\",\"reqDate\":\"20200428090310\",\"version\":\"1.0.0\"}";
+
 			}
 
 			if(StringUtils.isBlank(httpResult)){
@@ -86,6 +88,11 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 				if(StringUtils.isNotBlank(dataMap.getString("enterpriseName"))){
 					if(!agentBusinfoName.equals(dataMap.getString("enterpriseName"))){
 						return new AgentResult(405,"认证名称不一致，请重新输入", dataMap);
+					}
+				}
+				if(StringUtils.isNotBlank(dataMap.getString("enterpriseStatus"))){
+					if(!dataMap.getString("enterpriseStatus").startsWith("在营")){
+						return new AgentResult(405,"非法营业状态", dataMap);
 					}
 				}
 				return AgentResult.ok(dataMap);
@@ -136,6 +143,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		map.put("reqMsgId", reqMsgId);
 
 		String respStr = HttpUtil.doPost(AppConfig.getProperty("gs_auth_url"), map);
+
 		logger.info("返回密文======" + respStr);
 		//返回报文解密开始
 		JSONObject jsonObject = JSONObject.parseObject(respStr);

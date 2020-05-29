@@ -3,12 +3,14 @@ package com.ryx.job.task;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.dataflow.DataflowJob;
+import com.ryx.credit.common.enumc.CerResStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentCertification;
 import com.ryx.credit.service.agent.AgentCertificationService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.BusinessCAService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,8 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
     private static Logger logger = LoggerFactory.getLogger(UpdateAgentCertifiDetailJob.class);
     @Autowired
     private AgentCertificationService agentCertificationService;
+    @Autowired
+    private AgentService agentService;
 
     @Override
     public List<AgentCertification> fetchData(ShardingContext shardingContext) {
@@ -72,15 +76,23 @@ public class UpdateAgentCertifiDetailJob implements DataflowJob<AgentCertificati
                 AgentResult agentResult = agentCertificationService.processData(agent, cer.getId(),orgCerId);// 代理商信息  认证id 最近的一条认证记录
                 if (200!=agentResult.getStatus()){
                     cer.setCerProStat(Status.STATUS_2.status);
-                    cer.setCerRes(Status.STATUS_2.status);
+                    cer.setCerRes(CerResStatus.FAIL.status);
                     cer.setCerSuccessTm(date);
+                    Agent a_agent = agentService.getAgentById(cer.getAgentId());
+                    if(null!=a_agent)
+                        a_agent.setCaStatus(CerResStatus.FAIL.status);
+                        agentService.updateByPrimaryKeySelective(a_agent);
                     agentCertificationService.updateCertifi(cer);
                 }
             }catch (Exception e){
                 logger.error(e.toString());
                 cer.setCerProStat(Status.STATUS_2.status);
-                cer.setCerRes(Status.STATUS_2.status);
+                cer.setCerRes(CerResStatus.FAIL.status);
                 cer.setCerSuccessTm(date);
+                Agent a_agent = agentService.getAgentById(cer.getAgentId());
+                if(null!=a_agent)
+                    a_agent.setCaStatus(CerResStatus.FAIL.status);
+                    agentService.updateByPrimaryKeySelective(a_agent);
                 agentCertificationService.updateCertifi(cer);
                 logger.error("认证任务执行出错!商户唯一编码{},认证记录id{}",cer.getAgentId(),cer.getId());
             }

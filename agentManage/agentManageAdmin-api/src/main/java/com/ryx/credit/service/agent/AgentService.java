@@ -106,6 +106,8 @@ public interface AgentService {
 
     List<Agent> queryByIds(List ids);
 
+    List<Agent> queryAgentByIds(List ids);
+
     PageInfo agentCaManageList(Page page, Map map);
 
     List<AgentCaVo> exportAgentCa(Map map);
