@@ -166,7 +166,7 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
         if (new BigDecimal(orderUpModelVo.getRefundAmount()).compareTo(BigDecimal.ZERO) != 0){
             List<OrderAdjAccountVo>  accounts = orderUpModelVo.getAccounts();
             if (null == accounts || accounts.size() == 0){
-                agentResult.setMsg("请填写账户信息！");
+                agentResult.setMsg("请添加账户信息！");
                 return agentResult;
             }
         }
@@ -741,13 +741,13 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
         if (new BigDecimal(orderUpModelVo.getRefundAmount()).compareTo(BigDecimal.ZERO) != 0){
             List<OrderAdjAccountVo>  accounts = orderUpModelVo.getAccounts();
             if (null == accounts || accounts.size() == 0){
-                agentResult.setMsg("请填写账户信息！");
+                agentResult.setMsg("请添加账户信息！");
                 return agentResult;
             }
         }
         List<OrderAdjAccountVo>  accounts = orderUpModelVo.getAccounts();
         if (null == accounts || accounts.size() == 0){
-            agentResult.setMsg("请填写账户信息！");
+            agentResult.setMsg("请添加账户信息！");
             return agentResult;
         }
         //检查配货+排单数量
