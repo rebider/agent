@@ -2779,6 +2779,9 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                     .andAdjIdEqualTo(orderUpModelVo.getId());
             List<OrderAdjAccount> orderAdjAccounts = orderAdjAccountMapper.selectByExample(orderAdjAccountExample);
             for (OrderAdjAccount account:orderAdjAccounts){
+                if(null == adjAccountVo.getRefundCompany() || "".equals(adjAccountVo.getRefundCompany())){
+                    return AgentResult.fail("请选择出款公司!");
+                }
                 account.setRefundCompany(adjAccountVo.getRefundCompany());
                 account.setRefundAmo(adjAccountVo.getRefundAmo());
                 account.setRefundStat(RefundStat.REFUNDING.key);
