@@ -745,11 +745,11 @@ public class OrderServiceAdjustImpl implements OrderAdjustService {
                 return agentResult;
             }
         }
-        List<OrderAdjAccountVo>  accounts = orderUpModelVo.getAccounts();
-        if (null == accounts || accounts.size() == 0){
-            agentResult.setMsg("请添加账户信息！");
-            return agentResult;
-        }
+//        List<OrderAdjAccountVo>  accounts = orderUpModelVo.getAccounts();
+//        if (null == accounts || accounts.size() == 0){
+//            agentResult.setMsg("请添加账户信息！");
+//            return agentResult;
+//        }
         //检查配货+排单数量
         for (AdjProVo adjProVo : adjPros) {
             OSubOrderExample osubOrderExample = new OSubOrderExample();
