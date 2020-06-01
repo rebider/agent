@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -2954,6 +2955,346 @@ public class InvoiceApplyExample {
 
         public Criteria andRev4NotBetween(String value1, String value2) {
             addCriterion("REV4 not between", value1, value2, "rev4");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusIsNull() {
+            addCriterion("MAILING_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusIsNotNull() {
+            addCriterion("MAILING_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusEqualTo(String value) {
+            addCriterion("MAILING_STATUS =", value, "mailingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusNotEqualTo(String value) {
+            addCriterion("MAILING_STATUS <>", value, "mailingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusGreaterThan(String value) {
+            addCriterion("MAILING_STATUS >", value, "mailingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusGreaterThanOrEqualTo(String value) {
+            addCriterion("MAILING_STATUS >=", value, "mailingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusLessThan(String value) {
+            addCriterion("MAILING_STATUS <", value, "mailingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusLessThanOrEqualTo(String value) {
+            addCriterion("MAILING_STATUS <=", value, "mailingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusLike(String value) {
+            addCriterion("MAILING_STATUS like", value, "mailingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusNotLike(String value) {
+            addCriterion("MAILING_STATUS not like", value, "mailingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusIn(List<String> values) {
+            addCriterion("MAILING_STATUS in", values, "mailingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusNotIn(List<String> values) {
+            addCriterion("MAILING_STATUS not in", values, "mailingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusBetween(String value1, String value2) {
+            addCriterion("MAILING_STATUS between", value1, value2, "mailingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMailingStatusNotBetween(String value1, String value2) {
+            addCriterion("MAILING_STATUS not between", value1, value2, "mailingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchIsNull() {
+            addCriterion("IMPORT_BATCH is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchIsNotNull() {
+            addCriterion("IMPORT_BATCH is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchEqualTo(String value) {
+            addCriterion("IMPORT_BATCH =", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotEqualTo(String value) {
+            addCriterion("IMPORT_BATCH <>", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchGreaterThan(String value) {
+            addCriterion("IMPORT_BATCH >", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchGreaterThanOrEqualTo(String value) {
+            addCriterion("IMPORT_BATCH >=", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchLessThan(String value) {
+            addCriterion("IMPORT_BATCH <", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchLessThanOrEqualTo(String value) {
+            addCriterion("IMPORT_BATCH <=", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchLike(String value) {
+            addCriterion("IMPORT_BATCH like", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotLike(String value) {
+            addCriterion("IMPORT_BATCH not like", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchIn(List<String> values) {
+            addCriterion("IMPORT_BATCH in", values, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotIn(List<String> values) {
+            addCriterion("IMPORT_BATCH not in", values, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchBetween(String value1, String value2) {
+            addCriterion("IMPORT_BATCH between", value1, value2, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotBetween(String value1, String value2) {
+            addCriterion("IMPORT_BATCH not between", value1, value2, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoIsNull() {
+            addCriterion("BATCH_NO is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoIsNotNull() {
+            addCriterion("BATCH_NO is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoEqualTo(BigDecimal value) {
+            addCriterion("BATCH_NO =", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoNotEqualTo(BigDecimal value) {
+            addCriterion("BATCH_NO <>", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoGreaterThan(BigDecimal value) {
+            addCriterion("BATCH_NO >", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("BATCH_NO >=", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoLessThan(BigDecimal value) {
+            addCriterion("BATCH_NO <", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("BATCH_NO <=", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoIn(List<BigDecimal> values) {
+            addCriterion("BATCH_NO in", values, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoNotIn(List<BigDecimal> values) {
+            addCriterion("BATCH_NO not in", values, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("BATCH_NO between", value1, value2, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("BATCH_NO not between", value1, value2, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportIsNull() {
+            addCriterion("AGENT_IMPORT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportIsNotNull() {
+            addCriterion("AGENT_IMPORT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportEqualTo(String value) {
+            addCriterion("AGENT_IMPORT =", value, "agentImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportNotEqualTo(String value) {
+            addCriterion("AGENT_IMPORT <>", value, "agentImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportGreaterThan(String value) {
+            addCriterion("AGENT_IMPORT >", value, "agentImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_IMPORT >=", value, "agentImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportLessThan(String value) {
+            addCriterion("AGENT_IMPORT <", value, "agentImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_IMPORT <=", value, "agentImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportLike(String value) {
+            addCriterion("AGENT_IMPORT like", value, "agentImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportNotLike(String value) {
+            addCriterion("AGENT_IMPORT not like", value, "agentImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportIn(List<String> values) {
+            addCriterion("AGENT_IMPORT in", values, "agentImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportNotIn(List<String> values) {
+            addCriterion("AGENT_IMPORT not in", values, "agentImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportBetween(String value1, String value2) {
+            addCriterion("AGENT_IMPORT between", value1, value2, "agentImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentImportNotBetween(String value1, String value2) {
+            addCriterion("AGENT_IMPORT not between", value1, value2, "agentImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportIsNull() {
+            addCriterion("CW_IMPORT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportIsNotNull() {
+            addCriterion("CW_IMPORT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportEqualTo(String value) {
+            addCriterion("CW_IMPORT =", value, "cwImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportNotEqualTo(String value) {
+            addCriterion("CW_IMPORT <>", value, "cwImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportGreaterThan(String value) {
+            addCriterion("CW_IMPORT >", value, "cwImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportGreaterThanOrEqualTo(String value) {
+            addCriterion("CW_IMPORT >=", value, "cwImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportLessThan(String value) {
+            addCriterion("CW_IMPORT <", value, "cwImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportLessThanOrEqualTo(String value) {
+            addCriterion("CW_IMPORT <=", value, "cwImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportLike(String value) {
+            addCriterion("CW_IMPORT like", value, "cwImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportNotLike(String value) {
+            addCriterion("CW_IMPORT not like", value, "cwImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportIn(List<String> values) {
+            addCriterion("CW_IMPORT in", values, "cwImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportNotIn(List<String> values) {
+            addCriterion("CW_IMPORT not in", values, "cwImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportBetween(String value1, String value2) {
+            addCriterion("CW_IMPORT between", value1, value2, "cwImport");
+            return (Criteria) this;
+        }
+
+        public Criteria andCwImportNotBetween(String value1, String value2) {
+            addCriterion("CW_IMPORT not between", value1, value2, "cwImport");
             return (Criteria) this;
         }
     }
