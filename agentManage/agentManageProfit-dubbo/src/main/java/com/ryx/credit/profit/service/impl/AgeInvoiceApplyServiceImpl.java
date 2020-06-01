@@ -151,7 +151,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                         }
                     }
 
-                    //判断发票类型
+                    //判断发票类型 （税点0的普通纸质、所有专用纸质）
                     if("1".equals(invoiceApply.getYsResult())){
                         if("3".equals(map.get("invoiceType").toString())
                                 && BigDecimal.ZERO.equals(invoiceApply.getTax())){
