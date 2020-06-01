@@ -815,11 +815,11 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 e.printStackTrace();
                 throw new MessageException("查询机具sn异常:" + e.getLocalizedMessage());
             }
-        } else if (proModel.equals(PlatformType.POS.msg)) {
+        } else if (proModel.equals(PlatformType.POS.code) || proModel.equals(PlatformType.SSPOS.code)) {
             try {
                 AgentResult agentResult = termMachineService.querySnMsg(PlatformType.POS, snStart, snEnd);
                 if (!agentResult.isOK()) {
-                    throw new MessageException("当前SN状态异常或已经有在审批流程");
+                    throw new MessageException("业务平台未获取到此SN相关信息！");
                 }
                 logger.info("根据sn查询业务系统返回:" + agentResult.getMsg());
                 JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
@@ -848,16 +848,26 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     OActivityExample oActivityExample = new OActivityExample();
                     OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
                     activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                    //activityCriteria.andVenderEqualTo(manufaValue);
-                    //activityCriteria.andProModelEqualTo(tmsModel);
                     activityCriteria.andPosTypeEqualTo(posType);
-                    activityCriteria.andBusProCodeEqualTo(machineId);
+                    if (null != map.get("posActivityId")) {
+                        activityCriteria.andBusProCodeEqualTo(String.valueOf(map.get("posActivityId")));
+                    } else {
+                        activityCriteria.andBusProCodeEqualTo(machineId);
+                    }
+
                     List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
                     if (oActivities == null) {
                         throw new MessageException(posSn + "活动未找到");
                     }
                     if (oActivities.size() == 0) {
                         throw new MessageException(posSn + "活动未找到");
+                    }
+                    boolean actVisible = true;
+                    for (OActivity oActivity : oActivities) {
+                        if(oActivity.getVisible().equals(VisibleStatus.TWO.getValue())){
+                            actVisible = false;
+                            break;
+                        }
                     }
                     Set<BigDecimal> priceSet = new HashSet<>();
                     OActivity rActivity = null;
@@ -889,7 +899,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                                     break here;
                                 }
                             }
-                        }else{
+                        } else if (actVisible) {
                             priceSet.add(oActivity.getPrice());
                         }
                     }
