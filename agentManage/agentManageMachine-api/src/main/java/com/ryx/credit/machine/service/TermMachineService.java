@@ -147,11 +147,9 @@ public interface TermMachineService {
 
     /**
      * 终端划拨重新发起
-     * @param taskId 总批次号
-     * @param serialNumber 单个批次号
-     * @param type
+     * @param param
      * @return
      * @throws Exception
      */
-    AgentResult terminalTransAgain(String taskId, String serialNumber,String type) throws Exception;
+    AgentResult terminalTransAgain(Map<String,Object> param) throws Exception;
 }

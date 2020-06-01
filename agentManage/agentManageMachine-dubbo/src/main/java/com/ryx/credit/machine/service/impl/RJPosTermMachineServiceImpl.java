@@ -424,10 +424,10 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult terminalTransAgain(String taskId, String serialNumber, String type) throws Exception {
+    public AgentResult terminalTransAgain(Map<String,Object>  param) throws Exception {
         JSONObject data = new JSONObject();
-        data.put("taskId",taskId);
-        data.put("serialNumber",serialNumber);
+        data.put("taskId",param.get("taskId"));
+        data.put("serialNumber",param.get("serialNumber"));
         logger.info("RJPOS终端划拨重新发起参数"+JSONObject.toJSON(data));
         return  request( data,"transfer005");
     }

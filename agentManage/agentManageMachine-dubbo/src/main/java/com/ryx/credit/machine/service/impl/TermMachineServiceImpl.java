@@ -248,18 +248,25 @@ public class TermMachineServiceImpl implements TermMachineService {
         return agentResult;
     }
 
+    /**
+     *
+     * @param param
+     * @return
+     * @throws Exception
+     */
     @Override
-    public AgentResult terminalTransAgain(String taskId, String serialNumber, String type) throws Exception {
+    public AgentResult terminalTransAgain(Map<String,Object>  param) throws Exception {
         AgentResult agentResult = null;
+        String type = (String) param.get("type");
         logger.info("本次联动查询结果类型为:{}", type);
         if (String.valueOf(TerminalPlatformType.POS.getValue()).equals(type) || String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)) {
 
         } else if (String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)) {
-
+            return mposTermMachineServiceImpl.terminalTransAgain(param);
         } else if (String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)) {
 
         }else if (String.valueOf(TerminalPlatformType.RJPOS.getValue()).equals(type)) {
-            return rjTermMachineServiceImpl.terminalTransAgain(taskId,serialNumber,type);
+            return rjTermMachineServiceImpl.terminalTransAgain(param);
         }
         return agentResult;
     }

@@ -2056,35 +2056,22 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     @Override
     public AgentResult adjustAgain(String id) {
 
-        /**
-         * 调用接口远程
-         */
-        AgentResult agentResult = null;
-        try {
-            log.info("划拨重新开始明细id：" + id);
-            agentResult = termMachineService.terminalTransAgain(terminalTransferMapper.selectByPrimaryKey(terminalTransferDetailMapper.selectByPrimaryKey(id).getTerminalTransferId()).getTaskId(), id, String.valueOf(terminalTransferDetailMapper.selectByPrimaryKey(id).getPlatformType()));
-            log.info("划拨解锁结束：" + JSONObject.toJSON(agentResult));
+        AgentResult agentResult =null;
 
-        } catch (Exception e) {
-            log.error("划拨重新发起异常明细id：" + id);
-            e.printStackTrace();
-            agentResult = AgentResult.fail("划拨重新发起异常");
-        }
         String type = String.valueOf(terminalTransferDetailMapper.selectByPrimaryKey(id).getPlatformType());
 
-        if (agentResult != null) {
             if (String.valueOf(TerminalPlatformType.POS.getValue()).equals(type) || String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)) {
 
             } else if (String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)) {
-
+                return adjustAgainMPOS(id);
             } else if (String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)) {
 
             } else if (String.valueOf(TerminalPlatformType.RJPOS.getValue()).equals(type)) {
-                return adjustAgainRJPOS(agentResult);
+                return adjustAgainRJPOS(id);
             }
-        } else {
+
             agentResult = AgentResult.ok();
-        }
+
         return agentResult;
 
     }
@@ -2092,10 +2079,25 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     /**
      * 瑞+再次划拨结果返回
      *
-     * @param agentResult
+     * @param id 明细主键
      * @return
      */
-    public AgentResult adjustAgainRJPOS(AgentResult agentResult) {
+    public AgentResult adjustAgainRJPOS(String id) {
+
+        /**
+         * 调用接口远程
+         */
+        AgentResult agentResult =null;
+        try {
+            log.info("划拨重新开始明细id：" + id);
+            agentResult = termMachineService.terminalTransAgain(FastMap.fastMap("taskId",terminalTransferMapper.selectByPrimaryKey(terminalTransferDetailMapper.selectByPrimaryKey(id).getTerminalTransferId()).getTaskId()).putKeyV("serialNumber",id).putKeyV("type",String.valueOf(terminalTransferDetailMapper.selectByPrimaryKey(id).getPlatformType())));
+            log.info("划拨解锁结束：" + JSONObject.toJSON(agentResult));
+
+        } catch (Exception e) {
+            log.error("划拨重新发起异常明细id：" + id);
+            e.printStackTrace();
+            agentResult = AgentResult.fail("划拨重新发起异常");
+        }
 
         if (agentResult.isOK()) {
             JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
@@ -2127,6 +2129,58 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             agentResult = AgentResult.fail("划拨重新发起调用接口失败");
         }
 
+        return agentResult;
+    }
+
+    /**
+     * 手刷再次划拨结果返回
+     *
+     * @param id 明细主键
+     * @return
+     */
+    public AgentResult adjustAgainMPOS(String id) {
+        /**
+         * 调用接口远程
+         */
+        AgentResult agentResult =null;
+        try {
+            log.info("划拨重新开始明细id：" + id);
+            agentResult = termMachineService.terminalTransAgain(FastMap.fastMap("taskId",terminalTransferMapper.selectByPrimaryKey(terminalTransferDetailMapper.selectByPrimaryKey(id).getTerminalTransferId()).getTaskId())
+                    .putKeyV("serialNumber",id)
+                    .putKeyV("type",String.valueOf(terminalTransferDetailMapper.selectByPrimaryKey(id).getPlatformType()))
+                    .putKeyV("posNum",String.valueOf(terminalTransferDetailMapper.selectByPrimaryKey(id).getComSnNum()))
+                    .putKeyV("busPlatForm",String.valueOf(getAgentType(terminalTransferDetailMapper.selectByPrimaryKey(id).getOriginalOrgId()).get("BUS_PLATFORM"))));
+            log.info("划拨解锁结束：" + JSONObject.toJSON(agentResult));
+
+        } catch (Exception e) {
+            log.error("划拨重新发起异常明细id：" + id);
+            e.printStackTrace();
+            agentResult = AgentResult.fail("划拨重新发起异常");
+        }
+        
+        if (agentResult.isOK()) {
+            JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
+            String respCode = String.valueOf(jsonObject.get("respCode"));
+            if ("000000".equals(respCode)) {
+                    String respType = String.valueOf(jsonObject.get("respType"));
+                    if ("S".equals(respType)) {
+                        TerminalTransferDetail terminalTransferDetail = new TerminalTransferDetail();
+                        terminalTransferDetail.setId(id);
+                        terminalTransferDetail.setAdjustStatus(AdjustStatus.TZZ.getValue());
+                        terminalTransferDetail.setRemark("");
+                        terminalTransferDetail.setuTime(new Date());
+                        terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                        agentResult = AgentResult.ok(jsonObject.get("respMsg"));
+                    } else {
+                        agentResult = AgentResult.fail((String) jsonObject.get("respMsg"));
+                    }
+            } else {
+                agentResult = AgentResult.fail("划拨重新发起失败");
+            }
+
+        } else {
+            agentResult = AgentResult.fail("划拨重新发起调用接口失败");
+        }
         return agentResult;
     }
 

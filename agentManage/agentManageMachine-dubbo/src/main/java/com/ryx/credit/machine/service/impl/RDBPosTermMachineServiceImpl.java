@@ -513,7 +513,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult terminalTransAgain(String taskId, String serialNumber, String type) throws Exception {
+    public AgentResult terminalTransAgain(Map<String,Object>  param) throws Exception {
         return null;
     }
 }

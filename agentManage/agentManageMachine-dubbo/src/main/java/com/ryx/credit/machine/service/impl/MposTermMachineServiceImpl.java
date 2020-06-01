@@ -304,15 +304,29 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     }
 
     /**
-     * @param taskId       总批次号
-     * @param serialNumber 单个批次号
-     * @param type
+     *重新发起
+     * @param param
      * @return
      * @throws Exception
      */
     @Override
-    public AgentResult terminalTransAgain(String taskId, String serialNumber, String type) throws Exception {
-        return null;
+    public AgentResult terminalTransAgain(Map<String,Object>  param) throws Exception {
+
+        JSONObject data = new JSONObject();
+        data.put("taskId",param.get("taskId"));
+        data.put("serialNumber",param.get("serialNumber"));
+        data.put("posNum",param.get("posNum"));
+        data.put("busPlatForm",param.get("busPlatForm"));
+        logger.info("MPOS终端划拨重新发起参数"+JSONObject.toJSON(data));
+        JSONObject res = null;
+        try {
+            res = request(data, AppConfig.getProperty("mpos.terminalTransferAgain"));
+        } catch (Exception e) {
+            logger.info("MPOS机具终端划拨重新发起调用远程接口:{}失败", AppConfig.getProperty("mpos.terminalTransferAgain"));
+            return AgentResult.fail("MPOS机具终端划拨重新发起调用远程接口失败");
+        }
+        logger.info("MPOS机具终端划拨重新发起调用远程接口返回:{}{}", AppConfig.getProperty("mpos.terminalTransferAgain"), res.toJSONString());
+        return AgentResult.build(200, res.toString(),res.toString());
     }
 
     @Override
