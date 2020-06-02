@@ -742,6 +742,32 @@
     <include refid="OracleDialectSuffix" />
   </select>
 
+  <select id="selectNumByExampleExtends" parameterType="map" resultType="int">
+    select
+        count(1)
+    from
+      O_REFUND_PRICE_DIFF_DETAIL d
+      left join o_activity a on a.id= d.ACTIVITY_FRONT_ID
+      <where>
+        d.status = 1
+        <if test="par.agentId!=null and par.agentId!=''"> and d.Agent_Id=#{par.agentId} </if>
+        <if test="par.refundPriceDiffId!=null and par.refundPriceDiffId!=''"> and d.REFUND_PRICE_DIFF_ID=#{par.refundPriceDiffId} </if>
+        <choose>
+          <when test="par.beginSn!=null and par.beginSn!='' and par.endSn!=null and par.endSn!=''">
+            and d.begin_sn=#{par.beginSn} and d.end_sn=#{par.endSn}
+          </when>
+          <when test="par.beginSn!=null and par.beginSn!='' and (par.endSn==null or par.endSn=='')">
+            and d.begin_sn like concat('%',#{par.beginSn})
+          </when>
+          <when test="(par.beginSn==null or par.beginSn=='') and par.endSn!=null and par.endSn!=''">
+            and d.end_sn like concat('%',#{par.endSn})
+          </when>
+          <otherwise>
+          </otherwise>
+        </choose>
+      </where>
+  </select>
+
   <select id="selectById" parameterType="java.lang.String" resultType="map">
     select * from O_REFUND_PRICE_DIFF_DETAIL where ID = #{id,jdbcType=VARCHAR}
   </select>
