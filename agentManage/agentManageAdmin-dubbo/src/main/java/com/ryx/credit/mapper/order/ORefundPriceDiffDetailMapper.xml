@@ -668,63 +668,77 @@
   </resultMap>
   <select id="selectByExampleExtends" parameterType="map" resultMap="BaseResultMapExtends">
     <include refid="OracleDialectPrefix" />
-    select
-    O_REFUND_PRICE_DIFF_DETAIL.ID,
-    O_REFUND_PRICE_DIFF_DETAIL.SUB_ORDER_ID,
-    O_REFUND_PRICE_DIFF_DETAIL.AGENT_ID,
-    O_REFUND_PRICE_DIFF_DETAIL.ACTIVITY_FRONT_ID,
-    O_REFUND_PRICE_DIFF_DETAIL.ACTIVITY_REAL_ID,
-    O_REFUND_PRICE_DIFF_DETAIL.REFUND_PRICE_DIFF_ID,
-    O_REFUND_PRICE_DIFF_DETAIL.PRO_ID,
-    O_REFUND_PRICE_DIFF_DETAIL.PRO_NAME,
-    O_REFUND_PRICE_DIFF_DETAIL.CHANGE_COUNT,
-    O_REFUND_PRICE_DIFF_DETAIL.ACTIVITY_NAME,
-    O_REFUND_PRICE_DIFF_DETAIL.ACTIVITY_WAY,
-    O_REFUND_PRICE_DIFF_DETAIL.ACTIVITY_RULE,
-    O_REFUND_PRICE_DIFF_DETAIL.FRONT_PRICE,
-    O_REFUND_PRICE_DIFF_DETAIL.PRICE,
-    O_REFUND_PRICE_DIFF_DETAIL.S_TIME,
-    O_REFUND_PRICE_DIFF_DETAIL.BEGIN_SN,
-    O_REFUND_PRICE_DIFF_DETAIL.END_SN,
-    O_REFUND_PRICE_DIFF_DETAIL.VENDER,
-    O_REFUND_PRICE_DIFF_DETAIL.PRO_MODEL,
-    O_REFUND_PRICE_DIFF_DETAIL.C_TIME,
-    O_REFUND_PRICE_DIFF_DETAIL.U_TIME,
-    O_REFUND_PRICE_DIFF_DETAIL.C_USER,
-    O_REFUND_PRICE_DIFF_DETAIL.U_USER,
-    O_REFUND_PRICE_DIFF_DETAIL.STATUS,
-    O_REFUND_PRICE_DIFF_DETAIL.VERSION,
-    O_REFUND_PRICE_DIFF_DETAIL.ORDER_ID,
-    O_REFUND_PRICE_DIFF_DETAIL.SEND_STATUS,
-    O_REFUND_PRICE_DIFF_DETAIL.SEND_MSG,
-    O_REFUND_PRICE_DIFF_DETAIL.ORDER_TYPE,
-    O_REFUND_PRICE_DIFF_DETAIL.FRONT_PRO_ID,
-    O_REFUND_PRICE_DIFF_DETAIL.FRONT_PRO_NAME,
-    O_REFUND_PRICE_DIFF_DETAIL.PLATFORM_TYPE,
-    O_REFUND_PRICE_DIFF_DETAIL.OLD_ORG_ID,
-    O_REFUND_PRICE_DIFF_DETAIL.NEW_ORG_ID,
-    O_REFUND_PRICE_DIFF_DETAIL.DELIVERY_TIME,
-    O_REFUND_PRICE_DIFF_DETAIL.APP_TIME,
-    O_REFUND_PRICE_DIFF_DETAIL.OLD_SUPD_ORG_ID,
-    O_REFUND_PRICE_DIFF_DETAIL.OLD_SUPD_ORG_NAME,
-    O_REFUND_PRICE_DIFF_DETAIL.NEW_SUPD_ORG_ID,
-    O_REFUND_PRICE_DIFF_DETAIL.NEW_SUPD_ORG_NAME,
-    O_REFUND_PRICE_DIFF_DETAIL.DELAY_DAY,
-    O_REFUND_PRICE_DIFF_DETAIL.DELIVERY_TIME_TYPE,
-    O_REFUND_PRICE_DIFF_DETAIL.OLD_ORG_NAME,
-    O_REFUND_PRICE_DIFF_DETAIL.NEW_ORG_NAME,
-    pre_activity.activity_name as pre_activity_activityName,
-    pre_activity.act_code as pre_activity_act_code,
-    pre_activity.bus_pro_code as pre_activity_bus_pro_code,
-    pre_activity.price as pre_activity_price
-    from O_REFUND_PRICE_DIFF_DETAIL
-    left join o_activity  pre_activity on pre_activity.id= O_REFUND_PRICE_DIFF_DETAIL.ACTIVITY_FRONT_ID
-    <where>
-      O_REFUND_PRICE_DIFF_DETAIL.status=1
-      <if test="par.agentId!=null and par.agentId!=''"> and O_REFUND_PRICE_DIFF_DETAIL.Agent_Id=#{par.agentId} </if>
-      <if test="par.refundPriceDiffId!=null and par.refundPriceDiffId!=''"> and O_REFUND_PRICE_DIFF_DETAIL.REFUND_PRICE_DIFF_ID=#{par.refundPriceDiffId} </if>
-    </where>
-    order by O_REFUND_PRICE_DIFF_DETAIL.C_TIME desc
+      select
+        d.ID,
+        d.SUB_ORDER_ID,
+        d.AGENT_ID,
+        d.ACTIVITY_FRONT_ID,
+        d.ACTIVITY_REAL_ID,
+        d.REFUND_PRICE_DIFF_ID,
+        d.PRO_ID,
+        d.PRO_NAME,
+        d.CHANGE_COUNT,
+        d.ACTIVITY_NAME,
+        d.ACTIVITY_WAY,
+        d.ACTIVITY_RULE,
+        d.FRONT_PRICE,
+        d.PRICE,
+        d.S_TIME,
+        d.BEGIN_SN,
+        d.END_SN,
+        d.VENDER,
+        d.PRO_MODEL,
+        d.C_TIME,
+        d.U_TIME,
+        d.C_USER,
+        d.U_USER,
+        d.STATUS,
+        d.VERSION,
+        d.ORDER_ID,
+        d.SEND_STATUS,
+        d.SEND_MSG,
+        d.ORDER_TYPE,
+        d.FRONT_PRO_ID,
+        d.FRONT_PRO_NAME,
+        d.PLATFORM_TYPE,
+        d.OLD_ORG_ID,
+        d.NEW_ORG_ID,
+        d.DELIVERY_TIME,
+        d.APP_TIME,
+        d.OLD_SUPD_ORG_ID,
+        d.OLD_SUPD_ORG_NAME,
+        d.NEW_SUPD_ORG_ID,
+        d.NEW_SUPD_ORG_NAME,
+        d.DELAY_DAY,
+        d.DELIVERY_TIME_TYPE,
+        d.OLD_ORG_NAME,
+        d.NEW_ORG_NAME,
+        a.activity_name as pre_activity_activityName,
+        a.act_code as pre_activity_act_code,
+        a.bus_pro_code as pre_activity_bus_pro_code,
+        a.price as pre_activity_priced
+      from
+        O_REFUND_PRICE_DIFF_DETAIL d
+      left join o_activity a on a.id= d.ACTIVITY_FRONT_ID
+      <where>
+        d.status = 1
+        <if test="par.agentId!=null and par.agentId!=''"> and d.Agent_Id=#{par.agentId} </if>
+        <if test="par.refundPriceDiffId!=null and par.refundPriceDiffId!=''"> and d.REFUND_PRICE_DIFF_ID=#{par.refundPriceDiffId} </if>
+        <choose>
+          <when test="par.beginSn!=null and par.beginSn!='' and par.endSn!=null and par.endSn!=''">
+            and d.begin_sn=#{par.beginSn} and d.end_sn=#{par.endSn}
+          </when>
+          <when test="par.beginSn!=null and par.beginSn!='' and (par.endSn==null or par.endSn=='')">
+            and d.begin_sn like concat('%',#{par.beginSn})
+          </when>
+          <when test="(par.beginSn==null or par.beginSn=='') and par.endSn!=null and par.endSn!=''">
+            and d.end_sn like concat('%',#{par.endSn})
+          </when>
+          <otherwise>
+          </otherwise>
+        </choose>
+      </where>
+      order by d.C_TIME desc
     <include refid="OracleDialectSuffix" />
   </select>
 

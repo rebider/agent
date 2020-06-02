@@ -1940,6 +1940,8 @@ public class CompensateServiceImpl implements CompensateService {
             par.putKeyV("refundPriceDiffId",refundPriceDiffDetail.getRefundPriceDiffId());
         }
         par.putKeyV("page",page);
+        par.putKeyV("beginSn", null == refundPriceDiffDetail.getBeginSn() ? "" : refundPriceDiffDetail.getBeginSn());
+        par.putKeyV("endSn", null == refundPriceDiffDetail.getEndSn() ? "" : refundPriceDiffDetail.getEndSn());
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         refundPriceDiffDetailExample.setPage(page);
         List<Map> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExampleExtends(par,page);
