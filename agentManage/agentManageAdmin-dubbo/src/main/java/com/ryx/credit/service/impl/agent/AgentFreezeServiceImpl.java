@@ -723,4 +723,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         return mapList;
     }
 
+    @Override
+    public Map<String, String> selectAgentFreeze(HashMap map) throws MessageException {
+        return null;
+    }
+
 }

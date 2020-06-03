@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.AgentBusinfoFreezeMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentBusinfoFreeze">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
+    <result column="FREEZE_TYPE" jdbcType="DECIMAL" property="freezeType" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="PLAT_ID" jdbcType="VARCHAR" property="platId" />
+    <result column="PLAT_TYPE" jdbcType="VARCHAR" property="platType" />
+    <result column="PROFIT_FREEZR" jdbcType="DECIMAL" property="profitFreezr" />
+    <result column="REFLOW_FREEZE" jdbcType="DECIMAL" property="reflowFreeze" />
+    <result column="MONTHLY_FREEZE" jdbcType="DECIMAL" property="monthlyFreeze" />
+    <result column="DAILY_FREEZE" jdbcType="DECIMAL" property="dailyFreeze" />
+    <result column="STOP_PROFIT_FREEZE" jdbcType="DECIMAL" property="stopProfitFreeze" />
+    <result column="CASH_FREEZE" jdbcType="DECIMAL" property="cashFreeze" />
+    <result column="STOP_COUNT" jdbcType="DECIMAL" property="stopCount" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, BUS_ID, FREEZE_TYPE, BUS_NUM, PLAT_ID, PLAT_TYPE, PROFIT_FREEZR, REFLOW_FREEZE, 
+    MONTHLY_FREEZE, DAILY_FREEZE, STOP_PROFIT_FREEZE, CASH_FREEZE, STOP_COUNT
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusinfoFreezeExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_AGENT_BUSINFOFREEZE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from A_AGENT_BUSINFOFREEZE
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusinfoFreezeExample">
+    delete from A_AGENT_BUSINFOFREEZE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusinfoFreeze">
+    insert into A_AGENT_BUSINFOFREEZE (ID, BUS_ID, FREEZE_TYPE, 
+      BUS_NUM, PLAT_ID, PLAT_TYPE, 
+      PROFIT_FREEZR, REFLOW_FREEZE, MONTHLY_FREEZE, 
+      DAILY_FREEZE, STOP_PROFIT_FREEZE, CASH_FREEZE, 
+      STOP_COUNT)
+    values (#{id,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, #{freezeType,jdbcType=DECIMAL}, 
+      #{busNum,jdbcType=VARCHAR}, #{platId,jdbcType=VARCHAR}, #{platType,jdbcType=VARCHAR}, 
+      #{profitFreezr,jdbcType=DECIMAL}, #{reflowFreeze,jdbcType=DECIMAL}, #{monthlyFreeze,jdbcType=DECIMAL}, 
+      #{dailyFreeze,jdbcType=DECIMAL}, #{stopProfitFreeze,jdbcType=DECIMAL}, #{cashFreeze,jdbcType=DECIMAL}, 
+      #{stopCount,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusinfoFreeze">
+    insert into A_AGENT_BUSINFOFREEZE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="busId != null">
+        BUS_ID,
+      </if>
+      <if test="freezeType != null">
+        FREEZE_TYPE,
+      </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="platId != null">
+        PLAT_ID,
+      </if>
+      <if test="platType != null">
+        PLAT_TYPE,
+      </if>
+      <if test="profitFreezr != null">
+        PROFIT_FREEZR,
+      </if>
+      <if test="reflowFreeze != null">
+        REFLOW_FREEZE,
+      </if>
+      <if test="monthlyFreeze != null">
+        MONTHLY_FREEZE,
+      </if>
+      <if test="dailyFreeze != null">
+        DAILY_FREEZE,
+      </if>
+      <if test="stopProfitFreeze != null">
+        STOP_PROFIT_FREEZE,
+      </if>
+      <if test="cashFreeze != null">
+        CASH_FREEZE,
+      </if>
+      <if test="stopCount != null">
+        STOP_COUNT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null">
+        #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeType != null">
+        #{freezeType,jdbcType=DECIMAL},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="platId != null">
+        #{platId,jdbcType=VARCHAR},
+      </if>
+      <if test="platType != null">
+        #{platType,jdbcType=VARCHAR},
+      </if>
+      <if test="profitFreezr != null">
+        #{profitFreezr,jdbcType=DECIMAL},
+      </if>
+      <if test="reflowFreeze != null">
+        #{reflowFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="monthlyFreeze != null">
+        #{monthlyFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="dailyFreeze != null">
+        #{dailyFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="stopProfitFreeze != null">
+        #{stopProfitFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="cashFreeze != null">
+        #{cashFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="stopCount != null">
+        #{stopCount,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusinfoFreezeExample" resultType="java.lang.Long">
+    select count(*) from A_AGENT_BUSINFOFREEZE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusinfoFreeze">
+    update A_AGENT_BUSINFOFREEZE
+    <set>
+      <if test="busId != null">
+        BUS_ID = #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeType != null">
+        FREEZE_TYPE = #{freezeType,jdbcType=DECIMAL},
+      </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="platId != null">
+        PLAT_ID = #{platId,jdbcType=VARCHAR},
+      </if>
+      <if test="platType != null">
+        PLAT_TYPE = #{platType,jdbcType=VARCHAR},
+      </if>
+      <if test="profitFreezr != null">
+        PROFIT_FREEZR = #{profitFreezr,jdbcType=DECIMAL},
+      </if>
+      <if test="reflowFreeze != null">
+        REFLOW_FREEZE = #{reflowFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="monthlyFreeze != null">
+        MONTHLY_FREEZE = #{monthlyFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="dailyFreeze != null">
+        DAILY_FREEZE = #{dailyFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="stopProfitFreeze != null">
+        STOP_PROFIT_FREEZE = #{stopProfitFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="cashFreeze != null">
+        CASH_FREEZE = #{cashFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="stopCount != null">
+        STOP_COUNT = #{stopCount,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusinfoFreeze">
+    update A_AGENT_BUSINFOFREEZE
+    set BUS_ID = #{busId,jdbcType=VARCHAR},
+      FREEZE_TYPE = #{freezeType,jdbcType=DECIMAL},
+      BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      PLAT_ID = #{platId,jdbcType=VARCHAR},
+      PLAT_TYPE = #{platType,jdbcType=VARCHAR},
+      PROFIT_FREEZR = #{profitFreezr,jdbcType=DECIMAL},
+      REFLOW_FREEZE = #{reflowFreeze,jdbcType=DECIMAL},
+      MONTHLY_FREEZE = #{monthlyFreeze,jdbcType=DECIMAL},
+      DAILY_FREEZE = #{dailyFreeze,jdbcType=DECIMAL},
+      STOP_PROFIT_FREEZE = #{stopProfitFreeze,jdbcType=DECIMAL},
+      CASH_FREEZE = #{cashFreeze,jdbcType=DECIMAL},
+      STOP_COUNT = #{stopCount,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+
+
+
+
+  <!--                                         -开始写代码                 -->
+  <select id="queryAbfreezeListCount" parameterType="map" resultType="int">
+    select count(id) from(
+    <include refid="queryAbfreezeListSql"/>
+    )
+  </select>
+  <select id="queryAbfreezeListView" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="queryAbfreezeListSql"/>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+  <sql id="queryAbfreezeListSql">
+    select  <include refid="Base_Column_List"/> from A_AGENT_BUSINFOFREEZE
+  </sql>
+</mapper>

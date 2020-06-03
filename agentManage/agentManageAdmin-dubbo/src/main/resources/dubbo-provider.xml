@@ -164,4 +164,6 @@
 
     <!-- 图表数据 -->
     <dubbo:service interface="com.ryx.credit.service.data.EchartDataService" ref="echartDataService"  timeout="1200000" registry="myGroup" />
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentBusinfoFreezeService" ref="agentBusinfoFreezeService"  timeout="1200000" registry="myGroup" />
+
 </beans>
