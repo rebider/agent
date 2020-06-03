@@ -429,7 +429,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             // * 判断平台是否属于提交平台
             String result = platformSame(terminalTransferDetailList, saveFlag);
             if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
-                startTerminalTransferActivity(terminalTransferId, cuser, agentId, false);
+                startTerminalTransferActivity(terminalTransferId, cuser, agentId, true);
             }
             return AgentResult.ok(result);
 
@@ -546,12 +546,16 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 //判断代理商名称
                 Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
             }
-            //判断平台是否属于提交平台
-            platformSame(terminalTransferDetails, SaveFlag.TJSP.getValue());
+            if(!isSave){
+                //判断平台是否属于提交平台
+                platformSame(terminalTransferDetails, SaveFlag.TJSP.getValue());
+            }
+
+
             if (terminalTransfer == null) {
                 throw new MessageException("提交审批信息有误");
             }
-            if (!isSave) {
+
                 terminalTransfer.setuUser(cuser);
                 terminalTransfer.setuTime(new Date());
                 terminalTransfer.setReviewStatus(AgStatus.Approving.status);
@@ -559,7 +563,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 if (i != 1) {
                     throw new MessageException("提交审批处理失败");
                 }
-            }
+
 
             String proce = null;
             try {
