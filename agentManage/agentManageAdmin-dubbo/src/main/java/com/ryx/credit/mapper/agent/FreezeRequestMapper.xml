@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.FreezeRequestMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.FreezeRequest">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="REQ_TYPE" jdbcType="DECIMAL" property="reqType" />
+    <result column="C_TM" jdbcType="TIMESTAMP" property="cTm" />
+    <result column="C_USER_ID" jdbcType="VARCHAR" property="cUserId" />
+    <result column="FREEZE_CAUSE" jdbcType="VARCHAR" property="freezeCause" />
+    <result column="REQ_REASON" jdbcType="VARCHAR" property="reqReason" />
+    <result column="REVIEWS_STAT" jdbcType="DECIMAL" property="reviewsStat" />
+    <result column="REVIEWS_DATE" jdbcType="TIMESTAMP" property="reviewsDate" />
+    <result column="REVIEWS_USER" jdbcType="VARCHAR" property="reviewsUser" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, REQ_TYPE, C_TM, C_USER_ID, FREEZE_CAUSE, REQ_REASON, REVIEWS_STAT, REVIEWS_DATE, 
+    REVIEWS_USER, STATUS, VERSION
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_FREEZE_REQUEST
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from A_FREEZE_REQUEST
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestExample">
+    delete from A_FREEZE_REQUEST
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequest">
+    insert into A_FREEZE_REQUEST (ID, REQ_TYPE, C_TM, 
+      C_USER_ID, FREEZE_CAUSE, REQ_REASON, 
+      REVIEWS_STAT, REVIEWS_DATE, REVIEWS_USER, 
+      STATUS, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{reqType,jdbcType=DECIMAL}, #{cTm,jdbcType=TIMESTAMP}, 
+      #{cUserId,jdbcType=VARCHAR}, #{freezeCause,jdbcType=VARCHAR}, #{reqReason,jdbcType=VARCHAR}, 
+      #{reviewsStat,jdbcType=DECIMAL}, #{reviewsDate,jdbcType=TIMESTAMP}, #{reviewsUser,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequest">
+    insert into A_FREEZE_REQUEST
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="reqType != null">
+        REQ_TYPE,
+      </if>
+      <if test="cTm != null">
+        C_TM,
+      </if>
+      <if test="cUserId != null">
+        C_USER_ID,
+      </if>
+      <if test="freezeCause != null">
+        FREEZE_CAUSE,
+      </if>
+      <if test="reqReason != null">
+        REQ_REASON,
+      </if>
+      <if test="reviewsStat != null">
+        REVIEWS_STAT,
+      </if>
+      <if test="reviewsDate != null">
+        REVIEWS_DATE,
+      </if>
+      <if test="reviewsUser != null">
+        REVIEWS_USER,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="reqType != null">
+        #{reqType,jdbcType=DECIMAL},
+      </if>
+      <if test="cTm != null">
+        #{cTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUserId != null">
+        #{cUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeCause != null">
+        #{freezeCause,jdbcType=VARCHAR},
+      </if>
+      <if test="reqReason != null">
+        #{reqReason,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewsStat != null">
+        #{reviewsStat,jdbcType=DECIMAL},
+      </if>
+      <if test="reviewsDate != null">
+        #{reviewsDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="reviewsUser != null">
+        #{reviewsUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestExample" resultType="java.lang.Long">
+    select count(*) from A_FREEZE_REQUEST
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequest">
+    update A_FREEZE_REQUEST
+    <set>
+      <if test="reqType != null">
+        REQ_TYPE = #{reqType,jdbcType=DECIMAL},
+      </if>
+      <if test="cTm != null">
+        C_TM = #{cTm,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUserId != null">
+        C_USER_ID = #{cUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeCause != null">
+        FREEZE_CAUSE = #{freezeCause,jdbcType=VARCHAR},
+      </if>
+      <if test="reqReason != null">
+        REQ_REASON = #{reqReason,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewsStat != null">
+        REVIEWS_STAT = #{reviewsStat,jdbcType=DECIMAL},
+      </if>
+      <if test="reviewsDate != null">
+        REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="reviewsUser != null">
+        REVIEWS_USER = #{reviewsUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequest">
+    update A_FREEZE_REQUEST
+    set REQ_TYPE = #{reqType,jdbcType=DECIMAL},
+      C_TM = #{cTm,jdbcType=TIMESTAMP},
+      C_USER_ID = #{cUserId,jdbcType=VARCHAR},
+      FREEZE_CAUSE = #{freezeCause,jdbcType=VARCHAR},
+      REQ_REASON = #{reqReason,jdbcType=VARCHAR},
+      REVIEWS_STAT = #{reviewsStat,jdbcType=DECIMAL},
+      REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP},
+      REVIEWS_USER = #{reviewsUser,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
