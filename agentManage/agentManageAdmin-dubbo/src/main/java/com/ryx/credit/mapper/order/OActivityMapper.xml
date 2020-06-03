@@ -37,6 +37,7 @@
     <result column="STAND_AMT" jdbcType="DECIMAL" property="standAmt" />
     <result column="BACK_TYPE" jdbcType="CHAR" property="backType" />
     <result column="VISIBLE" jdbcType="VARCHAR" property="visible" />
+    <result column="QUANTITY_LIMIT" jdbcType="INTEGER" property="quantityLimit" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -72,7 +73,7 @@
     PRICE, BEGIN_TIME, END_TIME, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER, STATUS,
     VERSION, G_TIME, ACTIVITY_CONDITION, BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE,
     TERM_BATCHNAME, TERMTYPE, TERMTYPENAME, ACT_CODE, ORIGINAL_PRICE, POS_SPE_PRICE,
-    POS_TYPE, STAND_TIME, STAND_AMT, BACK_TYPE, VISIBLE
+    POS_TYPE, STAND_TIME, STAND_AMT, BACK_TYPE, VISIBLE, QUANTITY_LIMIT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OActivityExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -114,7 +115,7 @@
     TERM_BATCHNAME, TERMTYPE, TERMTYPENAME,
     ACT_CODE, ORIGINAL_PRICE, POS_SPE_PRICE,
     POS_TYPE, STAND_TIME, STAND_AMT,
-    BACK_TYPE, VISIBLE)
+    BACK_TYPE, VISIBLE, QUANTITY_LIMIT)
     values (#{id,jdbcType=VARCHAR}, #{productId,jdbcType=VARCHAR}, #{ruleId,jdbcType=VARCHAR},
     #{activityName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, #{activityWay,jdbcType=VARCHAR},
     #{activityRule,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL},
@@ -126,7 +127,7 @@
     #{termBatchname,jdbcType=VARCHAR}, #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR},
     #{actCode,jdbcType=VARCHAR}, #{originalPrice,jdbcType=DECIMAL}, #{posSpePrice,jdbcType=DECIMAL},
     #{posType,jdbcType=VARCHAR}, #{standTime,jdbcType=DECIMAL}, #{standAmt,jdbcType=DECIMAL},
-    #{backType,jdbcType=CHAR}, #{visible,jdbcType=VARCHAR})
+    #{backType,jdbcType=CHAR}, #{visible,jdbcType=VARCHAR}, #{quantityLimit,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OActivity">
     insert into O_ACTIVITY
@@ -236,6 +237,9 @@
       <if test="visible != null">
         VISIBLE,
       </if>
+      <if test="quantityLimit != null">
+        QUANTITY_LIMIT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -342,6 +346,9 @@
       </if>
       <if test="visible != null">
         #{visible,jdbcType=VARCHAR},
+      </if>
+      <if test="quantityLimit != null">
+        #{quantityLimit,jdbcType=INTEGER}
       </if>
     </trim>
   </insert>
@@ -455,6 +462,9 @@
       </if>
       <if test="visible != null">
         VISIBLE = #{visible,jdbcType=VARCHAR},
+      </if>
+      <if test="quantityLimit != null">
+        QUANTITY_LIMIT = #{quantityLimit,jdbcType=INTEGER}
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
