@@ -24,6 +24,8 @@ public interface IAgeInvoiceApplyService {
 
     InvoiceApply getInvoiceApplyById(String id);
 
+    void dealWithInvoiceData(List<Map<String,Object>> list,Map map,String agentId) throws MessageException;
+
     void saveInvoiceApply(List<Map<String,Object>> list,String agentId) throws MessageException;
 
     //返回所有终审失败的发票信息

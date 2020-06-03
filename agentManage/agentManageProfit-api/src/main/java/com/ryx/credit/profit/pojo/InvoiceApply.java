@@ -86,16 +86,10 @@ public class InvoiceApply implements Serializable {
     private String rev3;/*该字段暂未使用*/
 
     private String rev4;/*该字段暂未使用*/
-    /*发票代理商寄出状态*/
-    private String mailingStatus;
     /*导入批次*/
     private String importBatch;
     /*导入序号*/
     private BigDecimal batchNo;
-    /*代理商导入状态*/
-    private String agentImport;
-    /*财务导入状态*/
-    private String cwImport;
 
     public String getId() {
         return id;
@@ -425,13 +419,6 @@ public class InvoiceApply implements Serializable {
         this.rev4 = rev4 == null ? null : rev4.trim();
     }
 
-    public String getMailingStatus() {
-        return mailingStatus;
-    }
-
-    public void setMailingStatus(String mailingStatus) {
-        this.mailingStatus = mailingStatus == null ? null : mailingStatus.trim();
-    }
 
     public String getImportBatch() {
         return importBatch;
@@ -449,19 +436,4 @@ public class InvoiceApply implements Serializable {
         this.batchNo = batchNo;
     }
 
-    public String getAgentImport() {
-        return agentImport;
-    }
-
-    public void setAgentImport(String agentImport) {
-        this.agentImport = agentImport == null ? null : agentImport.trim();
-    }
-
-    public String getCwImport() {
-        return cwImport;
-    }
-
-    public void setCwImport(String cwImport) {
-        this.cwImport = cwImport == null ? null : cwImport.trim();
-    }
 }

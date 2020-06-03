@@ -52,4 +52,6 @@ public interface InvoiceApplyMapper {
     List<Map> selectByExampleOwn(InvoiceApplyExample example);
 
     long countByExampleOwn(InvoiceApplyExample example);
+
+    List<InvoiceApply> selectListForDeal(@Param("invoiceNumber") String invoiceNumber,@Param("invoiceCode") String invoiceCode);
 }
