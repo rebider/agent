@@ -862,11 +862,33 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     if (oActivities.size() == 0) {
                         throw new MessageException(posSn + "活动未找到");
                     }
+                    //POS系统，当有部分可见的时候取部分可见的价格，标志
                     boolean actVisible = true;
                     for (OActivity oActivity : oActivities) {
                         if(oActivity.getVisible().equals(VisibleStatus.TWO.getValue())){
-                            actVisible = false;
-                            break;
+                            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                            AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+                            criteria.andStatusEqualTo(Status.STATUS_1.status);
+                            criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+                            criteria.andBusNumEqualTo(orgid);
+                            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                            if(agentBusInfos.size()==0){
+                                continue;
+                            }
+                            if(agentBusInfos.size()!=1){
+                                throw new MessageException("业务编号不唯一");
+                            }
+                            AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+                            OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
+                            OActivityVisibleExample.Criteria visibleCriteria = oActivityVisibleExample.createCriteria();
+                            visibleCriteria.andActivityIdEqualTo(oActivity.getActCode());
+                            List<OActivityVisible> oActivityVisibles = activityVisibleMapper.selectByExample(oActivityVisibleExample);
+                            for (OActivityVisible oActivityVisible : oActivityVisibles) {
+                                if(oActivityVisible.getAgentId().equals(agentBusInfo.getAgentId())){
+                                    actVisible = false;
+                                    break;
+                                }
+                            }
                         }
                     }
                     Set<BigDecimal> priceSet = new HashSet<>();
