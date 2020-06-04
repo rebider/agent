@@ -876,7 +876,7 @@ public class OrderServiceImpl implements OrderService {
                         throw new MessageException("请补全活动名称为：" + activity.getActivityName() + "的订货数量下限！");
                     }
                     if (proNum < activity.getQuantityLimit()) {
-                        throw new MessageException("活动" + activity.getActivityName() + "最低订货数量为" + activity.getQuantityLimit() + "台");
+                        throw new MessageException("活动：" + activity.getActivityName() + "，最低订货数量为" + activity.getQuantityLimit() + "台");
                     }
 
                     oSubOrder.setProPrice(activity.getOriginalPrice());
@@ -1224,6 +1224,15 @@ public class OrderServiceImpl implements OrderService {
                 OActivity activity = oActivityMapper.selectByPrimaryKey(oActivity);
                 //活动存在
                 if (activity != null && activity.getPrice() != null && activity.getPrice().compareTo(BigDecimal.ZERO) >= 0) {
+
+                    if (null == activity.getQuantityLimit() || activity.getQuantityLimit() < 1) {
+                        logger.info("请补全活动名称为：" + activity.getActivityName() + "的订货数量下限！");
+                        throw new MessageException("请补全活动名称为：" + activity.getActivityName() + "的订货数量下限！");
+                    }
+                    if (oSubOrder.getProNum().intValue() < activity.getQuantityLimit()) {
+                        logger.info("活动：" + activity.getActivityName() + "，最低订货数量为" + activity.getQuantityLimit() + "台");
+                        throw new MessageException("活动：" + activity.getActivityName() + "，最低订货数量为" + activity.getQuantityLimit() + "台");
+                    }
                     //设置商品实际单价
                     oSubOrder.setProPrice(activity.getOriginalPrice());
                     oSubOrder.setProRelPrice(activity.getPrice());
