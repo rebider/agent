@@ -23,9 +23,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Reader;
 import java.math.BigDecimal;
+import java.sql.Clob;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -49,9 +53,44 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     @Override
     public PageInfo selectByMap(Map<String,String> param,Page page){
         PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(pmsProfitLogMapper.selectByMap(param,page));
+        List<Map<String, Object>> selectByMaps = pmsProfitLogMapper.selectByMap(param, page);
+        selectByMaps.forEach(map ->{
+            if(map.get("NOTE")!=null){
+                Clob clob= (Clob) map.get("NOTE");
+                try {
+                    String cString = ClobToString(clob);
+                    map.put("NOTE",cString);
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+        pageInfo.setRows(selectByMaps);
         pageInfo.setTotal((int) pmsProfitLogMapper.getCountByMap(param));
         return pageInfo;
+    }
+
+    public String ClobToString(Clob clob) throws SQLException, IOException {
+        String reString = "";
+        Reader is = clob.getCharacterStream();
+        BufferedReader br = new BufferedReader(is);
+        String s = br.readLine();
+        StringBuffer sb = new StringBuffer();
+        while (s != null) {
+            sb.append(s);
+            s = br.readLine();
+        }
+        reString = sb.toString();
+        if(br!=null){
+            br.close();
+        }
+        if(is!=null){
+            is.close();
+        }
+        return reString;
     }
 
 
