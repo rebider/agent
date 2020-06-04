@@ -297,10 +297,10 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     //判断代理商唯一码准确性
                     Agent agent = agentService.getAgentById(invoiceSumList.get(2).toString());
                     if (agent == null) {
-                        throw new MessageException("代理商ID" + invoiceSumList.get(2).toString() + "不存在");
+                        throw new MessageException("代理商AG码" + invoiceSumList.get(2).toString() + "不存在");
                     }
                     if (!agent.getAgName().equals(invoiceSumList.get(3).toString().trim())) {
-                        throw new MessageException("代理商名称" + invoiceSumList.get(3).toString() + "与ID不匹配");
+                        throw new MessageException("代理商名称" + invoiceSumList.get(3).toString() + "与AG码不匹配");
                     }
                     // 判断是否重复导入
                     int number = 0;
