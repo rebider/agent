@@ -842,8 +842,6 @@ public class OrderServiceImpl implements OrderService {
             oSubOrder.setId(idService.genId(TabId.o_sub_order));
             OProduct product = oProductMapper.selectByPrimaryKey(oSubOrder.getProId());
 
-            //cxinfo 订单添加 添加原价字段变更 价格计算采用活动中的价格 xx
-
             if (oSubOrder.getProNum() == null || oSubOrder.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
                 logger.info("下订单:{}", "商品数量错误");
                 throw new MessageException("商品数量错误");
@@ -873,6 +871,12 @@ public class OrderServiceImpl implements OrderService {
                     if (activity.getOriginalPrice()==null || activity.getOriginalPrice().compareTo(BigDecimal.ZERO) < 0) {
                         logger.info("下订单:{}", "活动原价不能小于0");
                         throw new MessageException("活动原价不能小于0");
+                    }
+                    if (null == activity.getQuantityLimit() || activity.getQuantityLimit() < 1) {
+                        throw new MessageException("请补全活动名称为：" + activity.getActivityName() + "的订货数量下限！");
+                    }
+                    if (proNum < activity.getQuantityLimit()) {
+                        throw new MessageException("活动" + activity.getActivityName() + "最低订货数量为" + activity.getQuantityLimit() + "台");
                     }
 
                     oSubOrder.setProPrice(activity.getOriginalPrice());

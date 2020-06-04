@@ -81,13 +81,13 @@ public class OActivity implements Serializable{
 
     private String productName;
 
-    private String quantityLimit;
+    private Integer quantityLimit;
 
-    public String getQuantityLimit() {
+    public Integer getQuantityLimit() {
         return quantityLimit;
     }
 
-    public void setQuantityLimit(String quantityLimit) {
+    public void setQuantityLimit(Integer quantityLimit) {
         this.quantityLimit = quantityLimit;
     }
 
