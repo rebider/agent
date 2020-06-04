@@ -396,7 +396,10 @@
              t.FREEZE_DATE,t.FREEZE_CAUSE,t.UNFREEZE_PERSON,
              t.UNFREEZE_DATE,t.UNFREEZE_CAUSE,t.FREEZE_NUM,
              t.REMARK,t.STATUS,t.VERSION,nvl(t.FREEZE_TYPE,'1') as FREEZE_TYPE,
-             a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS
+             a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS,
+             t.BUS_PLATFORM,t.BUS_NUM,t.BUS_FREEZE,t.PROFIT_FREEZR,
+             t.REFLOW_FREEZE,t.MONTHLY_FREEZE,t.DAILY_FREEZE,
+             t.STOP_PROFIT_FREEZE,t.CASH_FREEZE,t.STOP_COUNT
       from a_agent_freeze t
       left join a_agent a on a.id=t.agent_id
       <where>
