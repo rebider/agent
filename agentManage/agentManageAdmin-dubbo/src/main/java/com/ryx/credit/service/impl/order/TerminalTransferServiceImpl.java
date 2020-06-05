@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
@@ -618,8 +619,23 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId, boolean tf) throws Exception {
+    public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId, boolean tf,boolean isno) throws Exception {
         try {
+            if(isno){
+                if(agentVo.getTerminalTransferDetailList().get(0).getPlatformType().compareTo(TerminalPlatformType.POS.getValue())==0||agentVo.getTerminalTransferDetailList().get(0).getPlatformType().compareTo(TerminalPlatformType.ZHPOS.getValue())==0){
+                   List<String> allAgent = new ArrayList<>();
+                    List<TerminalTransferDetail> terminalTransferDetailList = agentVo.getTerminalTransferDetailList();
+                    for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
+                        allAgent.add(terminalTransferDetail.getId().trim());
+                    }
+
+                    //判断代理商是否被禁用
+                    List<String> terminalTransferFNoorbidde = agentVo.getTerminalTransferFNoorbidde();
+                    agentFNoorbidde(terminalTransferFNoorbidde,allAgent);
+                }
+
+            }
+
             if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
 
                 List<TerminalTransferDetail> terminalTransferDetails = queryDetailByTerminalId(busId);
@@ -651,6 +667,61 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
         return AgentResult.ok();
     }
+
+    /**
+     * 是否的禁用的判断
+     * @param terminalTransferFNoorbidde
+     * @throws Exception
+     */
+    public void agentFNoorbidde(List<String> terminalTransferFNoorbidde,List<String> allAgent) throws MessageException {
+
+        for (String agent : terminalTransferFNoorbidde) {
+            allAgent.remove(agent);
+        }
+        for (String ttd : allAgent) {
+
+            TerminalTransferDetail terminalTransferDetail = terminalTransferDetailMapper.selectByPrimaryKey(ttd);
+            String type = String.valueOf(terminalTransferDetail.getPlatformType());
+            List<String>  lists = new ArrayList<>();
+            lists.add(terminalTransferDetail.getOriginalOrgId().trim());
+            lists.add(terminalTransferDetail.getGoalOrgId().trim());
+            AgentResult agentResult = null;
+                try {
+                    agentResult = termMachineService.agentFNoorbidde(lists, type);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.error("调用代理商是否禁用接口异常"+e.getMessage());
+                    throw new MessageException("调用代理商是否禁用接口异常");
+                }
+                if (agentResult.isOK()) {
+                    JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
+                    List<Map<String,Object>> datas = (List<Map<String, Object>>) JSONArray.parseObject(String.valueOf(jsonObject.get("data")));
+                    for (Map<String, Object> m : datas) {
+                        /*开启*/
+                        if("0".equals(String.valueOf(m.get("status")))){
+                            if ("01".equals(String.valueOf(m.get("cancelStatus")))){
+                                throw  new MessageException(m.get("orgId")+"已经注销");
+                            }else {
+                                continue;
+                            }
+                            /*关闭*/
+                        }else if("1".equals(String.valueOf(m.get("status")))){
+                            if ("01".equals(String.valueOf(m.get("cancelStatus")))){
+                                throw  new MessageException(m.get("orgId")+"已经禁用并注销");
+                            }else {
+                                throw  new MessageException(m.get("orgId")+"已经禁用");
+                            }
+                        }
+                    }
+                }else {
+                    log.error("调用代理商是否禁用接口失败"+JSONObject.toJSON(agentResult));
+                    throw new MessageException("调用代理商是否禁用接口失败");
+                }
+
+        }
+
+    }
+
 
     @Override
     public List<Map<String, Object>> queryToolsFloor(Map<String, String> param) {

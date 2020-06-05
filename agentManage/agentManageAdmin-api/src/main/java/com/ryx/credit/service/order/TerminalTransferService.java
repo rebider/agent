@@ -55,7 +55,7 @@ public interface TerminalTransferService {
 
     Map<String, Object> queryPlatFrom(String plat);
 
-    AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId, boolean tf) throws Exception;
+    AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId, boolean tf,boolean isno) throws Exception;
 
     List<Map<String, Object>> queryToolsFloor(Map<String, String> param);
 
