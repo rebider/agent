@@ -439,9 +439,12 @@
   <!--省区任务查询-->
   <sql id="queryMyTaskWhereCity" >
     <if test="params.group!=null and params.group!=''">
-      (ri.group_id_='city' or ri.group_id_ = nvl(#{params.orgCode,jdbcType=VARCHAR},'nogroup') or ri.user_id_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser') or rt.assignee_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser') )
-      and
-      (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') )
+      (
+        (ri.group_id_='city' and (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%')))
+        or ri.group_id_ = nvl(#{params.orgCode,jdbcType=VARCHAR},'nogroup')
+        or ri.user_id_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser')
+        or rt.assignee_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser')
+      )
     </if>
     <if test="params.group==null and params.group==''"> and 1==-1</if>
   </sql>
@@ -449,9 +452,12 @@
   <!--大区任务查询条件-->
   <sql id="queryMyTaskWhereRegion" >
     <if test="params.group!=null and params.group!=''">
-      (ri.group_id_='region' or ri.group_id_ = nvl(#{params.orgCode,jdbcType=VARCHAR},'nogroup') or ri.user_id_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser') or rt.assignee_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser') )
-      and
-      (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') )
+      (
+        (ri.group_id_='region' and (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%')))
+        or ri.group_id_ = nvl(#{params.orgCode,jdbcType=VARCHAR},'nogroup')
+        or ri.user_id_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser')
+        or rt.assignee_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser')
+      )
     </if>
     <if test="params.group==null and params.group==''"> and 1==-1</if>
   </sql>
