@@ -3,6 +3,7 @@ package com.ryx.credit.activity.service.impl;
 import com.ryx.credit.activity.dao.ActRuTaskMapper;
 import com.ryx.credit.activity.entity.ActRuTask;
 import com.ryx.credit.activity.entity.ActRuTaskExample;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -11,6 +12,8 @@ import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.service.ActRuTaskService;
 import com.ryx.credit.service.CRoleService;
 import com.ryx.credit.service.IOrganizationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +31,8 @@ import java.util.*;
  */
 @Service("actRuTaskService")
 public class ActRuTaskServiceImpl implements ActRuTaskService {
+
+    private Logger logger = LoggerFactory.getLogger(ActRuTaskServiceImpl.class);
 
     @Autowired
     private ActRuTaskMapper  actRuTaskMapper;
@@ -110,8 +115,24 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
 
 
     @Override
-    public PageInfo queryMyTaskPage(Page page, Map<String,Object> param){
-
+    public PageInfo queryMyTaskPage(Page page, Map<String,Object> param)throws Exception{
+        logger.info("查询任务条件：{}",param);
+        if(param.get("userId")==null){
+            logger.info("queryMyTaskPage 缺少userId");
+          throw new MessageException("缺少参数");
+        }
+        if(param.get("group")==null){
+            logger.info("queryMyTaskPage 缺少group");
+            throw new MessageException("缺少参数");
+        }
+        if(param.get("orgId")==null){
+            logger.info("queryMyTaskPage 缺少orgId");
+            throw new MessageException("缺少参数");
+        }
+        if(param.get("orgCode")==null){
+            logger.info("queryMyTaskPage 缺少orgCode");
+            throw new MessageException("缺少参数");
+        }
         String dbUrlsPid = AppConfig.getProperty("dbUrls_pid");
         String netInUrlsPid = AppConfig.getProperty("netInUrls_pid");
         Set<String> dbUrls = roleService.selectShiroUrl((Long) param.get("userId"),dbUrlsPid,"/BusActRelBusType");//审批类型权限
@@ -157,4 +178,65 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
     public List<Map<String, Object>> queryHuddleMyTask(Map<String, Object> params) {
         return actRuTaskMapper.queryHuddleMyTask(params);
     }
+
+
+    @Override
+    public PageInfo dontUserThisSqlPage(Page page, Map<String, Object> param) throws Exception {
+        logger.info("查询任务条件：{}",param);
+        if(param.get("userId")==null){
+            logger.info("queryMyTaskPage 缺少userId");
+            throw new MessageException("缺少参数");
+        }
+        if(param.get("group")==null){
+            logger.info("queryMyTaskPage 缺少group");
+            throw new MessageException("缺少参数");
+        }
+        if(param.get("orgId")==null){
+            logger.info("queryMyTaskPage 缺少orgId");
+            throw new MessageException("缺少参数");
+        }
+        if(param.get("orgCode")==null){
+            logger.info("queryMyTaskPage 缺少orgCode");
+            throw new MessageException("缺少参数");
+        }
+        String dbUrlsPid = AppConfig.getProperty("dbUrls_pid");
+        String netInUrlsPid = AppConfig.getProperty("netInUrls_pid");
+        Set<String> dbUrls = roleService.selectShiroUrl((Long) param.get("userId"),dbUrlsPid,"/BusActRelBusType");//审批类型权限
+        Set<String> netInUrls = roleService.selectShiroUrl((Long) param.get("userId"),netInUrlsPid,"");//品牌权限
+        Set<String> roleNames = roleService.findFinanceRole((Long) param.get("userId"));//角色编号
+        param.put("roleIds",roleNames);
+        param.put("dbUrls",dbUrls);
+        param.put("netInUrls",netInUrls);
+        List<Map<String, Object>> taskList = actRuTaskMapper.dontUserThisSqlPage(param,page);
+        for (Map<String, Object> resultMap : taskList) {
+            String agDocPro = String.valueOf(resultMap.get("AG_DOC_PRO"));
+            String agDocDistrict = String.valueOf(resultMap.get("AG_DOC_DISTRICT"));
+            String explain = String.valueOf(resultMap.get("EXPLAIN"));
+            if(!agDocPro.equals("null")){
+                COrganization proOrganization = organizationService.selectByPrimaryKey(Integer.parseInt(agDocPro));
+                if(proOrganization!=null)
+                    resultMap.put("AG_DOC_PRO_NAME",proOrganization.getName());
+            }else{
+                resultMap.put("AG_DOC_PRO_NAME","");
+            }
+            if(!agDocDistrict.equals("null")){
+                COrganization districtOrganization = organizationService.selectByPrimaryKey(Integer.parseInt(agDocDistrict));
+                if(districtOrganization!=null)
+                    resultMap.put("AG_DOC_DISTRICT_NAME",districtOrganization.getName());
+            }else{
+                resultMap.put("AG_DOC_DISTRICT_NAME","");
+            }
+            if (!explain.equals("null")){
+                resultMap.put("EXPLAIN",explain);
+            }else{
+                resultMap.put("EXPLAIN","");
+            }
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(taskList);
+        pageInfo.setTotal(actRuTaskMapper.dontUserThisSqlCount(param));
+        return pageInfo;
+    }
+
+
 }

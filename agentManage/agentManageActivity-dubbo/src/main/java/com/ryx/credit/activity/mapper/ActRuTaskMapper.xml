@@ -393,6 +393,10 @@
         left join c_user c on br.c_user=to_char(c.ID)
         <where>
           1=1
+          /*没有分组禁止查询*/
+          <if test="params.group==null or params.group==''">
+            and 1==-1
+          </if>
           /*代理商sql*/
           <if test="params.group=='agent'">
             <include refid="queryMyTaskWhereAgent"/>
@@ -409,21 +413,53 @@
           <if test="params.group!='region' and params.group!='city' and params.group!='agent'">
             <include refid="queryMyTaskWhereInno"/>
           </if>
-          /*没有分组禁止查询*/
-          <if test="params.group==null or params.group==''">
-            and 1==-1
-          </if>
           /*通用查询sql*/
           <include refid="queryMyTaskWhere"/>
         </where>
       )
       ORDER by create_time desc
   </sql>
+
+  <sql id="dontUseThisSql">
+    (
+      select
+      <include refid="queryMyTaskField"/>
+      from ACT_RU_TASK rt
+      left join act_ru_execution act_ex on act_ex.proc_inst_id_=rt.proc_inst_id_ and rt.execution_id_=act_ex.id_
+      left join act_re_procdef act_prodef on act_prodef.id_=act_ex.proc_def_id_
+      left join A_bus_act_rel br on  rt.PROC_INST_ID_ = br.activ_id
+      left join act_ru_identitylink ri on ri.task_id_ = rt.id_
+      left join a_agent a on br.agent_id = a.id
+      left join C_ORGANIZATION oa on to_char(oa.id)=br.ag_doc_pro
+      left join C_ORGANIZATION ob on to_char(ob.id)=br.ag_doc_district
+      left join a_platform plat on  plat.PLATFORM_NUM =replace(br.NET_IN_BUS_TYPE,'ACTIVITY_','')
+      left join c_user c on br.c_user=to_char(c.ID)
+      <where>
+        /*通用查询sql*/
+        <include refid="queryMyTaskWhere"/>
+      </where>
+    )
+    ORDER by create_time desc
+  </sql>
+  <!--查询用户任务-->
   <select id="queryMyTaskPage" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
     <include refid="queryMyTaskSql"/>
     <include refid="OracleDialectSuffix" />
   </select>
+  <!--查询用户任务-->
+  <select id="dontUserThisSqlPage" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="dontUseThisSql"/>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="dontUserThisSqlCount" parameterType="map" resultType="int">
+    select count(*) from(
+    <include refid="dontUseThisSql"/>
+    )
+  </select>
+
+
 
   <!--代理商任务查询条件-->
   <sql id="queryMyTaskWhereAgent" >
@@ -440,7 +476,10 @@
   <sql id="queryMyTaskWhereCity" >
     <if test="params.group!=null and params.group!=''">
       (
-        (ri.group_id_='city' and (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%')))
+        (
+          ri.group_id_='city'
+          and (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%'))
+        )
         or ri.group_id_ = nvl(#{params.orgCode,jdbcType=VARCHAR},'nogroup')
         or ri.user_id_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser')
         or rt.assignee_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser')
@@ -453,7 +492,10 @@
   <sql id="queryMyTaskWhereRegion" >
     <if test="params.group!=null and params.group!=''">
       (
-        (ri.group_id_='region' and (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%')))
+        (
+          ri.group_id_='region'
+          and (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%'))
+        )
         or ri.group_id_ = nvl(#{params.orgCode,jdbcType=VARCHAR},'nogroup')
         or ri.user_id_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser')
         or rt.assignee_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser')
@@ -535,5 +577,9 @@
       <include refid="queryMyTaskSql"/>
     )
   </select>
+
+
+
+
 
 </mapper>
