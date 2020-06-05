@@ -114,11 +114,11 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
 
         String dbUrlsPid = AppConfig.getProperty("dbUrls_pid");
         String netInUrlsPid = AppConfig.getProperty("netInUrls_pid");
-        Set<String> dbUrls = roleService.selectShiroUrl((Long) param.get("userId"),dbUrlsPid,"/BusActRelBusType");
-        Set<String> netInUrls = roleService.selectShiroUrl((Long) param.get("userId"),netInUrlsPid,"");
-        Set<String> roleNames = roleService.findFinanceRole((Long) param.get("userId"));
+        Set<String> dbUrls = roleService.selectShiroUrl((Long) param.get("userId"),dbUrlsPid,"/BusActRelBusType");//审批类型权限
+        Set<String> netInUrls = roleService.selectShiroUrl((Long) param.get("userId"),netInUrlsPid,"");//品牌权限
+        Set<String> roleNames = roleService.findFinanceRole((Long) param.get("userId"));//角色编号
 
-        param.put("roleNames",roleNames);
+        param.put("roleIds",roleNames);
         param.put("dbUrls",dbUrls);
         param.put("netInUrls",netInUrls);
         List<Map<String, Object>> taskList = actRuTaskMapper.queryMyTaskPage(param,page);

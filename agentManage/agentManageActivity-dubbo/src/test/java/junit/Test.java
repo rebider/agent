@@ -31,10 +31,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -230,14 +227,23 @@ public class Test {
     }
 
 
+    /**
+     * 测试对公对私并行操作
+     */
     @org.junit.Test
     public void testStartProcess(){
         RuntimeService runtimeService = processEngineConfiguration.buildProcessEngine().getRuntimeService();
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("test_bingxing_back",
-                FastMap.fastMap("v",1)
-                .putKeyV("res","pass")
-                        .putKeyV("user1","pass")
-                        .putKeyV("user2","reject"));
+//        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("test_bingxing_back",
+//                FastMap.fastMap("v",1)
+//                .putKeyV("res","pass")
+//                        .putKeyV("user1","pass")
+//                        .putKeyV("user2","reject"));
+//        System.out.println(processInstance.getId());
+//        System.out.println(processInstance.getDeploymentId());
+//        System.out.println(processInstance.getBusinessKey());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("OrderAdjustRefund_2.4",
+                FastMap.fastMap("settlementCardDs",1)
+                        .putKeyV("settlementCardDg","0"));
         System.out.println(processInstance.getId());
         System.out.println(processInstance.getDeploymentId());
         System.out.println(processInstance.getBusinessKey());
@@ -248,11 +254,12 @@ public class Test {
     @org.junit.Test
     public void completTask(){
         TaskService taskService = processEngineConfiguration.buildProcessEngine().getTaskService();
-//        taskService.complete("4472509");
-        taskService.complete("4475005",FastMap.fastMap("v",1)
-                .putKeyV("user1","pass"));
-        taskService.complete("4475007",FastMap.fastMap("v",1)
-                .putKeyV("user2","pass"));
+        taskService.complete("5280011",FastMap.fastMap("provReject","0"));
+        taskService.complete("5280015",FastMap.fastMap("provReject","0"));
+//        taskService.complete("4475005",FastMap.fastMap("v",1)
+//                .putKeyV("user1","pass"));
+//        taskService.complete("4475007",FastMap.fastMap("v",1)
+//                .putKeyV("user2","pass"));
         System.out.println("任务完成");
     }
 
@@ -290,6 +297,19 @@ public class Test {
         runtimeService.signalEventReceived("testSig");
     }
 
+
+    /**
+     * 基础信息及结算卡信息变更申请
+     */
+    @org.junit.Test
+    public void testAgentAppyChangeCard(){
+        RuntimeService runtimeService = processEngineConfiguration.buildProcessEngine().getRuntimeService();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("appy_change_card",
+                FastMap.fastMap("provList", Arrays.asList("kermit","gonzo","fozzie"))
+                        .putKeyV("provReject","0")
+                        .putKeyV("distList",Arrays.asList("kermit","gonzo")));
+        System.out.println("基础信息及结算卡信息变更申请"+processInstance.getId());
+    }
 
 
 }
