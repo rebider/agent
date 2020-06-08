@@ -1989,14 +1989,6 @@ public class CompensateServiceImpl implements CompensateService {
 
     @Override
     public PageInfo compensateDetailList(ORefundPriceDiffDetail refundPriceDiffDetail, Page page, String dataRole,long userId){
-        ORefundPriceDiffDetailExample refundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
-        ORefundPriceDiffDetailExample.Criteria criteria = refundPriceDiffDetailExample.createCriteria();
-        if(StringUtils.isNotBlank(refundPriceDiffDetail.getAgentId())){
-            criteria.andAgentIdEqualTo(refundPriceDiffDetail.getAgentId());
-        }
-        if(StringUtils.isNotBlank(refundPriceDiffDetail.getRefundPriceDiffId())){
-            criteria.andRefundPriceDiffIdEqualTo(refundPriceDiffDetail.getRefundPriceDiffId());
-        }
 
         FastMap par = FastMap.fastSuccessMap();
         if(StringUtils.isNotBlank(refundPriceDiffDetail.getAgentId())){
@@ -2006,8 +1998,8 @@ public class CompensateServiceImpl implements CompensateService {
             par.putKeyV("refundPriceDiffId",refundPriceDiffDetail.getRefundPriceDiffId());
         }
         par.putKeyV("page",page);
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        refundPriceDiffDetailExample.setPage(page);
+        par.putKeyV("beginSn", null == refundPriceDiffDetail.getBeginSn() ? "" : refundPriceDiffDetail.getBeginSn());
+        par.putKeyV("endSn", null == refundPriceDiffDetail.getEndSn() ? "" : refundPriceDiffDetail.getEndSn());
         List<Map> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExampleExtends(par,page);
         log.info("活动调整明细查询结果：{}", JSONObject.toJSONString(oRefundPriceDiffDetails));
         //当活动明细中有智慧pos的话，查询s码放到Map中。
@@ -2047,7 +2039,7 @@ public class CompensateServiceImpl implements CompensateService {
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(maps);
-        pageInfo.setTotal((int)refundPriceDiffDetailMapper.countByExample(refundPriceDiffDetailExample));
+        pageInfo.setTotal(refundPriceDiffDetailMapper.selectNumByExampleExtends(par));
         return pageInfo;
     }
 
