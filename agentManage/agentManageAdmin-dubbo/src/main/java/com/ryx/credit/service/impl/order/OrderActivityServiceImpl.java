@@ -188,10 +188,16 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             logger.info("商品原价格不能为空");
             throw new MessageException("商品原价格不能为空");
         }
-//        if (activity.getBusProCode() == null) {
-//            logger.info("BusProCode不能为空");
-//            throw new MessageException("BusProCode不能为空");
-//        }
+        if (null == activity.getQuantityLimit()) {
+            logger.info("订货数量下限不能为空！");
+            throw new MessageException("订货数量下限不能为空！");
+        }
+
+        String regex = "^\\+?[1-9][0-9]*$";
+        if (!activity.getQuantityLimit().toString().matches(regex)) {
+            throw new MessageException("订货数量下限输入框,请输入大于等于1的正整数！");
+        }
+
         activity.setId(idService.genId(TabId.o_activity));
         Date nowDate = new Date();
         activity.setcTime(nowDate);
@@ -276,6 +282,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 logger.info("请选择或者填写正确的型号");
                 return AgentResult.fail("请选择或者填写正确的型号");
             }
+        }
+        if (null == activity.getQuantityLimit()) {
+            logger.info("订货数量下限不能为空！");
+            return AgentResult.fail("订货数量下限不能为空！");
+        }
+        if (!activity.getQuantityLimit().toString().matches("^\\+?[1-9][0-9]*$")) {
+            return AgentResult.fail("订货数量下限输入框,请输入大于等于1的正整数！");
         }
         String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
 
@@ -405,7 +418,14 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 return AgentResult.fail("请选择或者填写正确的型号");
             }
         }
+        if (null == activity.getQuantityLimit()) {
+            logger.info("订货数量下限不能为空！");
+            return AgentResult.fail("订货数量下限不能为空！");
+        }
 
+        if (!activity.getQuantityLimit().toString().matches("^\\+?[1-9][0-9]*$")) {
+            return AgentResult.fail("订货数量下限输入框,请输入大于等于1的正整数！");
+        }
         String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
         if (StringUtils.isNotBlank(platFormType)) {
             if (PlatformType.whetherPOS(platFormType)) {
