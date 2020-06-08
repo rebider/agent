@@ -824,7 +824,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 logger.info("根据sn查询业务系统返回:" + agentResult.getMsg());
                 JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
                 JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
-                logger.info(String.valueOf(data.get("termMachineList")));
+                logger.info("POS系统返回活动数据={}",data.get("termMachineList"));
                 List<Map<String, Object>> termMachineListMap = (List<Map<String, Object>>) JSONArray.parse(String.valueOf(data.get("termMachineList")));
                 if (termMachineListMap.size() != Integer.parseInt(count)) {
                     logger.info("查询pos根据SN号段查询机具信息数量：{},count:{}", termMachineListMap.size(), count);
