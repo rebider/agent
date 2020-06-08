@@ -70,4 +70,8 @@ public interface AgentMapper {
     List<AgentoutVo> exportAgentRisk(@Param("map") Map<String, Object> map);
 
     List<Agent> queryAgentByIds(List ids);
+
+    List<Map<String, Object>> queryAgentColinfoByAgentId(Map<String, Object> reqMap);
+
+    List<Map<String, Object>> queryAgentStatusByAgentId(Map<String, Object> reqMap);
 }
