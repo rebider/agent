@@ -327,7 +327,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             if (null != oRefundPriceDiff.getApplyCompType() && oRefundPriceDiff.getApplyCompType().equals("1")) {
                 //状态为1说明代理商要打款
                 if (oRefundPriceDiff.getApplyCompAmt().compareTo(belowPayAmt.add(shareDeductAmt)) != 0){
-                    throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
+                    //throw new ProcessException("应打款金额："+oRefundPriceDiff.getRelCompAmt());
                 }
             }
             Set<String> setOldOrgId = new HashSet<>();
