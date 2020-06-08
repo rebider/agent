@@ -1,7 +1,6 @@
 package com.ryx.credit.pojo.admin.agent;
 
 import com.ryx.credit.common.util.Page;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1685,6 +1684,76 @@ public class AgentFreezeExample {
 
         public Criteria andStopCountNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("STOP_COUNT not between", value1, value2, "stopCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdIsNull() {
+            addCriterion("BUS_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdIsNotNull() {
+            addCriterion("BUS_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdEqualTo(String value) {
+            addCriterion("BUS_ID =", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdNotEqualTo(String value) {
+            addCriterion("BUS_ID <>", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdGreaterThan(String value) {
+            addCriterion("BUS_ID >", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_ID >=", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdLessThan(String value) {
+            addCriterion("BUS_ID <", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdLessThanOrEqualTo(String value) {
+            addCriterion("BUS_ID <=", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdLike(String value) {
+            addCriterion("BUS_ID like", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdNotLike(String value) {
+            addCriterion("BUS_ID not like", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdIn(List<String> values) {
+            addCriterion("BUS_ID in", values, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdNotIn(List<String> values) {
+            addCriterion("BUS_ID not in", values, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdBetween(String value1, String value2) {
+            addCriterion("BUS_ID between", value1, value2, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdNotBetween(String value1, String value2) {
+            addCriterion("BUS_ID not between", value1, value2, "busId");
             return (Criteria) this;
         }
     }

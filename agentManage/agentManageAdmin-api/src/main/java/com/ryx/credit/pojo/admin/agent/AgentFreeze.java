@@ -135,6 +135,8 @@ public class AgentFreeze implements Serializable{
 
     private BigDecimal stopCount;
 
+    private String busId;
+
     public String getId() {
         return id;
     }
@@ -325,5 +327,13 @@ public class AgentFreeze implements Serializable{
 
     public void setStopCount(BigDecimal stopCount) {
         this.stopCount = stopCount;
+    }
+
+    public String getBusId() {
+        return busId;
+    }
+
+    public void setBusId(String busId) {
+        this.busId = busId == null ? null : busId.trim();
     }
 }

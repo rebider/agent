@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.agent;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class FreezeRequestDetail {
+public class FreezeRequestDetail implements Serializable {
     private String id;
 
     private String freezeReqId;
@@ -35,6 +36,8 @@ public class FreezeRequestDetail {
     private String remark;
 
     private String busPlatform;
+
+    private String busId;
 
     private String busNum;
 
@@ -200,6 +203,14 @@ public class FreezeRequestDetail {
 
     public void setBusPlatform(String busPlatform) {
         this.busPlatform = busPlatform == null ? null : busPlatform.trim();
+    }
+
+    public String getBusId() {
+        return busId;
+    }
+
+    public void setBusId(String busId) {
+        this.busId = busId == null ? null : busId.trim();
     }
 
     public String getBusNum() {

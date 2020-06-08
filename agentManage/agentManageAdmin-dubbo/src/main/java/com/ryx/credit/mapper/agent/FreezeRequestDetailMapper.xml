@@ -18,6 +18,7 @@
     <result column="FREEZE_NUM" jdbcType="VARCHAR" property="freezeNum" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
     <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
     <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
     <result column="BUS_FREEZE" jdbcType="DECIMAL" property="busFreeze" />
     <result column="PROFIT_FREEZE" jdbcType="DECIMAL" property="profitFreeze" />
@@ -70,7 +71,7 @@
   <sql id="Base_Column_List">
     ID, FREEZE_REQ_ID, FREEZA_ID, AGENT_ID, AGENT_FREEZE_STATUS, FREEZE_TYPE, FREEZE_STATUS, 
     FREEZE_PERSON, FREEZE_DATE, FREEZE_CAUSE, UNFREEZE_PERSON, UNFREEZE_DATE, UNFREEZE_CAUSE, 
-    FREEZE_NUM, REMARK, BUS_PLATFORM, BUS_NUM, BUS_FREEZE, PROFIT_FREEZE, REFLOW_FREEZE, 
+    FREEZE_NUM, REMARK, BUS_PLATFORM, BUS_ID, BUS_NUM, BUS_FREEZE, PROFIT_FREEZE, REFLOW_FREEZE, 
     MONTHLY_FREEZE, DAILY_FREEZE, STOP_PROFIT_FREEZE, CASH_FREEZE, STOP_COUNT, BUS_FREEZE_ORG, 
     PROFIT_FREEZE_ORG, REFLOW_FREEZE_ORG, MONTHLY_FREEZE_ORG, DAILY_FREEZE_ORG, STOP_PROFIT_FREEZE_ORG, 
     CASH_FREEZE_ORG, STOP_COUNT_ORG, STATUS, VERSION
@@ -109,25 +110,27 @@
       FREEZE_STATUS, FREEZE_PERSON, FREEZE_DATE, 
       FREEZE_CAUSE, UNFREEZE_PERSON, UNFREEZE_DATE, 
       UNFREEZE_CAUSE, FREEZE_NUM, REMARK, 
-      BUS_PLATFORM, BUS_NUM, BUS_FREEZE, 
-      PROFIT_FREEZE, REFLOW_FREEZE, MONTHLY_FREEZE, 
-      DAILY_FREEZE, STOP_PROFIT_FREEZE, CASH_FREEZE, 
-      STOP_COUNT, BUS_FREEZE_ORG, PROFIT_FREEZE_ORG, 
-      REFLOW_FREEZE_ORG, MONTHLY_FREEZE_ORG, DAILY_FREEZE_ORG, 
-      STOP_PROFIT_FREEZE_ORG, CASH_FREEZE_ORG, STOP_COUNT_ORG, 
-      STATUS, VERSION)
+      BUS_PLATFORM, BUS_ID, BUS_NUM, 
+      BUS_FREEZE, PROFIT_FREEZE, REFLOW_FREEZE, 
+      MONTHLY_FREEZE, DAILY_FREEZE, STOP_PROFIT_FREEZE, 
+      CASH_FREEZE, STOP_COUNT, BUS_FREEZE_ORG, 
+      PROFIT_FREEZE_ORG, REFLOW_FREEZE_ORG, MONTHLY_FREEZE_ORG, 
+      DAILY_FREEZE_ORG, STOP_PROFIT_FREEZE_ORG, CASH_FREEZE_ORG, 
+      STOP_COUNT_ORG, STATUS, VERSION
+      )
     values (#{id,jdbcType=VARCHAR}, #{freezeReqId,jdbcType=VARCHAR}, #{freezaId,jdbcType=VARCHAR}, 
       #{agentId,jdbcType=VARCHAR}, #{agentFreezeStatus,jdbcType=VARCHAR}, #{freezeType,jdbcType=DECIMAL}, 
       #{freezeStatus,jdbcType=VARCHAR}, #{freezePerson,jdbcType=VARCHAR}, #{freezeDate,jdbcType=TIMESTAMP}, 
       #{freezeCause,jdbcType=VARCHAR}, #{unfreezePerson,jdbcType=VARCHAR}, #{unfreezeDate,jdbcType=TIMESTAMP}, 
       #{unfreezeCause,jdbcType=VARCHAR}, #{freezeNum,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
-      #{busPlatform,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{busFreeze,jdbcType=DECIMAL}, 
-      #{profitFreeze,jdbcType=DECIMAL}, #{reflowFreeze,jdbcType=DECIMAL}, #{monthlyFreeze,jdbcType=DECIMAL}, 
-      #{dailyFreeze,jdbcType=DECIMAL}, #{stopProfitFreeze,jdbcType=DECIMAL}, #{cashFreeze,jdbcType=DECIMAL}, 
-      #{stopCount,jdbcType=DECIMAL}, #{busFreezeOrg,jdbcType=DECIMAL}, #{profitFreezeOrg,jdbcType=DECIMAL}, 
-      #{reflowFreezeOrg,jdbcType=DECIMAL}, #{monthlyFreezeOrg,jdbcType=DECIMAL}, #{dailyFreezeOrg,jdbcType=DECIMAL}, 
-      #{stopProfitFreezeOrg,jdbcType=DECIMAL}, #{cashFreezeOrg,jdbcType=DECIMAL}, #{stopCountOrg,jdbcType=DECIMAL}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+      #{busPlatform,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, 
+      #{busFreeze,jdbcType=DECIMAL}, #{profitFreeze,jdbcType=DECIMAL}, #{reflowFreeze,jdbcType=DECIMAL}, 
+      #{monthlyFreeze,jdbcType=DECIMAL}, #{dailyFreeze,jdbcType=DECIMAL}, #{stopProfitFreeze,jdbcType=DECIMAL}, 
+      #{cashFreeze,jdbcType=DECIMAL}, #{stopCount,jdbcType=DECIMAL}, #{busFreezeOrg,jdbcType=DECIMAL}, 
+      #{profitFreezeOrg,jdbcType=DECIMAL}, #{reflowFreezeOrg,jdbcType=DECIMAL}, #{monthlyFreezeOrg,jdbcType=DECIMAL}, 
+      #{dailyFreezeOrg,jdbcType=DECIMAL}, #{stopProfitFreezeOrg,jdbcType=DECIMAL}, #{cashFreezeOrg,jdbcType=DECIMAL}, 
+      #{stopCountOrg,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
     insert into A_FREEZE_REQUEST_DETAIL
@@ -179,6 +182,9 @@
       </if>
       <if test="busPlatform != null">
         BUS_PLATFORM,
+      </if>
+      <if test="busId != null">
+        BUS_ID,
       </if>
       <if test="busNum != null">
         BUS_NUM,
@@ -286,6 +292,9 @@
       </if>
       <if test="busPlatform != null">
         #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null">
+        #{busId,jdbcType=VARCHAR},
       </if>
       <if test="busNum != null">
         #{busNum,jdbcType=VARCHAR},
@@ -400,6 +409,9 @@
       <if test="busPlatform != null">
         BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
       </if>
+      <if test="busId != null">
+        BUS_ID = #{busId,jdbcType=VARCHAR},
+      </if>
       <if test="busNum != null">
         BUS_NUM = #{busNum,jdbcType=VARCHAR},
       </if>
@@ -477,6 +489,7 @@
       FREEZE_NUM = #{freezeNum,jdbcType=VARCHAR},
       REMARK = #{remark,jdbcType=VARCHAR},
       BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      BUS_ID = #{busId,jdbcType=VARCHAR},
       BUS_NUM = #{busNum,jdbcType=VARCHAR},
       BUS_FREEZE = #{busFreeze,jdbcType=DECIMAL},
       PROFIT_FREEZE = #{profitFreeze,jdbcType=DECIMAL},
