@@ -360,17 +360,23 @@
 
 
   <sql id="queryMyTaskField" >
-    rt.ID_,rt.NAME_,br.ACTIV_ID,
-    br.BUS_ID, br.BUS_TYPE, to_char(br.C_TIME, 'yyyy-mm-dd hh24:mi:ss') C_TIME,
+    rt.ID_,
+    rt.NAME_,
+    br.ACTIV_ID,
+    br.BUS_ID,
+    br.BUS_TYPE,
+    to_char(br.C_TIME, 'yyyy-mm-dd hh24:mi:ss') C_TIME,
     br.C_USER,
     br.ACTIV_STATUS,
-    br.STATUS,ri.group_id_,
-    br.agent_id,br.agent_name,
+    br.STATUS,ri.group_id_, ri.user_id_,rt.assignee_,
+    br.agent_id,
+    br.agent_name,
     br.net_in_bus_type,
-    rt.create_time_ as create_time,
+    br.data_shiro,
+    to_char(rt.create_time_, 'yyyy-mm-dd hh24:mi:ss') as create_time,
     br.ag_doc_pro,
     br.ag_doc_district,
-    nvl(plat.PLATFORM_NAME,0) PLATFORM_NAME,
+    nvl(plat.PLATFORM_NAME,0) as PLATFORM_NAME,
     c.NAME AS C_NAME,
     br.EXPLAIN,
     act_ex.PROC_INST_ID_,
@@ -393,31 +399,34 @@
         left join c_user c on br.c_user=to_char(c.ID)
         <where>
           1=1
-          /*没有分组禁止查询*/
+
           <if test="params.group==null or params.group==''">
-            and 1==-1
+            /*没有分组禁止查询*/
+            and 1=-1
           </if>
-          /*代理商sql*/
           <if test="params.group=='agent'">
+            /*代理商sql*/
             <include refid="queryMyTaskWhereAgent"/>
           </if>
-          /*省区*/
+
           <if test="params.group=='city'">
+            /*省区*/
             <include refid="queryMyTaskWhereCity"/>
           </if>
-          /*大区*/
+
           <if test="params.group=='region'">
+            /*大区*/
             <include refid="queryMyTaskWhereRegion"/>
           </if>
-          /*内部*/
           <if test="params.group!='region' and params.group!='city' and params.group!='agent'">
+            /*内部*/
             <include refid="queryMyTaskWhereInno"/>
           </if>
           /*通用查询sql*/
           <include refid="queryMyTaskWhere"/>
         </where>
+        ORDER by rt.create_time_ desc
       )
-      ORDER by create_time desc
   </sql>
 
   <sql id="dontUseThisSql">
@@ -435,11 +444,12 @@
       left join a_platform plat on  plat.PLATFORM_NUM =replace(br.NET_IN_BUS_TYPE,'ACTIVITY_','')
       left join c_user c on br.c_user=to_char(c.ID)
       <where>
+        1=1
         /*通用查询sql*/
         <include refid="queryMyTaskWhere"/>
       </where>
+      ORDER by rt.create_time_ asc
     )
-    ORDER by create_time desc
   </sql>
   <!--查询用户任务-->
   <select id="queryMyTaskPage" parameterType="map" resultType="map">
@@ -461,72 +471,100 @@
 
 
 
-  <!--代理商任务查询条件-->
+
   <sql id="queryMyTaskWhereAgent" >
     <if test="params.group!=null and params.group!=''">
+      <!--代理商任务查询条件-->
       and
       br.agent_id = #{params.agentId,jdbcType=VARCHAR}
       and
-      (ri.group_id_='agent' or ri.user_id_=nvl(#{params.agentId,jdbcType=VARCHAR},'nouser') or rt.assignee_=nvl(#{params.agentId,jdbcType=VARCHAR},'nouser') )
+      (
+       ri.group_id_='agent'
+       <if test="params.agentId!=null">
+          or ri.user_id_=nvl(#{params.agentId,jdbcType=VARCHAR},'nouser')
+       </if>
+       <if test="params.agentId!=null">
+          or rt.assignee_=nvl(#{params.agentId,jdbcType=VARCHAR},'nouser')
+       </if>
+      )
     </if>
     <if test="params.group==null and params.group==''"> and 1==-1</if>
   </sql>
 
-  <!--省区任务查询-->
+
   <sql id="queryMyTaskWhereCity" >
     <if test="params.group!=null and params.group!=''">
+      <!--省区任务查询-->
       (
         (
           ri.group_id_='city'
           and (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%'))
         )
+        <if test="params.orgCode!=null">
         or ri.group_id_ = nvl(#{params.orgCode,jdbcType=VARCHAR},'nogroup')
-        or ri.user_id_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser')
-        or rt.assignee_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser')
+        </if>
+        <if test="params.userId!=null">
+        or ri.user_id_ = to_char(#{params.userId})
+        </if>
+        <if test="params.userId!=null">
+        or rt.assignee_ = to_char(#{params.userId})
+        </if>
       )
     </if>
     <if test="params.group==null and params.group==''"> and 1==-1</if>
   </sql>
 
-  <!--大区任务查询条件-->
+
   <sql id="queryMyTaskWhereRegion" >
     <if test="params.group!=null and params.group!=''">
+      <!--大区任务查询条件-->
       (
         (
           ri.group_id_='region'
           and (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%'))
         )
-        or ri.group_id_ = nvl(#{params.orgCode,jdbcType=VARCHAR},'nogroup')
-        or ri.user_id_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser')
-        or rt.assignee_ = nvl(#{params.userId,jdbcType=VARCHAR},'nouser')
+        <if test="params.orgCode!=null">
+          or ri.group_id_ = #{params.orgCode,jdbcType=VARCHAR}
+        </if>
+        <if test="params.userId!=null">
+          or ri.user_id_ = to_char(#{params.userId})
+        </if>
+        <if test="params.userId!=null">
+          or rt.assignee_ = to_char(#{params.userId})
+        </if>
       )
     </if>
     <if test="params.group==null and params.group==''"> and 1==-1</if>
   </sql>
 
-  <!--内部人员查询任务条件-->
+
   <sql id="queryMyTaskWhereInno" >
+    <!--内部人员查询任务条件-->
     <if test="params.group!=null and params.group!=''">
       /*分组节点 （支持部门，角色id,用户id）*/
       and (
             ri.group_id_=#{params.group,jdbcType=VARCHAR}
-            or ri.user_id_ = nvl(#{params.userId,jdbcType=VARCHAR},'_nouser_')
-            or rt.assignee_ = nvl(#{params.userId,jdbcType=VARCHAR},'_nouser_')
+            <if test="params.userId!=null">
+              or ri.user_id_ = to_char(#{params.userId})
+            </if>
+            <if test="params.userId!=null">
+              or rt.assignee_ = to_char(#{params.userId})
+            </if>
             <if test="params.roleIds != null and params.roleIds.size>0 " >
-              <foreach collection="params.roleIds" separator="," item="roleId" index="index" open=" or ri.group_id_ in (" close=")">
-                #{roleId}
+              <foreach collection="params.roleIds"  item="roleId" index="index" open=" or ri.group_id_ in (" close=")" separator=",">
+                to_char(#{roleId})
               </foreach>
             </if>
           )
       and
         /*审批品牌权限*/
         (
-          NET_IN_BUS_TYPE is null
+          br.NET_IN_BUS_TYPE is null
           or
           (
-            NET_IN_BUS_TYPE is not null
+            br.NET_IN_BUS_TYPE is not null
             <if test="params.netInUrls != null and params.netInUrls.size>0">
-              <foreach collection="params.netInUrls" separator="," item="netInUrl" index="index" open=" and NET_IN_BUS_TYPE in (" close=")">
+              <foreach collection="params.netInUrls" separator="," item="netInUrl" index="index" open=" and br.NET_IN_BUS_TYPE in (" close=")">
                 #{netInUrl}
               </foreach>
             </if>
@@ -542,13 +580,14 @@
           </foreach>
         </if>
         <if test="params.dbUrls == null and params.dbUrls.size==0" >
-          and 1==-1
+          and 1=-1
         </if>
     </if>
     <if test="params.group==null and params.group==''"> and 1==-1</if>
   </sql>
-  <!--通用任务查询条件-->
+
   <sql id="queryMyTaskWhere" >
+    <!--通用任务查询条件-->
     <if test="params.busActRelBusType != null and params.busActRelBusType!='' " >
       and br.BUS_TYPE = #{params.busActRelBusType}
     </if>

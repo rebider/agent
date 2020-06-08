@@ -142,6 +142,7 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
         param.put("roleIds",roleNames);
         param.put("dbUrls",dbUrls);
         param.put("netInUrls",netInUrls);
+        logger.info("查询代办任务：{}",param);
         List<Map<String, Object>> taskList = actRuTaskMapper.queryMyTaskPage(param,page);
         for (Map<String, Object> resultMap : taskList) {
             String agDocPro = String.valueOf(resultMap.get("AG_DOC_PRO"));
@@ -207,6 +208,7 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
         param.put("roleIds",roleNames);
         param.put("dbUrls",dbUrls);
         param.put("netInUrls",netInUrls);
+        logger.info("查询代办任务：{}",param);
         List<Map<String, Object>> taskList = actRuTaskMapper.dontUserThisSqlPage(param,page);
         for (Map<String, Object> resultMap : taskList) {
             String agDocPro = String.valueOf(resultMap.get("AG_DOC_PRO"));
