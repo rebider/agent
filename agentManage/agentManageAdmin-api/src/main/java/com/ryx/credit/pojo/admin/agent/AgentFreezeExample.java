@@ -1267,63 +1267,63 @@ public class AgentFreezeExample {
             return (Criteria) this;
         }
 
-        public Criteria andProfitFreezrIsNull() {
-            addCriterion("PROFIT_FREEZR is null");
+        public Criteria andProfitFreezeIsNull() {
+            addCriterion("PROFIT_FREEZE is null");
             return (Criteria) this;
         }
 
-        public Criteria andProfitFreezrIsNotNull() {
-            addCriterion("PROFIT_FREEZR is not null");
+        public Criteria andProfitFreezeIsNotNull() {
+            addCriterion("PROFIT_FREEZE is not null");
             return (Criteria) this;
         }
 
-        public Criteria andProfitFreezrEqualTo(BigDecimal value) {
-            addCriterion("PROFIT_FREEZR =", value, "profitFreezr");
+        public Criteria andProfitFreezeEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_FREEZE =", value, "profitFreeze");
             return (Criteria) this;
         }
 
-        public Criteria andProfitFreezrNotEqualTo(BigDecimal value) {
-            addCriterion("PROFIT_FREEZR <>", value, "profitFreezr");
+        public Criteria andProfitFreezeNotEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_FREEZE <>", value, "profitFreeze");
             return (Criteria) this;
         }
 
-        public Criteria andProfitFreezrGreaterThan(BigDecimal value) {
-            addCriterion("PROFIT_FREEZR >", value, "profitFreezr");
+        public Criteria andProfitFreezeGreaterThan(BigDecimal value) {
+            addCriterion("PROFIT_FREEZE >", value, "profitFreeze");
             return (Criteria) this;
         }
 
-        public Criteria andProfitFreezrGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("PROFIT_FREEZR >=", value, "profitFreezr");
+        public Criteria andProfitFreezeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_FREEZE >=", value, "profitFreeze");
             return (Criteria) this;
         }
 
-        public Criteria andProfitFreezrLessThan(BigDecimal value) {
-            addCriterion("PROFIT_FREEZR <", value, "profitFreezr");
+        public Criteria andProfitFreezeLessThan(BigDecimal value) {
+            addCriterion("PROFIT_FREEZE <", value, "profitFreeze");
             return (Criteria) this;
         }
 
-        public Criteria andProfitFreezrLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("PROFIT_FREEZR <=", value, "profitFreezr");
+        public Criteria andProfitFreezeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_FREEZE <=", value, "profitFreeze");
             return (Criteria) this;
         }
 
-        public Criteria andProfitFreezrIn(List<BigDecimal> values) {
-            addCriterion("PROFIT_FREEZR in", values, "profitFreezr");
+        public Criteria andProfitFreezeIn(List<BigDecimal> values) {
+            addCriterion("PROFIT_FREEZE in", values, "profitFreeze");
             return (Criteria) this;
         }
 
-        public Criteria andProfitFreezrNotIn(List<BigDecimal> values) {
-            addCriterion("PROFIT_FREEZR not in", values, "profitFreezr");
+        public Criteria andProfitFreezeNotIn(List<BigDecimal> values) {
+            addCriterion("PROFIT_FREEZE not in", values, "profitFreeze");
             return (Criteria) this;
         }
 
-        public Criteria andProfitFreezrBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("PROFIT_FREEZR between", value1, value2, "profitFreezr");
+        public Criteria andProfitFreezeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PROFIT_FREEZE between", value1, value2, "profitFreeze");
             return (Criteria) this;
         }
 
-        public Criteria andProfitFreezrNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("PROFIT_FREEZR not between", value1, value2, "profitFreezr");
+        public Criteria andProfitFreezeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PROFIT_FREEZE not between", value1, value2, "profitFreeze");
             return (Criteria) this;
         }
 

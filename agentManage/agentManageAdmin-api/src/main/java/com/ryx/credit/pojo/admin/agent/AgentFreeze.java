@@ -121,7 +121,7 @@ public class AgentFreeze implements Serializable{
 
     private BigDecimal busFreeze;
 
-    private BigDecimal profitFreezr;
+    private BigDecimal profitFreeze;
 
     private BigDecimal reflowFreeze;
 
@@ -273,12 +273,12 @@ public class AgentFreeze implements Serializable{
         this.busFreeze = busFreeze;
     }
 
-    public BigDecimal getProfitFreezr() {
-        return profitFreezr;
+    public BigDecimal getProfitFreeze() {
+        return profitFreeze;
     }
 
-    public void setProfitFreezr(BigDecimal profitFreezr) {
-        this.profitFreezr = profitFreezr;
+    public void setProfitFreeze(BigDecimal profitFreeze) {
+        this.profitFreeze = profitFreeze;
     }
 
     public BigDecimal getReflowFreeze() {

@@ -19,7 +19,7 @@
     <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
     <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
     <result column="BUS_FREEZE" jdbcType="DECIMAL" property="busFreeze" />
-    <result column="PROFIT_FREEZR" jdbcType="DECIMAL" property="profitFreezr" />
+    <result column="PROFIT_FREEZE" jdbcType="DECIMAL" property="profitFreeze" />
     <result column="REFLOW_FREEZE" jdbcType="DECIMAL" property="reflowFreeze" />
     <result column="MONTHLY_FREEZE" jdbcType="DECIMAL" property="monthlyFreeze" />
     <result column="DAILY_FREEZE" jdbcType="DECIMAL" property="dailyFreeze" />
@@ -60,7 +60,7 @@
   <sql id="Base_Column_List">
     ID, AGENT_ID, FREEZE_STATUS, FREEZE_PERSON, FREEZE_DATE, FREEZE_CAUSE, UNFREEZE_PERSON, 
     UNFREEZE_DATE, UNFREEZE_CAUSE, FREEZE_NUM, REMARK, STATUS, VERSION, FREEZE_TYPE, 
-    BUS_PLATFORM, BUS_NUM, BUS_FREEZE, PROFIT_FREEZR, REFLOW_FREEZE, MONTHLY_FREEZE, 
+    BUS_PLATFORM, BUS_NUM, BUS_FREEZE, PROFIT_FREEZE, REFLOW_FREEZE, MONTHLY_FREEZE, 
     DAILY_FREEZE, STOP_PROFIT_FREEZE, CASH_FREEZE, STOP_COUNT, BUS_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreezeExample" resultMap="BaseResultMap">
@@ -97,7 +97,7 @@
       UNFREEZE_PERSON, UNFREEZE_DATE, UNFREEZE_CAUSE, 
       FREEZE_NUM, REMARK, STATUS, 
       VERSION, FREEZE_TYPE, BUS_PLATFORM, 
-      BUS_NUM, BUS_FREEZE, PROFIT_FREEZR, 
+      BUS_NUM, BUS_FREEZE, PROFIT_FREEZE, 
       REFLOW_FREEZE, MONTHLY_FREEZE, DAILY_FREEZE, 
       STOP_PROFIT_FREEZE, CASH_FREEZE, STOP_COUNT, 
       BUS_ID)
@@ -106,7 +106,7 @@
       #{unfreezePerson,jdbcType=VARCHAR}, #{unfreezeDate,jdbcType=TIMESTAMP}, #{unfreezeCause,jdbcType=VARCHAR}, 
       #{freezeNum,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
       #{version,jdbcType=DECIMAL}, #{freezeType,jdbcType=DECIMAL}, #{busPlatform,jdbcType=VARCHAR}, 
-      #{busNum,jdbcType=VARCHAR}, #{busFreeze,jdbcType=DECIMAL}, #{profitFreezr,jdbcType=DECIMAL}, 
+      #{busNum,jdbcType=VARCHAR}, #{busFreeze,jdbcType=DECIMAL}, #{profitFreeze,jdbcType=DECIMAL}, 
       #{reflowFreeze,jdbcType=DECIMAL}, #{monthlyFreeze,jdbcType=DECIMAL}, #{dailyFreeze,jdbcType=DECIMAL}, 
       #{stopProfitFreeze,jdbcType=DECIMAL}, #{cashFreeze,jdbcType=DECIMAL}, #{stopCount,jdbcType=DECIMAL}, 
       #{busId,jdbcType=VARCHAR})
@@ -165,8 +165,8 @@
       <if test="busFreeze != null">
         BUS_FREEZE,
       </if>
-      <if test="profitFreezr != null">
-        PROFIT_FREEZR,
+      <if test="profitFreeze != null">
+        PROFIT_FREEZE,
       </if>
       <if test="reflowFreeze != null">
         REFLOW_FREEZE,
@@ -242,8 +242,8 @@
       <if test="busFreeze != null">
         #{busFreeze,jdbcType=DECIMAL},
       </if>
-      <if test="profitFreezr != null">
-        #{profitFreezr,jdbcType=DECIMAL},
+      <if test="profitFreeze != null">
+        #{profitFreeze,jdbcType=DECIMAL},
       </if>
       <if test="reflowFreeze != null">
         #{reflowFreeze,jdbcType=DECIMAL},
@@ -325,8 +325,8 @@
       <if test="busFreeze != null">
         BUS_FREEZE = #{busFreeze,jdbcType=DECIMAL},
       </if>
-      <if test="profitFreezr != null">
-        PROFIT_FREEZR = #{profitFreezr,jdbcType=DECIMAL},
+      <if test="profitFreeze != null">
+        PROFIT_FREEZE = #{profitFreeze,jdbcType=DECIMAL},
       </if>
       <if test="reflowFreeze != null">
         REFLOW_FREEZE = #{reflowFreeze,jdbcType=DECIMAL},
@@ -370,7 +370,7 @@
       BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
       BUS_NUM = #{busNum,jdbcType=VARCHAR},
       BUS_FREEZE = #{busFreeze,jdbcType=DECIMAL},
-      PROFIT_FREEZR = #{profitFreezr,jdbcType=DECIMAL},
+      PROFIT_FREEZE = #{profitFreeze,jdbcType=DECIMAL},
       REFLOW_FREEZE = #{reflowFreeze,jdbcType=DECIMAL},
       MONTHLY_FREEZE = #{monthlyFreeze,jdbcType=DECIMAL},
       DAILY_FREEZE = #{dailyFreeze,jdbcType=DECIMAL},
