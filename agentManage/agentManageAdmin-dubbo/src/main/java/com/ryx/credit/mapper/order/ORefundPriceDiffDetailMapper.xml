@@ -742,7 +742,7 @@
             and d.begin_sn like concat(#{par.beginSn},'%') or (length(d.begin_sn)=LENGTH(#{par.beginSn}) AND d.begin_sn &lt;= #{par.beginSn} AND d.end_sn &gt;= #{par.beginSn})
           </when>
           <when test="(par.beginSn==null or par.beginSn=='') and par.endSn!=null and par.endSn!=''">
-            and d.end_sn like concat(#{par.endSn}, '%')  or (length(d.endSn)=LENGTH(#{par.endSn}) AND d.begin_sn &lt;= #{par.endSn} AND d.end_sn &gt;= #{par.endSn})
+            and d.end_sn like concat(#{par.endSn}, '%')  or (length(d.end_sn)=LENGTH(#{par.endSn}) AND d.begin_sn &lt;= #{par.endSn} AND d.end_sn &gt;= #{par.endSn})
           </when>
           <otherwise>
           </otherwise>
@@ -767,10 +767,10 @@
             and d.begin_sn=#{par.beginSn} and d.end_sn=#{par.endSn}
           </when>
           <when test="par.beginSn!=null and par.beginSn!='' and (par.endSn==null or par.endSn=='')">
-            and d.begin_sn like concat('%',#{par.beginSn})
+            and d.begin_sn like concat(#{par.beginSn},'%') or (length(d.begin_sn)=LENGTH(#{par.beginSn}) AND d.begin_sn &lt;= #{par.beginSn} AND d.end_sn &gt;= #{par.beginSn})
           </when>
           <when test="(par.beginSn==null or par.beginSn=='') and par.endSn!=null and par.endSn!=''">
-            and d.end_sn like concat('%',#{par.endSn})
+            and d.end_sn like concat(#{par.endSn}, '%')  or (length(d.end_sn)=LENGTH(#{par.endSn}) AND d.begin_sn &lt;= #{par.endSn} AND d.end_sn &gt;= #{par.endSn})
           </when>
           <otherwise>
           </otherwise>
