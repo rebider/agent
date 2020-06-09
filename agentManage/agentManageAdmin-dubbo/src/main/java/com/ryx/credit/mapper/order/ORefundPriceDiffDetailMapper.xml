@@ -726,7 +726,7 @@
         <if test="par.refundPriceDiffId!=null and par.refundPriceDiffId!=''"> and d.REFUND_PRICE_DIFF_ID=#{par.refundPriceDiffId} </if>
         <choose>
           <when test="par.beginSn!=null and par.beginSn!='' and par.endSn!=null and par.endSn!=''">
-            and d.begin_sn=#{par.beginSn} and d.end_sn=#{par.endSn}
+            and d.begin_sn=#{par.beginSn} and d.end_sn=#{par.endSn} or (length(d.begin_sn)=length(#{par.beginSn}) AND length(d.end_sn)=length(#{par.endSn}) AND d.begin_sn &lt;= #{par.beginSn} AND d.end_sn &gt;= #{par.beginSn})
           </when>
           <when test="par.beginSn!=null and par.beginSn!='' and (par.endSn==null or par.endSn=='')">
             and d.begin_sn like concat(#{par.beginSn},'%') or (length(d.begin_sn)=LENGTH(#{par.beginSn}) AND d.begin_sn &lt;= #{par.beginSn} AND d.end_sn &gt;= #{par.beginSn}) or d.end_sn like concat(#{par.beginSn}, '%')
@@ -754,7 +754,7 @@
         <if test="par.refundPriceDiffId!=null and par.refundPriceDiffId!=''"> and d.REFUND_PRICE_DIFF_ID=#{par.refundPriceDiffId} </if>
         <choose>
           <when test="par.beginSn!=null and par.beginSn!='' and par.endSn!=null and par.endSn!=''">
-            and d.begin_sn=#{par.beginSn} and d.end_sn=#{par.endSn}
+            and d.begin_sn=#{par.beginSn} and d.end_sn=#{par.endSn} or (length(d.begin_sn)=length(#{par.beginSn}) AND length(d.end_sn)=length(#{par.endSn}) AND d.begin_sn &lt;= #{par.beginSn} AND d.end_sn &gt;= #{par.beginSn})
           </when>
           <when test="par.beginSn!=null and par.beginSn!='' and (par.endSn==null or par.endSn=='')">
             and d.begin_sn like concat(#{par.beginSn},'%') or (length(d.begin_sn)=LENGTH(#{par.beginSn}) AND d.begin_sn &lt;= #{par.beginSn} AND d.end_sn &gt;= #{par.beginSn}) or d.end_sn like concat(#{par.beginSn}, '%')
