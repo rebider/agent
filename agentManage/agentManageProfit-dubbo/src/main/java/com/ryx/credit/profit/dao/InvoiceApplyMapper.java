@@ -41,4 +41,17 @@ public interface InvoiceApplyMapper {
 
     List<Map<String,Object>> exports(InvoiceApplyExample example);
 
+    Map<String,Object> getImportBatch(@Param("finUser") String finUser,@Param("dateStr") String dateStr);
+
+    String getMaxImportBatch(String dateStr);
+
+    List<Map<String,String>> getAgentIdByInvoiceCompany(@Param("invoiceCompany")String invoiceCompany,@Param("month") String month);
+
+    List<Map<String,String>> getImportUserList();
+
+    List<Map> selectByExampleOwn(InvoiceApplyExample example);
+
+    long countByExampleOwn(InvoiceApplyExample example);
+
+    List<InvoiceApply> selectListForDeal(@Param("invoiceNumber") String invoiceNumber,@Param("invoiceCode") String invoiceCode);
 }

@@ -375,8 +375,14 @@
            ps.OWN_INVOICE ownInvoice, ps.ADJUST_AMT adjustAmt, ps.ADJUST_ACCOUNT adjustAccount,
             ps.ADJUST_RESON adjustReson, ps.ADJUST_TIME adjustTime, ps.TOP_ORG_ID topOrgId, ps.TOP_ORG_NAME topOrgName,
             ps.INVOICE_STATUS invoiceStatus,ps.SUB_ADD_INVOICE_AMT subAddInvoiceAmt, ps.REV1 rev1,
-            ps.REV2 rev2, ps.REV3 rev3, ac.CLO_TAX_POINT tax
+            ps.REV2 rev2, ps.REV3 rev3, ac.CLO_TAX_POINT tax,nvl(pia.INVOICEAMT,0) INVOICEAMT
     from P_INVOICE_SUM ps
+    left join (
+      select AGENT_ID,INVOICE_COMPANY, INVOICE_MONTH,sum(SUM_AMT) INVOICEAMT from (
+        select AGENT_ID,INVOICE_COMPANY,SUM_AMT,to_char(add_months(TO_DATE(replace(substr(CREATE_DATE,0,7),'-',''),'yyyymm'),-1),'yyyymm') INVOICE_MONTH
+         from P_INVOICE_APPLY where STATUS = '0'  and YS_RESULT != '1' and ES_RESULT = '1'
+      )group by AGENT_ID,INVOICE_COMPANY,INVOICE_MONTH
+    ) pia on pia.AGENT_ID = ps.AGENT_ID and pia.INVOICE_MONTH = ps.PROFIT_MONTH and ps.INVOICE_COMPANY = pia.INVOICE_COMPANY
     inner join (
       select distinct aab.AGENT_ID from A_AGENT_BUSINFO aab where 1= 1
       <if test="map.docPro != null and map.docPro != '' ">
