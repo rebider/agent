@@ -48,8 +48,11 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
 
     @Override
     public PageInfo agentFreezeList(Map map, Page page) {
-        freezeRequestMapper.queryAgentFreezeRequestList(map,page);
-        return null;
+        PageInfo pageInfo = new PageInfo();
+        map.put("page", page);
+        pageInfo.setTotal(freezeRequestMapper.queryAgentFreezeRequestListCount(map));
+        pageInfo.setRows(freezeRequestMapper.queryAgentFreezeRequestList(map, page));
+        return pageInfo;
     }
 
     @Override

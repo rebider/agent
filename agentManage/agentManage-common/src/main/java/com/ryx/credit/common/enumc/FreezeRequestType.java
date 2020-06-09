@@ -10,9 +10,9 @@ import java.math.BigDecimal;
  */
 public enum FreezeRequestType {
 
-    Freeze(1,"申请冻结"),
+    Freeze(0,"申请冻结"),
     UnFreeze(2,"申请解冻"),
-    Modify(3,"申请修改");
+    Modify(1,"申请修改");
 
     public BigDecimal status;
 
