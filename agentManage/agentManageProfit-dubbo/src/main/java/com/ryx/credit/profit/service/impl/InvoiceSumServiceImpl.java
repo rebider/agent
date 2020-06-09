@@ -321,13 +321,19 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     cal.add(Calendar.MONTH, -1);
                     String  nextProMonth=sdf.format(cal.getTime());
 
+                    // 顶级结构数值读取时可能会存在读取格式问题
+                    String topOrgId = invoiceSumList.get(0).toString().trim();
+                    if(topOrgId.endsWith(".00")){
+                        topOrgId = topOrgId.substring(0,topOrgId.indexOf("."));
+                    }
+
                     InvoiceSum invoiceSum = new InvoiceSum();
                     //判断本月是否再次传入，表中数据。
                     invoiceSum.setAgentId(invoiceSumList.get(2).toString().trim());
                     invoiceSum.setAgentName(invoiceSumList.get(3).toString().trim());
                     invoiceSum.setInvoiceCompany(invoiceSumList.get(4).toString().trim());
                     invoiceSum.setProfitMonth(profitMonth);
-                    invoiceSum.setTopOrgId(invoiceSumList.get(0).toString().trim());
+                    invoiceSum.setTopOrgId(topOrgId);
                     invoiceSum.setTopOrgName(invoiceSumList.get(1).toString().trim());
                     invoiceSum.setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString()));
                     invoiceSum.setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString().trim()));
