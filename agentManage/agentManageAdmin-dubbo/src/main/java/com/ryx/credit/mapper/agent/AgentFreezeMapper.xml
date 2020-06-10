@@ -365,7 +365,7 @@
       FREEZE_NUM = #{freezeNum,jdbcType=VARCHAR},
       REMARK = #{remark,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
+      VERSION = VERSION + 1,
       FREEZE_TYPE = #{freezeType,jdbcType=DECIMAL},
       BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
       BUS_NUM = #{busNum,jdbcType=VARCHAR},
