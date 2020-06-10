@@ -57,6 +57,8 @@ public class FreezeRequestDetail implements Serializable {
 
     private BigDecimal stopCount;
 
+    private BigDecimal newBusFreeze;
+
     private BigDecimal busFreezeOrg;
 
     private BigDecimal profitFreezeOrg;
@@ -76,6 +78,8 @@ public class FreezeRequestDetail implements Serializable {
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private BigDecimal newBusFreezeOrg;
 
     public String getId() {
         return id;
@@ -285,6 +289,14 @@ public class FreezeRequestDetail implements Serializable {
         this.stopCount = stopCount;
     }
 
+    public BigDecimal getNewBusFreeze() {
+        return newBusFreeze;
+    }
+
+    public void setNewBusFreeze(BigDecimal newBusFreeze) {
+        this.newBusFreeze = newBusFreeze;
+    }
+
     public BigDecimal getBusFreezeOrg() {
         return busFreezeOrg;
     }
@@ -363,5 +375,13 @@ public class FreezeRequestDetail implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public BigDecimal getNewBusFreezeOrg() {
+        return newBusFreezeOrg;
+    }
+
+    public void setNewBusFreezeOrg(BigDecimal newBusFreezeOrg) {
+        this.newBusFreezeOrg = newBusFreezeOrg;
     }
 }

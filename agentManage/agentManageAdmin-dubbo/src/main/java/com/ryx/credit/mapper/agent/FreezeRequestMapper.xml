@@ -164,7 +164,7 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequest">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequest">
     update A_FREEZE_REQUEST
     <set>
       <if test="reqType != null">
@@ -224,4 +224,53 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+    <sql id="queryAgentFreezeRequestListSql">
+      SELECT fr.id,
+      fr.c_tm,
+      fr.req_type,
+      fr.c_user_id,
+      fr.FREEZE_CAUSE,
+      fr.REQ_REASON,
+      cu.name,
+      fr.reviews_stat,
+      fr.reviews_date,
+      fr.reviews_user,
+      cur.name as r_name
+      FROM a_freeze_request fr
+      LEFT JOIN c_user cu
+      ON cu.id = fr.c_user_id
+      LEFT JOIN c_user cur
+      ON cu.id = fr.reviews_user
+      <where>
+        and fr.status = '1'
+        <if test="map.agentId !=null and map.agentId!=''">
+          and frd.AGENT_ID = #{map.agentId}
+        </if>
+        <if test="map.id !=null and map.id!=''">
+          and fr.id = #{map.id}
+        </if>
+        <if test="map.agentName !=null and map.agentName!=''">
+          and ag.ag_name = #{map.agentName}
+        </if>
+        <if test="map.reqType != null and map.reqType != ''">
+          and fr.REQ_TYPE = #{map.reqType}
+        </if>
+        <if test="map.reqTimeBegin != null and map.reqTimeBegin != ''">
+          and fr.C_TM &gt;= to_date(#{#{map.reqTimeBegin}}, 'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.reqTimeEnd != null and map.reqTimeEnd != ''">
+          and fr.C_TM &lt;= to_date(#{#{map.reqTimeEnd}}, 'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        </where>
+        order by fr.id desc
+    </sql>
+  <select id="queryAgentFreezeRequestList" parameterType="map" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="queryAgentFreezeRequestListSql"/>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+    <select id="queryAgentFreezeRequestListCount" resultType="java.lang.Integer">
+        select count(*) from(
+        <include refid="queryAgentFreezeRequestListSql"/>)
+    </select>
 </mapper>
