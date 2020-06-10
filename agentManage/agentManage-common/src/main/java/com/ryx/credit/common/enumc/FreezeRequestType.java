@@ -14,7 +14,7 @@ public enum FreezeRequestType {
     UnFreeze(2,"申请解冻"),
     Modify(1,"申请修改");
 
-    public BigDecimal status;
+    public BigDecimal code;
 
     public String  msg;
     /**
@@ -22,7 +22,7 @@ public enum FreezeRequestType {
      * @return 枚举对象值
      */
     public BigDecimal getValue() {
-        return this.status;
+        return this.code;
     }
     /**
      * 取得缓存内容
@@ -32,7 +32,7 @@ public enum FreezeRequestType {
         return this.msg;
     }
     FreezeRequestType(int status, String s){
-        this.status = new BigDecimal(status);
+        this.code = new BigDecimal(status);
         msg = s;
     }
 
@@ -40,7 +40,7 @@ public enum FreezeRequestType {
     public static String getAgStatusString(BigDecimal s){
         if(s==null)return null;
         for (FreezeRequestType agStatus : FreezeRequestType.values()) {
-            if(agStatus.status.compareTo(s)==0){
+            if(agStatus.code.compareTo(s)==0){
                 return agStatus.name();
             }
         }
@@ -51,7 +51,7 @@ public enum FreezeRequestType {
         if(StringUtils.isEmpty(s))return null;
         for (FreezeRequestType agStatus : FreezeRequestType.values()) {
             if(agStatus.name().equals(s)){
-                return agStatus.status;
+                return agStatus.code;
             }
         }
         return new BigDecimal(-1);
@@ -69,7 +69,7 @@ public enum FreezeRequestType {
     public static String getMsg(BigDecimal s){
         if(s==null)return null;
         for (FreezeRequestType agStatus : FreezeRequestType.values()) {
-            if(agStatus.status.compareTo(s)==0){
+            if(agStatus.code.compareTo(s)==0){
                 return agStatus.msg;
             }
         }

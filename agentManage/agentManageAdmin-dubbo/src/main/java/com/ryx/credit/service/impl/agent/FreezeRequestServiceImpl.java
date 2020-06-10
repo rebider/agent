@@ -64,7 +64,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         }
         FreezeRequest freezeRequest = new FreezeRequest();
         freezeRequest.setId(idService.genId(TabId.a_freeze_request));
-        freezeRequest.setReqType(FreezeRequestType.Freeze.status);
+        freezeRequest.setReqType(FreezeRequestType.Freeze.code);
         freezeRequest.setcTm(new Date());
         freezeRequest.setcUserId(agentFreezePort.getOperationPerson());
         freezeRequest.setFreezeCause(agentFreezePort.getFreezeCause());
