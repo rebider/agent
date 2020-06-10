@@ -23,4 +23,6 @@ public interface IdService {
 
     String genInternetOffset();
 
+    public String genAbFreezeId(TabId tablename,Integer userid);
+
 }

@@ -135,7 +135,8 @@ public enum TabId {
     jo_order_expand("JE%s%015d"),
     jo_custom_key("JCK%s%015d"),
     a_freeze_request("FR%s%015d"),
-    a_freeze_request_detail("FRd%s%015d");
+    a_freeze_request_detail("FRd%s%015d"),
+    a_agent_businfofreeze("ABF%s%015d");
 
     public String patt;
 

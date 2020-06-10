@@ -29,4 +29,8 @@ public interface AgentBusinfoFreezeMapper {
     List queryAbfreezeListView(@Param("map")Map map, @Param("page")Page page);
 
     int queryAbfreezeListCount(@Param("map")Map map);
+
+    List<AgentBusinfoFreeze> queryAgentBusFreeze(@Param("map")Map map);
+
+    int deleteByAgentId(String agentId);
 }

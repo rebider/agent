@@ -555,4 +555,26 @@
     <result column="ac_ag_legal_cernum" property="acAgLegalCernum" jdbcType="VARCHAR"/>
     <result column="clo_review_status" property="cloReviewStatus" jdbcType="VARCHAR"/>
   </resultMap>
+
+
+  <select id="queryFreeByAgentId" parameterType="string" resultMap="BaseResultMap">
+    select
+    b.AGENT_ID,b.FREEZE_TYPE,b.BUS_PLATFORM,b.BUS_NUM,b.bus_id,a.BUS_FREEZE,
+    a.PROFIT_FREEZE,a.REFLOW_FREEZE,a.MONTHLY_FREEZE,a.DAILY_FREEZE,a.STOP_PROFIT_FREEZE,a.CASH_FREEZE
+    ,a.STOP_COUNT
+    from (select
+    sum(BUS_FREEZE)as BUS_FREEZE,
+    sum(PROFIT_FREEZE)as PROFIT_FREEZE,
+    sum(REFLOW_FREEZE)as REFLOW_FREEZE,
+    sum(MONTHLY_FREEZE)as MONTHLY_FREEZE,
+    sum(DAILY_FREEZE)as DAILY_FREEZE,
+    sum(STOP_PROFIT_FREEZE)as STOP_PROFIT_FREEZE,
+    sum(CASH_FREEZE)as CASH_FREEZE,
+    sum(STOP_COUNT)as STOP_COUNT,
+    min(id) as id,agent_id,freeze_type,BUS_PLATFORM,BUS_NUM from A_agent_freeze
+    where  freeze_status=0
+    <if test="agentId!=null and agentId!=''">and agent_id = #{agentId}</if>
+    group by agent_id,freeze_type,BUS_PLATFORM,BUS_NUM)a
+    left join A_agent_freeze b on a.id=b.id where b.bus_num is not null
+  </select>
 </mapper>

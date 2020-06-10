@@ -56,7 +56,7 @@ public interface AgentFreezeService {
 
     List<Map> approvedVerify(Agent agent, AgentColinfoVo agentColinfoVo);
 
-    Map<String,String> selectAgentFreeze(HashMap map)throws MessageException;
+    Map<String,Object> selectAgentFreeze(HashMap map)throws MessageException;
 
     AgentResult agentFreezeModify(AgentFreezePort agentFreezePort)throws MessageException;
 }
