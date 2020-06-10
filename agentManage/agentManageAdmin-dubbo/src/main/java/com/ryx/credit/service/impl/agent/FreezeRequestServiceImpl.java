@@ -109,6 +109,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 agentFreeze.setStatus(Status.STATUS_1.status);
                 agentFreeze.setVersion(BigDecimal.ONE);
                 agentFreeze.setFreezeType(freeType);
+                agentFreeze.setNewBusFreeze(new BigDecimal(agentFreezePort.getNewBusFreeze()));
                 /** 保存新增字段 **/
                 agentFreeze.setBusPlatform("");
                 agentFreeze.setBusId(busPlatform);

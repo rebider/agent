@@ -20,8 +20,6 @@ public class FreezeDetail implements Serializable {
 
     private BigDecimal stopCount;
 
-    private BigDecimal newBusFreeze;
-
     public BigDecimal getBusFreeze() {
         return busFreeze;
     }
@@ -84,14 +82,6 @@ public class FreezeDetail implements Serializable {
 
     public void setStopCount(BigDecimal stopCount) {
         this.stopCount = stopCount;
-    }
-
-    public BigDecimal getNewBusFreeze() {
-        return newBusFreeze;
-    }
-
-    public void setNewBusFreeze(BigDecimal newBusFreeze) {
-        this.newBusFreeze = newBusFreeze;
     }
 }
 
