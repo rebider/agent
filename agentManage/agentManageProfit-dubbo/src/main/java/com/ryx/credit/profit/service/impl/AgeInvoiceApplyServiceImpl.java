@@ -122,7 +122,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             Map<String,Object> batchUser = invoiceApplyMapper.getImportBatch(map.get("ID").toString(),dateStr);
             if(batchUser != null){
                 importBatch = batchUser.get("IMPORT_BATCH").toString();
-                batchNo = new BigDecimal(batchUser.get("BATCH_NO").toString());
+                batchNo = new BigDecimal(batchUser.get("BATCH_NO") == null ? "0" : batchUser.get("BATCH_NO").toString());
             }else{
                 String maxBatch = invoiceApplyMapper.getMaxImportBatch(dateStr);
                 if(StringUtils.isNotBlank(maxBatch)){
@@ -303,10 +303,29 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                }
            }
 
+           // 对发票金额进行判断,则若第一次审核金额大于欠票金额不能导入
+           if("1".equals(shStatus)){
+               //未汇总发票
+               BigDecimal bg = invoiceApplyMapper.getSumInvoice(invoiceApply.getAgentId(),invoiceApply.getInvoiceCompany(),addMonth("yyyy-MM",0));
+               bg = bg == null ? BigDecimal.ZERO : bg;
+               // 本月欠票
+               BigDecimal ownInvoice = invoiceApplyMapper.getOwnInvoice(invoiceApply.getAgentId(),invoiceApply.getInvoiceCompany(),addMonth("yyyyMM",-1));
+               if(null == ownInvoice){
+                   shStatus = "0";
+                   shMessage = "开票公司是：（"+invoiceApply.getInvoiceCompany()+"）未获取到欠票数据！";
+                  // throw new MessageException("开票公司是：（"+invoiceApply.getInvoiceCompany()+"）未获取到欠票数据！");
+               }
+               BigDecimal subtra = bg.subtract(ownInvoice);  //到票金额-欠票金额
+               if(subtra.compareTo(new BigDecimal(9999)) > 0 ){ //到票金额-欠票金额 大于 9999元时 ,跳过该发票处理下面发票
+                   return;
+                   //throw new MessageException("开票公司：("+invoiceApply.getInvoiceCompany()+")所开发票金额总计超过本月欠票"+subtra+"元，不符合条件，请重新导入");
+               }
+           }
+
            if("agent".equals(role)){
-              invoiceApply.setYsResult(shStatus);
-              invoiceApply.setRev1(shMessage);
-              invoiceApply.setYsDate(addMonth("yyyy-MM-dd HH:mm:ss",0));
+               invoiceApply.setYsResult(shStatus);
+               invoiceApply.setRev1(shMessage);
+               invoiceApply.setYsDate(addMonth("yyyy-MM-dd HH:mm:ss",0));
            }else if("finance".equals(role)){
                invoiceApply.setEsResult(shStatus);
                invoiceApply.setRev2(shMessage);
@@ -317,22 +336,6 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                BigDecimal aaa = new BigDecimal(batchNo.toString().substring(importBatch.length())).add(new BigDecimal(1));
                batchNo = new BigDecimal(importBatch+aaa);
                invoiceApply.setBatchNo(batchNo);
-           }
-
-           // 对发票金额进行判断,则若第一次审核金额大于欠票金额不能导入
-           if("1".equals(shStatus)){
-               //未汇总发票
-               BigDecimal bg = invoiceApplyMapper.getSumInvoice(invoiceApply.getAgentId(),invoiceApply.getInvoiceCompany(),addMonth("yyyy-MM",0));
-               bg = bg == null ? BigDecimal.ZERO : bg;
-               // 本月欠票
-               BigDecimal ownInvoice = invoiceApplyMapper.getOwnInvoice(invoiceApply.getAgentId(),invoiceApply.getInvoiceCompany(),addMonth("yyyyMM",-1));
-               if(null == ownInvoice){
-                   throw new MessageException("开票公司是：（"+invoiceApply.getInvoiceCompany()+"）未获取到欠票数据！");
-               }
-               BigDecimal subtra = bg.subtract(ownInvoice);  //到票金额-欠票金额
-               if(subtra.compareTo(new BigDecimal(10)) > 0 ){ //到票金额-欠票金额 大于 10元时
-                   throw new MessageException("开票公司：("+invoiceApply.getInvoiceCompany()+")所开发票金额总计超过本月欠票"+subtra+"元，不符合条件，请重新导入");
-               }
            }
            invoiceApplyMapper.insertSelective(invoiceApply);
        }catch (MessageException e){
@@ -398,7 +401,9 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             invoiceApply.setCreateDate(addMonth("yyyy-MM-dd HH:mm:ss",0));
             invoiceApplyMapper.updateByPrimaryKeySelective(invoiceApply);
         }else if("agent".equals(role) && "1".equals(invoiceApply.getYsResult())){
-            invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
+            logger.info("*********该发票代理商方重复导入*******");
+            return;
+            /*invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
             invoiceApply.setYsResult("0");
             invoiceApply.setYsDate(addMonth("yyyy-MM-dd HH:mm:ss",0));
             invoiceApply.setRev1("该发票代理商方重复导入");
@@ -406,9 +411,11 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             invoiceApply.setEsDate("");
             invoiceApply.setRev2("");
             invoiceApply.setCreateDate(addMonth("yyyy-MM-dd HH:mm:ss",0));
-            invoiceApplyMapper.insertSelective(invoiceApply);
+            invoiceApplyMapper.insertSelective(invoiceApply);*/
         }else if("finance".equals(role) && "1".equals(invoiceApply.getEsResult())){
-            invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
+            logger.info("*********该发票财务方重复导入********");
+            return;
+            /*invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
             invoiceApply.setYsResult("2");
             invoiceApply.setYsDate("");
             invoiceApply.setRev1("");
@@ -421,7 +428,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             invoiceApply.setBatchNo(batchNo);
             invoiceApply.setCreateName(user);
             invoiceApply.setCreateDate(addMonth("yyyy-MM-dd HH:mm:ss",0));
-            invoiceApplyMapper.insertSelective(invoiceApply);
+            invoiceApplyMapper.insertSelective(invoiceApply);*/
         }else{
             logger.info("******不会出现这种情况********");
         }
