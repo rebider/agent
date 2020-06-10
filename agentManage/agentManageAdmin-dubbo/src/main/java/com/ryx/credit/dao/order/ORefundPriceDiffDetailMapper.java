@@ -27,5 +27,7 @@ public interface ORefundPriceDiffDetailMapper {
 
     List<Map> selectByExampleExtends(@Param("par") Map map,@Param("page") Page page);
 
+    int selectNumByExampleExtends(@Param("par") Map map);
+
     Map<String, Object> selectById(String id);
 }
