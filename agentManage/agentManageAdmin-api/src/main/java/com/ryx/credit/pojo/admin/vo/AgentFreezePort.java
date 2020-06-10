@@ -23,6 +23,7 @@ public class AgentFreezePort implements Serializable{
     private List<BigDecimal> freeType;
     private FreezeDetail curLevel;
     private FreezeDetail subLevel;
+    private String newBusFreeze;
 
     public String getUnfreezeCause() {
         return unfreezeCause;
@@ -102,5 +103,13 @@ public class AgentFreezePort implements Serializable{
 
     public void setBusPlatform(List<String> busPlatform) {
         this.busPlatform = busPlatform;
+    }
+
+    public String getNewBusFreeze() {
+        return newBusFreeze;
+    }
+
+    public void setNewBusFreeze(String newBusFreeze) {
+        this.newBusFreeze = newBusFreeze;
     }
 }
