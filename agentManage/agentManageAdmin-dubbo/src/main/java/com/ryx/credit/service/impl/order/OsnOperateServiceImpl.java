@@ -800,6 +800,58 @@ public class OsnOperateServiceImpl implements OsnOperateService {
                     throw new MessageException("物流明细添加失败:" + logistics.getId() + ":" + id);
                 }
             }
+        } else {
+            //为实现的物流平台明细生成
+            logger.info("未实现的平台物流明细生成");
+            for (String id : ids) {
+                OLogisticsDetail detail = new OLogisticsDetail();
+                //id，物流id，创建人，更新人，状态
+                detail.setId(idService.genId(TabId.o_logistics_detail));
+                detail.setOrderId(oSubOrder.getOrderId());
+                detail.setOrderNum(order.getoNum());
+                detail.setLogisticsId(logistics.getId());
+                detail.setProId(oSubOrder.getProId());
+                detail.setProName(oSubOrder.getProName());
+                detail.setSettlementPrice(oSubOrder.getProRelPrice());
+                if (OSubOrderActivitylist.size() > 0) {
+                    detail.setActivityId(oActivity_plan.getId());
+                    detail.setActivityName(oActivity_plan.getActivityName());
+                    detail.setgTime(oActivity_plan.getgTime());
+                    detail.setBusProCode(oActivity_plan.getBusProCode());
+                    detail.setBusProName(oActivity_plan.getBusProName());
+                    detail.setTermBatchcode(oActivity_plan.getTermBatchcode());
+                    detail.setTermBatchname(oActivity_plan.getTermBatchname());
+                    detail.setTermtype(oActivity_plan.getTermtype());
+                    detail.setTermtypename(oActivity_plan.getTermtypename());
+                    detail.setSettlementPrice(oActivity_plan.getPrice());
+                    detail.setPosType(oActivity_plan.getPosType());
+                    detail.setPosSpePrice(oActivity_plan.getPosSpePrice());
+                    detail.setStandTime(oActivity_plan.getStandTime());
+                }
+                detail.setSnNum(id);
+                detail.setAgentId(order.getAgentId());
+                detail.setcUser(logistics.getcUser());
+                detail.setuUser(logistics.getcUser());
+                detail.setcTime(Calendar.getInstance().getTime());
+                detail.setuTime(Calendar.getInstance().getTime());
+                detail.setOptType(OLogisticsDetailOptType.ORDER.code);
+                detail.setOptId(orderId);
+                detail.setSbusMsg("此平台未实现物流下发");
+                OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
+                detail.setBusId(oOrder.getBusId());
+                if (StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
+                    OReturnOrderDetail detail1 = oReturnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
+                    detail.setReturnOrderId(detail1.getReturnId());
+                }
+                detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
+                detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                detail.setSendStatus(LogisticsDetailSendStatus.none_send.code);
+                detail.setVersion(Status.STATUS_1.status);
+                if (1 != oLogisticsDetailMapper.insertSelective(detail)) {
+                    logger.info("物流明细添加失败:{},{}", logistics.getId(), id);
+                    throw new MessageException("物流明细添加失败:" + logistics.getId() + ":" + id);
+                }
+            }
         }
         return true;
     }

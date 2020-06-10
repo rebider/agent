@@ -571,8 +571,9 @@
       orderdetail.id as O_RETURN_ORDER_DETAIL_ID,
       orderdetail.return_count,
       oa.act_code,
-      odetail.model as pro_model,odetail.pro_com as vender,
-      odetail.pro_type
+      orderdetail.model as pro_model,
+      orderdetail.pro_com as vender,
+      orderdetail.pro_type
     from o_return_order_detail orderdetail
       left join o_sub_order suborder on orderdetail.order_id=suborder.order_id and orderdetail.pro_id=suborder.pro_id and suborder.status=1
       left join o_sub_order_activity subact on subact.sub_order_id=suborder.id and subact.status=1
