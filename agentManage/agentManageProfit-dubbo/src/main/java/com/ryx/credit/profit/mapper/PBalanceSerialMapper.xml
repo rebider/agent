@@ -303,127 +303,133 @@
   </select>
 
   <sql id="getListByMap_sql">
-    select
-    pb.BALANCE_ID, pb.BALANCE_BATCH_NO, pb.SETTLE_MONTH, pb.SETTLE_DATE, pb.AG_ID, pb.AG_NAME, pb.BRAND_NO,
-     pb.REAL_AG_ID, pb.REAL_AG_NAME, pb.BALANCE_AMT, pb.BALANCE_BANK_NO, pb.BALANCE_BANK_NAME, pb.BALANCE_ACCT_TYPE,
-    pb.BALANCE_ACCT_NO, pb.BALANCE_ACCT_NAME,  pb.BALANCE_DESC, pb.SUBMIT_TER, pb.SUBMIT_TIME, pb.SYNC_TIME, pb.CHECK_STATUS,
-    pb.RECON_STATUS, pb.RECON_REMARK, pb.BALANCE_BANK_VERSION, pb.CKWC_TIME,
-    cu.NAME,ap.PLATFORM_NAME,pa.NOTICE_TIME
-    ,pp.BATCH_NO,pp.IMPORT_BATCH, /**导入批次**/
-    case when pb.IMPORT_BATCH = '77' then '一次请款'
-        when pb.IMPORT_BATCH = '88' then '二次请款'
-        when pb.IMPORT_BATCH = '99' then '补出款'
-        else '分润数据导入' end as PROFIT_TYPE, /**请款批次**/
-    case when pb.BALANCE_STATUS='00' then '未出款'
-          when pb.BALANCE_STATUS='01' then '出款中'
-          when pb.BALANCE_STATUS='02' then '出款成功'
-          when pb.BALANCE_STATUS='03' then '出款失败'
-          else '未知' end as BALANCE_STATUS, /**结算状态**/
-    case when pa.NOTICE_RESULT = '00' then '未通知'
-          when pa.NOTICE_RESULT = '01' then '已通知'
-          when pa.NOTICE_RESULT = '02' then '修改完成'
-          else '' end NOTICE_RESULT  /**通知结果**/
-    from P_BALANCE_SERIAL pb
-    left join (
-    select * from(
-      select  BALANCE_ID,PRE_BALANCE_ID,FIRST_BALANCE_ID,NOTICE_RESULT,CK_TIME,NOTICE_TIME ,
-      row_number() over (partition by  FIRST_BALANCE_ID order by CK_TIME desc ) rn from P_REFUND_SERIAL pr
-      ) where rn = 1
-    ) pa on pb.BALANCE_ID = pa.FIRST_BALANCE_ID
-    left join C_USER cu on cu.ID = pb.SUBMIT_TER
-    left join PMS_PROFIT pp on pb.BALANCE_ID = pp.BALANCE_ID
-    left join A_PLATFORM ap on pb.BRAND_NO = ap.PLATFORM_NUM
+    select zzz.*,cu.NAME,pp.BATCH_NO,/*pp.IMPORT_BATCH,*/ap.PLATFORM_NAME,
+      case when zzz.IMPORT_BATCH = '77' then '一次请款'
+      when zzz.IMPORT_BATCH = '88' then '二次请款'
+      when zzz.IMPORT_BATCH = '99' then '补出款'
+      else '分润数据导入' end as PROFIT_TYPE1,
+      case when zzz.BALANCE_STATUS='00' then '未出款'
+      when zzz.BALANCE_STATUS='01' then '出款中'
+      when zzz.BALANCE_STATUS='02' then '出款成功'
+      when zzz.BALANCE_STATUS='03' then '出款失败'
+      else '未知' end as BALANCE_STATUS1,
+      case when zzz.NOTICE_RESULT = '00' then '否'
+      when zzz.NOTICE_RESULT = '01' then '是'
+      when zzz.NOTICE_RESULT = '02' then '修改完成'
+      else '' end NOTICE_RESULT1
+    from (
+      select pb.BALANCE_ID, pb.BALANCE_BATCH_NO, pb.SETTLE_MONTH, pb.SETTLE_DATE, pb.AG_ID, pb.AG_NAME, pb.BRAND_NO,
+      pb.REAL_AG_ID, pb.REAL_AG_NAME, pb.BALANCE_AMT,pb.BALANCE_DESC, pb.SUBMIT_TER, pb.SUBMIT_TIME, pb.SYNC_TIME,
+      pb.CHECK_STATUS,pb.RECON_STATUS, pb.RECON_REMARK, pb.BALANCE_BANK_VERSION, pb.CKWC_TIME,pb.BALANCE_STATUS,
+      pb.IMPORT_BATCH,
+      pr.BALANCE_BANK_NO, pr.BALANCE_BANK_NAME,  pr.BALANCE_ACCT_NO, pr.BALANCE_ACCT_NAME,  pr.BALANCE_ID REPLY_ID,
+      pr.CK_TIME,pr.NOTICE_RESULT,pr.NOTICE_TIME
+      from P_BALANCE_SERIAL pb
+      left join  P_REFUND_SERIAL  pr on pb.BALANCE_ID = pr.FIRST_BALANCE_ID where pb.BALANCE_STATUS = '03'
+
+      union all
+
+      select pb.BALANCE_ID, pb.BALANCE_BATCH_NO, pb.SETTLE_MONTH, pb.SETTLE_DATE, pb.AG_ID, pb.AG_NAME, pb.BRAND_NO,
+      pb.REAL_AG_ID, pb.REAL_AG_NAME, pb.BALANCE_AMT,pb.BALANCE_DESC, pb.SUBMIT_TER, pb.SUBMIT_TIME, pb.SYNC_TIME,
+      pb.CHECK_STATUS,pb.RECON_STATUS, pb.RECON_REMARK, pb.BALANCE_BANK_VERSION, pb.CKWC_TIME,pb.BALANCE_STATUS,
+      pb.IMPORT_BATCH,pb.BALANCE_BANK_NO, pb.BALANCE_BANK_NAME,  pb.BALANCE_ACCT_NO, pb.BALANCE_ACCT_NAME, REPLY_ID,
+      CKWC_TIME CK_TIME,'' NOTICE_RESULT,'' NOTICE_TIME
+      from P_BALANCE_SERIAL pb where pb.BALANCE_STATUS <![CDATA[<>]]> '03'
+    ) zzz
+    left join C_USER cu on cu.ID = zzz.SUBMIT_TER
+    left join PMS_PROFIT pp on zzz.BALANCE_ID = pp.BALANCE_ID
+    left join A_PLATFORM ap on zzz.BRAND_NO = ap.PLATFORM_NUM
     where 1= 1
     <if test="param.agDoc != '' and param.agDoc != null">
-      and pb.AG_ID in (
+      and zzz.AG_ID in (
       select distinct AGENT_ID from A_AGENT_BUSINFO
       where AG_DOC_PRO in
       ( select id from C_ORGANIZATION where PID = #{param.agDoc} ) or AG_DOC_PRO = #{param.agDoc}
       )
     </if>
     <if test="param.agDis != '' and param.agDis != null">
-      and pb.AG_ID in (
+      and zzz.AG_ID in (
       select distinct AGENT_ID from A_AGENT_BUSINFO
       where AG_DOC_DISTRICT = #{param.agDis}
       )
     </if>
     <if test="param.agentId != '' and param.agentId != null">
-      and pb.AG_ID  = #{param.agentId}
+      and zzz.AG_ID  = #{param.agentId}
     </if>
     <if test="param.agentName != '' and param.agentName != null">
-      and pb.AG_NAME  = #{param.agentName}
+      and zzz.AG_NAME  = #{param.agentName}
     </if>
     <choose>
       <when test="param.startMonth != '' and param.startMonth !=null and param.endMonth !='' and param.endMonth != null ">
-        and pb.SETTLE_MONTH between #{param.startMonth} and #{param.endMonth}
+        and zzz.SETTLE_MONTH between #{param.startMonth} and #{param.endMonth}
       </when>
       <when test="param.startMonth != '' and param.startMonth !=null">
-        and pb.SETTLE_MONTH = #{param.startMonth}
+        and zzz.SETTLE_MONTH = #{param.startMonth}
       </when>
       <when test="param.endMonth != '' and param.endMonth !=null">
-        and pb.SETTLE_MONTH = #{param.endMonth}
+        and zzz.SETTLE_MONTH = #{param.endMonth}
       </when>
     </choose>
     <if test="param.busPlayNum != '' and param.busPlayNum != null">
-      and pb.BRAND_NO  = #{param.busPlayNum}
+      and zzz.BRAND_NO  = #{param.busPlayNum}
     </if>
     <if test="param.busPlayName != '' and param.busPlayName != null">
-      and pb.BRAND_NO  = #{param.busPlayName}
+      and zzz.BRAND_NO  = #{param.busPlayName}
     </if>
     <if test="param.balanceBatchId != '' and param.balanceBatchId != null">
-      and pb.BALANCE_BATCH_NO  = #{param.balanceBatchId}
+      and zzz.BALANCE_BATCH_NO  = #{param.balanceBatchId}
     </if>
     <!--<choose>
       <when test="param.settleDateStart != '' and param.settleDateStart !=null and param.settleDateEnd !='' and param.settleDateEnd != null">
-        and pb.SETTLE_DATE between #{param.settleDateStart} and #{param.settleDateEnd}
+        and zzz.SETTLE_DATE between #{param.settleDateStart} and #{param.settleDateEnd}
       </when>
       <when test="param.settleDateStart != '' and param.settleDateStart !=null">
-        and pb.SETTLE_DATE = #{param.settleDateStart}
+        and zzz.SETTLE_DATE = #{param.settleDateStart}
       </when>
       <when test="param.settleDateEnd != '' and param.settleDateEnd !=null">
-        and pb.SETTLE_DATE = #{param.settleDateEnd}
+        and zzz.SETTLE_DATE = #{param.settleDateEnd}
       </when>
     </choose>-->
     <if test="param.importBatch != '' and param.importBatch != null">
-      and pb.IMPORT_BATCH  = #{param.importBatch}
+      and zzz.IMPORT_BATCH  = #{param.importBatch}
     </if>
     <if test="param.balanceId != '' and param.balanceId != null">
-      and pb.BALANCE_ID  = #{param.balanceId}
+      and zzz.BALANCE_ID  = #{param.balanceId}
     </if>
     <!--<choose>
       <when test="param.paymentTimeStart != '' and param.paymentTimeStart !=null and param.paymentTimeEnd !='' and param.paymentTimeEnd != null">
-        and pb.SYNC_TIME between #{param.paymentTimeStart} and #{param.paymentTimeEnd}
+        and zzz.SYNC_TIME between #{param.paymentTimeStart} and #{param.paymentTimeEnd}
       </when>
       <when test="param.paymentTimeStart != '' and param.paymentTimeStart !=null">
-        and pb.SYNC_TIME = #{param.settleDateStart}
+        and zzz.SYNC_TIME = #{param.settleDateStart}
       </when>
       <when test="param.paymentTimeEnd != '' and param.paymentTimeEnd !=null">
-        and pb.SYNC_TIME = #{param.settleDateEnd}
+        and zzz.SYNC_TIME = #{param.settleDateEnd}
       </when>
     </choose>-->
     <choose>
     <when test="param.cktjDateStart != '' and param.cktjDateStart !=null and param.cktjDateEnd !='' and param.cktjDateEnd != null">
-      and pb.SUBMIT_TIME between #{param.cktjDateStart} and #{param.cktjDateEnd}
+      and zzz.SUBMIT_TIME between #{param.cktjDateStart} and #{param.cktjDateEnd}
     </when>
     <when test="param.cktjDateStart != '' and param.cktjDateStart !=null">
-      and pb.SUBMIT_TIME = #{param.cktjDateStart}
+      and zzz.SUBMIT_TIME = #{param.cktjDateStart}
     </when>
     <when test="param.cktjDateEnd != '' and param.cktjDateEnd !=null">
-      and pb.SUBMIT_TIME = #{param.cktjDateEnd}
+      and zzz.SUBMIT_TIME = #{param.cktjDateEnd}
     </when>
   </choose>
     <choose>
     <when test="param.ckwcStart != '' and param.ckwcStart !=null and param.ckwcEnd !='' and param.ckwcEnd != null">
-      and pb.CKWC_TIME between #{param.ckwcStart} and #{param.ckwcEnd}
+      and zzz.CKWC_TIME between #{param.ckwcStart} and #{param.ckwcEnd}
     </when>
     <when test="param.ckwcStart != '' and param.ckwcStart !=null">
-      and pb.CKWC_TIME = #{param.ckwcStart}
+      and zzz.CKWC_TIME = #{param.ckwcStart}
     </when>
     <when test="param.ckwcEnd != '' and param.ckwcEnd !=null">
-      and pb.CKWC_TIME = #{param.ckwcEnd}
+      and zzz.CKWC_TIME = #{param.ckwcEnd}
     </when>
   </choose>
-    order by pb.SYNC_TIME desc
+    order by  zzz.SETTLE_MONTH desc,zzz.SYNC_TIME desc
   </sql>
 
   <select id="getRefundLog" resultType="java.util.Map" parameterType="java.lang.String">
@@ -436,9 +442,84 @@
 
   <select id="statisticalData" resultType="java.util.Map">
     select count(1) as count,nvl(sum(zzz.BALANCE_AMT),0) as amt from (
-    <include refid="getListByMap_sql"/>
+    <include refid="getCount_sql"/>
     ) zzz
   </select>
+
+  <sql id="getCount_sql">
+    select * from P_BALANCE_SERIAL zzz
+    where 1= 1
+    <if test="param.agDoc != '' and param.agDoc != null">
+      and zzz.AG_ID in (
+      select distinct AGENT_ID from A_AGENT_BUSINFO
+      where AG_DOC_PRO in
+      ( select id from C_ORGANIZATION where PID = #{param.agDoc} ) or AG_DOC_PRO = #{param.agDoc}
+      )
+    </if>
+    <if test="param.agDis != '' and param.agDis != null">
+      and zzz.AG_ID in (
+      select distinct AGENT_ID from A_AGENT_BUSINFO
+      where AG_DOC_DISTRICT = #{param.agDis}
+      )
+    </if>
+    <if test="param.agentId != '' and param.agentId != null">
+      and zzz.AG_ID  = #{param.agentId}
+    </if>
+    <if test="param.agentName != '' and param.agentName != null">
+      and zzz.AG_NAME  = #{param.agentName}
+    </if>
+    <choose>
+      <when test="param.startMonth != '' and param.startMonth !=null and param.endMonth !='' and param.endMonth != null ">
+        and zzz.SETTLE_MONTH between #{param.startMonth} and #{param.endMonth}
+      </when>
+      <when test="param.startMonth != '' and param.startMonth !=null">
+        and zzz.SETTLE_MONTH = #{param.startMonth}
+      </when>
+      <when test="param.endMonth != '' and param.endMonth !=null">
+        and zzz.SETTLE_MONTH = #{param.endMonth}
+      </when>
+    </choose>
+    <if test="param.busPlayNum != '' and param.busPlayNum != null">
+      and zzz.BRAND_NO  = #{param.busPlayNum}
+    </if>
+    <if test="param.busPlayName != '' and param.busPlayName != null">
+      and zzz.BRAND_NO  = #{param.busPlayName}
+    </if>
+    <if test="param.balanceBatchId != '' and param.balanceBatchId != null">
+      and zzz.BALANCE_BATCH_NO  = #{param.balanceBatchId}
+    </if>
+    <if test="param.importBatch != '' and param.importBatch != null">
+      and zzz.IMPORT_BATCH  = #{param.importBatch}
+    </if>
+    <if test="param.balanceId != '' and param.balanceId != null">
+      and zzz.BALANCE_ID  = #{param.balanceId}
+    </if>
+    <choose>
+      <when test="param.cktjDateStart != '' and param.cktjDateStart !=null and param.cktjDateEnd !='' and param.cktjDateEnd != null">
+        and zzz.SUBMIT_TIME between #{param.cktjDateStart} and #{param.cktjDateEnd}
+      </when>
+      <when test="param.cktjDateStart != '' and param.cktjDateStart !=null">
+        and zzz.SUBMIT_TIME = #{param.cktjDateStart}
+      </when>
+      <when test="param.cktjDateEnd != '' and param.cktjDateEnd !=null">
+        and zzz.SUBMIT_TIME = #{param.cktjDateEnd}
+      </when>
+    </choose>
+    <choose>
+      <when test="param.ckwcStart != '' and param.ckwcStart !=null and param.ckwcEnd !='' and param.ckwcEnd != null">
+        and zzz.CKWC_TIME between #{param.ckwcStart} and #{param.ckwcEnd}
+      </when>
+      <when test="param.ckwcStart != '' and param.ckwcStart !=null">
+        and zzz.CKWC_TIME = #{param.ckwcStart}
+      </when>
+      <when test="param.ckwcEnd != '' and param.ckwcEnd !=null">
+        and zzz.CKWC_TIME = #{param.ckwcEnd}
+      </when>
+    </choose>
+    order by  zzz.SETTLE_MONTH desc,zzz.SYNC_TIME desc
+  </sql>
+
+
 
   <select id="getNeedNoticeList" resultType="java.util.Map">
     select  * from (
