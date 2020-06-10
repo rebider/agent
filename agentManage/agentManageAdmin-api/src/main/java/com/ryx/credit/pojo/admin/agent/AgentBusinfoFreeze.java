@@ -1,9 +1,13 @@
 package com.ryx.credit.pojo.admin.agent;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
-public class AgentBusinfoFreeze {
+public class AgentBusinfoFreeze implements Serializable{
     private String id;
+
+    private String agId;
 
     private String busId;
 
@@ -15,7 +19,11 @@ public class AgentBusinfoFreeze {
 
     private String platType;
 
-    private BigDecimal profitFreezr;
+    private String busPlatform;
+
+    private BigDecimal busFreeze;
+
+    private BigDecimal profitFreeze;
 
     private BigDecimal reflowFreeze;
 
@@ -29,12 +37,28 @@ public class AgentBusinfoFreeze {
 
     private BigDecimal stopCount;
 
+    private Date cTime;
+
+    private Date uTime;
+
+    private BigDecimal status;
+
+    private BigDecimal version;
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id == null ? null : id.trim();
+    }
+
+    public String getAgId() {
+        return agId;
+    }
+
+    public void setAgId(String agId) {
+        this.agId = agId == null ? null : agId.trim();
     }
 
     public String getBusId() {
@@ -77,12 +101,28 @@ public class AgentBusinfoFreeze {
         this.platType = platType == null ? null : platType.trim();
     }
 
-    public BigDecimal getProfitFreezr() {
-        return profitFreezr;
+    public String getBusPlatform() {
+        return busPlatform;
     }
 
-    public void setProfitFreezr(BigDecimal profitFreezr) {
-        this.profitFreezr = profitFreezr;
+    public void setBusPlatform(String busPlatform) {
+        this.busPlatform = busPlatform == null ? null : busPlatform.trim();
+    }
+
+    public BigDecimal getBusFreeze() {
+        return busFreeze;
+    }
+
+    public void setBusFreeze(BigDecimal busFreeze) {
+        this.busFreeze = busFreeze;
+    }
+
+    public BigDecimal getProfitFreeze() {
+        return profitFreeze;
+    }
+
+    public void setProfitFreeze(BigDecimal profitFreeze) {
+        this.profitFreeze = profitFreeze;
     }
 
     public BigDecimal getReflowFreeze() {
@@ -131,5 +171,37 @@ public class AgentBusinfoFreeze {
 
     public void setStopCount(BigDecimal stopCount) {
         this.stopCount = stopCount;
+    }
+
+    public Date getcTime() {
+        return cTime;
+    }
+
+    public void setcTime(Date cTime) {
+        this.cTime = cTime;
+    }
+
+    public Date getuTime() {
+        return uTime;
+    }
+
+    public void setuTime(Date uTime) {
+        this.uTime = uTime;
+    }
+
+    public BigDecimal getStatus() {
+        return status;
+    }
+
+    public void setStatus(BigDecimal status) {
+        this.status = status;
+    }
+
+    public BigDecimal getVersion() {
+        return version;
+    }
+
+    public void setVersion(BigDecimal version) {
+        this.version = version;
     }
 }

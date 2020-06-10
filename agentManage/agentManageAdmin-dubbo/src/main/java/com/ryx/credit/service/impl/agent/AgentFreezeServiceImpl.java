@@ -8,6 +8,8 @@ import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.AgentBusinfoFreezeMapper;
 import com.ryx.credit.dao.agent.AgentFreezeMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.FreezeRequestMapper;
@@ -29,8 +31,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -56,6 +58,8 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     private IUserService userService;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private AgentBusinfoFreezeMapper agentBusinfoFreezeMapper;
     @Autowired
     private PlatFormService platFormService;
     @Autowired
@@ -761,8 +765,58 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     }
 
     @Override
-    public Map<String, String> selectAgentFreeze(HashMap map) throws MessageException {
-        return null;
+    public Map<String, Object> selectAgentFreeze(HashMap hashMap) throws MessageException {
+        log.info("代理商冻结查询请求参数：{},{}", String.valueOf(hashMap.get("busNum")),String.valueOf(hashMap.get("busType")));
+        Map<String,Object> resultMap = new HashMap<>();
+        if(StringUtils.isBlank(String.valueOf(hashMap.get("busNum")))){
+            throw new MessageException("业务平台编码不能为空");
+        }
+        if(StringUtils.isBlank(String.valueOf(hashMap.get("busType")))){
+            throw new MessageException("业务平台不能为空");
+        }
+        AgentBusinfoFreezeExample agentBusinfoFreezeExample = new AgentBusinfoFreezeExample();
+        AgentBusinfoFreezeExample.Criteria criteria = agentBusinfoFreezeExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(hashMap.get("busNum"))).andPlatIdEqualTo(String.valueOf(hashMap.get("busType")));
+        List<AgentBusinfoFreeze> agentBusinfoFreezeList = agentBusinfoFreezeMapper.selectByExample(agentBusinfoFreezeExample);
+        log.info("冻结查询结果：{}",agentBusinfoFreezeList);
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        if(null==agentBusinfoFreezeList || agentBusinfoFreezeList.size()==0)
+            resultMap.put("freezeInfo","");
+        for (AgentBusinfoFreeze agentBusinfoFreeze : agentBusinfoFreezeList) {
+            Map<String, Object> map = new HashMap<>();
+            //直签  非直签
+            map.put("busNum",agentBusinfoFreeze.getBusNum());
+            if(null!=agentBusinfoFreeze.getFreezeType()){
+                map.put("freezeType",agentBusinfoFreeze.getFreezeType());
+            }
+            //冻结内容--分润 返现冻结 PROFIT_FREEZR REFLOW_FREEZE
+            if(null!=agentBusinfoFreeze.getProfitFreeze()){
+                map.put("profitFreezr",agentBusinfoFreeze.getProfitFreeze());
+            }
+            if(null!=agentBusinfoFreeze.getReflowFreeze()){
+                map.put("reflowFreeze",agentBusinfoFreeze.getReflowFreeze());
+            }
+            //冻结范围 月结 日结冻结  MONTHLY_FREEZE  DAILY_FREEZE
+            if(null!=agentBusinfoFreeze.getMonthlyFreeze()){
+                map.put("monthlyFreeze",agentBusinfoFreeze.getMonthlyFreeze());
+            }
+            if(null!=agentBusinfoFreeze.getDailyFreeze()){
+                map.put("dailyFreeze",agentBusinfoFreeze.getDailyFreeze());
+            }
+            //冻结方式  停发  提现（结算）冻结  停算 STOP_PROFIT_FREEZE  CASH_FREEZE  STOP_COUNT
+            if(null!=agentBusinfoFreeze.getStopProfitFreeze()){
+                map.put("stopProfitFreeze",agentBusinfoFreeze.getStopProfitFreeze());
+            }
+            if(null!=agentBusinfoFreeze.getCashFreeze()){
+                map.put("cashFreeze",agentBusinfoFreeze.getCashFreeze());
+            }
+            if(null!=agentBusinfoFreeze.getStopCount()){
+                map.put("stopCount",agentBusinfoFreeze.getStopCount());
+            }
+            resultList.add(map);
+        }
+        log.info("查询结果：{}",resultList);
+        resultMap.put("freezeInfo",resultList);
+        return resultMap;
     }
 
     @Override

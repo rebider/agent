@@ -31,4 +31,6 @@ public interface AgentFreezeMapper {
     int queryAgentFreezeCount(@Param("map")Map<String,Object> map);
 
     List<AgentFreezeVo> queryAgentBasicLackData();
+
+    List<AgentFreeze> queryFreeByAgentId(@Param("agentId")String agentId);
 }
