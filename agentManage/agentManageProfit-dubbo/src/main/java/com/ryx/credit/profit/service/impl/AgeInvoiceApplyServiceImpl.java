@@ -53,6 +53,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
     private String tocken = "";
     private String importBatch = ""; // 导入批次号
     private BigDecimal batchNo = BigDecimal.ZERO; //发票排序
+    private String errorInfo = null; // 错误提示
 
     @Autowired
     private InvoiceApplyMapper invoiceApplyMapper;
@@ -108,6 +109,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         String role = map.get("ORGANIZATIONCODE").toString();
         String userName = null;
         String user = null;
+        errorInfo = null;
 
         if( Objects.equals(role, "agent")){
             if(agentId == null) throw new MessageException("登陆账号查询代AG码失败,请联系管理员处理");
@@ -144,6 +146,10 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                     InvoiceApply invoiceApply = list1.get(0);
                     dealWithSecond(invoiceApply,role,user,userName);
                 }
+            }
+
+            if(errorInfo != null && StringUtils.isNotBlank(errorInfo)){
+                throw new MessageException(errorInfo);
             }
         }catch (MessageException e){
             e.printStackTrace();
@@ -317,6 +323,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                }
                BigDecimal subtra = bg.subtract(ownInvoice);  //到票金额-欠票金额
                if(subtra.compareTo(new BigDecimal(9999)) > 0 ){ //到票金额-欠票金额 大于 9999元时 ,跳过该发票处理下面发票
+                   errorInfo += "(发票号:"+invoiceApply.getInvoiceNumber()+"--"+invoiceApply.getInvoiceCode()+")金额超过本月欠票"+subtra+"元\\n";
                    return;
                    //throw new MessageException("开票公司：("+invoiceApply.getInvoiceCompany()+")所开发票金额总计超过本月欠票"+subtra+"元，不符合条件，请重新导入");
                }
