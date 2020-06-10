@@ -303,7 +303,7 @@
   </select>
 
   <sql id="getListByMap_sql">
-    select zzz.*,cu.NAME,pp.BATCH_NO,/*pp.IMPORT_BATCH,*/ap.PLATFORM_NAME,
+    select zzz.*,cu.NAME,pp.BATCH_NO,pp.IMPORT_BATCH IMPORT_BATCH1,ap.PLATFORM_NAME,
       case when zzz.IMPORT_BATCH = '77' then '一次请款'
       when zzz.IMPORT_BATCH = '88' then '二次请款'
       when zzz.IMPORT_BATCH = '99' then '补出款'
