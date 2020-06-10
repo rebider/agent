@@ -1756,6 +1756,66 @@ public class AgentFreezeExample {
             addCriterion("BUS_ID not between", value1, value2, "busId");
             return (Criteria) this;
         }
+
+        public Criteria andNewBusFreezeIsNull() {
+            addCriterion("NEW_BUS_FREEZE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeIsNotNull() {
+            addCriterion("NEW_BUS_FREEZE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeEqualTo(BigDecimal value) {
+            addCriterion("NEW_BUS_FREEZE =", value, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeNotEqualTo(BigDecimal value) {
+            addCriterion("NEW_BUS_FREEZE <>", value, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeGreaterThan(BigDecimal value) {
+            addCriterion("NEW_BUS_FREEZE >", value, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("NEW_BUS_FREEZE >=", value, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeLessThan(BigDecimal value) {
+            addCriterion("NEW_BUS_FREEZE <", value, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("NEW_BUS_FREEZE <=", value, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeIn(List<BigDecimal> values) {
+            addCriterion("NEW_BUS_FREEZE in", values, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeNotIn(List<BigDecimal> values) {
+            addCriterion("NEW_BUS_FREEZE not in", values, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("NEW_BUS_FREEZE between", value1, value2, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("NEW_BUS_FREEZE not between", value1, value2, "newBusFreeze");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -137,6 +137,8 @@ public class AgentFreeze implements Serializable{
 
     private String busId;
 
+    private BigDecimal newBusFreeze;
+
     public String getId() {
         return id;
     }
@@ -335,5 +337,13 @@ public class AgentFreeze implements Serializable{
 
     public void setBusId(String busId) {
         this.busId = busId == null ? null : busId.trim();
+    }
+
+    public BigDecimal getNewBusFreeze() {
+        return newBusFreeze;
+    }
+
+    public void setNewBusFreeze(BigDecimal newBusFreeze) {
+        this.newBusFreeze = newBusFreeze;
     }
 }
