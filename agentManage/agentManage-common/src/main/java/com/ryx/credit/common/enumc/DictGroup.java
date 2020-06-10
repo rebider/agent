@@ -123,7 +123,8 @@ public enum DictGroup {
     JOKEYTYPE("关键词类型"),
     APPROVAL_OPINION("订单审批意见"),
     FREE_TYPE("冻结层级"),
-    FREE_CAUSE("冻结原因");
+    FREE_CAUSE("冻结原因"),
+    FREEZE_RULE("冻结规则");
 
 
 

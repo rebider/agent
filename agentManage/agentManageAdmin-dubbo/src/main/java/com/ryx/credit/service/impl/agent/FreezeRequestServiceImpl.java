@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.TransformUnderlineUtils;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.RegExpression;
@@ -14,8 +15,10 @@ import com.ryx.credit.dao.agent.FreezeRequestMapper;
 import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
+import com.ryx.credit.pojo.admin.vo.FreezeDetail;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.FreezeRequestService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +28,14 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
 
 @Service("freezeRequestService")
 public class FreezeRequestServiceImpl implements FreezeRequestService {
 
-    private static Logger log = LoggerFactory.getLogger(FreezeRequestServiceImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(FreezeRequestServiceImpl.class);
 
     @Autowired
     private FreezeRequestMapper freezeRequestMapper;
@@ -45,6 +49,8 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
     private AgentFreezeMapper agentFreezeMapper;
     @Autowired
     private FreezeRequestDetailMapper freezeRequestDetailMapper;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
     @Override
     public PageInfo agentFreezeList(Map map, Page page) {
@@ -58,6 +64,10 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public AgentResult agentFreeze(AgentFreezePort agentFreezePort) throws MessageException {
+        AgentResult checkRuleRest =  checkFreezeRule(agentFreezePort);
+        if (!checkRuleRest.isOK()){
+           return  checkRuleRest;
+        }
         AgentResult verify = verify(agentFreezePort, FreeStatus.DJ.getValue(),BigDecimal.ZERO);
         if(!verify.isOK()){
             return verify;
@@ -76,7 +86,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         }
         for(String busPlatform:agentFreezePort.getBusPlatform()){
             for (BigDecimal freeType:agentFreezePort.getFreeType()){
-                log.info("冻结类型为[{}]",FreeType.getmsg(freeType));
+                logger.info("冻结类型为[{}]",FreeType.getmsg(freeType));
                 AgentFreezeExample agentFreezeExample = new AgentFreezeExample();
                 if (freeType.compareTo(FreeType.AGNET.code) == 0){
                     AgentFreezeExample.Criteria criteria = agentFreezeExample.createCriteria();
@@ -97,7 +107,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                     throw new MessageException("代理商此原因已被冻结:"+FreeType.getmsg(freeType));
                 }
                 FreezeRequestDetail agentFreeze = new FreezeRequestDetail();
-                agentFreeze.setId(idService.genId(TabId.a_agent_freeze));
+                agentFreeze.setId(idService.genId(TabId.a_freeze_request_detail));
                 agentFreeze.setFreezeReqId(freezeRequest.getId());
                 agentFreeze.setAgentId(agentFreezePort.getAgentId());
                 agentFreeze.setFreezeStatus(FreeStatus.DJ.getValue().toString());
@@ -185,7 +195,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                     }
                 }
             }else {
-                log.info("[{}]未传入冻结层级，默认本级",agentFreezePort.getAgentId());
+                logger.info("[{}]未传入冻结层级，默认本级",agentFreezePort.getAgentId());
                 agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
             }
         }
@@ -223,4 +233,62 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         }
         return AgentResult.ok(resultMap);
     }
+
+    /**
+     * 根据Object,返回属性对应的map,key-field,value-value
+     * @param bean
+     * @return
+     */
+    public static Map<String, Object> getFieldValueMap(Object bean) {
+        Class<?> cls = bean.getClass();
+        Map<String, Object> valueMap = new HashMap<String, Object>();
+        Field[] fields = cls.getDeclaredFields();
+        for (Field field : fields) {
+            try {
+                field.setAccessible(true);
+                Object value = field.get(bean);
+                valueMap.put(field.getName(), value);
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return valueMap;
+    }
+
+    private AgentResult checkFreezeRule(AgentFreezePort agentFreezePort){
+        List<Dict> dicts = dictOptionsService.dictList(DictGroup.FREEZE_RULE.name(), agentFreezePort.getFreezeCause());
+        Map<String,Object> ruleMap = new HashMap<String, Object>();
+        for (Dict dict:dicts){
+            ruleMap.put(dict.getdItemvalue(),dict.getdItemname()+"-"+dict.getdItemnremark());
+        }
+        FreezeDetail cur = agentFreezePort.getCurLevel();
+        FreezeDetail sub = agentFreezePort.getSubLevel();
+        if (cur!= null){
+            Map curMap = TransformUnderlineUtils.transform(cur);
+            //1:对比本级代理商
+            for(Map.Entry<String, Object> rulEentry:ruleMap.entrySet()){
+                String ruleValue = rulEentry.getValue() == null?"":String.valueOf(rulEentry.getValue()).substring(0,String.valueOf(rulEentry.getValue()).lastIndexOf("-"));
+                String curValue = curMap.get(rulEentry.getKey())==null?"":String.valueOf(curMap.get(rulEentry.getKey()));
+                if (!curValue.equals("") && !ruleValue.equals(curValue) && ruleValue.equals("0")) {//若两个map中相同key对应的value不相等
+                    return AgentResult.fail("存在不允许配置的选项:"+String.valueOf(rulEentry.getValue()).substring(String.valueOf(rulEentry.getValue()).lastIndexOf("-")+1));
+                }
+            }
+        }
+        if (null != sub){
+            Map subMap = TransformUnderlineUtils.transform(sub);
+            //2:对比非直签下级
+            for(Map.Entry<String, Object> rulEentry:ruleMap.entrySet()){
+                String ruleValue = rulEentry.getValue() == null?"":String.valueOf(rulEentry.getValue());
+                String curValue = subMap.get(rulEentry.getKey())==null?"":String.valueOf(subMap.get(rulEentry.getKey()));
+                if (!curValue.equals("") && !ruleValue.equals(curValue) && ruleValue.equals("0")) {//若两个map中相同key对应的value不相等
+                    return AgentResult.fail("存在不允许配置的选项"+String.valueOf(rulEentry.getValue()).substring(String.valueOf(rulEentry.getValue()).lastIndexOf("-")+1));
+                }
+            }
+        }
+        return AgentResult.ok();
+    }
+
+
 }

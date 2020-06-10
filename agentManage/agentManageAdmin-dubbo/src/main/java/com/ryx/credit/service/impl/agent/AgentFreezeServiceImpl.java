@@ -765,29 +765,6 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         return null;
     }
 
-    /**
-     * 根据Object,返回属性对应的map,key-field,value-value
-     * @param bean
-     * @return
-     */
-    public static Map<String, Object> getFieldValueMap(Object bean) {
-        Class<?> cls = bean.getClass();
-        Map<String, Object> valueMap = new HashMap<String, Object>();
-        Field[] fields = cls.getDeclaredFields();
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true);
-                Object value = field.get(bean);
-                valueMap.put(field.getName(), value);
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        return valueMap;
-    }
-
     @Override
     public AgentResult agentFreezeModify(AgentFreezePort agentFreezePort) throws MessageException {
         log.info("代理商申请你变更请求参数：{}",JsonUtil.objectToJson(agentFreezePort));

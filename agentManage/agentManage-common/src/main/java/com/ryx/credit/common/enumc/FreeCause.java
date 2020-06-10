@@ -21,7 +21,7 @@ public enum FreeCause {
     QTDJ("QTDJ","其他原因"),
     XXQS("XXQS","基本信息缺失"),
     JSKBG("JSKBG","结算卡变更冻结"),
-    FRFX("FRFX","分润返现");
+    FRFX("FRFX","分润返现冻结");
 
     public String code;
 
