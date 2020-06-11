@@ -409,6 +409,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             invoiceApplyMapper.updateByPrimaryKeySelective(invoiceApply);
         }else if("agent".equals(role) && "1".equals(invoiceApply.getYsResult())){
             logger.info("*********该发票代理商方重复导入*******");
+            errorInfo += "{"+invoiceApply.getInvoiceNumber()+"-"+invoiceApply.getInvoiceCode()+"重复导入,已过滤};";
             return;
             /*invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
             invoiceApply.setYsResult("0");
@@ -421,6 +422,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             invoiceApplyMapper.insertSelective(invoiceApply);*/
         }else if("finance".equals(role) && "1".equals(invoiceApply.getEsResult())){
             logger.info("*********该发票财务方重复导入********");
+            errorInfo += "{"+invoiceApply.getInvoiceNumber()+"-"+invoiceApply.getInvoiceCode()+"重复导入,已过滤};";
             return;
             /*invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
             invoiceApply.setYsResult("2");
