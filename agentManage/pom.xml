@@ -3,11 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.ryx.ry</groupId>
     <artifactId>agentManage</artifactId>
     <packaging>pom</packaging>
-    <version>${agentManage.version}</version>
+    <version>1.0-SNAPSHOT</version>
+    <properties>
+        <spring.version>4.3.7.RELEASE</spring.version>
+        <jackson.version>2.9.5</jackson.version>
+        <!--<agentManage.version>1.0-SNAPSHOT</agentManage.version>-->
+        <agentManage.version>2020.06.11.V1-release</agentManage.version>
+    </properties>
     <modules>
         <module>agentManageInternetCard-api</module>
         <module>agentManageInternetCard-dubbo</module>
@@ -26,11 +31,6 @@
         <module>agentManageJobOrder-dubbo</module>
         <module>agentManageJob</module>
     </modules>
-    <properties>
-        <spring.version>4.3.7.RELEASE</spring.version>
-        <jackson.version>2.9.5</jackson.version>
-        <agentManage.version>1.0-SNAPSHOT</agentManage.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.5.1</version>
+            <version>2.8.7</version>
         </dependency>
         <!-- spring的mvc包 -->
         <dependency>
@@ -327,7 +327,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
-            <!--<scope>provided</scope>-->
+            <scope>provided</scope>
         </dependency>
         <!-- json序列化包 -->
         <dependency>
@@ -500,9 +500,6 @@
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
-                <configuration>
-                    <path>/bankLoanUser</path>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
