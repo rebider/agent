@@ -17,4 +17,7 @@ public interface FreezeRequestService {
     AgentResult agentFreeze(AgentFreezePort agentFreezePort)throws MessageException;
 
     AgentResult agentFreezeFinish(String busId);
+
+    AgentResult agentFreezeModify(AgentFreezePort agentFreezePort)throws MessageException;
+
 }

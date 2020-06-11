@@ -375,7 +375,7 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
     update A_FREEZE_REQUEST_DETAIL
     <set>
       <if test="freezeReqId != null">
@@ -543,4 +543,51 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <sql id="selectReqDetails">
+
+    SELECT
+      FRD.AGENT_ID,
+      AG.AG_NAME,
+      AG.C_INCOM_TIME,
+      p.PLATFORM_NAME,
+      frd.BUS_PLATFORM,
+      frd.BUS_NUM,
+      frd.FREEZE_CAUSE,
+      frd.FREEZE_TYPE,
+      frd.BUS_FREEZE,
+      frd.PROFIT_FREEZE,
+      frd.REFLOW_FREEZE,
+      frd.MONTHLY_FREEZE,
+      frd.DAILY_FREEZE,
+      frd.STOP_PROFIT_FREEZE,
+      frd.CASH_FREEZE,
+      frd.STOP_COUNT,
+      fr.REQ_TYPE
+    FROM
+      A_FREEZE_REQUEST_DETAIL FRD
+        LEFT JOIN A_FREEZE_REQUEST FR
+                  ON FRD.FREEZE_REQ_ID = FR.ID
+        LEFT JOIN A_AGENT AG
+                  ON AG.ID = FRD.AGENT_ID
+        LEFT JOIN A_PLATFORM p
+                  ON p.PLATFORM_NUM = frd.BUS_PLATFORM
+    <trim prefix="where" prefixOverrides="and | or">
+      <if test="map.id != null and map.id !=''">
+        fr.id = #{map.id}
+      </if>
+      <if test="map.reqType != null and map.reqType != ''">
+       and fr.req_type = #{map.reqType}
+      </if>
+    </trim>
+  </sql>
+  <select id="queryFreezeDetials"  parameterType="map" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="selectReqDetails"/>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+
+  <select id="queryFreezeDetialsCount"  parameterType="map" resultType="int">
+    select count(*)from (
+    <include refid="selectReqDetails"/>)
+  </select>
 </mapper>
