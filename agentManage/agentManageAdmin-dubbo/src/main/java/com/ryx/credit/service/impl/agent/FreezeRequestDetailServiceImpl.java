@@ -23,4 +23,16 @@ public class FreezeRequestDetailServiceImpl implements FreezeRequestDetailServic
         pageInfo.setTotal(freezeRequestDetailMapper.queryFreezeDetialsCount(map,page));
         return pageInfo;
     }
+
+    @Override
+    public PageInfo queryModifyDetail(Map map,Page page) {
+        PageInfo pageInfo = new PageInfo();
+
+        List<Map<String,Object>> freezeRequestDetails = freezeRequestDetailMapper.queryFreezeDetials(map,page);
+        if (freezeRequestDetails == null ){
+            return null;
+        }
+        pageInfo.setRows(freezeRequestDetails);
+        return pageInfo;
+    }
 }

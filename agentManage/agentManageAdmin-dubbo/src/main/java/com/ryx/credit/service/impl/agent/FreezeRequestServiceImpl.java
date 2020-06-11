@@ -246,6 +246,16 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             if(!verify.isOK()){
                 return verify;
             }
+            //查询原冻结信息
+            AgentFreezeExample orgFreezeExample = new AgentFreezeExample();
+            orgFreezeExample.or().andAgentIdEqualTo(agentFreezePort.getAgentId())
+                    .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
+                    .andFreezeTypeEqualTo(agentFreezePort.getFreeType().get(0))
+                    .andStatusEqualTo(Status.STATUS_1.status);
+            List<AgentFreeze> orgAgentFreezeList = agentFreezeMapper.selectByExample(orgFreezeExample);
+            if (orgAgentFreezeList == null || orgAgentFreezeList.size() == 0){
+                throw new MessageException("代理商冻结信息不存在!");
+            }
             //创建新的冻结任务
             FreezeRequest freezeRequest = new FreezeRequest();
             freezeRequest.setId(idService.genId(TabId.a_freeze_request));
@@ -299,25 +309,26 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                     AgentBusInfo agentBusInfo = agentBusinfoService.getById(busPlatform);
                     agentFreeze.setBusPlatform(agentBusInfo.getBusPlatform());
                     agentFreeze.setBusId(busPlatform);
-                    agentFreeze.setBusNum(agentBusInfo.getBusNum());if (freeType.compareTo(FreeType.AGNET.code)==0){
-                        agentFreeze.setBusFreeze(agentFreezePort.getCurLevel().getBusFreeze());
-                        agentFreeze.setProfitFreeze(agentFreezePort.getCurLevel().getProfitFreeze());
-                        agentFreeze.setReflowFreeze(agentFreezePort.getCurLevel().getReflowFreeze());
-                        agentFreeze.setMonthlyFreeze(agentFreezePort.getCurLevel().getMonthlyFreeze());
-                        agentFreeze.setDailyFreeze(agentFreezePort.getCurLevel().getDailyFreeze());
-                        agentFreeze.setStopProfitFreeze(agentFreezePort.getCurLevel().getStopProfitFreeze());
-                        agentFreeze.setCashFreeze(agentFreezePort.getCurLevel().getCashFreeze());
-                        agentFreeze.setStopCount(agentFreezePort.getCurLevel().getStopCount());
-                    }else if (freeType.compareTo(FreeType.SUB_AGENT.code)==0){
-                        agentFreeze.setBusFreeze(agentFreezePort.getSubLevel().getBusFreeze());
-                        agentFreeze.setProfitFreeze(agentFreezePort.getSubLevel().getProfitFreeze());
-                        agentFreeze.setReflowFreeze(agentFreezePort.getSubLevel().getReflowFreeze());
-                        agentFreeze.setMonthlyFreeze(agentFreezePort.getSubLevel().getMonthlyFreeze());
-                        agentFreeze.setDailyFreeze(agentFreezePort.getSubLevel().getDailyFreeze());
-                        agentFreeze.setStopProfitFreeze(agentFreezePort.getSubLevel().getStopProfitFreeze());
-                        agentFreeze.setCashFreeze(agentFreezePort.getSubLevel().getCashFreeze());
-                        agentFreeze.setStopCount(agentFreezePort.getSubLevel().getStopCount());
-                    }
+                    agentFreeze.setBusFreeze(agentFreezePort.getCurLevel().getBusFreeze());
+                    agentFreeze.setProfitFreeze(agentFreezePort.getCurLevel().getProfitFreeze());
+                    agentFreeze.setReflowFreeze(agentFreezePort.getCurLevel().getReflowFreeze());
+                    agentFreeze.setMonthlyFreeze(agentFreezePort.getCurLevel().getMonthlyFreeze());
+                    agentFreeze.setDailyFreeze(agentFreezePort.getCurLevel().getDailyFreeze());
+                    agentFreeze.setStopProfitFreeze(agentFreezePort.getCurLevel().getStopProfitFreeze());
+                    agentFreeze.setCashFreeze(agentFreezePort.getCurLevel().getCashFreeze());
+                    agentFreeze.setStopCount(agentFreezePort.getCurLevel().getStopCount());
+                    /**
+                     * 保存原信息
+                     */
+                    agentFreeze.setBusFreezeOrg(orgAgentFreezeList.get(0).getBusFreeze());
+                    agentFreeze.setProfitFreezeOrg(orgAgentFreezeList.get(0).getProfitFreeze());
+                    agentFreeze.setReflowFreezeOrg(orgAgentFreezeList.get(0).getReflowFreeze());
+                    agentFreeze.setMonthlyFreezeOrg(orgAgentFreezeList.get(0).getMonthlyFreeze());
+                    agentFreeze.setDailyFreezeOrg(orgAgentFreezeList.get(0).getDailyFreeze());
+                    agentFreeze.setStopProfitFreezeOrg(orgAgentFreezeList.get(0).getStopProfitFreeze());
+                    agentFreeze.setCashFreezeOrg(orgAgentFreezeList.get(0).getCashFreeze());
+                    agentFreeze.setStopCountOrg(orgAgentFreezeList.get(0).getStopCount());
+
                     if(StringUtils.isNotBlank(agentFreezePort.getRemark())){//备注
                         agentFreeze.setRemark(agentFreezePort.getRemark());
                     }

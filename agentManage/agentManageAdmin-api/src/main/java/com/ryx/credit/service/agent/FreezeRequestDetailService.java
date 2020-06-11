@@ -10,4 +10,6 @@ public interface FreezeRequestDetailService {
 
     PageInfo agentFreezeDetailList(Map map, Page page);
 
+    PageInfo queryModifyDetail(Map map,Page page);
+
 }

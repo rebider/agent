@@ -546,23 +546,31 @@
   <sql id="selectReqDetails">
 
     SELECT
-      FRD.AGENT_ID,
-      AG.AG_NAME,
-      AG.C_INCOM_TIME,
-      p.PLATFORM_NAME,
-      frd.BUS_PLATFORM,
-      frd.BUS_NUM,
-      frd.FREEZE_CAUSE,
-      frd.FREEZE_TYPE,
-      frd.BUS_FREEZE,
-      frd.PROFIT_FREEZE,
-      frd.REFLOW_FREEZE,
-      frd.MONTHLY_FREEZE,
-      frd.DAILY_FREEZE,
-      frd.STOP_PROFIT_FREEZE,
-      frd.CASH_FREEZE,
-      frd.STOP_COUNT,
-      fr.REQ_TYPE
+    FRD.AGENT_ID,
+    AG.AG_NAME,
+    AG.C_INCOM_TIME,
+    p.PLATFORM_NAME,
+    frd.BUS_PLATFORM,
+    frd.BUS_NUM,
+    frd.FREEZE_CAUSE,
+    frd.FREEZE_TYPE,
+    frd.BUS_FREEZE,
+    frd.PROFIT_FREEZE,
+    frd.REFLOW_FREEZE,
+    frd.MONTHLY_FREEZE,
+    frd.DAILY_FREEZE,
+    frd.STOP_PROFIT_FREEZE,
+    frd.CASH_FREEZE,
+    frd.STOP_COUNT,
+    fr.REQ_TYPE,
+    frd.BUS_FREEZE_ORG,
+    frd.PROFIT_FREEZE_ORG,
+    frd.REFLOW_FREEZE_ORG,
+    frd.MONTHLY_FREEZE_ORG,
+    frd.DAILY_FREEZE_ORG,
+    frd.STOP_PROFIT_FREEZE_ORG,
+    frd.CASH_FREEZE_ORG,
+    frd.STOP_COUNT_ORG
     FROM
       A_FREEZE_REQUEST_DETAIL FRD
         LEFT JOIN A_FREEZE_REQUEST FR
