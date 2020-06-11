@@ -111,4 +111,8 @@ public interface AgentService {
     PageInfo agentCaManageList(Page page, Map map);
 
     List<AgentCaVo> exportAgentCa(Map map);
+
+    List<Map<String, Object>> queryAgentColinfoInfo(String agentId) throws MessageException;
+
+    AgentResult queryAgentStatusInfo(String agentId) throws MessageException;
 }
