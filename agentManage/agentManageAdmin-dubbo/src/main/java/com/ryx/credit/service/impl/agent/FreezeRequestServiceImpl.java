@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -15,6 +16,7 @@ import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.pojo.admin.vo.FreezeDetail;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
+import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.agent.FreezeRequestService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -26,7 +28,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -51,6 +52,8 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private BusActRelService busActRelService;
     @Override
     public PageInfo agentFreezeList(Map map, Page page) {
         PageInfo pageInfo = new PageInfo();
@@ -156,8 +159,29 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
     }
 
     @Override
-    public AgentResult agentFreezeFinish(String busid) {
-        return null;
+    public AgentResult agentFreezeFinish(String insid, String actname) throws Exception {
+        logger.info("订单调整审批完成:{},{}", insid, actname);
+        //审批流关系
+        BusActRel busActRel = busActRelService.findById(insid);
+        if (actname.equals("finish_end")) { //审批完成
+            logger.info("审批通过{}", busActRel.getBusId());
+            busActRel.setActivStatus(AgStatus.Approved.name());
+            if (1 != busActRelService.updateByPrimaryKey(busActRel)) {
+                throw new MessageException("请重新提交！");
+            }
+
+        } else if(actname.equals("reject_end")) { //审批拒绝
+            logger.info("审批完审批拒绝{}", busActRel.getBusId());
+            busActRel.setActivStatus(AgStatus.Refuse.name());
+            if (1 != busActRelService.updateByPrimaryKey(busActRel)) {
+                throw new MessageException("请重新提交！");
+            }
+
+
+
+        }
+        logger.info("订单调整审批结束", busActRel.getBusId());
+        return AgentResult.ok();
     }
 
     /**
@@ -344,6 +368,30 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             return AgentResult.fail("冻结申请变更失败!");
         }
 
+    }
+
+    @Override
+    public AgentResult approvalTask(AgentFreezePort agentFreezePort, String userId) throws Exception {
+        try {
+            AgentResult result = new AgentResult();/*agentEnterService.completeTaskEnterActivity(agentVo, userId);*/
+            if (!result.isOK()) {
+                logger.error(result.getMsg());
+                throw new MessageException("工作流处理任务异常");
+            }
+        } catch (MessageException | ProcessException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getLocalizedMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException("catch工作流处理任务异常!");
+        }
+        return AgentResult.ok();
+    }
+
+    @Override
+    public FreezeRequest queryFreezeRequestById(String id)  {
+        FreezeRequest freezeRequest = freezeRequestMapper.selectByPrimaryKey(id);
+        return freezeRequest;
     }
 
     private AgentResult checkFreezeRule(AgentFreezePort agentFreezePort){

@@ -169,7 +169,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             if(!verify.isOK()){
                 return verify;
             }
-            for(String busPlatform:agentFreezePort.getBusPlatform()){
+//            for(String busPlatform:agentFreezePort.getBusPlatform()){
                 for (BigDecimal freeType:agentFreezePort.getFreeType()){
                     log.info("冻结类型为[{}]",FreeType.getmsg(freeType));
                     AgentFreezeExample agentFreezeExample = new AgentFreezeExample();
@@ -205,27 +205,27 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     agentFreeze.setFreezeType(freeType);
                     /** 保存新增字段 **/
                     agentFreeze.setBusPlatform("");
-                    agentFreeze.setBusId(busPlatform);
+//                    agentFreeze.setBusId(busPlatform);
                     agentFreeze.setBusNum("");
-                    if (freeType.compareTo(FreeType.AGNET.code)==0){
-                        agentFreeze.setBusFreeze(agentFreezePort.getCurLevel().getBusFreeze());
-                        agentFreeze.setProfitFreeze(agentFreezePort.getCurLevel().getProfitFreeze());
-                        agentFreeze.setReflowFreeze(agentFreezePort.getCurLevel().getReflowFreeze());
-                        agentFreeze.setMonthlyFreeze(agentFreezePort.getCurLevel().getMonthlyFreeze());
-                        agentFreeze.setDailyFreeze(agentFreezePort.getCurLevel().getDailyFreeze());
-                        agentFreeze.setStopProfitFreeze(agentFreezePort.getCurLevel().getStopProfitFreeze());
-                        agentFreeze.setCashFreeze(agentFreezePort.getCurLevel().getCashFreeze());
-                        agentFreeze.setStopCount(agentFreezePort.getCurLevel().getStopCount());
-                    }else if (freeType.compareTo(FreeType.SUB_AGENT.code)==0){
-                        agentFreeze.setBusFreeze(agentFreezePort.getSubLevel().getBusFreeze());
-                        agentFreeze.setProfitFreeze(agentFreezePort.getSubLevel().getProfitFreeze());
-                        agentFreeze.setReflowFreeze(agentFreezePort.getSubLevel().getReflowFreeze());
-                        agentFreeze.setMonthlyFreeze(agentFreezePort.getSubLevel().getMonthlyFreeze());
-                        agentFreeze.setDailyFreeze(agentFreezePort.getSubLevel().getDailyFreeze());
-                        agentFreeze.setStopProfitFreeze(agentFreezePort.getSubLevel().getStopProfitFreeze());
-                        agentFreeze.setCashFreeze(agentFreezePort.getSubLevel().getCashFreeze());
-                        agentFreeze.setStopCount(agentFreezePort.getSubLevel().getStopCount());
-                    }
+//                    if (freeType.compareTo(FreeType.AGNET.code)==0){
+//                        agentFreeze.setBusFreeze(agentFreezePort.getCurLevel().getBusFreeze());
+//                        agentFreeze.setProfitFreeze(agentFreezePort.getCurLevel().getProfitFreeze());
+//                        agentFreeze.setReflowFreeze(agentFreezePort.getCurLevel().getReflowFreeze());
+//                        agentFreeze.setMonthlyFreeze(agentFreezePort.getCurLevel().getMonthlyFreeze());
+//                        agentFreeze.setDailyFreeze(agentFreezePort.getCurLevel().getDailyFreeze());
+//                        agentFreeze.setStopProfitFreeze(agentFreezePort.getCurLevel().getStopProfitFreeze());
+//                        agentFreeze.setCashFreeze(agentFreezePort.getCurLevel().getCashFreeze());
+//                        agentFreeze.setStopCount(agentFreezePort.getCurLevel().getStopCount());
+//                    }else if (freeType.compareTo(FreeType.SUB_AGENT.code)==0){
+//                        agentFreeze.setBusFreeze(agentFreezePort.getSubLevel().getBusFreeze());
+//                        agentFreeze.setProfitFreeze(agentFreezePort.getSubLevel().getProfitFreeze());
+//                        agentFreeze.setReflowFreeze(agentFreezePort.getSubLevel().getReflowFreeze());
+//                        agentFreeze.setMonthlyFreeze(agentFreezePort.getSubLevel().getMonthlyFreeze());
+//                        agentFreeze.setDailyFreeze(agentFreezePort.getSubLevel().getDailyFreeze());
+//                        agentFreeze.setStopProfitFreeze(agentFreezePort.getSubLevel().getStopProfitFreeze());
+//                        agentFreeze.setCashFreeze(agentFreezePort.getSubLevel().getCashFreeze());
+//                        agentFreeze.setStopCount(agentFreezePort.getSubLevel().getStopCount());
+//                    }
                     if(StringUtils.isNotBlank(agentFreezePort.getRemark())){//备注
                         agentFreeze.setRemark(agentFreezePort.getRemark());
                     }
@@ -242,7 +242,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                         }
                     }
                 }
-            }
+//            }
 
 
             return AgentResult.ok("冻结成功");
