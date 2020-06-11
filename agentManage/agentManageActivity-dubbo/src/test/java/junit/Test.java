@@ -31,10 +31,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -248,11 +245,11 @@ public class Test {
     @org.junit.Test
     public void completTask(){
         TaskService taskService = processEngineConfiguration.buildProcessEngine().getTaskService();
-//        taskService.complete("4472509");
-        taskService.complete("4475005",FastMap.fastMap("v",1)
-                .putKeyV("user1","pass"));
-        taskService.complete("4475007",FastMap.fastMap("v",1)
-                .putKeyV("user2","pass"));
+        taskService.complete("5332523",FastMap.fastMap("rejectCount","1").putKeyV("rs","pass"));
+//        taskService.complete("5325033",FastMap.fastMap("v",1)
+//                .putKeyV("user1","pass"));
+//        taskService.complete("4475007",FastMap.fastMap("v",1)
+//                .putKeyV("user2","pass"));
         System.out.println("任务完成");
     }
 
@@ -290,6 +287,20 @@ public class Test {
         runtimeService.signalEventReceived("testSig");
     }
 
+
+    /**
+     * 基础信息及结算卡信息变更申请
+     */
+    @org.junit.Test
+    public void testAgentAppyChangeCard(){
+        RuntimeService runtimeService = processEngineConfiguration.buildProcessEngine().getRuntimeService();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("finance_agent_1.0",
+                FastMap.fastMap("proList", Arrays.asList("kermit","gonzo","fozzie"))//省区审批人部门代码
+                        .putKeyV("rejectCount","0")//拒绝数量，有拒绝就置为1
+                        .putKeyV("docList",Arrays.asList("kermit","gonzo"))//大区审批人部门代码
+                        .putKeyV("makUserList",Arrays.asList("kermit","gonzo")));//市场部审批用户ID 用户ID
+        System.out.println("基础信息及结算卡信息变更申请"+processInstance.getId());
+    }
 
 
 }
