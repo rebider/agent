@@ -10,8 +10,8 @@
     <properties>
         <spring.version>4.3.7.RELEASE</spring.version>
         <jackson.version>2.9.5</jackson.version>
-        <!--<agentManage.version>1.0-SNAPSHOT</agentManage.version>-->
-        <agentManage.version>2020.06.11.V1-release</agentManage.version>
+        <agentManage.version>1.0-SNAPSHOT</agentManage.version>
+        <!--<agentManage.version>2020.06.11.V1-release</agentManage.version>-->
     </properties>
     <modules>
         <module>agentManageInternetCard-api</module>
