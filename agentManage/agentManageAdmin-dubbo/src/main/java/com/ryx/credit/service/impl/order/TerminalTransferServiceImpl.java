@@ -625,8 +625,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             if(isno){
                 if(terminalTransferDetails.get(0).getPlatformType().compareTo(TerminalPlatformType.POS.getValue())==0||terminalTransferDetails.get(0).getPlatformType().compareTo(TerminalPlatformType.ZHPOS.getValue())==0){
                     List<String> allAgent = new ArrayList<>();
-                    List<TerminalTransferDetail> terminalTransferDetailList = agentVo.getTerminalTransferDetailList();
-                    for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
+                    for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
                         allAgent.add(terminalTransferDetail.getId().trim());
                     }
 
