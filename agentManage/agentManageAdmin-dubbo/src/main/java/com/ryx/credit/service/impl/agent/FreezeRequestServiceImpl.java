@@ -264,6 +264,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             freezeRequest.setcUserId(agentFreezePort.getOperationPerson());
             freezeRequest.setFreezeCause(agentFreezePort.getFreezeCause());
             freezeRequest.setReqReason(agentFreezePort.getRemark());
+            freezeRequest.setReviewsStat(AgStatus.Approving.status);
             freezeRequest.setStatus(Status.STATUS_1.status);
             freezeRequest.setVersion(BigDecimal.ONE);
             if (freezeRequestMapper.insert(freezeRequest)!=1){
