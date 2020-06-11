@@ -139,6 +139,11 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         try{
             tocken = getTockenString();
             for (Map<String,Object> param:list) {
+                List<InvoiceApply> invoiceApplyList = getHZList(param.get("invoiceCode").toString(),param.get("invoiceNo").toString(),"1");
+                if(invoiceApplyList.size() != 0){
+                    errorInfo += "{"+param.get("invoiceNo").toString()+"-"+param.get("invoiceCode").toString()+"已使用,重复导入,已过滤};";
+                    continue;
+                }
                 List<InvoiceApply> list1 = invoiceApplyMapper.selectListForDeal(param.get("invoiceNo").toString(),param.get("invoiceCode").toString());
                 if(list1.size() == 0){// 发票第一次导入处理
                     dealWithFirst(param,role,user,userName);
@@ -158,6 +163,17 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             e.printStackTrace();
             throw  new MessageException("数据处理失败");
         }
+    }
+
+    private List  getHZList(String invoiceCode,String invoiceNumber,String status){
+        Map map = new HashMap();
+        map.put("status",status);
+        map.put("invoiceCode",invoiceCode);
+        map.put("invoiceNumber",invoiceNumber);
+        InvoiceApplyExample example = new InvoiceApplyExample();
+        InvoiceApplyExample.Criteria criteria = example.createCriteria();
+        setValueExample(criteria,map);
+        return invoiceApplyMapper.selectByExample(example);
     }
 
     /**
@@ -957,6 +973,9 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
             criteria.andEsDateGreaterThanOrEqualTo(map.get("esDateStart").toString());
         }else if(map.get("esDateEnd") != null && StringUtils.isNotBlank(map.get("esDateEnd").toString())){
             criteria.andEsDateLessThanOrEqualTo(map.get("esDateEnd").toString());
+        }
+        if(map.get("status") != null && StringUtils.isNotBlank(map.get("status").toString())){
+            criteria.andStatusEqualTo(map.get("status").toString());
         }
     }
 
