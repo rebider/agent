@@ -723,6 +723,7 @@
         d.DELIVERY_TIME_TYPE,
         d.OLD_ORG_NAME,
         d.NEW_ORG_NAME,
+        d.PAY_STATUS,
         a.activity_name as pre_activity_activityName,
         a.act_code as pre_activity_act_code,
         a.bus_pro_code as pre_activity_bus_pro_code,
