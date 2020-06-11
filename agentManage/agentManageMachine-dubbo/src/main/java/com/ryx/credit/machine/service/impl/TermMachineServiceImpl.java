@@ -3,6 +3,7 @@ package com.ryx.credit.machine.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.enumc.TerminalPlatformType;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
@@ -167,13 +168,15 @@ public class TermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult querySnMsg(PlatformType platformType, String snBegin, String snEnd) throws Exception {
-        if (PlatformType.whetherPOS(platformType.name())) {
-            return posTermMachineServiceImpl.querySnMsg(platformType, snBegin, snEnd);
-        } else if (PlatformType.MPOS.code.equals(platformType.name())) {
-            return mposTermMachineServiceImpl.querySnMsg(platformType, snBegin, snEnd);
-        } else if (PlatformType.RDBPOS.code.equals(platformType.name())) {
-            return rdbTermMachineServiceImpl.querySnMsg(platformType, snBegin, snEnd);
+    public AgentResult querySnMsg(PlatformType platformType,String snBegin,String snEnd)throws Exception{
+        if(PlatformType.whetherPOS(platformType.name())){
+            return posTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
+        }else  if (PlatformType.MPOS.code.equals(platformType.name())){
+            return mposTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
+        } else if (PlatformType.RDBPOS.code.equals(platformType.name())){
+            return rdbTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
+        } else if (PlatformType.SSPOS.code.equals(platformType.name())){
+            return sPosTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
         }
         return AgentResult.fail("未知业务平台");
     }
@@ -354,7 +357,6 @@ public class TermMachineServiceImpl implements TermMachineService {
             return AgentResult.ok();
         }
     }
-
     @Override
     public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
         if (PlatformType.RJPOS.getValue().equals(platformType)) {
@@ -365,4 +367,5 @@ public class TermMachineServiceImpl implements TermMachineService {
             return AgentResult.fail("未实现的物流平台。");
         }
     }
+
 }

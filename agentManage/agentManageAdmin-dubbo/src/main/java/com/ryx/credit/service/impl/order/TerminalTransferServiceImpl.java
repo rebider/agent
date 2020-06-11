@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
@@ -13,6 +14,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.TerminalTransferDetailMapper;
 import com.ryx.credit.dao.order.TerminalTransferMapper;
+import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.AgentVoTerminalTransferDetail;
 import com.ryx.credit.pojo.admin.order.TerminalTransfer;
@@ -82,6 +84,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private OsnOperateService osnOperateService;
     @Autowired
     TerminalTransferSharer terminalTransferSharer;
+    @Autowired
+    TermMachineService termMachineService;
 
     private String QUERY_SWITCH = "TerminalTransfer:ISOPEN_RES_QUERY";
     private String TRANS_SWITCH = "TerminalTransfer:ISOPEN_RES_trans";
