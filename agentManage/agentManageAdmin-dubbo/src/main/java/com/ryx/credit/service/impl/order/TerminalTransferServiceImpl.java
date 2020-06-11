@@ -619,7 +619,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId, boolean tf) throws Exception {
 
         List<TerminalTransferDetail> terminalTransferDetails = queryDetailByTerminalId(busId);
-        com.ryx.credit.pojo.admin.order.TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransferDetails.get(0).getTerminalTransferId());
+        TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransferDetails.get(0).getTerminalTransferId());
         if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
 
             terminalTransferDetails = queryDetailByTerminalId(busId);
@@ -704,7 +704,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 throw new MessageException("审批和数据关系有误");
             }
             BusActRel busActRel = list.get(0);
-            com.ryx.credit.pojo.admin.order.TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(busActRel.getBusId());
+            TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(busActRel.getBusId());
 
             terminalTransfer.setReviewStatus(agStatus);
             terminalTransfer.setuTime(new Date());
@@ -746,7 +746,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
 
     //代理商拒绝更新明细
-    public void RefuseTransfer(com.ryx.credit.pojo.admin.order.TerminalTransfer terminalTransfer) throws Exception {
+    public void RefuseTransfer(TerminalTransfer terminalTransfer) throws Exception {
         TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
         TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
         criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
@@ -822,7 +822,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if (StringUtils.isBlank(terminalTransferId)) {
             return null;
         }
-        com.ryx.credit.pojo.admin.order.TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransferId);
+        TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransferId);
         if (null == terminalTransfer) {
             return null;
         }
@@ -950,7 +950,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if (StringUtils.isBlank(terminalTransferId)) {
             throw new MessageException("数据ID为空");
         }
-        com.ryx.credit.pojo.admin.order.TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransferId);
+        TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransferId);
         if (terminalTransfer.getStatus().compareTo(new BigDecimal("1")) != 0) {
             throw new MessageException("本次提交审批信息已经删除,不需要多次删除");
         }
@@ -988,7 +988,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult editTerminalTransfer(com.ryx.credit.pojo.admin.order.TerminalTransfer terminalTransfer, List<TerminalTransferDetail> terminalTransferDetailList, String cuser, String agentId) throws Exception {
+    public AgentResult editTerminalTransfer(TerminalTransfer terminalTransfer, List<TerminalTransferDetail> terminalTransferDetailList, String cuser, String agentId) throws Exception {
 
         if (StringUtils.isBlank(terminalTransfer.getId())) {
             throw new MessageException("数据ID为空");
@@ -1017,7 +1017,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if (terminalTransferDetailList.size() == 0) {
             throw new MessageException("请填写明细最少一条");
         }
-        com.ryx.credit.pojo.admin.order.TerminalTransfer qTerminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransfer.getId());
+        TerminalTransfer qTerminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransfer.getId());
         if (qTerminalTransfer.getReviewStatus().compareTo(AgStatus.Approving.getValue()) == 0) {
             BusActRel busActRel = busActRelMapper.findByBusId(qTerminalTransfer.getId());
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(qTerminalTransfer.getPlatformType());
