@@ -309,6 +309,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                     AgentBusInfo agentBusInfo = agentBusinfoService.getById(busPlatform);
                     agentFreeze.setBusPlatform(agentBusInfo.getBusPlatform());
                     agentFreeze.setBusId(busPlatform);
+                    agentFreeze.setBusNum(agentBusInfo.getBusNum());
                     agentFreeze.setBusFreeze(agentFreezePort.getCurLevel().getBusFreeze());
                     agentFreeze.setProfitFreeze(agentFreezePort.getCurLevel().getProfitFreeze());
                     agentFreeze.setReflowFreeze(agentFreezePort.getCurLevel().getReflowFreeze());

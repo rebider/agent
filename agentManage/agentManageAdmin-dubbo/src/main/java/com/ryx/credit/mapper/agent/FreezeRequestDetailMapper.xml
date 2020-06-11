@@ -570,7 +570,10 @@
     frd.DAILY_FREEZE_ORG,
     frd.STOP_PROFIT_FREEZE_ORG,
     frd.CASH_FREEZE_ORG,
-    frd.STOP_COUNT_ORG
+    frd.STOP_COUNT_ORG,
+    fr.C_TM,
+    frd.remark,
+    cu.name as FREEZE_PERSON_MSG
     FROM
       A_FREEZE_REQUEST_DETAIL FRD
         LEFT JOIN A_FREEZE_REQUEST FR
@@ -579,6 +582,7 @@
                   ON AG.ID = FRD.AGENT_ID
         LEFT JOIN A_PLATFORM p
                   ON p.PLATFORM_NUM = frd.BUS_PLATFORM
+        LEFT JOIN C_USER CU ON frd.FREEZE_PERSON = cu.id
     <trim prefix="where" prefixOverrides="and | or">
       <if test="map.id != null and map.id !=''">
         fr.id = #{map.id}
