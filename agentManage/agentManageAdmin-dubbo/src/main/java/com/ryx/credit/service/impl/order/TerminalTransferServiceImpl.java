@@ -699,21 +699,24 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     List<Map<String, Object>> datas = (List<Map<String, Object>>) dataMap.get("organList");
                     for (Map<String, Object> m : datas) {
                         /*开启*/
-                        if("0".equals(String.valueOf(m.get("status")))){
+                        if("01".equals(String.valueOf(m.get("status")))){
                             if ("01".equals(String.valueOf(m.get("cancelStatus")))){
                                 throw  new MessageException(m.get("orgId")+"已经注销");
                             }else {
                                 continue;
                             }
                             /*关闭*/
-                        }else if("1".equals(String.valueOf(m.get("status")))){
+                        }else if("02".equals(String.valueOf(m.get("status")))){
                             if ("01".equals(String.valueOf(m.get("cancelStatus")))){
                                 throw  new MessageException(m.get("orgId")+"已经禁用并注销");
                             }else {
                                 throw  new MessageException(m.get("orgId")+"已经禁用");
                             }
+                        }else {
+                            throw  new MessageException(m.get("orgId")+"未查到状态");
                         }
                     }
+
                 }else {
                     log.error("调用代理商是否禁用接口失败"+JSONObject.toJSON(agentResult));
                     throw new MessageException("调用代理商是否禁用接口失败");
