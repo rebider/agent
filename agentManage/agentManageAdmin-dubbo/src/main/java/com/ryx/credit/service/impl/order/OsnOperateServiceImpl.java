@@ -2,7 +2,6 @@ package com.ryx.credit.service.impl.order;
 
 import com.alibaba.druid.sql.ast.statement.SQLIfStatement;
 import com.alibaba.fastjson.JSONObject;
-import com.rabbitmq.client.AMQP;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
