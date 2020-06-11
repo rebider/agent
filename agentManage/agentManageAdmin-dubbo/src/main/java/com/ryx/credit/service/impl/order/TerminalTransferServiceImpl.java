@@ -621,9 +621,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     @Override
     public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId, boolean tf,boolean isno) throws Exception {
         try {
+            List<TerminalTransferDetail> terminalTransferDetails = queryDetailByTerminalId(busId);
             if(isno){
-                if(agentVo.getTerminalTransferDetailList().get(0).getPlatformType().compareTo(TerminalPlatformType.POS.getValue())==0||agentVo.getTerminalTransferDetailList().get(0).getPlatformType().compareTo(TerminalPlatformType.ZHPOS.getValue())==0){
-                   List<String> allAgent = new ArrayList<>();
+                if(terminalTransferDetails.get(0).getPlatformType().compareTo(TerminalPlatformType.POS.getValue())==0||terminalTransferDetails.get(0).getPlatformType().compareTo(TerminalPlatformType.ZHPOS.getValue())==0){
+                    List<String> allAgent = new ArrayList<>();
                     List<TerminalTransferDetail> terminalTransferDetailList = agentVo.getTerminalTransferDetailList();
                     for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
                         allAgent.add(terminalTransferDetail.getId().trim());
@@ -635,10 +636,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
 
             }
+            TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransferDetails.get(0).getTerminalTransferId());
+
 
             if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
-
-                List<TerminalTransferDetail> terminalTransferDetails = queryDetailByTerminalId(busId);
                 log.info("本次提交的明细SN:{}", JSONObject.toJSON(terminalTransferDetails));
                 //判断sn是否重复提交
                 repetitionSN(terminalTransferDetails);
