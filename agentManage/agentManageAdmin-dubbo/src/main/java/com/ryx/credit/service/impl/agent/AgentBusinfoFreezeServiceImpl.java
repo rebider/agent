@@ -1,5 +1,8 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.KafkaMessageTopic;
+import com.ryx.credit.common.enumc.KafkaMessageType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
@@ -11,6 +14,7 @@ import com.ryx.credit.dao.agent.AgentFreezeMapper;
 import com.ryx.credit.pojo.admin.agent.AgentBusinfoFreeze;
 import com.ryx.credit.pojo.admin.agent.AgentFreeze;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
+import com.ryx.credit.service.AgentKafkaService;
 import com.ryx.credit.service.agent.AgentBusinfoFreezeService;
 import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.service.dict.IdService;
@@ -45,7 +49,8 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
     private AgentFreezeMapper agentFreezeMapper;
     @Autowired
     private PlatFormService platFormService;
-
+    @Autowired
+    private AgentKafkaService agentKafkaService;
 
     @Override
     public PageInfo abfreezeList(Page page, Map map) {
@@ -125,6 +130,21 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
                     if(1!=agentBusinfoFreezeMapper.insertSelective(agentBusinfoFreeze)){
                         logger.info("添加业务冻结失败");
                         return  AgentResult.fail("添加业务冻结失败");
+                    }
+                    try {
+                        logger.info("开始执行kafka消息分发");
+                        agentKafkaService.sendPayMentMessage(agentBusinfoFreeze.getAgId(),
+                                agentBusinfoFreeze.getId(),
+                                agentBusinfoFreeze.getBusId(),
+                                agentBusinfoFreeze.getBusNum(),
+                                KafkaMessageType.FREEZE,
+                                KafkaMessageTopic.agent_Freeze.code,
+                                JSONObject.toJSONString(agentBusinfoFreeze)
+                        );
+                        logger.info("结束kafka消息分发");
+                    } catch (Exception e) {
+                        logger.info("kafka接口调用失败 代理商业务id {}",freeze.getBusId());
+                        e.printStackTrace();
                     }
                 }
             }else{

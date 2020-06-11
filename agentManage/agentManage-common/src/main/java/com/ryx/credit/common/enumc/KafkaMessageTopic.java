@@ -6,7 +6,8 @@ package com.ryx.credit.common.enumc;
  * 描述：
  */
 public enum KafkaMessageTopic {
-    agent_Payment("agent_Payment","付款信息");
+    agent_Payment("agent_Payment","付款信息"),
+    agent_Freeze("agent_Freeze","冻结信息");
 
     public String code;
 
