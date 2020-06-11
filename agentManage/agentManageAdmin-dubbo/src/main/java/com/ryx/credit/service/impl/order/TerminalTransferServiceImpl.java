@@ -695,7 +695,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }
                 if (agentResult.isOK()) {
                     JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
-                    List<Map<String,Object>> datas = (List<Map<String, Object>>) JSONArray.parseObject(String.valueOf(jsonObject.get("data")));
+                    JSONObject dataMap = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
+                    List<Map<String, Object>> datas = (List<Map<String, Object>>) dataMap.get("organList");
                     for (Map<String, Object> m : datas) {
                         /*开启*/
                         if("0".equals(String.valueOf(m.get("status")))){
