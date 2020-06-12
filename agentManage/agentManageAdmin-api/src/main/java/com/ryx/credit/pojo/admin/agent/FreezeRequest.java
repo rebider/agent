@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.agent;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class FreezeRequest {
+public class FreezeRequest implements Serializable {
     private String id;
 
     private BigDecimal reqType;
