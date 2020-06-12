@@ -30,6 +30,7 @@
         <module>agentManageJobOrder-api</module>
         <module>agentManageJobOrder-dubbo</module>
         <module>agentManageJob</module>
+        <module>agentManageKafka-dubbo</module>
     </modules>
     <dependencies>
         <dependency>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+               xmlns="http://www.springframework.org/schema/beans"
+               xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo
+       http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="job-dubbo-client"/>
+    <!-- 使用zookeeper注册中心暴露服务地址 uat-->
+    <!-- <dubbo:registry protocol="zookeeper" address="172.30.16.56:2181" /> -->
+    <dubbo:registry protocol="zookeeper" address="${zk.server}" group="${zk.group}" id="myGroup"/>
+    <!-- 使用zookeeper注册中心暴露服务地址 -->
+    <!--  <dubbo:protocol name="dubbo" port="20881"/>
+     <dubbo:protocol name="dubbo" port="20880"/> -->
+    <dubbo:consumer check="false" timeout="1200000" />
+    <dubbo:reference interface="com.ryx.credit.service.agent.AgentService" id="agentService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:reference interface="com.ryx.credit.service.order.OrderService" id="orderService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:reference interface="com.ryx.credit.service.order.IOPdSumService" id="OPdSumService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.ColinfoTaskService" id="colinfoTaskService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.AgentBusinfoService" id="agentBusinfoService"  timeout="1200000" registry="myGroup" />
+    <dubbo:reference interface="com.ryx.credit.service.agent.AgentColinfoService" id="agentColinfoService"  timeout="1200000" registry="myGroup" />
+    <dubbo:reference interface="com.ryx.credit.service.order.OLogisticsDetailHService" id="oLogisticsDetailHService" timeout="1200000" registry="myGroup" />
+    <dubbo:reference interface="com.ryx.credit.service.order.OsnOperateService" id="osnOperateService"  timeout="1200000" registry="myGroup" />
+    <dubbo:reference interface="com.ryx.internet.service.InternetCardService" id="internetCardService"  timeout="1200000" registry="myGroup" />
+    <dubbo:reference interface="com.ryx.credit.service.order.TerminalTransferService" id="terminalTransferService"  timeout="1200000" registry="myGroup" />
+    <dubbo:reference interface="com.ryx.internet.service.OInternetRenewService" id="internetRenewService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.AgentCertificationService" id="agentCertificationService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.order.ORemoveAccountService" id="oRemoveAccountService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.order.CompensateService" id="compensateService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:reference interface="com.ryx.internet.service.QueryCardStatusJobService" id="queryCardStatusJobService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.internet.service.LogoutMobileStopJobService" id="logoutMobileStopJobService"  timeout="1200000" registry="myGroup" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.AgentDebitCardFileService" id="agentDebitCardFileService"  timeout="1200000" registry="myGroup" check="false"/>
+
+    <!-- 退货任务消费者 -->
+    <dubbo:reference interface="com.ryx.credit.service.order.OsnOperateReturnService" id="osnOperateReturnService" timeout="1200000" registry="myGroup" />
+    <dubbo:reference interface="com.ryx.credit.service.ActBusRelScanView" id="actBusRelScanView" timeout="1200000" registry="myGroup" />
+</beans>
