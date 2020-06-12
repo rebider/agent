@@ -678,8 +678,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         for (String agent : terminalTransferFNoorbidde) {
             allAgent.remove(agent);
         }
+        Set<String> agent = new HashSet<>();
         for (String ttd : allAgent) {
-
             TerminalTransferDetail terminalTransferDetail = terminalTransferDetailMapper.selectByPrimaryKey(ttd);
             String type = String.valueOf(terminalTransferDetail.getPlatformType());
             List<String>  lists = new ArrayList<>();
@@ -701,16 +701,16 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                         /*开启*/
                         if("01".equals(String.valueOf(m.get("status")))){
                             if ("01".equals(String.valueOf(m.get("cancelStatus")))){
-                                throw  new MessageException(m.get("orgId")+"已经注销");
+                                agent.add(String.valueOf(m.get("orgId")));
                             }else {
                                 continue;
                             }
                             /*关闭*/
                         }else if("02".equals(String.valueOf(m.get("status")))){
                             if ("01".equals(String.valueOf(m.get("cancelStatus")))){
-                                throw  new MessageException(m.get("orgId")+"已经禁用并注销");
+                                agent.add(String.valueOf(m.get("orgId")));
                             }else {
-                                throw  new MessageException(m.get("orgId")+"已经禁用");
+                                agent.add(String.valueOf(m.get("orgId")));
                             }
                         }else {
                             throw  new MessageException(m.get("orgId")+"未查到状态");
@@ -720,6 +720,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 }else {
                     log.error("调用代理商是否禁用接口失败"+JSONObject.toJSON(agentResult));
                     throw new MessageException("调用代理商是否禁用接口失败");
+                }
+
+                if(agent.size()>0){
+                    throw new MessageException(agent.toString()+"：这些代理商已经注销或者禁用，不支持直接划拨");
                 }
 
         }
