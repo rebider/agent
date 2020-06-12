@@ -260,11 +260,23 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if (StringUtils.isBlank(agUniqNum)) {
             return result;
         }
+
         AgentExample example = new AgentExample();
         AgentExample.Criteria criteria = example.createCriteria();
         criteria.andAgUniqNumEqualTo(agUniqNum);
         criteria.andAgStatusIn(agStatusList);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+
+        AgentExample.Criteria criteria_uniq = example.createCriteria();
+        criteria_uniq.andIdEqualTo(agUniqNum);
+        criteria_uniq.andAgStatusIn(agStatusList);
+        criteria_uniq.andStatusEqualTo(Status.STATUS_1.status);
+
+        AgentExample.Criteria criteriaName = example.createCriteria();
+        criteriaName.andAgNameEqualTo(agUniqNum);
+        criteriaName.andAgStatusIn(agStatusList);
+        criteriaName.andStatusEqualTo(Status.STATUS_1.status);
+
         List<Agent> agents = agentMapper.selectByExample(example);
         if(agents.size()==1){
             return AgentResult.ok(agents.get(0));
@@ -273,19 +285,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             result.setMsg("代理商不唯一");
             return result;
         }
-        AgentExample exampleName = new AgentExample();
-        AgentExample.Criteria criteriaName = exampleName.createCriteria();
-        criteriaName.andAgNameEqualTo(agUniqNum);
-        criteriaName.andAgStatusIn(agStatusList);
-        criteriaName.andStatusEqualTo(Status.STATUS_1.status);
-        List<Agent> agentsName = agentMapper.selectByExample(exampleName);
-        if(agentsName.size()==1){
-            return AgentResult.ok(agentsName.get(0));
-        }
-        if (agentsName.size()>1) {
-            result.setMsg("代理商不唯一");
-            return result;
-        }
+
         AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
         AgentBusInfoExample.Criteria agentBusInfoCriteria = agentBusInfoExample.createCriteria();
         agentBusInfoCriteria.andBusNumEqualTo(agUniqNum);
@@ -300,10 +300,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             AgentBusInfo agentBusInfo = agentBusInfos.get(0);
             Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
             return AgentResult.ok(agent);
-        }
-        if (agentsName.size()>1) {
-            result.setMsg("代理商不唯一");
-            return result;
         }
         result.setMsg("代理商不存在");
         return result;
