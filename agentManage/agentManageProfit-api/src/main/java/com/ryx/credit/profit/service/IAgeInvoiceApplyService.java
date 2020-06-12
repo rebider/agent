@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public interface IAgeInvoiceApplyService {
 
-    PageInfo queryInvoiceDetail(InvoiceApply invoiceApply,Map<String,String> dateMap, Page page,Map<String, Object> department,boolean flag);
+    PageInfo queryInvoiceDetail(Page page,Map map);
 
     void deleteById(String id);
 
@@ -24,10 +24,14 @@ public interface IAgeInvoiceApplyService {
 
     InvoiceApply getInvoiceApplyById(String id);
 
+    void dealWithInvoiceData(List<Map<String,Object>> list,Map map,String agentId) throws MessageException;
+
     void saveInvoiceApply(List<Map<String,Object>> list,String agentId) throws MessageException;
 
     //返回所有终审失败的发票信息
     void finalCheckInvoice(List<Map<String,Object>> list,String user) throws MessageException;
 
-    List<Map<String,Object>> exports(InvoiceApply invoiceApply,Map<String,String> dateMap);
+    List<Map<String,Object>> exports(Map map);
+
+    List<Map<String,String>> getCWImportUserList();
 }
