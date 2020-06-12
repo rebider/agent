@@ -20,7 +20,9 @@ public class RegexUtil {
 		REALNAME("[\u4E00-\u9FA5]{2,5}(?:·[\u4E00-\u9FA5]{2,5})*"),
 		PASSPORTNUM("(P\\d{7})|(G\\d{8})"), 
 		ID("^(\\d{15}$|^\\d{18}$|^\\d{17}(\\d|X|x))$"),
-		NICKNAME("^[\u4E00-\u9FA5|0-9|a-z|A-Z]{2,10}$");
+		NICKNAME("^[\u4E00-\u9FA5|0-9|a-z|A-Z]{2,10}$"),
+		//密码中必须包含字母（不区分大小写）、数字、特称字符，至少8个字符，最多16个字符；
+		COMP_PASSWORD("^(?=.*?[a-zA-Z]{1,})(?=(.*[\\d]){1,})(?=(.*[\\W]){1,})(?!.*[\\u4e00-\\u9fa5])(?!.*\\s).{8,16}$");
 
 		private String value;
 
@@ -87,6 +89,13 @@ public class RegexUtil {
 
 	}
 
+	public static boolean checkCompPassword(String pass) {
+		if(null==pass)
+			return false;
+		return Pattern.matches(regexp.COMP_PASSWORD.value, pass);
+
+	}
+
 	public static String rvZeroAndDot(String s){
 		if (s.isEmpty()) {
 			return null;
@@ -99,6 +108,6 @@ public class RegexUtil {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(RegexUtil.checkRealName(""));
+		System.out.println(RegexUtil.checkCompPassword("Test123$"));
 	}
 }
