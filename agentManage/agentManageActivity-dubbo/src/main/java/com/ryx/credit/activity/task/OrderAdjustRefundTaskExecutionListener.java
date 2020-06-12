@@ -2,7 +2,6 @@ package com.ryx.credit.activity.task;
 
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.service.order.OrderAdjustService;
-import com.ryx.credit.service.order.OrderService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
@@ -12,18 +11,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * OrderTaskExecutionListener
+ * OrderAdjustRefundTaskExecutionListener
  * Created by IntelliJ IDEA.
  *
- * @author Wang Qi
+ * @author ssx
  * @version 1.0 2018/7/19 9:37
- * @see OrderAdjustTaskExecutionListener
+ * @see OrderAdjustRefundTaskExecutionListener
  * To change this template use File | Settings | File Templates.
  */
 
-public class OrderAdjustTaskExecutionListener extends BaseTaskListener implements TaskListener, ExecutionListener {
+public class OrderAdjustRefundTaskExecutionListener extends BaseTaskListener implements TaskListener, ExecutionListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderAdjustTaskExecutionListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrderAdjustRefundTaskExecutionListener.class);
 
     @Override
     public void notify(DelegateExecution delegateExecution) throws Exception {
@@ -36,16 +35,16 @@ public class OrderAdjustTaskExecutionListener extends BaseTaskListener implement
             OrderAdjustService orderService = (OrderAdjustService)MySpringContextHandler.applicationContext.getBean("orderAdjustService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
-                logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-                AgentResult res = orderService.approveFinishOrderAdjust(delegateExecution.getProcessInstanceId(), activityName);
-                logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
+                logger.info("=========OrderAdjustRefundTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
+                AgentResult res = orderService.approveFinishOrderAdjustRefund(delegateExecution.getProcessInstanceId(), activityName);
+                logger.info("=========OrderAdjustRefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
 
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-                logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-                AgentResult res = orderService.approveFinishOrderAdjust(delegateExecution.getProcessInstanceId(), activityName);
-                logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
+                logger.info("=========OrderAdjustRefundTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
+                AgentResult res = orderService.approveFinishOrderAdjustRefund(delegateExecution.getProcessInstanceId(), activityName);
+//                logger.info("=========OrderAdjustRefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
 
             }
         } else if ("take".equals(eventName)) {
