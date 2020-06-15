@@ -251,7 +251,7 @@ public class Test {
     @org.junit.Test
     public void completTask(){
         TaskService taskService = processEngineConfiguration.buildProcessEngine().getTaskService();
-        taskService.complete("5332523",FastMap.fastMap("rejectCount","1").putKeyV("rs","pass"));
+        taskService.complete("5362523",FastMap.fastMap("rejectCount","1").putKeyV("rs","reject"));
 //        taskService.complete("5325033",FastMap.fastMap("v",1)
 //                .putKeyV("user1","pass"));
 //        taskService.complete("4475007",FastMap.fastMap("v",1)
@@ -308,6 +308,19 @@ public class Test {
         System.out.println("基础信息及结算卡信息变更申请"+processInstance.getId());
     }
 
+
+    /**
+     * 测试冻结流程
+     */
+    @org.junit.Test
+    public void testFreezeAppy(){
+        RuntimeService runtimeService = processEngineConfiguration.buildProcessEngine().getRuntimeService();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("agentFreeze_1.0",
+                FastMap.fastMap("userList", Arrays.asList("kermit","gonzo","fozzie"))//审批人
+                        .putKeyV("rejectCount","0")//拒绝数量，有拒绝就置为1
+                 );
+        System.out.println("代理商冻结流程申请"+processInstance.getId());
+    }
 
 }
 
