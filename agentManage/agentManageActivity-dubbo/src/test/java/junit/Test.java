@@ -206,7 +206,7 @@ public class Test {
     @org.junit.Test
     public void testKafka(){
 
-        ListenableFuture listenableFuture = kafkaTemplate.send("agent","123123213");
+        ListenableFuture listenableFuture = kafkaTemplate.send("agent","这是一个测试agent");
         listenableFuture.addCallback(new ListenableFutureCallback() {
             @Override
             public void onFailure(Throwable ex) {
