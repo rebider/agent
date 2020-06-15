@@ -135,12 +135,15 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
         String POS_ID      =   posInfo.get("POS_ID");
         String ACTIVITY_ID =   posInfo.get("ACTIVITY_ID");
         ImsMachineActivity activity = imsMachineActivityMapper.selectByPrimaryKey(ACTIVITY_ID);
-        //判断是否设置返现模板
-        ImsOrganReturnTemplateExample imsOrganReturnTemplateCheck = new ImsOrganReturnTemplateExample();
-        imsOrganReturnTemplateCheck.or().andOrgIdEqualTo(imsTermWarehouseDetail.getOrgId()).andActivityIdEqualTo(ACTIVITY_ID);
-        if(imsOrganReturnTemplateMapper.countByExample(imsOrganReturnTemplateCheck)<=0){
-            log.info("同步SSPOS入库划拨数据异常:snList:{},请求参数:{},错误消息:{}",lowerHairMachineVo.getSnList().size(),JSONObject.toJSONString(lowerHairMachineVo.getImsTermWarehouseDetail()),"没有设置返现模板");
-            return AgentResult.fail("没有设置返现模板么["+imsTermWarehouseDetail.getOrgId()+"]");
+
+        if (!(null != lowerHairMachineVo.getPosType() && "0".equals(lowerHairMachineVo.getPosType()))) {
+            //判断是否设置返现模板
+            ImsOrganReturnTemplateExample imsOrganReturnTemplateCheck = new ImsOrganReturnTemplateExample();
+            imsOrganReturnTemplateCheck.or().andOrgIdEqualTo(imsTermWarehouseDetail.getOrgId()).andActivityIdEqualTo(ACTIVITY_ID);
+            if(imsOrganReturnTemplateMapper.countByExample(imsOrganReturnTemplateCheck)<=0){
+                log.info("同步SSPOS入库划拨失败原因请查看明细数据异常:snList:{},请求参数:{},错误消息:{}",lowerHairMachineVo.getSnList().size(),JSONObject.toJSONString(lowerHairMachineVo.getImsTermWarehouseDetail()),"没有设置返现模板");
+                return AgentResult.fail("没有设置返现模板["+imsTermWarehouseDetail.getOrgId()+"]");
+            }
         }
         //检查商户是否有分润模板
         log.info("同步POS入库划拨:POS编号:{},活动编号:{},活动名称:{},sn：{}",POS_ID,ACTIVITY_ID,activity==null?"null":activity.getActivityName(),lowerHairMachineVo.getSnList());
@@ -364,9 +367,10 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("operation", operation);
+        jsonObject.put("isFreeze", "0");
         List<Map<String, Object>> listDetail = new ArrayList<>();
         for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
 
@@ -399,6 +403,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             mapDetail.put("oldMachineId", refundPriceDiffDetail.getOldMachineId());
             mapDetail.put("oldBrandCode", refundPriceDiffDetail.getOldBrandCode());
             mapDetail.put("newBrandCode", refundPriceDiffDetail.getNewBrandCode());
+            mapDetail.put("adjNum", refundPriceDiffDetail.getChangeCount().toString());
             if(org.apache.commons.lang.StringUtils.isNotBlank(refundPriceDiffDetail.getDeliveryTimeType())){
                 mapDetail.put("deliveryTimeType", refundPriceDiffDetail.getDeliveryTimeType());
                 if(refundPriceDiffDetail.getDeliveryTimeType().equals(DeliveryTimeType.ZERO.getValue())){
@@ -444,7 +449,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             }
         }else{
             try {
-                log.info("活动调整POS返回参数:{}", res.getMsg());
+                log.info("实时POS活动调整返回参数:{}", res.getMsg());
                 JSONObject respXMLObj = JSONObject.parseObject(res.getMsg());
                 JSONObject res_data = respXMLObj.getJSONObject("data");
                 if (res_data != null && res_data.size() > 0) {
@@ -473,11 +478,53 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
-        return AgentResult.ok("04");
+        JSONObject data = new JSONObject();
+        data.put("serialNumber", serialNumber);
+        log.info("实时POS活动调整结果查询请求参数：{}", JSONObject.toJSONString(data));
+        AgentResult agentResult = request("ORG017", data);
+        log.info("实时POS活动调整结果查询返回参数：{}", JSONObject.toJSONString(agentResult));
+        if(agentResult.isOK()){
+            String resmsg = agentResult.getMsg();
+            if(resmsg!=null) {
+                JSONObject res_obj = JSONObject.parseObject(resmsg) ;
+                JSONObject res  = res_obj.getJSONObject("data");
+                String result_code = res.getString("result_code");
+                String snAdjStatus = res.getString("transferStatus");
+                String serialNumber_res = res.getString("serialNumber");
+                String resMsg = res.getString("resMsg");
+                if(serialNumber.equals(serialNumber_res) && "00".equals(snAdjStatus) && "000000".equals(result_code)){
+                    //调整成功
+                    log.info("实时POS活动调整成功:{} {}",serialNumber,platformType);
+                    return AgentResult.ok("00");
+                }else if(serialNumber.equals(serialNumber_res) && "01".equals(snAdjStatus) && "000000".equals(result_code)) {
+                    //调整中
+                    log.info("实时POS活动调整中:{} {}",serialNumber,platformType);
+                    AgentResult result = AgentResult.ok("01");
+                    result.setMsg(resMsg);
+                    return result;
+                }else if(serialNumber.equals(serialNumber_res) && "02".equals(snAdjStatus) && "000000".equals(result_code)) {
+                    //调整失败
+                    log.info("实时POS活动调整失败:{} {}",serialNumber,platformType);
+                    AgentResult result = AgentResult.ok("02");
+                    result.setMsg(resMsg);
+                    return result;
+                }else{
+                    //未知结果
+                    AgentResult result = AgentResult.ok("03");
+                    result.setMsg(resMsg);
+                    return result;
+                }
+            }else{
+                //未知结果
+                return AgentResult.ok("03");
+            }
+        }else{
+            return AgentResult.ok("03");
+        }
     }
 
 
-    private AgentResult request(String tranCode,JSONObject data)throws Exception{
+    private AgentResult request(String tranCode,JSONObject data) throws ProcessException{
         try{
             PrivateKey rsaPrivateKey = RSAUtil.getRSAPrivateKey(AppConfig.getProperty("industryAuth_local_private_key"), "pem", null, "RSA");
             PublicKey rsaPublicKey = RSAUtil.getRSAPublicKey(AppConfig.getProperty("industryAuth_cooper_public_key"), "pem", "RSA");
@@ -515,7 +562,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
                 log.info("请求异常======" + httpResult);
-                throw new Exception("http请求异常");
+                throw new ProcessException("http请求异常");
             } else {
                 String resEncryptData = jsonObject.getString("encryptData");
                 String resEncryptKey = jsonObject.getString("encryptKey");
@@ -544,7 +591,10 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
                 }
                 return new AgentResult(500,"http请求异常",respXML);
             }
-        } catch (Exception e) {
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMessage());
+        } catch (ProcessException e) {
             log.info("http请求超时:{}",e.getMessage());
             throw e;
         }
@@ -553,7 +603,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     @Override
     public boolean checkModleIsEq(Map<String, String> data, String platformType) {
         log.info("checkModleIsEq:{},{}",data,platformType);
-        return imsTermMachineService.checkModleIsEqByMiddle(data.get("oldMerid"), data.get("newMerId"));
+        return imsTermMachineService.checkModleIsEqByMiddle(data.get("oldMerid"), data.get("newMerId"),data.get("newMerType"),data.get("oldMerType"));
     }
 
     @Override

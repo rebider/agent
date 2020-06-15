@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:reg="http://www.dangdang.com/schema/ddframe/reg"
+       xmlns:job="http://www.dangdang.com/schema/ddframe/job"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.dangdang.com/schema/ddframe/reg
+                        http://www.dangdang.com/schema/ddframe/reg/reg.xsd
+                        http://www.dangdang.com/schema/ddframe/job
+                        http://www.dangdang.com/schema/ddframe/job/job.xsd
+                        ">
+
+    <job:dataflow id="mothOfEndJobTrigger"
+                  job-ref="mothOfEndJob"
+                  registry-center-ref="regCenter"
+                  cron="0 0 23 L * ? *"
+                  sharding-total-count="1"
+                  sharding-item-parameters="0=C"
+                  streaming-process="false"
+                  description="月末触发任务"
+                  overwrite="true"
+                  disabled="${job.mothOfEndJobTrigger}"/>
+</beans>

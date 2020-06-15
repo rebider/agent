@@ -92,7 +92,7 @@ public class OrderAdjustScanServiceImpl implements ActBusRelScanService {
                                 //结束流程
                                 Map<String,Object> reqMap = new HashMap<>();
                                 reqMap.put("rs", "reject");
-                                reqMap.put("approvalOpinion", "跨月审批,系统自动结束");
+                                reqMap.put("approvalOpinion", "订单调整，跨月审批，自动结束审批");
                                 reqMap.put("approvalPerson", systemId);
                                 reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
                                 reqMap.put("taskId", task.getId());

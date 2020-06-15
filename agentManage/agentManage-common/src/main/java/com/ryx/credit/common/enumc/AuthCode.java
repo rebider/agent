@@ -31,6 +31,7 @@ public enum AuthCode {
     NO_CROSS_PLATFORM("1016","不允许跨平台查询"),
     ACCOUNT_LOCK("1017","账号已锁定"),
     PASS_WORD_ERROR("1018","账号或密码错误"),
+    PASS_NOT_COMP("1022","密码不符规范"),
     NO_BUS_INFO("1019","没有可用的业务"),
     PLATFORM_NULL("1020","平台不能为空"),
     PASS_KEY("1021","密钥配置错误");

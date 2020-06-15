@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
@@ -1034,6 +1035,80 @@ public class AgentServiceImpl implements AgentService {
 //            }
 //        }
         return agentoutVoList;
+    }
+
+    /**
+     * 代理商信息查询接口
+     * @param agentId
+     * @return
+     * @throws MessageException
+     */
+    @Override
+    public List<Map<String, Object>> queryAgentColinfoInfo(String agentId) throws MessageException {
+        logger.info("查询代理商信息请求参数：{}", JsonUtil.objectToJson(agentId));
+        if (StringUtils.isBlank(agentId)) {
+            throw new MessageException("AG码不能为空");
+        }
+        List<Map<String, Object>> agentColInfoList = agentMapper.queryAgentColinfoByAgentId(FastMap.fastMap("agentId", agentId));
+        if (agentColInfoList==null || agentColInfoList.size()==0) {
+            throw new MessageException("AG码未找到");
+        }
+        logger.info("======返回代理商信息======" + JSONObject.toJSONString(agentColInfoList));
+        return agentColInfoList;
+    }
+
+    /**
+     * AG码账号状态查询接口
+     * @param agentId
+     * @param // 0:正常,1:停用
+     * @return
+     * @throws MessageException
+     */
+    @Override
+    public AgentResult queryAgentStatusInfo(String agentId) throws MessageException {
+        logger.info("查询AG码账号请求参数：{}", JsonUtil.objectToJson(agentId));
+        if (StringUtils.isBlank(agentId)) {
+            throw new MessageException("AG码不能为空");
+        }
+        Map<String, Object> resultMap = new HashMap<>();
+        List<Map<String, Object>> agentStatusList = agentMapper.queryAgentStatusByAgentId(FastMap.fastMap("agentId", agentId));
+        if (agentStatusList!=null && agentStatusList.size()!=0) {
+            Map<String, Object> agentMap = agentStatusList.get(0);
+            String bus_id = String.valueOf(agentMap.get("BUS_ID"));
+            String bus_status = String.valueOf(agentMap.get("BUS_STATUS"));
+            String ag_status = String.valueOf(agentMap.get("STATUS"));
+            if (StringUtils.isNotBlank(bus_id)) {
+                if (bus_status.equals(String.valueOf(BusinessStatus.quit.status))
+                        || bus_status.equals(String.valueOf(BusinessStatus.quitzq.status))
+                        || bus_status.equals(String.valueOf(BusinessStatus.move.status))) {
+                    resultMap.put("ag_status", "停用");
+                    resultMap.put("ag_msg", "代理商没有可用的业务");
+                    logger.info("======返回AG码账号状态信息======" + JSONObject.toJSONString(resultMap));
+                    return AgentResult.okMap(resultMap);
+                }
+            } else {
+                resultMap.put("ag_status", "停用");
+                resultMap.put("ag_msg", "代理商没有可用的业务");
+                logger.info("======返回AG码账号状态信息======" + JSONObject.toJSONString(resultMap));
+                return AgentResult.okMap(resultMap);
+            }
+            if (ag_status.equals(String.valueOf(Status.STATUS_0.status))) {
+                resultMap.put("ag_status", "正常");
+                resultMap.put("ag_msg", "账号正常");
+                logger.info("======返回AG码账号状态信息======" + JSONObject.toJSONString(resultMap));
+                return AgentResult.okMap(resultMap);
+            } else {
+                resultMap.put("ag_status", "停用");
+                resultMap.put("ag_msg", "账号停用");
+                logger.info("======返回AG码账号状态信息======" + JSONObject.toJSONString(resultMap));
+                return AgentResult.okMap(resultMap);
+            }
+        } else {
+            resultMap.put("ag_status", "停用");
+            resultMap.put("ag_msg", "AG码未找到");
+            logger.info("======返回AG码账号状态信息======" + JSONObject.toJSONString(resultMap));
+            return AgentResult.okMap(resultMap);
+        }
     }
 
 }

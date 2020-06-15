@@ -3,11 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.ryx.ry</groupId>
     <artifactId>agentManage</artifactId>
     <packaging>pom</packaging>
-    <version>${agentManage.version}</version>
+    <version>1.0-SNAPSHOT</version>
+    <properties>
+        <spring.version>4.3.7.RELEASE</spring.version>
+        <jackson.version>2.9.5</jackson.version>
+        <agentManage.version>1.0-SNAPSHOT</agentManage.version>
+        <!--<agentManage.version>2020.06.11.V1-release</agentManage.version>-->
+    </properties>
     <modules>
         <module>agentManageInternetCard-api</module>
         <module>agentManageInternetCard-dubbo</module>
@@ -25,12 +30,8 @@
         <module>agentManageJobOrder-api</module>
         <module>agentManageJobOrder-dubbo</module>
         <module>agentManageJob</module>
+        <module>agentManageKafka-dubbo</module>
     </modules>
-    <properties>
-        <spring.version>4.3.7.RELEASE</spring.version>
-        <jackson.version>2.9.5</jackson.version>
-        <agentManage.version>1.0-SNAPSHOT</agentManage.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -41,6 +42,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <version>2.9.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.8.7</version>
         </dependency>
         <!-- spring的mvc包 -->
         <dependency>
@@ -267,22 +273,22 @@
         </dependency>
         <!-- dubbo end -->
         <!-- 腾讯第三方包 -->
-        <dependency>
-            <groupId>net.gplatform</groupId>
-            <artifactId>Sdk4J-1.0</artifactId>
-            <version>1.0</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>net.gplatform</groupId>-->
+            <!--<artifactId>Sdk4J-1.0</artifactId>-->
+            <!--<version>1.0</version>-->
+        <!--</dependency>-->
         <!-- RabbitMQ 支持 -->
-        <dependency>
-            <groupId>org.springframework.amqp</groupId>
-            <artifactId>spring-rabbit</artifactId>
-            <version>1.6.5.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>com.rabbitmq</groupId>
-            <artifactId>rabbitmq-client</artifactId>
-            <version>1.3.0</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.amqp</groupId>-->
+            <!--<artifactId>spring-rabbit</artifactId>-->
+            <!--<version>1.6.5.RELEASE</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.rabbitmq</groupId>-->
+            <!--<artifactId>rabbitmq-client</artifactId>-->
+            <!--<version>1.3.0</version>-->
+        <!--</dependency>-->
         <!-- http请求包 -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -328,7 +334,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.36</version>
+            <version>1.2.69</version>
         </dependency>
         <!-- String 处理 -->
         <dependency>
@@ -495,9 +501,6 @@
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
-                <configuration>
-                    <path>/bankLoanUser</path>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -575,22 +578,30 @@
     </build>
 
     <repositories>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>Public</id>
+            <name>Public Repositories</name>
+            <url>http://12.3.10.212:9999/nexus/repository/ryx-repository-ry-group/</url>
+        </repository>
     </repositories>
 
-    <pluginRepositories>
-    </pluginRepositories>
 
     <distributionManagement>
         <repository>
-            <id>pro-release</id>
-            <name>Proj Release Repository</name>
-            <url>http://12.3.10.225:9081/nexus/content/repositories/wq-release/</url>
+            <id>Releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://12.3.10.212:9999/nexus/repository/ryx-repository-ry-releases/</url>
         </repository>
-
         <snapshotRepository>
-            <id>pro-snapshot</id>
-            <name>Proj Snapshot Repository</name>
-            <url>http://12.3.10.225:9081/nexus/content/repositories/wq-snapshot/</url>
+            <id>Snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://12.3.10.212:9999/nexus/repository/ryx-repository-ry-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>

@@ -48,6 +48,22 @@ public enum FreeCause {
         return "";
     }
 
+
+    /**
+     * 根据值获取内容
+     * @param msg
+     * @return
+     */
+    public static String getcodeBymsg(String msg) {
+        FreeCause[] freeCause = FreeCause.values();
+        for (FreeCause cc : freeCause) {
+            if(cc.msg.equals(msg)){
+                return cc.code;
+            }
+        }
+        return "";
+    }
+
     public static Map<Object, Object> getContentMap() {
         FreeCause[] freeCause = FreeCause.values();
         Map<Object, Object> resultMap = new HashMap<>();

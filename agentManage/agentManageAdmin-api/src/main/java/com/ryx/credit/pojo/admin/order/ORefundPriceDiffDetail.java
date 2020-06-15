@@ -106,7 +106,8 @@ public class ORefundPriceDiffDetail  implements Serializable {
     private String newMachineId;
 
     private String oldMachineId;
-
+    //pos平台已付标志
+    private String payStatus;
     //原平台S码
     private String oldPosPlatCode;
     //目标平台S码
@@ -566,5 +567,13 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     public void setNewOrgName(String newOrgName) {
         this.newOrgName = newOrgName;
+    }
+
+    public String getPayStatus() {
+        return payStatus;
+    }
+
+    public void setPayStatus(String payStatus) {
+        this.payStatus = payStatus;
     }
 }
