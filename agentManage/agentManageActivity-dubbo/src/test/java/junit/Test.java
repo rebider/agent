@@ -316,9 +316,7 @@ public class Test {
     public void testFreezeAppy(){
         RuntimeService runtimeService = processEngineConfiguration.buildProcessEngine().getRuntimeService();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("agentFreeze_1.0",
-                FastMap.fastMap("userList", Arrays.asList("kermit","gonzo","fozzie"))//审批人
-                        .putKeyV("rejectCount","0")//拒绝数量，有拒绝就置为1
-                 );
+                FastMap.fastMap("userList", Arrays.asList("kermit","gonzo","fozzie")));
         System.out.println("代理商冻结流程申请"+processInstance.getId());
     }
 
