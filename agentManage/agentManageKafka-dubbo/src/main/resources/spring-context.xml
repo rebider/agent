@@ -69,7 +69,6 @@
             <ref bean="consumerProperties"/>
         </constructor-arg>
     </bean>
-
     <!-- 消费者容器配置信息 -->
     <bean id="containerProperties" class="com.ryx.kafka.context.KafkaContainerProperties">
         <constructor-arg >
@@ -80,12 +79,11 @@
         <property name="messageListener" ref="defaultKafkaQueue"/>
         <property name="groupId" value="${kafka.consumer.group.id}"/>
     </bean>
-
-    <!-- 创建kafkatemplate bean，使用的时候，只需要注入这个bean，即可使用template的send消息方法 -->
     <bean id="messageListenerContainer" class="org.springframework.kafka.listener.ConcurrentMessageListenerContainer" init-method="doStart">
         <constructor-arg ref="consumerFactory"/>
         <constructor-arg ref="containerProperties"/>
         <property name="concurrency" value="2"/>
     </bean>
+    <import resource="spring-mybatis.xml"/>
     <import resource="dubbo-consumer.xml"/>
 </beans>

@@ -1,6 +1,13 @@
 package com.ryx.kafka.customers;
 
+import com.ryx.credit.common.enumc.KafkaMessageTopic;
+import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.PropUtils;
+import com.ryx.kafka.dao.KfkSendMessageMapper;
+import com.ryx.kafka.pojo.KfkSendMessage;
+import com.ryx.kafka.service.CardChangeService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -25,13 +32,17 @@ import javax.annotation.PostConstruct;
 public class DefaultKafkaQueue implements MessageListener<String,String> {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultKafkaQueue.class);
 
-
+	@Autowired
+	private KfkSendMessageMapper kfkSendMessageMapper;
 
 	@Autowired
 	private KafkaTemplate kafkaTemplateService;
 
 	private static KafkaTemplate kafkaTemplate;
 	private static String defaultTopic = "";
+
+	@Autowired
+	private CardChangeService cardChangeService;
 	/**
 	 * 通过take方法，移除并返回队列头部的元素，如果队列为空，则阻塞
 	 */
@@ -47,7 +58,29 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
 	public void onMessage(ConsumerRecord<String, String> msg) {
 		LOG.info("接收到kafka消息{} {} {}",msg.topic(),msg.key(),msg.value());
 		try {
-			String dto = msg.value();
+			/**
+			 * 结算卡变更通知
+			 */
+			if(StringUtils.isNotBlank(msg.topic()) && KafkaMessageTopic.CardChange.code.equals(msg.topic())){
+				//结算卡信息
+				String key = msg.key();String value = msg.value();
+				LOG.info("接收到结算卡变更通知:{} {}",key);
+				//通知清结算系统
+				FastMap res = FastMap.fastFailMap("未调用");
+				try {
+				  res =  cardChangeService.notifyCardChange(key,value);
+				  KfkSendMessage kfkSendMessage = kfkSendMessageMapper.selectByPrimaryKey(key);
+				  if("0000".equals(res.get("code"))){
+					  kfkSendMessage.setStatus(Status.STATUS_3.status);
+				  }else{
+					  kfkSendMessage.setStatus(Status.STATUS_4.status);
+				  }
+				} catch (MessageException e) {
+					e.printStackTrace();
+				}finally {
+					LOG.info("调用通知清结算接口:{} {}",key,res.get("msg"));
+				}
+			}
 		}catch (Exception e){
 			e.printStackTrace();
 			LOG.error("异步队列处理异常：{} {} {} {}",msg.topic(),msg.key(),msg.value(),e.getLocalizedMessage());

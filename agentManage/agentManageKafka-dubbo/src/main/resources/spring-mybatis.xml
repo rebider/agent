@@ -51,11 +51,11 @@
 		<property name="dataSource" ref="dataSource" />
 		<!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
 		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
-		<property name="mapperLocations" value="classpath*:com/ryx/job/mapper/*Mapper.xml"></property>
+		<property name="mapperLocations" value="classpath*:com/ryx/kafka/mapper/*Mapper.xml"></property>
 	</bean>
 
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.ryx.job.dao.**" />
+		<property name="basePackage" value="com.ryx.kafka.dao.**" />
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
 	</bean>
 	<!-- 配置事务管理器 -->
