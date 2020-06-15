@@ -2,6 +2,7 @@ package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.activity.dao.KafkaSendMessageMapper;
 import com.ryx.credit.activity.entity.KafkaSendMessage;
+import com.ryx.credit.common.enumc.KafkaMessageTopic;
 import com.ryx.credit.common.enumc.KafkaMessageType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.result.AgentResult;
@@ -17,6 +18,9 @@ import org.springframework.kafka.core.KafkaProducerException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
@@ -43,6 +47,8 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
     private KafkaTemplate kafkaTemplate;
     @Autowired
     private KafkaSendMessageMapper kafkaSendMessageMapper;
+    @Autowired
+    private AgentKafkaService agentKafkaService;
 
     /**
      * 发送一条String消息到主体
@@ -53,23 +59,16 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
     @Override
     public AgentResult sendPayMentMessage(String agentId, String agentName, String busId, String busnum, KafkaMessageType ktype, String topic, String message) {
         logger.info("发送消息到kafka {}",message);
-        LocalDateTime ldt = LocalDateTime.now();
-        KafkaSendMessage record = new KafkaSendMessage();
-        record.setId(UUID.randomUUID().toString().replace("-",""));
-        record.setAgentId(agentId);
-        record.setAgentName(agentName);
-        record.setBusid(busId);
-        record.setBusnum(busnum);
-        record.setKtype(ktype.code);
-        record.setKtopic(topic);
-        record.setKmessage(message);
-        record.setcDateStr(ldt.format(date));
-        record.setcTimeStr(ldt.format(time));
-        record.setStatus(Status.STATUS_0.status);
-        if(1==kafkaSendMessageMapper.insertSelective(record)){
-            logger.info("发送消息到kafka 数据库保存成功 {}",message);
+        AgentResult agentResult = agentKafkaService.sendPayMentMessageDb(agentId,agentName,busId,busnum,ktype,topic,message);
+        logger.info("发送消息到kafka 数据库保存 {}",agentResult.getMsg());
+        if(agentResult.isOK()){
             try {
-                if(StringUtils.isNotBlank(record.getBusnum())) {
+                KafkaSendMessage record = (KafkaSendMessage)agentResult.getData();
+                if(
+                   StringUtils.isNotBlank(record.getBusnum()) && KafkaMessageType.PAYMENT.code.equals(record.getKtype())
+                   ||
+                   KafkaMessageType.CARD.code.equals(record.getKtype())
+                   ) {
                     logger.info("发送消息到kafka 平台编号不为空发送kafka {}",message);
                     ListenableFuture<SendResult<String, String>> listenableFuture = kafkaTemplate.send(topic, record.getId(), record.getKmessage());
                     listenableFuture.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
@@ -114,6 +113,30 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
         return AgentResult.ok();
     }
 
+
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
+    @Override
+    public AgentResult sendPayMentMessageDb(String agentId, String agentName, String busId, String busnum, KafkaMessageType ktype, String topic, String message) {
+        LocalDateTime ldt = LocalDateTime.now();
+        KafkaSendMessage record = new KafkaSendMessage();
+        record.setId(UUID.randomUUID().toString().replace("-",""));
+        record.setAgentId(agentId);
+        record.setAgentName(agentName);
+        record.setBusid(busId);
+        record.setBusnum(busnum);
+        record.setKtype(ktype.code);
+        record.setKtopic(topic);
+        record.setKmessage(message);
+        record.setcDateStr(ldt.format(date));
+        record.setcTimeStr(ldt.format(time));
+        record.setStatus(Status.STATUS_0.status);
+        if(1==kafkaSendMessageMapper.insertSelective(record)) {
+            AgentResult result = AgentResult.ok();
+            result.setData(record);
+            return result;
+        }
+        return AgentResult.fail();
+    }
 
     @Override
     public AgentResult sendPayMentMessageById(String id) {

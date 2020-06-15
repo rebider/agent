@@ -56,30 +56,35 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
 
 	@Override
 	public void onMessage(ConsumerRecord<String, String> msg) {
-		LOG.info("接收到kafka消息{} {} {}",msg.topic(),msg.key(),msg.value());
+		LOG.info("接收到kafka消息 {} {} {}",msg.topic(),msg.key(),msg.value());
 		try {
+			//通知
+			FastMap res = FastMap.fastFailMap("未调用");
+			//信息
+			String key = msg.key();String value = msg.value();
 			/**
 			 * 结算卡变更通知
 			 */
 			if(StringUtils.isNotBlank(msg.topic()) && KafkaMessageTopic.CardChange.code.equals(msg.topic())){
-				//结算卡信息
-				String key = msg.key();String value = msg.value();
-				LOG.info("接收到结算卡变更通知:{} {}",key);
-				//通知清结算系统
-				FastMap res = FastMap.fastFailMap("未调用");
+				LOG.info("接收到结算卡变更通知:{} {}",msg.topic(),key);
 				try {
 				  res =  cardChangeService.notifyCardChange(key,value);
-				  KfkSendMessage kfkSendMessage = kfkSendMessageMapper.selectByPrimaryKey(key);
-				  if("0000".equals(res.get("code"))){
-					  kfkSendMessage.setStatus(Status.STATUS_3.status);
-				  }else{
-					  kfkSendMessage.setStatus(Status.STATUS_4.status);
-				  }
 				} catch (MessageException e) {
 					e.printStackTrace();
 				}finally {
 					LOG.info("调用通知清结算接口:{} {}",key,res.get("msg"));
 				}
+			}
+			KfkSendMessage kfkSendMessage = kfkSendMessageMapper.selectByPrimaryKey(key);
+			if("0000".equals(res.get("code"))){
+				kfkSendMessage.setStatus(Status.STATUS_3.status);
+			}else{
+				kfkSendMessage.setStatus(Status.STATUS_4.status);
+			}
+			if(1==kfkSendMessageMapper.updateByPrimaryKeySelective(kfkSendMessage)){
+				LOG.info("接收到结算卡变更通知:{} {}",msg.topic(),key,"更新结果完成");
+			}else{
+				LOG.info("接收到结算卡变更通知:{} {}",msg.topic(),key,"更新结果失败");
 			}
 		}catch (Exception e){
 			e.printStackTrace();

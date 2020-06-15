@@ -6,7 +6,8 @@ package com.ryx.credit.common.enumc;
  * 描述：
  */
 public enum KafkaMessageType {
-    PAYMENT("PAYMENT","付款信息");
+    PAYMENT("PAYMENT","付款信息"),
+    CARD("CARD","结算卡信息");
 
     public String code;
 

@@ -74,6 +74,7 @@
         <constructor-arg >
             <list>
                 <value>${kafka.consumer.defaultTopic}</value>
+                <value>CardChange</value>
             </list>
         </constructor-arg>
         <property name="messageListener" ref="defaultKafkaQueue"/>
