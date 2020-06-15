@@ -5,6 +5,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.FreezeRequest;
+import com.ryx.credit.pojo.admin.agent.FreezeRequestDetail;
 import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.pojo.admin.vo.FreeRequestVo;
 
@@ -27,6 +28,8 @@ public interface FreezeRequestService {
 
     FreezeRequest queryFreezeRequestById(String id);
 
-    List<String> addList(List<List<Object>> list, String userid) throws Exception;
+    AgentResult addList(List<List<Object>> list, String userid) throws Exception;
+
+    AgentResult agentFreezeBatch( List<FreezeRequestDetail> freezeRequestDetails,AgentFreezePort agentFreezePort)throws MessageException;
 
 }
