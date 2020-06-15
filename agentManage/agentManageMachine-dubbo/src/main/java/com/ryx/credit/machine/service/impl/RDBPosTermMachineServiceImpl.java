@@ -294,7 +294,7 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
      * @throws Exception
      */
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
 
         //封装参数
         String currentAgencyId = refundPriceDiffDetailList.get(0).getAgentId();
@@ -348,9 +348,12 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
                 //异常结果
                 return AgentResult.fail("查询RDB换活动返回值异常！");
             }
-        } catch (Exception e) {
+        } catch (ProcessException e) {
             e.printStackTrace();
             throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMessage());
         }
     }
 

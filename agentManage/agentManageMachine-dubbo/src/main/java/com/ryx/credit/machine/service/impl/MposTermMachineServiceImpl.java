@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -272,8 +273,8 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception {
-        return  AgentResult.ok("未联动");
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
+        return  AgentResult.ok();
     }
 
     @Override

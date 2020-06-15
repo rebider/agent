@@ -296,7 +296,8 @@
          <if test="proType!=null and proType!=''"> and O_product.Pro_Type=#{proType}</if>
          <if test="proCode!=null and proCode!=''"> and O_product.Pro_Code=#{proCode}</if>
          <if test="proName!=null and proName!=''"> and O_product.Pro_Name like '${proName}'</if>
-          <if test="proTypes!=null"> and O_product.Pro_Type IN
+          <if test="proTypes != null and proTypes.size() >= 1" >
+            and O_product.Pro_Type IN
             <foreach collection="proTypes" item="proTypeitem" open="(" separator="," close=")">
                 '${proTypeitem}'
             </foreach>
@@ -315,7 +316,8 @@
           <if test="proType!=null and proType!=''"> and O_product.Pro_Type=#{proType}</if>
           <if test="proCode!=null and proCode!=''"> and O_product.Pro_Code=#{proCode}</if>
           <if test="proName!=null and proName!=''"> and O_product.Pro_Name like '${proName}'</if>
-          <if test="proTypes!=null"> and O_product.Pro_Type IN
+          <if test="proTypes != null and proTypes.size() >= 1" >
+           and O_product.Pro_Type IN
             <foreach collection="proTypes" item="proTypeitem" open="(" separator="," close=")">
               '${proTypeitem}'
             </foreach>

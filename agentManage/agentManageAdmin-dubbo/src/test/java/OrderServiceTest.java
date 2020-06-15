@@ -1,3 +1,4 @@
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -64,10 +65,10 @@ public class OrderServiceTest  extends BaseSpringTest  {
     }
 
     @Test
-    public void test1(){
+    public void executeOrderAdj(){
         try {
             AgentResult agentResult = orderService.enableOrderAdjFinish("AD20200310000000000000709");
-            System.out.println(agentResult);
+            logger.info("测试订单调整执行结果：{}", JSONObject.toJSON(agentResult));
         }catch (Exception e){
             e.toString();
         }

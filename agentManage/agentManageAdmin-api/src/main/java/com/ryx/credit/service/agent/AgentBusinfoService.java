@@ -36,6 +36,13 @@ public interface AgentBusinfoService {
     public List<AgentBusInfo> agentBusInfoList(String agentId);
     public List<AgentBusInfo> agentBusInfoList(String agentId, String id, BigDecimal appStatus);
 
+    /**
+     * 查询代理商的可用业务
+     * @param agentId
+     * @return
+     */
+    public List<AgentBusInfo> agentAvbBusInfoList(String agentId);
+
     public int updateAgentBusInfo(AgentBusInfo agentBusInfo);
 
     public AgentBusInfo getById(String id);

@@ -1092,11 +1092,13 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 .andOptTypeEqualTo(OLogisticsDetailOptType.ORDER.code);
         List<OLogisticsDetail> oLogisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
         if (oLogistics.getSendNum().intValue() != oLogisticsDetails.size()){
+            logger.info("物流明细异常！");
             throw new MessageException("物流明细异常！");
         }
 
         //删除物流明细
         if (oLogistics.getSendNum().intValue() != oLogisticsDetailMapper.deleteByExample(oLogisticsDetailExample)) {
+            logger.info("删除失败，请刷新后重试！");
             throw new MessageException("删除失败，请刷新后重试！");
         }
 

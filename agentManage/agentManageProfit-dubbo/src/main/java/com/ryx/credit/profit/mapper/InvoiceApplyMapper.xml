@@ -43,6 +43,8 @@
     <result column="REV2" jdbcType="VARCHAR" property="rev2" />
     <result column="REV3" jdbcType="VARCHAR" property="rev3" />
     <result column="REV4" jdbcType="VARCHAR" property="rev4" />
+    <result column="IMPORT_BATCH" jdbcType="VARCHAR" property="importBatch" />
+    <result column="BATCH_NO" jdbcType="DECIMAL" property="batchNo" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -108,7 +110,7 @@
     YS_DATE, ES_DATE, YS_RESULT, RETURN_REASON, RETURN_DATE, RETURN_EXPRESS_NUMBER, RETURN_EXPRESS_COMPANY,
     CREATE_DATE, CREATE_NAME, AGENT_ID, AGENT_NAME, INVOICE_AMT_MONTH, ES_RESULT, AMOUNT_TAX,
     STATUS, SERIAL_NO, AMOUNT, EXPENSE_STATUS, INVOICE_TYPE, SALLER_NAME, SALLER_NO,
-    REMARK, PROFIT_MONTH, REV1, REV2, REV3, REV4
+    REMARK, PROFIT_MONTH, REV1, REV2, REV3, REV4, IMPORT_BATCH, BATCH_NO
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.InvoiceApplyExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -126,6 +128,7 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
+
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
@@ -152,7 +155,8 @@
       AMOUNT, EXPENSE_STATUS, INVOICE_TYPE,
       SALLER_NAME, SALLER_NO, REMARK,
       PROFIT_MONTH, REV1, REV2,
-      REV3, REV4)
+      REV3, REV4,
+      IMPORT_BATCH, BATCH_NO )
     values (#{id,jdbcType=VARCHAR}, #{invoiceCompany,jdbcType=VARCHAR}, #{invoiceDate,jdbcType=VARCHAR},
       #{invoiceNumber,jdbcType=VARCHAR}, #{invoiceCode,jdbcType=VARCHAR}, #{invoiceItem,jdbcType=VARCHAR},
       #{unitPrice,jdbcType=DECIMAL}, #{numberSl,jdbcType=DECIMAL}, #{sumAmt,jdbcType=DECIMAL},
@@ -166,7 +170,8 @@
       #{amount,jdbcType=DECIMAL}, #{expenseStatus,jdbcType=VARCHAR}, #{invoiceType,jdbcType=VARCHAR},
       #{sallerName,jdbcType=VARCHAR}, #{sallerNo,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
       #{profitMonth,jdbcType=VARCHAR}, #{rev1,jdbcType=VARCHAR}, #{rev2,jdbcType=VARCHAR},
-      #{rev3,jdbcType=VARCHAR}, #{rev4,jdbcType=VARCHAR})
+      #{rev3,jdbcType=VARCHAR}, #{rev4,jdbcType=VARCHAR},
+      #{importBatch,jdbcType=VARCHAR}, #{batchNo,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.InvoiceApply">
     insert into P_INVOICE_APPLY
@@ -294,6 +299,12 @@
       <if test="rev4 != null">
         REV4,
       </if>
+      <if test="importBatch != null">
+        IMPORT_BATCH,
+      </if>
+      <if test="batchNo != null">
+        BATCH_NO,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -418,6 +429,12 @@
       </if>
       <if test="rev4 != null">
         #{rev4,jdbcType=VARCHAR},
+      </if>
+      <if test="importBatch != null">
+        #{importBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="batchNo != null">
+        #{batchNo,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -553,6 +570,12 @@
       <if test="record.rev4 != null">
         REV4 = #{record.rev4,jdbcType=VARCHAR},
       </if>
+      <if test="record.importBatch != null">
+        IMPORT_BATCH = #{record.importBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="record.batchNo != null">
+        BATCH_NO = #{record.batchNo,jdbcType=DECIMAL},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -600,7 +623,9 @@
     REV1 = #{record.rev1,jdbcType=VARCHAR},
     REV2 = #{record.rev2,jdbcType=VARCHAR},
     REV3 = #{record.rev3,jdbcType=VARCHAR},
-    REV4 = #{record.rev4,jdbcType=VARCHAR}
+    REV4 = #{record.rev4,jdbcType=VARCHAR},
+    IMPORT_BATCH = #{record.importBatch,jdbcType=VARCHAR},
+    BATCH_NO = #{record.batchNo,jdbcType=DECIMAL}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -728,6 +753,12 @@
       <if test="rev4 != null">
         REV4 = #{rev4,jdbcType=VARCHAR},
       </if>
+      <if test="importBatch != null">
+        IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="batchNo != null">
+        BATCH_NO = #{batchNo,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -772,7 +803,9 @@
       REV1 = #{rev1,jdbcType=VARCHAR},
       REV2 = #{rev2,jdbcType=VARCHAR},
       REV3 = #{rev3,jdbcType=VARCHAR},
-      REV4 = #{rev4,jdbcType=VARCHAR}
+      REV4 = #{rev4,jdbcType=VARCHAR},
+      IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR},
+      BATCH_NO = #{batchNo,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -786,6 +819,10 @@
     </if>
   </sql>
 
+
+  <!-- *************************************以上是自动生成代码，有少许修改**************************************-->
+
+
   <delete id="deleteById" parameterType="java.lang.String">
     delete from P_INVOICE_APPLY where ID = #{id,jdbcType=VARCHAR}
   </delete>
@@ -795,11 +832,12 @@
   </select>
 
   <select id="getSumInvoice" resultType="java.math.BigDecimal">
-    select sum(SUM_AMT) from P_INVOICE_APPLY
-      where  YS_RESULT = '1' and STATUS = '0'
-             and INVOICE_COMPANY = #{invoiceCompany} and AGENT_ID = #{agentId}
-             and substr(YS_DATE,0,7) = #{month}
-  </select>
+    select  sum(SUM_AMT) from P_INVOICE_APPLY
+    where  STATUS = '0'
+    and INVOICE_COMPANY = #{invoiceCompany} and AGENT_ID = #{agentId}
+    and ( (YS_RESULT = '1' and substr(YS_DATE,0,7) = #{month})
+    or ( ES_RESULT  = '1' and  substr(ES_DATE,0,7) = #{month}) )
+   </select>
 
   <select id="getOwnInvoice" resultType="java.math.BigDecimal">
     select OWN_INVOICE from P_INVOICE_SUM
@@ -810,38 +848,108 @@
     select CLO_TAX_POINT from A_AGENT_COLINFO where STATUS = 1 and AGENT_ID = #{agentId}
   </select>
 
+  <select id="getImportBatch" resultType="java.util.Map">
+     select
+     IMPORT_BATCH,max(BATCH_NO) BATCH_NO
+     from P_INVOICE_APPLY
+     where CREATE_NAME = #{finUser}
+     and substr(IMPORT_BATCH,0,8) = #{dateStr}
+     group by IMPORT_BATCH
+     </select>
+
+  <select id="getMaxImportBatch" parameterType="java.lang.String" resultType="java.lang.String">
+     select max(IMPORT_BATCH) from P_INVOICE_APPLY where substr(IMPORT_BATCH,0,8) = #{dateStr}
+     </select>
+
+  <select id="getAgentIdByInvoiceCompany" resultType="java.util.Map">
+     select AGENT_ID,AGENT_NAME from P_INVOICE_SUM
+     where INVOICE_COMPANY = #{invoiceCompany} and PROFIT_MONTH = #{month}
+  </select>
+
+  <select id="getImportUserList" resultType="java.util.Map">
+    select distinct pa.CREATE_NAME,cu.NAME,cu.LOGIN_NAME
+    from P_INVOICE_APPLY pa
+    inner join C_USER  cu on pa.CREATE_NAME = cu.ID
+  </select>
+
+
+  <sql id="Base_Column_List_own">
+    pa.ID, pa.INVOICE_COMPANY, pa.INVOICE_DATE, pa.INVOICE_NUMBER, pa.INVOICE_CODE, pa.INVOICE_ITEM, pa.UNIT_PRICE,
+    pa.NUMBER_SL, pa.SUM_AMT, pa.TAX, pa.EXPRESS_COMPANY, pa.EXPRESS_NUMBER, pa.EXPRESS_DATE, pa.EXPRESS_REMARK,
+    pa.YS_DATE, pa.ES_DATE, pa.YS_RESULT, pa.RETURN_REASON, pa.RETURN_DATE, pa.RETURN_EXPRESS_NUMBER, pa.RETURN_EXPRESS_COMPANY,
+    pa.CREATE_DATE, pa.CREATE_NAME, pa.AGENT_ID, pa.AGENT_NAME, pa.INVOICE_AMT_MONTH, pa.ES_RESULT, pa.AMOUNT_TAX,
+    pa.STATUS, pa.SERIAL_NO, pa.AMOUNT, pa.EXPENSE_STATUS, pa.INVOICE_TYPE, pa.SALLER_NAME, pa.SALLER_NO,
+    pa.REMARK, pa.PROFIT_MONTH, pa.REV1, pa.REV2, pa.REV3, pa.REV4,  pa.IMPORT_BATCH, pa.BATCH_NO,cu.NAME
+  </sql>
+
+  <select id="selectByExampleOwn" parameterType="com.ryx.credit.profit.pojo.InvoiceApplyExample" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List_own" />
+    from P_INVOICE_APPLY  pa
+    left join C_USER cu on pa.CREATE_NAME = cu.ID
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="countByExampleOwn" parameterType="com.ryx.credit.profit.pojo.InvoiceApplyExample" resultType="java.lang.Long">
+    select count(*) from P_INVOICE_APPLY pa
+    left join C_USER cu on pa.CREATE_NAME = cu.ID
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+
   <select id="exports" parameterType="com.ryx.credit.profit.pojo.InvoiceApplyExample" resultType="java.util.Map">
     select
-      ID,INVOICE_DATE INVOICEDATE, INVOICE_NUMBER INVOICENUMBER, INVOICE_CODE INVOICECODE, INVOICE_ITEM INVOICEITEM,
-      SUM_AMT SUMAMT, TAX TAX,  EXPRESS_NUMBER EXPRESSNUMBER,YS_DATE YSDATE, ES_DATE ESDATE,AMOUNT_TAX AMOUNTTAX,
-      AMOUNT AMOUNT,SALLER_NAME SALLERNAME,REMARK remark,  REV1, REV2,INVOICE_COMPANY INVOICECOMPANY,
-      AGENT_ID AGENTID,AGENT_NAME AGENTNAME,
-      case
-        when YS_RESULT = '1' then '通过'
-        when YS_RESULT = '0' then '未通过'
-        when YS_RESULT = '2' then '未进行初审'
-        else '未审核' end as YSRESULT,
-      case
-        when ES_RESULT = '1' then '通过'
-        when ES_RESULT = '0' then '未通过'
-        else '未审核' end as ESRESULT,
-      case
-        when INVOICE_TYPE = '1' then '普通电子发票'
-        when INVOICE_TYPE = '2' then '电子发票专票'
-        when INVOICE_TYPE = '3' then '普通纸质发票'
-        when INVOICE_TYPE = '4' then '专用纸质发票'
-        when INVOICE_TYPE = '5' then '普通纸质卷票'
-        when INVOICE_TYPE = '7' then '通用机打'
-        when INVOICE_TYPE = '8' then '的士票'
-        when INVOICE_TYPE = '9' then '火车票'
-        when INVOICE_TYPE = '10' then '飞机票'
-        when INVOICE_TYPE = '11' then '其他'
-        when INVOICE_TYPE = '12' then '机动车'
-        when INVOICE_TYPE = '13' then '二手车'
-        when INVOICE_TYPE = '14' then '定额发票'
-        when INVOICE_TYPE = '15' then '通行费'
-        else INVOICE_TYPE end as INVOICETYPE
-    from P_INVOICE_APPLY
+    <if test="distinct">
+      distinct
+    </if>
+    pa.INVOICE_COMPANY INVOICECOMPANY, pa.INVOICE_DATE INVOICEDATE, pa.INVOICE_NUMBER INVOICENUMBER,
+    pa.INVOICE_CODE INVOICECODE, pa.INVOICE_ITEM INVOICEITEM,
+    pa.SUM_AMT SUMAMT, pa.TAX, pa.EXPRESS_COMPANY EXPRESSCOMPANY, pa.EXPRESS_NUMBER EXPRESSNUMBER,
+    pa.EXPRESS_DATE EXPRESSDATE, pa.EXPRESS_REMARK EXPRESSREMARK,
+    pa.YS_DATE YSDATE, pa.ES_DATE ESDATE,
+    pa.CREATE_DATE CREATEDATE, pa.AGENT_ID AGENTID, pa.AGENT_NAME AGENTNAME,  pa.AMOUNT_TAX AMOUNTTAX,
+    pa.STATUS, pa.SERIAL_NO, pa.AMOUNT, pa.EXPENSE_STATUS,  pa.SALLER_NAME SALLERNAME, pa.SALLER_NO,
+    pa.REMARK, pa.REV1, pa.REV2, pa.IMPORT_BATCH IMPORTBATCH, pa.BATCH_NO BATCHNO,
+    cu.NAME,
+    case
+    when pa.YS_RESULT = '1' then '通过'
+    when pa.YS_RESULT = '0' then '未通过'
+    when pa.YS_RESULT = '2' then '未进行初审'
+    else '未审核' end as YSRESULT,
+    case
+    when pa.ES_RESULT = '1' then '通过'
+    when pa.ES_RESULT = '0' then '未通过'
+    else '未审核' end as ESRESULT,
+    case
+    when pa.INVOICE_TYPE = '1' then '普通电子发票'
+    when pa.INVOICE_TYPE = '2' then '电子发票专票'
+    when pa.INVOICE_TYPE = '3' then '普通纸质发票'
+    when pa.INVOICE_TYPE = '4' then '专用纸质发票'
+    when pa.INVOICE_TYPE = '5' then '普通纸质卷票'
+    when pa.INVOICE_TYPE = '7' then '通用机打'
+    when pa.INVOICE_TYPE = '8' then '的士票'
+    when pa.INVOICE_TYPE = '9' then '火车票'
+    when pa.INVOICE_TYPE = '10' then '飞机票'
+    when pa.INVOICE_TYPE = '11' then '其他'
+    when pa.INVOICE_TYPE = '12' then '机动车'
+    when pa.INVOICE_TYPE = '13' then '二手车'
+    when pa.INVOICE_TYPE = '14' then '定额发票'
+    when pa.INVOICE_TYPE = '15' then '通行费'
+    else pa.INVOICE_TYPE end as INVOICETYPE
+
+    from P_INVOICE_APPLY  pa
+    left join C_USER cu on pa.CREATE_NAME = cu.ID
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -849,5 +957,14 @@
       order by ${orderByClause}
     </if>
   </select>
+
+  <select id="selectListForDeal" resultMap="BaseResultMap">
+    select * from P_INVOICE_APPLY
+    where STATUS = '0'
+    and INVOICE_NUMBER = #{invoiceNumber}
+    and INVOICE_CODE = #{invoiceCode}
+    and (ES_RESULT = '1' or YS_RESULT = '1')
+  </select>
+
 
 </mapper>
