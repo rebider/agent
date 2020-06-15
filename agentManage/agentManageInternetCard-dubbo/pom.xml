@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>agentManageInternetCard-dubbo</artifactId>
     <name>agentManageInternetCard-dubbo</name>
+    <version>${agentManage.version}</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
