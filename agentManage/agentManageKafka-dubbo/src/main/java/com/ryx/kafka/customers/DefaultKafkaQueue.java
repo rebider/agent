@@ -31,15 +31,15 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
 	private KafkaTemplate kafkaTemplateService;
 
 	private static KafkaTemplate kafkaTemplate;
-	private static String WalletQ_Topic = "";
+	private static String defaultTopic = "";
 	/**
 	 * 通过take方法，移除并返回队列头部的元素，如果队列为空，则阻塞
 	 */
 	@PostConstruct
 	public void init(){
 		kafkaTemplate = kafkaTemplateService;
-		WalletQ_Topic = PropUtils.getProp("WalletQ_Topic");
-		LOG.info("初始化主题:{}",WalletQ_Topic);
+		defaultTopic = PropUtils.getProp("kafka.producer.defaultTopic");
+		LOG.info("初始化主题:{}",defaultTopic);
 
 	}
 
@@ -61,20 +61,20 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
 	public static void queuePut(String data){
 		try {
 			if(StringUtils.isBlank(data)) {
-				LOG.error("发送消息 {}到主题 {} 内容为空不进行发送",data,WalletQ_Topic);
+				LOG.error("发送消息 {}到主题 {} 内容为空不进行发送",data,defaultTopic);
 				return;
 			}
-			LOG.info("发送消息 {}到主题 {}",data,WalletQ_Topic);
-			ListenableFuture<SendResult<String, String>> listenableFuture = kafkaTemplate.send(WalletQ_Topic, data);
+			LOG.info("发送消息 {}到主题 {}",data,defaultTopic);
+			ListenableFuture<SendResult<String, String>> listenableFuture = kafkaTemplate.send(defaultTopic, data);
 			listenableFuture.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
                 @Override
                 public void onFailure(Throwable ex) {
-					LOG.info("发送消息失败 {} 到主题 {} {}",data,WalletQ_Topic,ex.getMessage());
+					LOG.info("发送消息失败 {} 到主题 {} {}",data,defaultTopic,ex.getMessage());
                     if (ex instanceof KafkaProducerException) {
                         ProducerRecord<String, String> recode = (ProducerRecord<String, String>) ((KafkaProducerException) ex).getProducerRecord();
                         LOG.info("发送消息失败 {} 到主题 {} {}",recode.value(),recode.topic(),ex.getMessage());
                     }
-                    LOG.info("发送消息失败 {} 到主题 {} {}",data,WalletQ_Topic,ex.getMessage());
+                    LOG.info("发送消息失败 {} 到主题 {} {}",data,defaultTopic,ex.getMessage());
                     ex.printStackTrace();
                 }
 
@@ -87,12 +87,11 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
                         e.printStackTrace();
                     }
                 }
-
             });
-			LOG.info("发送消息完成 {} 到主题 {}",data,WalletQ_Topic);
+			LOG.info("发送消息完成 {} 到主题 {}",data,defaultTopic);
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("发送消息异常 {} 到主题 {}",data,WalletQ_Topic,e.getMessage());
+			LOG.error("发送消息异常 {} 到主题 {}",data,defaultTopic,e.getMessage());
 
 		}
 	}
