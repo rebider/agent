@@ -21,6 +21,7 @@ import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IOrderReturnService;
 import com.ryx.credit.service.order.OLogisticsService;
+import com.ryx.credit.service.order.ProductService;
 import com.ryx.internet.service.InternetCardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +90,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
     private InternetCardService internetCardService;
     @Autowired
     private IUserService userService;
+    @Autowired
+    private OActivityVisibleMapper activityVisibleMapper;
+    @Autowired
+    private ProductService productService;
 
     /**
      * 物流信息:
@@ -1149,28 +1154,31 @@ public class OLogisticServiceImpl implements OLogisticsService {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public List<String> upLogisticsDetailList(List<List<Object>> data, String user) throws Exception {
-        List<String> listRes = new ArrayList<>();
+        List<String> listResSuccess = new ArrayList<>();
+        List<String> listResFail = new ArrayList<>();
+        List<String> listResException = new ArrayList<>();
         for (List<Object> objectList : data) {
             try {
                 AgentResult agentResult = oLogisticsService.upLogisticsDetailListItem(objectList, user);
                 if (agentResult.isOK()) {
-                    logger.info("导入明细成功=={}", objectList.toString());
-                    listRes.add("物流明细[" + objectList.toString() + "]导入成功=/=");
+                    logger.info("成功=={}", objectList.toString());
+                    listResSuccess.add("成功[" + objectList.toString() + "]");
                 } else {
-                    listRes.add("物流明细[" + objectList.toString() + "]导入失败:" + agentResult.getData() + "=/=");
+                    listResFail.add("失败[" + objectList.toString() + "]:" + agentResult.getData());
                 }
             } catch (MessageException e) {
                 e.printStackTrace();
-                logger.info("导入物流明细失败{}抛出异常", objectList.toString());
-                listRes.add("物流[" + objectList.toString() + "]导入失败:" + e.getMsg() + "=/=");
+                logger.info("异常[" + objectList.toString() + "]:" + e.getMsg());
+                listResException.add("异常[" + objectList.toString() + "]:" + e.getMsg());
             } catch (Exception e) {
                 e.printStackTrace();
-                logger.info("导入物流明细失败{}抛出异常", objectList.toString());
-                listRes.add("物流明细[" + objectList.toString() + "]导入失败:" + e.getMessage() + "=/=");
+                logger.info("异常[" + objectList.toString() + "]:" + e.getMessage());
+                listResException.add("异常[" + objectList.toString() + "]:" + e.getMessage());
             }
         }
-        logger.info("最终导入数据核查，用户=={}导入物流的数据有=={}", user, listRes.toString());
-        return listRes;
+        logger.info("最终导入数量核查，用户=={}导入物流明细，成功条数=={}失败条数=={}异常条数{}", user, listResSuccess.size(), listResFail.size(), listResException.size());
+        logger.info("最终导入数据核查，用户=={}导入物流明细，成功数据=={}失败数据=={}异常数据{}", user, listResSuccess, listResFail, listResException);
+        return listResSuccess;
     }
 
     /**
@@ -1194,13 +1202,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
             orgId = String.valueOf(objectList.get(col.indexOf("ORG_ID"))).trim();
             busProCode = String.valueOf(objectList.get(col.indexOf("BUS_PRO_CODE"))).trim();
 
-            //查询系统中与sn对应的活动
-            OActivityExample oActivityExample = new OActivityExample();
-            OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
-            activityCriteria
-                    .andStatusEqualTo(Status.STATUS_1.status)
-                    .andBusProCodeEqualTo(busProCode);
-            List<OActivity> oActivities = oActivityMapper.selectByExample(oActivityExample);
 
             //查询物流明细，发货有效的，只有一条的
             OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
@@ -1218,24 +1219,50 @@ public class OLogisticServiceImpl implements OLogisticsService {
             OLogisticsDetail insLogisticsDetail = oLogisticsDetails.get(0);
             OLogisticsDetail upLogisticsDetail = oLogisticsDetails.get(0);
 
-            //修改之前物流状态
+            //修改之前物流明细状态
             upLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
             upLogisticsDetail.setuTime(new Date());
             if (1 != oLogisticsDetailMapper.updateByPrimaryKeySelective(upLogisticsDetail)) {
                 throw new MessageException("更新物流明细失败:" + upLogisticsDetail.getId());
             }
 
+            //查询与sn对应的活动
+            OActivityExample oActivityExample = new OActivityExample();
+            OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
+            activityCriteria
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andBusProCodeEqualTo(busProCode);
+            List<OActivity> oActivities = oActivityMapper.selectByExample(oActivityExample);
+
+            //活动价格，
+            /*if (oActivities.size() > 1) {
+                for (OActivity activity : oActivities) {
+                    if (null != activity.getVisible() && activity.getVisible().equals(VisibleStatus.TWO.getValue())) {
+                        OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
+                        OActivityVisibleExample.Criteria visibleCriteria = oActivityVisibleExample.createCriteria();
+                        visibleCriteria.andActivityIdEqualTo(activity.getActCode());
+                        List<OActivityVisible> oActivityVisibles = activityVisibleMapper.selectByExample(oActivityVisibleExample);
+                        for (OActivityVisible oActivityVisible : oActivityVisibles) {
+                            if(oActivityVisible.getAgentId().equals(oLogisticsDetails.get(0).getAgentId())){
+
+                            }
+                        }
+                    }
+                }
+            }*/
+
             //插入新的物流明细（成功或失败都导入）
             if (oActivities.size() == 1) {
                 insLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
-                //insLogisticsDetail.setOptId(row.getId());
                 insLogisticsDetail.setOptType(OLogisticsDetailOptType.BCJ.code);
                 insLogisticsDetail.setProId(oActivities.get(0).getProductId());
-                //insLogisticsDetail.setProName(proName);
+                OProduct product = productService.findById(oActivities.get(0).getProductId());
+                if (null == product) throw new MessageException("没有查询到产品！活动ID"+ oActivities.get(0).getId());
+                insLogisticsDetail.setProName(product.getProName());
                 insLogisticsDetail.setActivityId(oActivities.get(0).getId());
                 insLogisticsDetail.setActivityName(oActivities.get(0).getActivityName());
                 insLogisticsDetail.setgTime(oActivities.get(0).getgTime());
-                //insLogisticsDetail.setSettlementPrice(row.getPrice());
+                insLogisticsDetail.setSettlementPrice(oActivities.get(0).getPrice());
                 insLogisticsDetail.setcTime(new Date());
                 insLogisticsDetail.setuTime(new Date());
                 insLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
