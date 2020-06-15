@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -2954,6 +2955,131 @@ public class InvoiceApplyExample {
 
         public Criteria andRev4NotBetween(String value1, String value2) {
             addCriterion("REV4 not between", value1, value2, "rev4");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchIsNotNull() {
+            addCriterion("IMPORT_BATCH is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchEqualTo(String value) {
+            addCriterion("IMPORT_BATCH =", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotEqualTo(String value) {
+            addCriterion("IMPORT_BATCH <>", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchGreaterThan(String value) {
+            addCriterion("IMPORT_BATCH >", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchGreaterThanOrEqualTo(String value) {
+            addCriterion("IMPORT_BATCH >=", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchLessThan(String value) {
+            addCriterion("IMPORT_BATCH <", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchLessThanOrEqualTo(String value) {
+            addCriterion("IMPORT_BATCH <=", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchLike(String value) {
+            addCriterion("IMPORT_BATCH like", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotLike(String value) {
+            addCriterion("IMPORT_BATCH not like", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchIn(List<String> values) {
+            addCriterion("IMPORT_BATCH in", values, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotIn(List<String> values) {
+            addCriterion("IMPORT_BATCH not in", values, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchBetween(String value1, String value2) {
+            addCriterion("IMPORT_BATCH between", value1, value2, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotBetween(String value1, String value2) {
+            addCriterion("IMPORT_BATCH not between", value1, value2, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoIsNull() {
+            addCriterion("BATCH_NO is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoIsNotNull() {
+            addCriterion("BATCH_NO is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoEqualTo(BigDecimal value) {
+            addCriterion("BATCH_NO =", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoNotEqualTo(BigDecimal value) {
+            addCriterion("BATCH_NO <>", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoGreaterThan(BigDecimal value) {
+            addCriterion("BATCH_NO >", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("BATCH_NO >=", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoLessThan(BigDecimal value) {
+            addCriterion("BATCH_NO <", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("BATCH_NO <=", value, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoIn(List<BigDecimal> values) {
+            addCriterion("BATCH_NO in", values, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoNotIn(List<BigDecimal> values) {
+            addCriterion("BATCH_NO not in", values, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("BATCH_NO between", value1, value2, "batchNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andBatchNoNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("BATCH_NO not between", value1, value2, "batchNo");
             return (Criteria) this;
         }
     }

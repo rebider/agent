@@ -97,7 +97,7 @@ public interface TermMachineService {
     AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception;
 
 
-    AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws Exception;
+    AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException;
 
 
     AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception;

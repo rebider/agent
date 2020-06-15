@@ -188,10 +188,16 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             logger.info("商品原价格不能为空");
             throw new MessageException("商品原价格不能为空");
         }
-//        if (activity.getBusProCode() == null) {
-//            logger.info("BusProCode不能为空");
-//            throw new MessageException("BusProCode不能为空");
-//        }
+        if (null == activity.getQuantityLimit()) {
+            logger.info("订货数量下限不能为空！");
+            throw new MessageException("订货数量下限不能为空！");
+        }
+
+        String regex = "^\\+?[1-9][0-9]*$";
+        if (!activity.getQuantityLimit().toString().matches(regex)) {
+            throw new MessageException("订货数量下限输入框,请输入大于等于1的正整数！");
+        }
+
         activity.setId(idService.genId(TabId.o_activity));
         Date nowDate = new Date();
         activity.setcTime(nowDate);
@@ -276,6 +282,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 logger.info("请选择或者填写正确的型号");
                 return AgentResult.fail("请选择或者填写正确的型号");
             }
+        }
+        if (null == activity.getQuantityLimit()) {
+            logger.info("订货数量下限不能为空！");
+            return AgentResult.fail("订货数量下限不能为空！");
+        }
+        if (!activity.getQuantityLimit().toString().matches("^\\+?[1-9][0-9]*$")) {
+            return AgentResult.fail("订货数量下限输入框,请输入大于等于1的正整数！");
         }
         String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
 
@@ -405,7 +418,14 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 return AgentResult.fail("请选择或者填写正确的型号");
             }
         }
+        if (null == activity.getQuantityLimit()) {
+            logger.info("订货数量下限不能为空！");
+            return AgentResult.fail("订货数量下限不能为空！");
+        }
 
+        if (!activity.getQuantityLimit().toString().matches("^\\+?[1-9][0-9]*$")) {
+            return AgentResult.fail("订货数量下限输入框,请输入大于等于1的正整数！");
+        }
         String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
         if (StringUtils.isNotBlank(platFormType)) {
             if (PlatformType.whetherPOS(platFormType)) {
@@ -815,16 +835,16 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 e.printStackTrace();
                 throw new MessageException("查询机具sn异常:" + e.getLocalizedMessage());
             }
-        } else if (proModel.equals(PlatformType.POS.msg)) {
+        } else if (proModel.equals(PlatformType.POS.code) || proModel.equals(PlatformType.SSPOS.code)) {
             try {
                 AgentResult agentResult = termMachineService.querySnMsg(PlatformType.POS, snStart, snEnd);
                 if (!agentResult.isOK()) {
-                    throw new MessageException("当前SN状态异常或已经有在审批流程");
+                    throw new MessageException("业务平台未获取到此SN相关信息！");
                 }
                 logger.info("根据sn查询业务系统返回:" + agentResult.getMsg());
                 JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
                 JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
-                logger.info(String.valueOf(data.get("termMachineList")));
+                logger.info("POS系统返回活动数据={}",data.get("termMachineList"));
                 List<Map<String, Object>> termMachineListMap = (List<Map<String, Object>>) JSONArray.parse(String.valueOf(data.get("termMachineList")));
                 if (termMachineListMap.size() != Integer.parseInt(count)) {
                     logger.info("查询pos根据SN号段查询机具信息数量：{},count:{}", termMachineListMap.size(), count);
@@ -848,16 +868,48 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     OActivityExample oActivityExample = new OActivityExample();
                     OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
                     activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                    //activityCriteria.andVenderEqualTo(manufaValue);
-                    //activityCriteria.andProModelEqualTo(tmsModel);
                     activityCriteria.andPosTypeEqualTo(posType);
-                    activityCriteria.andBusProCodeEqualTo(machineId);
+                    if (null != map.get("posActivityId")) {
+                        activityCriteria.andBusProCodeEqualTo(String.valueOf(map.get("posActivityId")));
+                    } else {
+                        activityCriteria.andBusProCodeEqualTo(machineId);
+                    }
+
                     List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
                     if (oActivities == null) {
                         throw new MessageException(posSn + "活动未找到");
                     }
                     if (oActivities.size() == 0) {
                         throw new MessageException(posSn + "活动未找到");
+                    }
+                    //POS系统，当有部分可见的时候取部分可见的价格，标志
+                    boolean actVisible = true;
+                    for (OActivity oActivity : oActivities) {
+                        if(oActivity.getVisible().equals(VisibleStatus.TWO.getValue())){
+                            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                            AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+                            criteria.andStatusEqualTo(Status.STATUS_1.status);
+                            criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+                            criteria.andBusNumEqualTo(orgid);
+                            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                            if(agentBusInfos.size()==0){
+                                continue;
+                            }
+                            if(agentBusInfos.size()!=1){
+                                throw new MessageException("业务编号不唯一");
+                            }
+                            AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+                            OActivityVisibleExample oActivityVisibleExample = new OActivityVisibleExample();
+                            OActivityVisibleExample.Criteria visibleCriteria = oActivityVisibleExample.createCriteria();
+                            visibleCriteria.andActivityIdEqualTo(oActivity.getActCode());
+                            List<OActivityVisible> oActivityVisibles = activityVisibleMapper.selectByExample(oActivityVisibleExample);
+                            for (OActivityVisible oActivityVisible : oActivityVisibles) {
+                                if(oActivityVisible.getAgentId().equals(agentBusInfo.getAgentId())){
+                                    actVisible = false;
+                                    break;
+                                }
+                            }
+                        }
                     }
                     Set<BigDecimal> priceSet = new HashSet<>();
                     OActivity rActivity = null;
@@ -889,7 +941,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                                     break here;
                                 }
                             }
-                        }else{
+                        } else if (actVisible) {
                             priceSet.add(oActivity.getPrice());
                         }
                     }

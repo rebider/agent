@@ -1,6 +1,7 @@
 package com.ryx.credit.activity.task;
 
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.service.order.OrderAdjustService;
 import com.ryx.credit.service.order.OrderService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -32,7 +33,7 @@ public class OrderAdjustTaskExecutionListener extends BaseTaskListener implement
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            OrderService orderService = (OrderService)MySpringContextHandler.applicationContext.getBean("orderService");
+            OrderAdjustService orderService = (OrderAdjustService)MySpringContextHandler.applicationContext.getBean("orderAdjustService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 logger.info("=========OrderAdjustTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);

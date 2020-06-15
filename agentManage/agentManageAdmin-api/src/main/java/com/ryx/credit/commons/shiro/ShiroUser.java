@@ -17,6 +17,7 @@ public class ShiroUser implements Serializable {
     private Long id;
     private final String loginName;
     private String name;
+    private String pwd;
     private Set<String> urlSet;
     private Set<String> roles;
 
@@ -65,6 +66,14 @@ public class ShiroUser implements Serializable {
 
     public String getLoginName() {
         return loginName;
+    }
+
+    public String getPwd() {
+        return pwd;
+    }
+
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
     }
 
     /**

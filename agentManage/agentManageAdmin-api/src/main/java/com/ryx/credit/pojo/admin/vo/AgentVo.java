@@ -104,12 +104,22 @@ public class AgentVo implements Serializable {
     private String delayDay;
     private String deliveryTimeType;
     //发票信息
-   private String invoiceId;
-   private  String invoiceReturnReason;
-    private  String invoiceReturnExpressNumber;
-    private  String invoiceReturnExpressCompany;
-    private  String invoiceReturnDate;
+    private String invoiceId;
+    private String invoiceReturnReason;
+    private String invoiceReturnExpressNumber;
+    private String invoiceReturnExpressCompany;
+    private String invoiceReturnDate;
     private String renewWay;
+    //pos是否已付标志 (活动调整使用)
+    private String posPaidFlag;
+
+    public String getPosPaidFlag() {
+        return posPaidFlag;
+    }
+
+    public void setPosPaidFlag(String posPaidFlag) {
+        this.posPaidFlag = posPaidFlag;
+    }
 
     public String getRenewWay() {
         return renewWay;

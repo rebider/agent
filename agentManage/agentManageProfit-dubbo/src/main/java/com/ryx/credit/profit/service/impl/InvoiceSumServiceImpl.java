@@ -128,10 +128,10 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         BigDecimal surplusAmt = invoiceSum.getOwnInvoice().subtract((BigDecimal) param.get("INVOICE_AMT"));
         try {
             if(surplusAmt.compareTo(BigDecimal.ZERO) < 0){
-                if( surplusAmt.add(new BigDecimal(10)).compareTo(BigDecimal.ZERO) < 0){
-                    logger.info("发票金额大于本月欠票数超过10元");
+                if( surplusAmt.add(new BigDecimal("9999")).compareTo(BigDecimal.ZERO) < 0){
+                    logger.info("发票金额超过本月欠票数"+surplusAmt+"元");
                     resultMap.put("returnCode", 0000);
-                    resultMap.put("returnInfo", "发票金额超过本月欠票数多于10元");
+                    resultMap.put("returnInfo", "发票金额超过本月欠票数"+surplusAmt+"元");
                     return resultMap;
                 }
             }
@@ -297,10 +297,10 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     //判断代理商唯一码准确性
                     Agent agent = agentService.getAgentById(invoiceSumList.get(2).toString());
                     if (agent == null) {
-                        throw new MessageException("代理商ID" + invoiceSumList.get(2).toString() + "不存在");
+                        throw new MessageException("代理商AG码" + invoiceSumList.get(2).toString() + "不存在");
                     }
                     if (!agent.getAgName().equals(invoiceSumList.get(3).toString().trim())) {
-                        throw new MessageException("代理商名称" + invoiceSumList.get(3).toString() + "与ID不匹配");
+                        throw new MessageException("代理商名称" + invoiceSumList.get(3).toString() + "与AG码不匹配");
                     }
                     // 判断是否重复导入
                     int number = 0;
@@ -321,13 +321,19 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                     cal.add(Calendar.MONTH, -1);
                     String  nextProMonth=sdf.format(cal.getTime());
 
+                    // 顶级结构数值读取时可能会存在读取格式问题
+                    String topOrgId = invoiceSumList.get(0).toString().trim();
+                    if(topOrgId.endsWith(".00")){
+                        topOrgId = topOrgId.substring(0,topOrgId.indexOf("."));
+                    }
+
                     InvoiceSum invoiceSum = new InvoiceSum();
                     //判断本月是否再次传入，表中数据。
                     invoiceSum.setAgentId(invoiceSumList.get(2).toString().trim());
                     invoiceSum.setAgentName(invoiceSumList.get(3).toString().trim());
                     invoiceSum.setInvoiceCompany(invoiceSumList.get(4).toString().trim());
                     invoiceSum.setProfitMonth(profitMonth);
-                    invoiceSum.setTopOrgId(invoiceSumList.get(0).toString().trim());
+                    invoiceSum.setTopOrgId(topOrgId);
                     invoiceSum.setTopOrgName(invoiceSumList.get(1).toString().trim());
                     invoiceSum.setDayBackAmt(new BigDecimal(invoiceSumList.get(6).toString()));
                     invoiceSum.setDayProfitAmt(new BigDecimal(invoiceSumList.get(7).toString().trim()));

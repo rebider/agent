@@ -214,6 +214,22 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 
+	@Override
+	public List<AgentBusInfo> agentAvbBusInfoList(String agentId) {
+    	if(StringUtils.isEmpty(agentId))return new ArrayList<>();
+		Agent agent = agentMapper.selectByPrimaryKey(agentId);
+		if(agent.getStatus().compareTo(BigDecimal.ZERO)==0 || !AgStatus.Approved.name().equals(agent.getAgStatus())){
+			return new ArrayList<>();
+		}
+		AgentBusInfoExample example = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria c = example.or()
+				.andStatusEqualTo(Status.STATUS_1.status)
+				.andAgentIdEqualTo(agentId)
+				.andCloReviewStatusEqualTo(AgStatus.Approved.status)
+				.andBusStatusIn(Arrays.asList(BusStatus.QY.getValue(),BusStatus.WJH.getValue()));
+		return agentBusInfoMapper.selectByExample(example);
+	}
+
 	public int updateAgentBusInfo(AgentBusInfo agentBusInfo){
     	return agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
 	}

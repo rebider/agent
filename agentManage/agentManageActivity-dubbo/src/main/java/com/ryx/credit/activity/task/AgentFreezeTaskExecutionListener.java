@@ -34,7 +34,7 @@ public class AgentFreezeTaskExecutionListener extends BaseTaskListener implement
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //代理商冻结申请服务类
-            FreezeRequestService freezeRequestDetailService = (FreezeRequestService)MySpringContextHandler.applicationContext.getBean("FreezeRequestService");
+            FreezeRequestService freezeRequestDetailService = (FreezeRequestService)MySpringContextHandler.applicationContext.getBean("freezeRequestService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 logger.info("=========AgentFreezeTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);

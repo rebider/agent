@@ -33,4 +33,8 @@ public interface ActRuTaskMapper {
 
     List<Map<String,Object>> queryHuddleMyTask(@Param("params") Map<String,Object> params);
 
+    List<Map<String,Object>> dontUserThisSqlPage(@Param("params") Map<String,Object> params,@Param("page") Page page);
+
+    int dontUserThisSqlCount(@Param("params") Map<String,Object> params);
+
 }
