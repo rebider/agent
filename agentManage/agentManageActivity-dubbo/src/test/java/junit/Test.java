@@ -227,6 +227,9 @@ public class Test {
     }
 
 
+    /**
+     * 测试对公对私并行操作
+     */
     @org.junit.Test
     public void testStartProcess(){
         RuntimeService runtimeService = processEngineConfiguration.buildProcessEngine().getRuntimeService();
@@ -251,8 +254,9 @@ public class Test {
     @org.junit.Test
     public void completTask(){
         TaskService taskService = processEngineConfiguration.buildProcessEngine().getTaskService();
-        taskService.complete("5362523",FastMap.fastMap("rejectCount","1").putKeyV("rs","reject"));
-//        taskService.complete("5325033",FastMap.fastMap("v",1)
+        taskService.complete("5280011",FastMap.fastMap("provReject","0"));
+        taskService.complete("5280015",FastMap.fastMap("provReject","0"));
+//        taskService.complete("4475005",FastMap.fastMap("v",1)
 //                .putKeyV("user1","pass"));
 //        taskService.complete("4475007",FastMap.fastMap("v",1)
 //                .putKeyV("user2","pass"));
@@ -300,25 +304,13 @@ public class Test {
     @org.junit.Test
     public void testAgentAppyChangeCard(){
         RuntimeService runtimeService = processEngineConfiguration.buildProcessEngine().getRuntimeService();
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("finance_agent_1.0",
-                FastMap.fastMap("proList", Arrays.asList("kermit","gonzo","fozzie"))//省区审批人部门代码
-                        .putKeyV("rejectCount","0")//拒绝数量，有拒绝就置为1
-                        .putKeyV("docList",Arrays.asList("kermit","gonzo"))//大区审批人部门代码
-                        .putKeyV("makUserList",Arrays.asList("kermit","gonzo")));//市场部审批用户ID 用户ID
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("appy_change_card",
+                FastMap.fastMap("provList", Arrays.asList("kermit","gonzo","fozzie"))
+                        .putKeyV("provReject","0")
+                        .putKeyV("distList",Arrays.asList("kermit","gonzo")));
         System.out.println("基础信息及结算卡信息变更申请"+processInstance.getId());
     }
 
-
-    /**
-     * 测试冻结流程
-     */
-    @org.junit.Test
-    public void testFreezeAppy(){
-        RuntimeService runtimeService = processEngineConfiguration.buildProcessEngine().getRuntimeService();
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("agentFreeze_1.0",
-                FastMap.fastMap("userList", Arrays.asList("kermit","gonzo","fozzie")));
-        System.out.println("代理商冻结流程申请"+processInstance.getId());
-    }
 
 }
 
