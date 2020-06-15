@@ -1,19 +1,15 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.KafkaMessageTopic;
-import com.ryx.credit.common.enumc.KafkaMessageType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentBusinfoFreezeMapper;
 import com.ryx.credit.dao.agent.AgentFreezeMapper;
-import com.ryx.credit.pojo.admin.agent.AgentBusinfoFreeze;
-import com.ryx.credit.pojo.admin.agent.AgentFreeze;
-import com.ryx.credit.pojo.admin.agent.PlatForm;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.service.AgentKafkaService;
 import com.ryx.credit.service.agent.AgentBusinfoFreezeService;
 import com.ryx.credit.service.agent.PlatFormService;
@@ -25,11 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Auther: lrr
@@ -51,6 +46,8 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
     private PlatFormService platFormService;
     @Autowired
     private AgentKafkaService agentKafkaService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
     @Override
     public PageInfo abfreezeList(Page page, Map map) {
@@ -62,7 +59,7 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
 
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
     @Override
-    public AgentResult AgentBusinfoFreeze(AgentFreeze agentFreeze,String userId){
+    public AgentResult agentBusinfoFreeze(AgentFreeze agentFreeze,String userId){
         if(null!=agentFreeze && StringUtils.isNotBlank(agentFreeze.getAgentId())){
             //汇总冻结表的数据
             List<AgentFreeze> agentFreeList = agentFreezeMapper.queryFreeByAgentId(agentFreeze.getAgentId());
@@ -80,7 +77,9 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
                     PlatForm platForm = platFormService.selectByPlatformNum(freeze.getBusPlatform());
                     if(null!=platForm){
                         agentBusinfoFreeze.setPlatType(platForm.getPlatformType());
-                        agentBusinfoFreeze.setBusPlatform(platForm.getBusplatform());
+                        if(StringUtils.isNotBlank(platForm.getBusplatform())){
+                            agentBusinfoFreeze.setBusPlatform(platForm.getBusplatform());
+                        }
                     }
                     agentBusinfoFreeze.setAgId(freeze.getAgentId());
 
@@ -131,22 +130,16 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
                         logger.info("添加业务冻结失败");
                         return  AgentResult.fail("添加业务冻结失败");
                     }
-                    try {
-                        logger.info("开始执行kafka消息分发");
-                        agentKafkaService.sendPayMentMessage(agentBusinfoFreeze.getAgId(),
-                                agentBusinfoFreeze.getId(),
-                                agentBusinfoFreeze.getBusId(),
-                                agentBusinfoFreeze.getBusNum(),
-                                KafkaMessageType.FREEZE,
-                                KafkaMessageTopic.agent_Freeze.code,
-                                JSONObject.toJSONString(agentBusinfoFreeze)
-                        );
-                        logger.info("结束kafka消息分发");
-                    } catch (Exception e) {
-                        logger.info("kafka接口调用失败 代理商业务id {}",freeze.getBusId());
-                        e.printStackTrace();
-                    }
                 }
+                AgentResult result = queryagentBusinfoFreeze(agentFreeze.getAgentId());
+                if (result.isOK()){
+                    logger.info("kafka消息分发成功");
+                    return AgentResult.ok("kafka消息分发成功");
+                }else {
+                    logger.info("kafka消息分发失败");
+                    return AgentResult.fail("kafka消息分发失败");
+                }
+
             }else{
                 logger.info("查询无数据");
                 return    AgentResult.fail("查询无数据");
@@ -155,6 +148,140 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
             logger.info("请传入代理商唯一编码");
             return   AgentResult.fail("请传入代理商唯一编码");
         }
-        return AgentResult.ok("成功");
+    }
+
+
+    /**
+     * 代理商冻结发送消息通知
+     *
+     *
+     *  0：否  1：是
+     *
+     *     瑞大宝平台 （RDBPOS）
+     *     手刷平台    (MPOS)
+     *     实时POS平台（SSPOS）
+     *     月结POS平台 (POS)
+     *     瑞+平台 (RJPOS)
+     *     瑞花宝平台 (RHPOS)
+     *     智慧平台 （ZHPOS）
+     *    智能POS平台 （ZPOS）
+     * @return
+     * {
+     *  "msg": "成功",
+     *  "code":"0000",
+     *   data{
+     *      "agId": "AG19103701221",            //Ag码
+     *      "busFreeze": 1,                     //业务冻结
+     *      "busId": "AB20191015000000000022540",//业务平台ID
+     *      "busNum": "O00000000160744",        //业务平台编码
+     *      "busPlatform": "000",               //平台号
+     *      "cTime": 1592191686000,             //创建时间
+     *      "cashFreeze": 0,                    //提现冻结
+     *      "dailyFreeze": 0,                   //日结冻结
+     *      "freezeType": 1,                    //冻结层级 (1:本级代理商 2：非直签下级代理商)
+     *      "monthlyFreeze": 1,                 //月结冻结
+     *      "platId": "100003",                 //平台ID
+     *      "platType": "POS",                  //平台类型
+     *      "profitFreeze": 0,                  //分润冻结
+     *      "reflowFreeze": 1,                  //返现冻结
+     *      "stopCount": 0,                     //停算冻结
+     *      "stopProfitFreeze": 0,              //停发冻结
+     *      "uTime": 1592191687000,             //修改时间
+     *     }
+     * }
+     */
+    private AgentResult queryagentBusinfoFreeze(String agentId){
+        if(StringUtils.isBlank(agentId)){
+            logger.info("请传入代理商Id{}",agentId);
+            AgentResult.fail("请传入代理商Id");
+        }
+        //查询汇总的代理商信息
+        AgentBusinfoFreezeExample agentBusinfoFreezeExample = new AgentBusinfoFreezeExample();
+        AgentBusinfoFreezeExample.Criteria criteria = agentBusinfoFreezeExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andAgIdEqualTo(agentId);
+        List<AgentBusinfoFreeze> agentBusinfoFreezeList = agentBusinfoFreezeMapper.selectByExample(agentBusinfoFreezeExample);
+        logger.info("业务冻结数据查询结果{}",agentBusinfoFreezeList != null && !agentBusinfoFreezeList.isEmpty() ?agentBusinfoFreezeList.size() :0);
+
+        ArrayList<String> agentBusFreeList = new ArrayList<>();
+        if(null!=agentBusinfoFreezeList || agentBusinfoFreezeList.size()>0){
+            for (AgentBusinfoFreeze agentBusinfoFreeze : agentBusinfoFreezeList) {
+                agentBusFreeList.add(agentBusinfoFreeze.getBusId());
+                try {
+                    logger.info("开始执行kafka消息分发");
+                    AgentResult result = agentKafkaService.sendPayMentMessage(agentBusinfoFreeze.getAgId(),
+                            agentBusinfoFreeze.getId(),
+                            agentBusinfoFreeze.getBusId(),
+                            agentBusinfoFreeze.getBusNum(),
+                            KafkaMessageType.FREEZE,
+                            KafkaMessageTopic.agent_Freeze.code,
+                            JSONObject.toJSONString(agentBusinfoFreeze)
+                    );
+                    logger.info("结束kafka消息分发");
+                } catch (Exception e) {
+                    logger.info("kafka接口调用失败 代理商业务id {}",agentBusinfoFreeze.getBusId());
+                    e.printStackTrace();
+                }
+            }
+        }
+//查询代理商下所有的业务平台
+        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+        agentBusInfoExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status)
+                .andAgentIdEqualTo(agentId)
+                .andCloReviewStatusEqualTo(AgStatus.Approved.status)
+                .andBusStatusIn(Arrays.asList(BusinessStatus.Enabled.status,BusinessStatus.inactive.status,BusinessStatus.lock.status,BusinessStatus.pause.status));
+        List<AgentBusInfo> busInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+        logger.info("业务平台数据查询结果{}",busInfoList != null && !busInfoList.isEmpty() ?busInfoList.size() :0);
+        ArrayList<String> busList = new ArrayList<>();
+        if(null!=busInfoList || busInfoList.size()>0){
+            for (AgentBusInfo agentBusInfo : busInfoList) {
+                busList.add(agentBusInfo.getId());
+            }
+            //取差集
+            boolean b = busList.removeAll(agentBusFreeList);
+            if(busList.size()>0){
+                for (String busId : busList) {
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+                    try {
+                        AgentBusinfoFreeze agentBusinfoFreeze = new AgentBusinfoFreeze();
+                        agentBusinfoFreeze.setAgId(agentBusInfo.getAgentId());
+                        agentBusinfoFreeze.setBusId(agentBusInfo.getId());
+                        agentBusinfoFreeze.setBusNum(agentBusInfo.getBusNum());
+                        if(StringUtils.isNotBlank(agentBusInfo.getBusPlatform())){
+                            agentBusinfoFreeze.setPlatId(agentBusInfo.getBusPlatform());
+                            PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+                            if(null!=platForm){
+                                agentBusinfoFreeze.setPlatType(platForm.getPlatformType());
+                                if(StringUtils.isNotBlank(platForm.getBusplatform()))
+                                    agentBusinfoFreeze.setBusPlatform(platForm.getBusplatform());
+                            }
+                        }
+                        agentBusinfoFreeze.setBusFreeze(Status.STATUS_0.status);
+                        agentBusinfoFreeze.setProfitFreeze(Status.STATUS_0.status);
+                        agentBusinfoFreeze.setReflowFreeze(Status.STATUS_0.status);
+                        agentBusinfoFreeze.setMonthlyFreeze(Status.STATUS_0.status);
+                        agentBusinfoFreeze.setDailyFreeze(Status.STATUS_0.status);
+                        agentBusinfoFreeze.setStopProfitFreeze(Status.STATUS_0.status);
+                        agentBusinfoFreeze.setCashFreeze(Status.STATUS_0.status);
+                        agentBusinfoFreeze.setStopCount(Status.STATUS_0.status);
+                        agentBusinfoFreeze.setcTime(new Date());
+                        agentBusinfoFreeze.setuTime(new Date());
+                        logger.info("开始执行kafka消息分发");
+                        agentKafkaService.sendPayMentMessage(agentBusinfoFreeze.getAgId(),
+                                agentBusinfoFreeze.getBusId(),
+                                agentBusinfoFreeze.getBusId(),
+                                agentBusinfoFreeze.getBusNum(),
+                                KafkaMessageType.FREEZE,
+                                KafkaMessageTopic.agent_Freeze.code,
+                                JSONObject.toJSONString(agentBusinfoFreeze)
+                        );
+                        logger.info("结束kafka消息分发");
+                    } catch (Exception e) {
+                        logger.info("kafka接口调用失败 代理商业务id {}",agentBusInfo.getId()
+                        );
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return AgentResult.ok(agentBusinfoFreezeList);
     }
 }

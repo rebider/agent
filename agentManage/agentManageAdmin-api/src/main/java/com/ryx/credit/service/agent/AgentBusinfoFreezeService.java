@@ -16,5 +16,5 @@ public interface AgentBusinfoFreezeService {
 
     PageInfo abfreezeList(Page page, Map map);
 
-    public AgentResult AgentBusinfoFreeze(AgentFreeze agentFreeze, String userId);
+    public AgentResult agentBusinfoFreeze(AgentFreeze agentFreeze, String userId);
 }

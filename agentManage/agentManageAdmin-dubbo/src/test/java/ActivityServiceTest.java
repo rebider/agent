@@ -43,7 +43,7 @@ public class ActivityServiceTest extends BaseSpringTest {
     public void c(){
         AgentFreeze agentFreeze = new AgentFreeze();
         agentFreeze.setAgentId("AG19103701221");
-        agentBusinfoFreezeService.AgentBusinfoFreeze(agentFreeze,"111");
+        agentBusinfoFreezeService.agentBusinfoFreeze(agentFreeze,"111");
     }
     @Test
     public void a(){
