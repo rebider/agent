@@ -33,7 +33,7 @@ public class FreezeDayJob {
      * 分润月份（空则为当前日期上2天）yyyymmdd
      * 每日凌晨2点：@Scheduled(cron = "0 0 2 * * ?")
      */
-    @Scheduled(cron = "0 0 2 * * ?")
+    /*@Scheduled(cron = "0 0 2 * * ?")*/
     public void queryDayFreeze() {
         logger.info("===================================开始同步每日冻结=======================================");
         logger.info("获取日冻结总数");

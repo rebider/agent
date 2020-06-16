@@ -101,7 +101,7 @@ public class NewProfitDataJob {
      * 每月3号9点10分执行
      * @Date: 11:25 2019/1/24
      */
-    @Scheduled(cron = "${pos_profit_job_cron}")
+    /*@Scheduled(cron = "${pos_profit_job_cron}")*/
     public void doCron() {
         if (!"preproduction".equals(environment)){
             String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);

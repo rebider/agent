@@ -46,7 +46,7 @@ public class LinkDateTest {
      * @throws Exception
      */
     @Test
-    @Scheduled(cron = "0 0 * * * ?")
+    /*@Scheduled(cron = "0 0 * * * ?")*/
     public void new_computerTax() throws Exception {
 //        String profitDate = "201808";
         String profitDate = null;
