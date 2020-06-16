@@ -64,11 +64,7 @@ public class AgentKafkaServiceImpl implements AgentKafkaService {
         if(agentResult.isOK()){
             try {
                 KafkaSendMessage record = (KafkaSendMessage)agentResult.getData();
-                if(
-                   StringUtils.isNotBlank(record.getBusnum()) && KafkaMessageType.PAYMENT.code.equals(record.getKtype())
-                   ||
-                   KafkaMessageType.CARD.code.equals(record.getKtype())
-                   ) {
+                if(StringUtils.isNotBlank(record.getBusnum()) || !KafkaMessageType.PAYMENT.code.equals(record.getKtype())) {
                     logger.info("发送消息到kafka 平台编号不为空发送kafka {}",message);
                     ListenableFuture<SendResult<String, String>> listenableFuture = kafkaTemplate.send(topic, record.getId(), record.getKmessage());
                     listenableFuture.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
