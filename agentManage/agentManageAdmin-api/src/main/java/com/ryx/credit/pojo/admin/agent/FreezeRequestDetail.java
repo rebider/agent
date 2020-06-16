@@ -9,7 +9,7 @@ public class FreezeRequestDetail implements Serializable {
 
     private String freezeReqId;
 
-    private String freezaId;
+    private String freezeId;
 
     private String agentId;
 
@@ -97,12 +97,12 @@ public class FreezeRequestDetail implements Serializable {
         this.freezeReqId = freezeReqId == null ? null : freezeReqId.trim();
     }
 
-    public String getFreezaId() {
-        return freezaId;
+    public String getFreezeId() {
+        return freezeId;
     }
 
-    public void setFreezaId(String freezaId) {
-        this.freezaId = freezaId == null ? null : freezaId.trim();
+    public void setFreezeId(String freezeId) {
+        this.freezeId = freezeId == null ? null : freezeId.trim();
     }
 
     public String getAgentId() {

@@ -277,73 +277,73 @@ public class FreezeRequestDetailExample {
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdIsNull() {
-            addCriterion("FREEZA_ID is null");
+        public Criteria andFreezeIdIsNull() {
+            addCriterion("FREEZE_ID is null");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdIsNotNull() {
-            addCriterion("FREEZA_ID is not null");
+        public Criteria andFreezeIdIsNotNull() {
+            addCriterion("FREEZE_ID is not null");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdEqualTo(String value) {
-            addCriterion("FREEZA_ID =", value, "freezaId");
+        public Criteria andFreezeIdEqualTo(String value) {
+            addCriterion("FREEZE_ID =", value, "freezeId");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdNotEqualTo(String value) {
-            addCriterion("FREEZA_ID <>", value, "freezaId");
+        public Criteria andFreezeIdNotEqualTo(String value) {
+            addCriterion("FREEZE_ID <>", value, "freezeId");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdGreaterThan(String value) {
-            addCriterion("FREEZA_ID >", value, "freezaId");
+        public Criteria andFreezeIdGreaterThan(String value) {
+            addCriterion("FREEZE_ID >", value, "freezeId");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdGreaterThanOrEqualTo(String value) {
-            addCriterion("FREEZA_ID >=", value, "freezaId");
+        public Criteria andFreezeIdGreaterThanOrEqualTo(String value) {
+            addCriterion("FREEZE_ID >=", value, "freezeId");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdLessThan(String value) {
-            addCriterion("FREEZA_ID <", value, "freezaId");
+        public Criteria andFreezeIdLessThan(String value) {
+            addCriterion("FREEZE_ID <", value, "freezeId");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdLessThanOrEqualTo(String value) {
-            addCriterion("FREEZA_ID <=", value, "freezaId");
+        public Criteria andFreezeIdLessThanOrEqualTo(String value) {
+            addCriterion("FREEZE_ID <=", value, "freezeId");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdLike(String value) {
-            addCriterion("FREEZA_ID like", value, "freezaId");
+        public Criteria andFreezeIdLike(String value) {
+            addCriterion("FREEZE_ID like", value, "freezeId");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdNotLike(String value) {
-            addCriterion("FREEZA_ID not like", value, "freezaId");
+        public Criteria andFreezeIdNotLike(String value) {
+            addCriterion("FREEZE_ID not like", value, "freezeId");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdIn(List<String> values) {
-            addCriterion("FREEZA_ID in", values, "freezaId");
+        public Criteria andFreezeIdIn(List<String> values) {
+            addCriterion("FREEZE_ID in", values, "freezeId");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdNotIn(List<String> values) {
-            addCriterion("FREEZA_ID not in", values, "freezaId");
+        public Criteria andFreezeIdNotIn(List<String> values) {
+            addCriterion("FREEZE_ID not in", values, "freezeId");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdBetween(String value1, String value2) {
-            addCriterion("FREEZA_ID between", value1, value2, "freezaId");
+        public Criteria andFreezeIdBetween(String value1, String value2) {
+            addCriterion("FREEZE_ID between", value1, value2, "freezeId");
             return (Criteria) this;
         }
 
-        public Criteria andFreezaIdNotBetween(String value1, String value2) {
-            addCriterion("FREEZA_ID not between", value1, value2, "freezaId");
+        public Criteria andFreezeIdNotBetween(String value1, String value2) {
+            addCriterion("FREEZE_ID not between", value1, value2, "freezeId");
             return (Criteria) this;
         }
 

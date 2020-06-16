@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
     <id column="ID" jdbcType="VARCHAR" property="id" />
     <result column="FREEZE_REQ_ID" jdbcType="VARCHAR" property="freezeReqId" />
-    <result column="FREEZA_ID" jdbcType="VARCHAR" property="freezaId" />
+    <result column="FREEZE_ID" jdbcType="VARCHAR" property="freezeId" />
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
     <result column="AGENT_FREEZE_STATUS" jdbcType="VARCHAR" property="agentFreezeStatus" />
     <result column="FREEZE_TYPE" jdbcType="DECIMAL" property="freezeType" />
@@ -71,7 +71,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, FREEZE_REQ_ID, FREEZA_ID, AGENT_ID, AGENT_FREEZE_STATUS, FREEZE_TYPE, FREEZE_STATUS, 
+    ID, FREEZE_REQ_ID, FREEZE_ID, AGENT_ID, AGENT_FREEZE_STATUS, FREEZE_TYPE, FREEZE_STATUS, 
     FREEZE_PERSON, FREEZE_DATE, FREEZE_CAUSE, UNFREEZE_PERSON, UNFREEZE_DATE, UNFREEZE_CAUSE, 
     FREEZE_NUM, REMARK, BUS_PLATFORM, BUS_ID, BUS_NUM, BUS_FREEZE, PROFIT_FREEZE, REFLOW_FREEZE, 
     MONTHLY_FREEZE, DAILY_FREEZE, STOP_PROFIT_FREEZE, CASH_FREEZE, STOP_COUNT, NEW_BUS_FREEZE, 
@@ -107,7 +107,7 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
-    insert into A_FREEZE_REQUEST_DETAIL (ID, FREEZE_REQ_ID, FREEZA_ID, 
+    insert into A_FREEZE_REQUEST_DETAIL (ID, FREEZE_REQ_ID, FREEZE_ID, 
       AGENT_ID, AGENT_FREEZE_STATUS, FREEZE_TYPE, 
       FREEZE_STATUS, FREEZE_PERSON, FREEZE_DATE, 
       FREEZE_CAUSE, UNFREEZE_PERSON, UNFREEZE_DATE, 
@@ -120,7 +120,7 @@
       MONTHLY_FREEZE_ORG, DAILY_FREEZE_ORG, STOP_PROFIT_FREEZE_ORG, 
       CASH_FREEZE_ORG, STOP_COUNT_ORG, STATUS, 
       VERSION, NEW_BUS_FREEZE_ORG)
-    values (#{id,jdbcType=VARCHAR}, #{freezeReqId,jdbcType=VARCHAR}, #{freezaId,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=VARCHAR}, #{freezeReqId,jdbcType=VARCHAR}, #{freezeId,jdbcType=VARCHAR}, 
       #{agentId,jdbcType=VARCHAR}, #{agentFreezeStatus,jdbcType=VARCHAR}, #{freezeType,jdbcType=DECIMAL}, 
       #{freezeStatus,jdbcType=VARCHAR}, #{freezePerson,jdbcType=VARCHAR}, #{freezeDate,jdbcType=TIMESTAMP}, 
       #{freezeCause,jdbcType=VARCHAR}, #{unfreezePerson,jdbcType=VARCHAR}, #{unfreezeDate,jdbcType=TIMESTAMP}, 
@@ -143,8 +143,8 @@
       <if test="freezeReqId != null">
         FREEZE_REQ_ID,
       </if>
-      <if test="freezaId != null">
-        FREEZA_ID,
+      <if test="freezeId != null">
+        FREEZE_ID,
       </if>
       <if test="agentId != null">
         AGENT_ID,
@@ -259,8 +259,8 @@
       <if test="freezeReqId != null">
         #{freezeReqId,jdbcType=VARCHAR},
       </if>
-      <if test="freezaId != null">
-        #{freezaId,jdbcType=VARCHAR},
+      <if test="freezeId != null">
+        #{freezeId,jdbcType=VARCHAR},
       </if>
       <if test="agentId != null">
         #{agentId,jdbcType=VARCHAR},
@@ -375,14 +375,14 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
     update A_FREEZE_REQUEST_DETAIL
     <set>
       <if test="freezeReqId != null">
         FREEZE_REQ_ID = #{freezeReqId,jdbcType=VARCHAR},
       </if>
-      <if test="freezaId != null">
-        FREEZA_ID = #{freezaId,jdbcType=VARCHAR},
+      <if test="freezeId != null">
+        FREEZE_ID = #{freezeId,jdbcType=VARCHAR},
       </if>
       <if test="agentId != null">
         AGENT_ID = #{agentId,jdbcType=VARCHAR},
@@ -495,7 +495,7 @@
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
     update A_FREEZE_REQUEST_DETAIL
     set FREEZE_REQ_ID = #{freezeReqId,jdbcType=VARCHAR},
-      FREEZA_ID = #{freezaId,jdbcType=VARCHAR},
+      FREEZE_ID = #{freezeId,jdbcType=VARCHAR},
       AGENT_ID = #{agentId,jdbcType=VARCHAR},
       AGENT_FREEZE_STATUS = #{agentFreezeStatus,jdbcType=VARCHAR},
       FREEZE_TYPE = #{freezeType,jdbcType=DECIMAL},
