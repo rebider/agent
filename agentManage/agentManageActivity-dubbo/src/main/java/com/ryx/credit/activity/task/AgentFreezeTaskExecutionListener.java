@@ -34,18 +34,18 @@ public class AgentFreezeTaskExecutionListener extends BaseTaskListener implement
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //代理商冻结申请服务类
-            FreezeRequestService freezeRequestDetailService = (FreezeRequestService)MySpringContextHandler.applicationContext.getBean("freezeRequestService");
+            FreezeRequestService freezeRequestService = (FreezeRequestService)MySpringContextHandler.applicationContext.getBean("freezeRequestService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 logger.info("=========AgentFreezeTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-                AgentResult res = freezeRequestDetailService.agentFreezeFinish(delegateExecution.getProcessInstanceId(), activityName);
+                AgentResult res = freezeRequestService.agentFreezeFinish(delegateExecution.getProcessInstanceId(), activityName);
                 logger.info("=========AgentFreezeTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
 
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
                 logger.info("=========AgentFreezeTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-                AgentResult res = freezeRequestDetailService.agentFreezeFinish(delegateExecution.getProcessInstanceId(), activityName);
+                AgentResult res = freezeRequestService.agentFreezeFinish(delegateExecution.getProcessInstanceId(), activityName);
                 logger.info("=========AgentFreezeTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
 
             }

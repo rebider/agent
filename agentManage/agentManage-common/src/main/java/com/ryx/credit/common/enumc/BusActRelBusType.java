@@ -43,7 +43,7 @@ public enum BusActRelBusType {
     cashierApprove("/BusActRelBusType/cashierApprove","订单调整出纳申请"),
     cardRenew("/BusActRelBusType/cardRenew","物联网卡续费申请"),
     cardLogout("/BusActRelBusType/cardLogout","物联网卡注销申请"),
-    freeze("/agentFreeze/agentFreezeApproval","冻结申请");
+    freeze("/BusActRelBusType/agentFreezeApproval","冻结申请");
 
 
     public String key;

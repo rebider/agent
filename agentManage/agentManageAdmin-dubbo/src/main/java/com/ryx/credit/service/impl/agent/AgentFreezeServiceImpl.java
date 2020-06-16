@@ -211,16 +211,16 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     agentFreeze.setBusPlatform(agentBusInfo.getBusPlatform());
                     agentFreeze.setBusId(agentFreezePort.getBusPlatform().get(0));
                     agentFreeze.setBusNum(agentBusInfo.getBusNum());
-                    agentFreeze.setNewBusFreeze(new BigDecimal(agentFreezePort.getNewBusFreeze()));
 //                    if (freeType.compareTo(FreeType.AGNET.code)==0){
-                        agentFreeze.setBusFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getBusFreeze());
-                        agentFreeze.setProfitFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getProfitFreeze());
-                        agentFreeze.setReflowFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getReflowFreeze());
-                        agentFreeze.setMonthlyFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getMonthlyFreeze());
-                        agentFreeze.setDailyFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getDailyFreeze());
-                        agentFreeze.setStopProfitFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getStopProfitFreeze());
-                        agentFreeze.setCashFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getCashFreeze());
-                        agentFreeze.setStopCount(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getStopCount());
+                    agentFreeze.setNewBusFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getNewBusFreeze());
+                    agentFreeze.setBusFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getBusFreeze());
+                    agentFreeze.setProfitFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getProfitFreeze());
+                    agentFreeze.setReflowFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getReflowFreeze());
+                    agentFreeze.setMonthlyFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getMonthlyFreeze());
+                    agentFreeze.setDailyFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getDailyFreeze());
+                    agentFreeze.setStopProfitFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getStopProfitFreeze());
+                    agentFreeze.setCashFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getCashFreeze());
+                    agentFreeze.setStopCount(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getStopCount());
 //                    }else if (freeType.compareTo(FreeType.SUB_AGENT.code)==0){
 //                        agentFreeze.setBusFreeze(agentFreezePort.getSubLevel().getBusFreeze());
 //                        agentFreeze.setProfitFreeze(agentFreezePort.getSubLevel().getProfitFreeze());

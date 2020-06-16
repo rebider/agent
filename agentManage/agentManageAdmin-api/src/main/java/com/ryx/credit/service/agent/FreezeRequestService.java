@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.FreezeRequest;
 import com.ryx.credit.pojo.admin.agent.FreezeRequestDetail;
 import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.FreeRequestVo;
 
 import java.util.List;
@@ -20,9 +21,11 @@ public interface FreezeRequestService {
 
     AgentResult agentFreeze(AgentFreezePort agentFreezePort)throws MessageException;
 
+    AgentResult agentUnFreeze(AgentFreezePort agentFreezePort)throws MessageException;
+
     AgentResult agentFreezeModify(AgentFreezePort agentFreezePort)throws MessageException;
 
-    AgentResult approvalTask(FreeRequestVo freeRequestVo, String userId)throws Exception ;
+    AgentResult approvalTask(AgentVo agentVo, String userId)throws Exception ;
 
     AgentResult agentFreezeFinish(String insid, String actname) throws Exception ;
 
