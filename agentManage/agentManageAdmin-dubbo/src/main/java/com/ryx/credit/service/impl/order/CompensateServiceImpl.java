@@ -119,6 +119,8 @@ public class CompensateServiceImpl implements CompensateService {
     private OsnOperateService osnOperateService;
     @Autowired
     private OrderOffsetService orderOffsetService;
+    @Autowired
+    private OLogisticsDetailService logisticsDetailService;
 
 
     @Override
@@ -625,6 +627,14 @@ public class CompensateServiceImpl implements CompensateService {
                         .fastMap("beginSN", refundPriceDiffDetail.getBeginSn())
                         .putKeyV("endSN", refundPriceDiffDetail.getEndSn()));
                 if (!FastMap.isSuc(fastMap)) throw new ProcessException(fastMap.get("msg").toString());
+                //验证是否有效的平台码
+                List<String> sns = logisticsDetailService.querySnLList(refundPriceDiffDetail.getBeginSn(), refundPriceDiffDetail.getEndSn());
+                for (String sn : sns) {
+                    List<Map<String, Object>> agentBusInfos = agentBusInfoMapper.queryAgentBusInfoByLogisticsDetailSn(FastMap.fastMap("snNum", sn));
+                    if (null == agentBusInfos || agentBusInfos.size() != 1) {
+                        throw new ProcessException("无效的业务平台，SN：" + sn);
+                    }
+                }
 
                 refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_d));
                 refundPriceDiffDetail.setRefundPriceDiffId(priceDiffId);
@@ -665,7 +675,7 @@ public class CompensateServiceImpl implements CompensateService {
                 refundPriceDiffDetail.setNewMachineId(newActivity.getBusProCode());
                 refundPriceDiffDetail.setOldMachineId(oldActivity.getBusProCode());
 
-                //封装不同平台所需的不同参数
+                //不同平台校验不同，封装参数不同
                 if (PlatformType.ZHPOS.code.equals(platForm.getPlatformType()) || PlatformType.ZPOS.code.equals(platForm.getPlatformType())) {
                     //特殊平台增加个校验（智慧POS，智能POS）替换busNum
                     List<AgentBusInfo> oldList = agentBusInfoMapper.queryBusinfo(FastMap.fastMap("posPlatCode", refundPriceDiffDetail.getOldOrgId()));

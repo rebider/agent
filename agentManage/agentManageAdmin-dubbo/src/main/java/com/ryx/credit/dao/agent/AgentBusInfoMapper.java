@@ -135,4 +135,11 @@ public interface AgentBusInfoMapper {
     List<String> selectBusNumByBusProCode(Map<String, Object> reqMap);
 
     List<Map<String, Object>> queryRegionByAccount(Map<String,Object> map);
+
+    /**
+     * 查询物流明细对应的业务平台是否有效
+     * @param map
+     * @return
+     */
+    List<Map<String, Object>> queryAgentBusInfoByLogisticsDetailSn(Map<String,Object> map);
 }
