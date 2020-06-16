@@ -272,6 +272,7 @@ public class JobOrderQueryServiceImpl implements JobOrderQueryService {
                     joTask.setJoTaskContent(String.valueOf(map.get("joContent")));
                     joTask.setDealGroup(joTask1.getDealGroup());
                     joTask.setDealGroupId(joTask1.getDealGroupId());
+                    joTask.setSecondDealGroup(joTask1.getSecondDealGroup());
                     joTask.setDealPersonId("");
                     joTask.setDealPersonName("");
                     joTask.setId( idService.genId(TabId.jo_task) );

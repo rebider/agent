@@ -65,6 +65,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception {
+        log.info("查询POS活动参数：{}，{}",platformType,JSONObject.toJSONString(par));
         List<ImsTermMachine> list = imsTermMachineService.selectByExample();
         List<TermMachineVo> termMachineVoList = new ArrayList<>();
         for (ImsTermMachine imsTermMachine : list) {
@@ -72,9 +73,14 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             newvo.setId(imsTermMachine.getMachineId());
             String model = imsTermMachine.getModel();
             ImsPos imsPos = imsPosMapper.selectByPrimaryKey(model);
-            newvo.setMechineName("型号代码:" + model + "|厂商型号:" + imsPos.getPosModel() + "|价格:" + imsTermMachine.getPrice()
-                    + "|达标金额:" + imsTermMachine.getStandAmt() + "|返还类型:" + BackType.getContentByValue(imsTermMachine.getBackType())
-                    + "|备注:" + imsTermMachine.getRemark());
+            String activeName = "";
+            if (null != imsTermMachine.getActivityName()) {
+                activeName = imsTermMachine.getActivityName();
+            } else {
+                activeName = imsTermMachine.getRemark();
+            }
+            newvo.setMechineName("活动名称:" + activeName + "|型号代码:" + model + "|厂商型号:" + imsPos.getPosModel() + "|价格:" + imsTermMachine.getPrice()
+                    + "|达标金额:" + imsTermMachine.getStandAmt() + "|返还类型:" + BackType.getContentByValue(imsTermMachine.getBackType()));
             newvo.setStandAmt(String.valueOf(imsTermMachine.getStandAmt()));
             newvo.setBackType(imsTermMachine.getBackType());
             termMachineVoList.add(newvo);
@@ -284,6 +290,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws Exception {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("operation", operation);
+        jsonObject.put("isFreeze", "0");
         List<Map<String, Object>> listDetail = new ArrayList<>();
         for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
 
@@ -316,6 +323,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             mapDetail.put("oldMachineId", refundPriceDiffDetail.getOldMachineId());
             mapDetail.put("oldBrandCode", refundPriceDiffDetail.getOldBrandCode());
             mapDetail.put("newBrandCode", refundPriceDiffDetail.getNewBrandCode());
+            mapDetail.put("adjNum", refundPriceDiffDetail.getChangeCount().toString());
             if(StringUtils.isNotBlank(refundPriceDiffDetail.getDeliveryTimeType())){
                 mapDetail.put("deliveryTimeType", refundPriceDiffDetail.getDeliveryTimeType());
                 if(refundPriceDiffDetail.getDeliveryTimeType().equals(DeliveryTimeType.ZERO.getValue())){
@@ -339,7 +347,13 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
         }
         jsonObject.put("snList", listDetail);
         log.info("活动调整POS请求参数:{}",JSONObject.toJSON(jsonObject));
-        AgentResult res = request("ORG016", jsonObject);
+        AgentResult res = null;
+        try {
+            res = request("ORG016", jsonObject);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMessage());
+        }
         if(res.isOK()) {
             JSONObject respXMLObj = JSONObject.parseObject(res.getMsg());
             JSONObject res_data = respXMLObj.getJSONObject("data");
@@ -441,7 +455,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     @Override
     public boolean checkModleIsEq(Map<String, String> data, String platformType) {
         log.info("checkModleIsEq:{},{}",data,platformType);
-        return imsTermMachineService.checkModleIsEq(data.get("oldMerid"),data.get("newMerId"));
+        return imsTermMachineService.checkModleIsEqByMiddle(data.get("oldMerid"), data.get("newMerId"),data.get("newMerType"),data.get("oldMerType"));
     }
 
     @Override

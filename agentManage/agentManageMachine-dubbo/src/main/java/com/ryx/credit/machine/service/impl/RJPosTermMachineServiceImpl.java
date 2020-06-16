@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.FastMap;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 /**
- * 作者：zyd
+ * 作者：zhaoyd
  * 时间：2019/10/18
  * 描述：瑞+平台接口
  */
@@ -372,7 +373,7 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws Exception {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws ProcessException {
         return null;
     }
 

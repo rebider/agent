@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.dao.order.OOrderMapper;
 import com.ryx.credit.dao.order.OPayDetailMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
@@ -35,7 +36,8 @@ public class OPayDetailServiceImpl implements OPayDetailService {
         BigDecimal takeAmount = BigDecimal.ZERO;
         OPayDetailExample oPayDetailExample = new OPayDetailExample();
         oPayDetailExample.or().andSrcIdEqualTo(srcId)
-                .andPayTypeEqualTo(payType);
+                .andPayTypeEqualTo(payType)
+                .andStatusEqualTo(Status.STATUS_1.status);
         List<OPayDetail> oPayDetails = oPayDetailMapper.selectByExample(oPayDetailExample);
         List<OPayDetailVo> oPayDetailVos = new ArrayList<>();
         if (oPayDetails != null && oPayDetails.size() > 0){

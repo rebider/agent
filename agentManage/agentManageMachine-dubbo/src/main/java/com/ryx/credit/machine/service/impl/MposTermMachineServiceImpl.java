@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -36,9 +37,6 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     public static final String MPOS_SUCESS_respCode = "000000";//000000-成功，000002-系统报错，000003-缺失参数，000004-其他, 100000-失败
     public static final String MPOS_SUCESS_respType = "S";//S-成功，E-报错，R-重复请求
     private Logger logger = LoggerFactory.getLogger(MposTermMachineServiceImpl.class);
-
-    @Autowired
-    private OrderActivityService orderActivityService;
 
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{

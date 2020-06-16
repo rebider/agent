@@ -204,7 +204,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
     }
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws Exception {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws ProcessException {
         String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
         if (PlatformType.whetherPOS(platformType)) {
             return posTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation, isFreeze);
@@ -215,7 +215,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
         } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
             return rdbTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation, isFreeze);
         } else {
-            return AgentResult.fail("未实现的业务系统");
+            return AgentResult.fail(platformType + "平台活动调整功能未实现");
         }
     }
 
