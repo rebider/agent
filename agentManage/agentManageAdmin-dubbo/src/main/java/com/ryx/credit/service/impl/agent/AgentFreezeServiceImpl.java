@@ -777,10 +777,13 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             throw new MessageException("业务平台编码不能为空");
         }
         if(StringUtils.isBlank(String.valueOf(hashMap.get("busType")))){
-            throw new MessageException("业务平台不能为空");
+            throw new MessageException("业务平台类型不能为空");
         }
+        String[] busTypes = String.valueOf(hashMap.get("busType")).split(",");
+        ArrayList<String> busTypeList = new ArrayList<String>();
+        Collections.addAll(busTypeList, busTypes);
         AgentBusinfoFreezeExample agentBusinfoFreezeExample = new AgentBusinfoFreezeExample();
-        AgentBusinfoFreezeExample.Criteria criteria = agentBusinfoFreezeExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(hashMap.get("busNum"))).andPlatIdEqualTo(String.valueOf(hashMap.get("busType")));
+        AgentBusinfoFreezeExample.Criteria criteria = agentBusinfoFreezeExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(hashMap.get("busNum"))).andPlatTypeIn(busTypeList);
         List<AgentBusinfoFreeze> agentBusinfoFreezeList = agentBusinfoFreezeMapper.selectByExample(agentBusinfoFreezeExample);
         log.info("冻结查询结果：{}",agentBusinfoFreezeList);
         List<Map<String,Object>> resultList = new ArrayList<>();
@@ -790,6 +793,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             Map<String, Object> map = new HashMap<>();
             //直签  非直签
             map.put("busNum",agentBusinfoFreeze.getBusNum());
+            map.put("busType",agentBusinfoFreeze.getPlatType());
             if(null!=agentBusinfoFreeze.getFreezeType()){
                 map.put("freezeType",agentBusinfoFreeze.getFreezeType());
             }
@@ -816,6 +820,10 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             }
             if(null!=agentBusinfoFreeze.getStopCount()){
                 map.put("stopCount",agentBusinfoFreeze.getStopCount());
+            }
+            //是否限制登录
+            if(null!=agentBusinfoFreeze.getBusFreeze()){
+                map.put("busFreeze",agentBusinfoFreeze.getBusFreeze());
             }
             resultList.add(map);
         }
