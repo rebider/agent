@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.kafka.dao.KfkSendMessageMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.kafka.pojo.KfkSendMessage">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="BUSID" jdbcType="VARCHAR" property="busid" />
+    <result column="BUSNUM" jdbcType="VARCHAR" property="busnum" />
+    <result column="KTYPE" jdbcType="VARCHAR" property="ktype" />
+    <result column="KTOPIC" jdbcType="VARCHAR" property="ktopic" />
+    <result column="C_DATE_STR" jdbcType="VARCHAR" property="cDateStr" />
+    <result column="C_TIME_STR" jdbcType="VARCHAR" property="cTimeStr" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ryx.kafka.pojo.KfkSendMessage">
+    <result column="KMESSAGE" jdbcType="CLOB" property="kmessage" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_ID, AGENT_NAME, BUSID, BUSNUM, KTYPE, KTOPIC, C_DATE_STR, C_TIME_STR, STATUS
+  </sql>
+  <sql id="Blob_Column_List">
+    KMESSAGE
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.ryx.kafka.pojo.KfkSendMessageExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from KAFKA_SEND_MESSAGE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.ryx.kafka.pojo.KfkSendMessageExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from KAFKA_SEND_MESSAGE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from KAFKA_SEND_MESSAGE
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.kafka.pojo.KfkSendMessageExample">
+    delete from KAFKA_SEND_MESSAGE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.kafka.pojo.KfkSendMessage">
+    insert into KAFKA_SEND_MESSAGE (ID, AGENT_ID, AGENT_NAME, 
+      BUSID, BUSNUM, KTYPE, 
+      KTOPIC, C_DATE_STR, C_TIME_STR, 
+      STATUS, KMESSAGE)
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, 
+      #{busid,jdbcType=VARCHAR}, #{busnum,jdbcType=VARCHAR}, #{ktype,jdbcType=VARCHAR}, 
+      #{ktopic,jdbcType=VARCHAR}, #{cDateStr,jdbcType=VARCHAR}, #{cTimeStr,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{kmessage,jdbcType=CLOB})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.kafka.pojo.KfkSendMessage">
+    insert into KAFKA_SEND_MESSAGE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="busid != null">
+        BUSID,
+      </if>
+      <if test="busnum != null">
+        BUSNUM,
+      </if>
+      <if test="ktype != null">
+        KTYPE,
+      </if>
+      <if test="ktopic != null">
+        KTOPIC,
+      </if>
+      <if test="cDateStr != null">
+        C_DATE_STR,
+      </if>
+      <if test="cTimeStr != null">
+        C_TIME_STR,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="kmessage != null">
+        KMESSAGE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="busid != null">
+        #{busid,jdbcType=VARCHAR},
+      </if>
+      <if test="busnum != null">
+        #{busnum,jdbcType=VARCHAR},
+      </if>
+      <if test="ktype != null">
+        #{ktype,jdbcType=VARCHAR},
+      </if>
+      <if test="ktopic != null">
+        #{ktopic,jdbcType=VARCHAR},
+      </if>
+      <if test="cDateStr != null">
+        #{cDateStr,jdbcType=VARCHAR},
+      </if>
+      <if test="cTimeStr != null">
+        #{cTimeStr,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="kmessage != null">
+        #{kmessage,jdbcType=CLOB},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.kafka.pojo.KfkSendMessageExample" resultType="java.lang.Long">
+    select count(*) from KAFKA_SEND_MESSAGE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.kafka.pojo.KfkSendMessage">
+    update KAFKA_SEND_MESSAGE
+    <set>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="busid != null">
+        BUSID = #{busid,jdbcType=VARCHAR},
+      </if>
+      <if test="busnum != null">
+        BUSNUM = #{busnum,jdbcType=VARCHAR},
+      </if>
+      <if test="ktype != null">
+        KTYPE = #{ktype,jdbcType=VARCHAR},
+      </if>
+      <if test="ktopic != null">
+        KTOPIC = #{ktopic,jdbcType=VARCHAR},
+      </if>
+      <if test="cDateStr != null">
+        C_DATE_STR = #{cDateStr,jdbcType=VARCHAR},
+      </if>
+      <if test="cTimeStr != null">
+        C_TIME_STR = #{cTimeStr,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="kmessage != null">
+        KMESSAGE = #{kmessage,jdbcType=CLOB},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.kafka.pojo.KfkSendMessage">
+    update KAFKA_SEND_MESSAGE
+    set AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      BUSID = #{busid,jdbcType=VARCHAR},
+      BUSNUM = #{busnum,jdbcType=VARCHAR},
+      KTYPE = #{ktype,jdbcType=VARCHAR},
+      KTOPIC = #{ktopic,jdbcType=VARCHAR},
+      C_DATE_STR = #{cDateStr,jdbcType=VARCHAR},
+      C_TIME_STR = #{cTimeStr,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      KMESSAGE = #{kmessage,jdbcType=CLOB}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.kafka.pojo.KfkSendMessage">
+    update KAFKA_SEND_MESSAGE
+    set AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      BUSID = #{busid,jdbcType=VARCHAR},
+      BUSNUM = #{busnum,jdbcType=VARCHAR},
+      KTYPE = #{ktype,jdbcType=VARCHAR},
+      KTOPIC = #{ktopic,jdbcType=VARCHAR},
+      C_DATE_STR = #{cDateStr,jdbcType=VARCHAR},
+      C_TIME_STR = #{cTimeStr,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

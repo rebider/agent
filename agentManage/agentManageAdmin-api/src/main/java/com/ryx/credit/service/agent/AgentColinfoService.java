@@ -2,6 +2,7 @@ package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
@@ -59,5 +60,12 @@ public interface AgentColinfoService {
 
     public ResultVO updateAgentColinfoVoNow(List<AgentColinfoVo> colinfoVoList, Agent agent,String userId,String saveStatus)throws Exception;
 
+
+    /**
+     * 结算卡变Kafka通知处理类更处理类
+     * @return
+     * @throws Exception
+     */
+    public FastMap notifyCardChange(String key,String msg)throws Exception;
 
 }

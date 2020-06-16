@@ -1,10 +1,16 @@
 package junit;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.activity.entity.ActIdUser;
+import com.ryx.credit.common.enumc.KafkaMessageTopic;
+import com.ryx.credit.common.enumc.KafkaMessageType;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.FastMap;
+import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.service.ActIdUserService;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.AgentKafkaService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -51,6 +57,8 @@ public class Test {
     ActIdUserService actIdUserService;
     @Autowired
     private KafkaTemplate kafkaTemplate;
+    @Autowired
+    private AgentKafkaService agentKafkaService;
 
     /**
      * 测试
@@ -205,24 +213,33 @@ public class Test {
 
     @org.junit.Test
     public void testKafka(){
-
-        ListenableFuture listenableFuture = kafkaTemplate.send("agent","123123213");
-        listenableFuture.addCallback(new ListenableFutureCallback() {
-            @Override
-            public void onFailure(Throwable ex) {
-                if(ex instanceof KafkaProducerException) {
-                    ProducerRecord recode = ((KafkaProducerException) ex).getProducerRecord();
-                    System.out.println(recode.key());
-                    System.out.println(recode.key());
-                    ex.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onSuccess(Object result) {
-                System.out.println(result.toString());
-            }
-        });
+        AgentColinfo agentColinfo = new AgentColinfo();
+        agentColinfo.setId("AC20200422000000000018183");
+        agentColinfo.setAgentId("AG20043770130");
+        agentColinfo.setCloType(Status.STATUS_2.status);
+        agentColinfo.setCloRealname("验证");
+        agentColinfo.setCloBankBranch("华夏银行股份有限公司长春吉林大路支行");
+        agentColinfo.setBranchLineNum("304241012222");
+        agentColinfo.setCloBankAccount("6230200010568765");
+        agentColinfo.setAgLegalCernum("220183199009190876");
+        agentKafkaService.sendPayMentMessage("AG20043770130","瑞嘉AG验证登录","","", KafkaMessageType.CARD,KafkaMessageTopic.CardChange.code, JSONObject.toJSONString(agentColinfo));
+//        ListenableFuture listenableFuture = kafkaTemplate.send(KafkaMessageTopic.CardChange.code,"这是一个测试agent");
+//        listenableFuture.addCallback(new ListenableFutureCallback() {
+//            @Override
+//            public void onFailure(Throwable ex) {
+//                if(ex instanceof KafkaProducerException) {
+//                    ProducerRecord recode = ((KafkaProducerException) ex).getProducerRecord();
+//                    System.out.println(recode.key());
+//                    System.out.println(recode.key());
+//                    ex.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onSuccess(Object result) {
+//                System.out.println(result.toString());
+//            }
+//        });
 
     }
 

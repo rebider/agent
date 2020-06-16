@@ -21,6 +21,7 @@ public interface AgentKafkaService {
      * @return
      */
     public AgentResult sendPayMentMessage(String agentId, String agentName, String busId, String busnum, KafkaMessageType ktype, String topic, String message);
+    public AgentResult sendPayMentMessageDb(String agentId, String agentName, String busId, String busnum, KafkaMessageType ktype, String topic, String message);
 
     /**
      * 放存量消息
