@@ -266,10 +266,12 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             freezeRequestDetail.setFreezeReqId(freezeRequest.getId());
             freezeRequestDetail.setAgentId(curAgentFreeze.getAgentId());
             freezeRequestDetail.setFreezeStatus(FreeStatus.JD.getValue().toString());
-            freezeRequestDetail.setFreezaId(curAgentFreeze.getId());
+            freezeRequestDetail.setFreezeId(curAgentFreeze.getId());
             freezeRequestDetail.setFreezeCause(curAgentFreeze.getFreezeCause());
-            freezeRequestDetail.setFreezeDate(new Date());
-            freezeRequestDetail.setFreezePerson(agentFreezePort.getOperationPerson());
+            freezeRequestDetail.setFreezeDate(curAgentFreeze.getFreezeDate());
+            freezeRequestDetail.setFreezePerson(curAgentFreeze.getFreezePerson());
+            freezeRequestDetail.setUnfreezePerson(agentFreezePort.getOperationPerson());
+            freezeRequestDetail.setUnfreezeCause(agentFreezePort.getUnfreezeCause());
             freezeRequestDetail.setFreezeNum(freezeRequest.getId());
             freezeRequestDetail.setStatus(Status.STATUS_1.status);
             freezeRequestDetail.setVersion(BigDecimal.ONE);
@@ -585,6 +587,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 agentFreezePort.setOperationPerson(freezeRequestDetail.getFreezePerson());
                 agentFreezePort.setRemark(freezeRequestDetail.getRemark());
                 agentFreezePort.setNewBusFreeze(String.valueOf(freezeRequestDetail.getNewBusFreeze()));
+                agentFreezePort.setUnfreezeCause(freezeRequestDetail.getUnfreezeCause());
                 FreezeDetail curDetail = new FreezeDetail();
                 curDetail.setBusFreeze(freezeRequestDetail.getBusFreeze());
                 curDetail.setProfitFreeze(freezeRequestDetail.getProfitFreeze());
@@ -824,9 +827,46 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 throw new MessageException("第[" + num + "]行,代理商冻结申请明细保存失败!");
             }
         }
+        //流程中的部门参数
+        Map startPar = agentEnterService.startPar(agentFreezePort.getOperationPerson());
+        if (null == startPar) {
+            logger.info("========用户{}{}启动部门参数为空", agentFreezePort.getOperationPerson(), freezeRequest.getId());
+            throw new MessageException("启动部门参数为空！");
+        }
+        //Todo:增加判断是否为瑞+方法
+        startPar.put("userList", Arrays.asList("10552"));
+        //启动审批
+        String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("agentFreeze"), null, null, startPar);
+        if (proce == null) {
+            logger.info("批量冻结申请提交审批，审批流启动失败{}:{}", agentFreezePort.getOperationPerson(), freezeRequest.getId());
+            throw new MessageException("审批流启动失败！");
+        }
+//        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(freezeRequest.getId());
 
+        //添加审批关系
+        BusActRel record = new BusActRel();
+        record.setBusId(freezeRequest.getId());
+        record.setActivId(proce);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(freezeRequest.getcUserId());
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(BusActRelBusType.freeze.name());
+        record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(agentFreezePort.getAgentId());
+        Agent agent = agentMapper.selectByPrimaryKey(agentFreezePort.getAgentId());
+        if(agent!=null) {
+            record.setAgentName(agent.getAgName());
+        }
+//        record.setNetInBusType("ACTIVITY_"+agentBusInfo.getBusPlatform());//数据权限
+        record.setDataShiro(BusActRelBusType.freeze.key);
+//        record.setAgDocPro(agentBusInfo.getAgDocPro());
+//        record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
+        if (1 != busActRelMapper.insertSelective(record)) {
+            logger.info("批量冻结申请提交审批，启动审批异常，添加审批关系失败{}:{}", freezeRequest.getId(), proce);
+            throw new MessageException("批量申请冻结审批流启动失败：添加审批关系失败！");
+        }
 
-        return AgentResult.ok("申请冻结成功");
+        return AgentResult.ok("批量冻结申请成功");
     }
 
     private AgentResult checkFreezeRule(AgentFreezePort agentFreezePort){

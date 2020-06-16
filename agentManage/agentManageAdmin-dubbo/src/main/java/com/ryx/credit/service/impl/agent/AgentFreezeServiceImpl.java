@@ -111,7 +111,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         if(StringUtils.isNotBlank(agentFreeze.getFreezeStatus())){
             reqMap.put("freezeStatus",agentFreeze.getFreezeStatus());
         }
-
+        reqMap.put("userId",agentFreeze.getFreezePerson());
         List<Map<String, String>> resultMaps = agentFreezeMapper.queryAgentFreezeList(reqMap,page);
         for (Map<String, String> resultMap : resultMaps) {
             resultMap.put("FREESTATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREESTATUS"))));

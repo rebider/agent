@@ -573,16 +573,21 @@
     frd.STOP_COUNT_ORG,
     fr.C_TM,
     frd.remark,
-    cu.name as FREEZE_PERSON_MSG
+    cu.name as FREEZE_PERSON_MSG,
+    cu2.NAME as UNFREEZE_PERSON_MSG,
+    FRD.UNFREEZE_CAUSE,
+    frd.FREEZE_DATE,
+    frd.REMARK as FREEZE_CAUSE_MSG
     FROM
-      A_FREEZE_REQUEST_DETAIL FRD
-        LEFT JOIN A_FREEZE_REQUEST FR
-                  ON FRD.FREEZE_REQ_ID = FR.ID
-        LEFT JOIN A_AGENT AG
-                  ON AG.ID = FRD.AGENT_ID
-        LEFT JOIN A_PLATFORM p
-                  ON p.PLATFORM_NUM = frd.BUS_PLATFORM
-        LEFT JOIN C_USER CU ON frd.FREEZE_PERSON = cu.id
+    A_FREEZE_REQUEST_DETAIL FRD
+    LEFT JOIN A_FREEZE_REQUEST FR
+    ON FRD.FREEZE_REQ_ID = FR.ID
+    LEFT JOIN A_AGENT AG
+    ON AG.ID = FRD.AGENT_ID
+    LEFT JOIN A_PLATFORM p
+    ON p.PLATFORM_NUM = frd.BUS_PLATFORM
+    LEFT JOIN C_USER CU ON frd.FREEZE_PERSON = cu.id
+    left join C_USER cu2 on frd.UNFREEZE_PERSON = cu2.ID
     <trim prefix="where" prefixOverrides="and | or">
       <if test="map.id != null and map.id !=''">
         fr.id = #{map.id}

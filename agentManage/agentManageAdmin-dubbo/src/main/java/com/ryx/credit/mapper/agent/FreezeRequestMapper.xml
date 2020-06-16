@@ -240,7 +240,7 @@
       LEFT JOIN c_user cu
       ON cu.id = fr.c_user_id
       LEFT JOIN c_user cur
-      ON cu.id = fr.reviews_user
+      ON cur.id = fr.reviews_user
       <where>
         and fr.status = '1'
         <if test="map.agentId !=null and map.agentId!=''">
@@ -260,6 +260,9 @@
         </if>
         <if test="map.reqTimeEnd != null and map.reqTimeEnd != ''">
           and fr.C_TM &lt;= to_date(#{#{map.reqTimeEnd}}, 'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.userId != null and map.userId != ''">
+          and fr.c_user_id = #{map.userId}
         </if>
         </where>
         order by fr.id desc
