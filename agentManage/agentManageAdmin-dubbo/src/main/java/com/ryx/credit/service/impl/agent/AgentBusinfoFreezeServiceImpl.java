@@ -222,7 +222,7 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
                 }
             }
         }
-//查询代理商下所有的业务平台
+        //查询代理商下所有的业务平台
         AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
         agentBusInfoExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status)
                 .andAgentIdEqualTo(agentId)
