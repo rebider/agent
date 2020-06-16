@@ -38,6 +38,9 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     public static final String MPOS_SUCESS_respType = "S";//S-成功，E-报错，R-重复请求
     private Logger logger = LoggerFactory.getLogger(MposTermMachineServiceImpl.class);
 
+    @Autowired
+    private OrderActivityService orderActivityService;
+
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{
         JSONObject res = request(FastMap.fastSuccessMap(), AppConfig.getProperty("mpos.queryTermActive"));
@@ -277,7 +280,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws Exception {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws ProcessException {
         String taskId = refundPriceDiffDetailList.get(0).getRefundPriceDiffId();
         List<Map<String, Object>> reqList = new ArrayList<>();
         for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {

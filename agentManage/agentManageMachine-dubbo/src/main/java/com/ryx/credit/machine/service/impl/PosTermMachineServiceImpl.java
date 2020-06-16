@@ -287,7 +287,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws Exception {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws ProcessException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("operation", operation);
         jsonObject.put("isFreeze", "0");

@@ -374,7 +374,7 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws ProcessException {
-        return null;
+        return AgentResult.ok();
     }
 
     @Override
