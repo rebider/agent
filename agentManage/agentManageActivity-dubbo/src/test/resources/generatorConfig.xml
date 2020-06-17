@@ -17,22 +17,22 @@
 			<property name="forceLongs" value="false" />
 		</javaTypeResolver>
 		<!-- 生成模型的包名和位置 -->
-		<javaModelGenerator targetPackage="com.ryx.credit.pojo.admin.order"
-			targetProject="src\main\java">
+		<javaModelGenerator targetPackage="com.ryx.kafka.pojo"
+			targetProject="..\agentManageKafka-dubbo\src\main\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- 生成的映射文件包名和位置 -->
-		<sqlMapGenerator targetPackage="com.ryx.credit.mapper.order"
-			targetProject="src\main\java">
+		<sqlMapGenerator targetPackage="com.ryx.kafka.mapper"
+			targetProject="..\agentManageKafka-dubbo\src\main\java">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		 <!--生成DAO的包名和位置-->
 		<javaClientGenerator type="XMLMAPPER"
-			targetPackage="com.ryx.credit.dao.order" targetProject="src\main\java">
+			targetPackage="com.ryx.kafka.dao" targetProject="..\agentManageKafka-dubbo\src\main\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 		 <!--要生成那些表(更改tableName和domainObjectName就可以)-->
-		<table tableName="O_PAYMENT" domainObjectName="OPayment" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
+		<table tableName="KAFKA_SEND_MESSAGE" domainObjectName="KfkSendMessage" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
 	</context>
 </generatorConfiguration>
