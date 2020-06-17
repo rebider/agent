@@ -184,13 +184,15 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                         criteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
                         criteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
                         criteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                        criteria.andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
                     }
                     agentFreezeExample.or()
                             .andFreezeTypeEqualTo(freeType)
                             .andStatusEqualTo(Status.STATUS_1.status)
                             .andAgentIdEqualTo(agentFreezePort.getAgentId())
                             .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
-                            .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                            .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
+                            .andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
                     List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
                     if(agentFreezes.size()!=0){
                         throw new MessageException("代理商此原因已被冻结:"+FreeType.getmsg(freeType));
@@ -288,12 +290,14 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     freezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
                     freezeCriteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
                     freezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                    freezeCriteria.andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
                 }
                 freezeExample.or().andFreezeTypeEqualTo(freeType)
                         .andStatusEqualTo(Status.STATUS_1.status)
                         .andAgentIdEqualTo(agentFreezePort.getAgentId())
                         .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
-                        .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                        .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
+                        .andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
                 List<AgentFreeze> agentFreezeList = agentFreezeMapper.selectByExample(freezeExample);
                 if(agentFreezeList.size()==0){
                     return AgentResult.fail("解冻信息不存在");

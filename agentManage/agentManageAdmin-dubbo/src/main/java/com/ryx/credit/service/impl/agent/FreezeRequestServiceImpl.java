@@ -109,81 +109,125 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         if (agentFreezePort.getBusPlatform().size() == 0){
             throw new MessageException("获取业务平台异常!");
         }
-        for (BigDecimal freeType:agentFreezePort.getFreeType()){
-            logger.info("冻结类型为[{}]",FreeType.getmsg(freeType));
-            AgentFreezeExample agentFreezeExample = new AgentFreezeExample();
-            if (freeType.compareTo(FreeType.AGNET.code) == 0){
-                AgentFreezeExample.Criteria criteria = agentFreezeExample.createCriteria();
-                criteria.andFreezeTypeIsNull();
-                criteria.andStatusEqualTo(Status.STATUS_1.status);
-                criteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
-                criteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
-                criteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
-            }
-            agentFreezeExample.or()
-                    .andFreezeTypeEqualTo(freeType)
-                    .andStatusEqualTo(Status.STATUS_1.status)
-                    .andAgentIdEqualTo(agentFreezePort.getAgentId())
-                    .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
-                    .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
-            List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
-            if(agentFreezes.size()!=0){
-                throw new MessageException("代理商此原因已被冻结:"+FreeType.getmsg(freeType));
-            }
-            FreezeRequestDetail  freezeRequestDetail  = new FreezeRequestDetail();
-            freezeRequestDetail.setId(idService.genId(TabId.a_freeze_request_detail));
-            freezeRequestDetail.setFreezeReqId(freezeRequest.getId());
-            freezeRequestDetail.setAgentId(agentFreezePort.getAgentId());
-            freezeRequestDetail.setFreezeStatus(FreeStatus.DJ.getValue().toString());
-            freezeRequestDetail.setFreezeCause(agentFreezePort.getFreezeCause());
-            freezeRequestDetail.setFreezeDate(new Date());
-            freezeRequestDetail.setFreezePerson(agentFreezePort.getOperationPerson());
-            freezeRequestDetail.setFreezeNum(freezeRequest.getId());
-            freezeRequestDetail.setRemark(agentFreezePort.getRemark());
-            freezeRequestDetail.setStatus(Status.STATUS_1.status);
-            freezeRequestDetail.setVersion(BigDecimal.ONE);
-            freezeRequestDetail.setFreezeType(freeType);
-            freezeRequestDetail.setNewBusFreeze(new BigDecimal(agentFreezePort.getNewBusFreeze()));
-            /** 保存新增字段 **/
-            AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentFreezePort.getBusPlatform().get(0));
-            freezeRequestDetail.setBusPlatform(agentBusInfo.getBusPlatform());
-            freezeRequestDetail.setBusId(agentFreezePort.getBusPlatform().get(0));
-            freezeRequestDetail.setBusNum(agentBusInfo.getBusNum());
-            if (freeType.compareTo(FreeType.AGNET.code)==0){
-                freezeRequestDetail.setBusFreeze(agentFreezePort.getCurLevel().getBusFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getBusFreeze());
-                freezeRequestDetail.setProfitFreeze(agentFreezePort.getCurLevel().getProfitFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getProfitFreeze());
-                freezeRequestDetail.setReflowFreeze(agentFreezePort.getCurLevel().getReflowFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getReflowFreeze());
-                freezeRequestDetail.setMonthlyFreeze(agentFreezePort.getCurLevel().getMonthlyFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getMonthlyFreeze());
-                freezeRequestDetail.setDailyFreeze(agentFreezePort.getCurLevel().getDailyFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getDailyFreeze());
-                freezeRequestDetail.setStopProfitFreeze(agentFreezePort.getCurLevel().getStopProfitFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getStopProfitFreeze());
-                freezeRequestDetail.setCashFreeze(agentFreezePort.getCurLevel().getCashFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getCashFreeze());
-                freezeRequestDetail.setStopCount(agentFreezePort.getCurLevel().getStopCount()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getStopCount());
-            }else if (freeType.compareTo(FreeType.SUB_AGENT.code)==0){
-                freezeRequestDetail.setBusFreeze(agentFreezePort.getSubLevel().getBusFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getBusFreeze());
-                freezeRequestDetail.setProfitFreeze(agentFreezePort.getSubLevel().getProfitFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getProfitFreeze());
-                freezeRequestDetail.setReflowFreeze(agentFreezePort.getSubLevel().getReflowFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getReflowFreeze());
-                freezeRequestDetail.setMonthlyFreeze(agentFreezePort.getSubLevel().getMonthlyFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getMonthlyFreeze());
-                freezeRequestDetail.setDailyFreeze(agentFreezePort.getSubLevel().getDailyFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getDailyFreeze());
-                freezeRequestDetail.setStopProfitFreeze(agentFreezePort.getSubLevel().getStopProfitFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getStopProfitFreeze());
-                freezeRequestDetail.setCashFreeze(agentFreezePort.getSubLevel().getCashFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getCashFreeze());
-                freezeRequestDetail.setStopCount(agentFreezePort.getSubLevel().getStopCount()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getStopCount());
-            }
-            if(StringUtils.isNotBlank(agentFreezePort.getRemark())){//备注
+        Map userMap = new HashMap();
+        for (String busPlatform: agentFreezePort.getBusPlatform()){
+            for (BigDecimal freeType:agentFreezePort.getFreeType()){
+                logger.info("冻结类型为[{}]",FreeType.getmsg(freeType));
+                AgentFreezeExample agentFreezeExample = new AgentFreezeExample();
+                if (freeType.compareTo(FreeType.AGNET.code) == 0){
+                    AgentFreezeExample.Criteria criteria = agentFreezeExample.createCriteria();
+                    criteria.andFreezeTypeIsNull();
+                    criteria.andStatusEqualTo(Status.STATUS_1.status);
+                    criteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
+                    criteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
+                    criteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                    criteria.andBusIdEqualTo(busPlatform);
+                }
+                agentFreezeExample.or()
+                        .andFreezeTypeEqualTo(freeType)
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andAgentIdEqualTo(agentFreezePort.getAgentId())
+                        .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
+                        .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
+                        .andBusIdEqualTo(busPlatform);
+                List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
+                if(agentFreezes.size()!=0){
+                    throw new MessageException("代理商此原因已被冻结:"+FreeType.getmsg(freeType));
+                }
+
+                //检查是否有在审批中的冻结申请
+                FreezeRequestDetailExample freezeRequestDetailExample = new FreezeRequestDetailExample();
+                freezeRequestDetailExample.or()
+                        .andAgentIdEqualTo(agentFreezePort.getAgentId())
+                        .andFreezeTypeEqualTo(freeType)
+                        .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
+                        .andBusIdEqualTo(busPlatform)
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                List<FreezeRequestDetail> freezeRequestDetails = freezeRequestDetailMapper.selectByExample(freezeRequestDetailExample);
+                if (freezeRequestDetails!=null && freezeRequestDetails.size()>0){
+                    for (FreezeRequestDetail freezeRequestDetail : freezeRequestDetails) {
+                        String freezeReqId = freezeRequestDetail.getFreezeReqId();
+                        FreezeRequest freezeRequestApp = freezeRequestMapper.selectByPrimaryKey(freezeReqId);
+                        if (freezeRequestApp !=null && freezeRequestApp.getReviewsStat().compareTo(AgStatus.Approving.status)==0 && freezeRequestApp.getStatus().compareTo(Status.STATUS_1.status)==0){
+                            throw new MessageException("代理商此原因已申请冻结:"+FreeType.getmsg(freeType));
+                        }
+                    }
+
+                }
+                FreezeRequestDetail  freezeRequestDetail  = new FreezeRequestDetail();
+                freezeRequestDetail.setId(idService.genId(TabId.a_freeze_request_detail));
+                freezeRequestDetail.setFreezeReqId(freezeRequest.getId());
+                freezeRequestDetail.setAgentId(agentFreezePort.getAgentId());
+                freezeRequestDetail.setFreezeStatus(FreeStatus.DJ.getValue().toString());
+                freezeRequestDetail.setFreezeCause(agentFreezePort.getFreezeCause());
+                freezeRequestDetail.setFreezeDate(new Date());
+                freezeRequestDetail.setFreezePerson(agentFreezePort.getOperationPerson());
+                freezeRequestDetail.setFreezeNum(freezeRequest.getId());
                 freezeRequestDetail.setRemark(agentFreezePort.getRemark());
-            }
-            if (freezeRequestDetailMapper.insert(freezeRequestDetail)!=1){
-                throw new MessageException("代理商冻结申请明细保存失败!");
+                freezeRequestDetail.setStatus(Status.STATUS_1.status);
+                freezeRequestDetail.setVersion(BigDecimal.ONE);
+                freezeRequestDetail.setFreezeType(freeType);
+                freezeRequestDetail.setNewBusFreeze(new BigDecimal(agentFreezePort.getNewBusFreeze()));
+                /** 保存新增字段 **/
+                AgentBusInfo agentBusInfo = agentBusinfoService.queryAgentBusInfoById(busPlatform);
+                if (agentBusInfo != null){
+                    freezeRequestDetail.setBusPlatform(agentBusInfo.getBusPlatform());
+                    freezeRequestDetail.setBusNum(agentBusInfo.getBusNum());
+                }
+                freezeRequestDetail.setBusId(busPlatform);
+                if (freeType.compareTo(FreeType.AGNET.code)==0){
+                    freezeRequestDetail.setBusFreeze(agentFreezePort.getCurLevel().getBusFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getBusFreeze());
+                    freezeRequestDetail.setProfitFreeze(agentFreezePort.getCurLevel().getProfitFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getProfitFreeze());
+                    freezeRequestDetail.setReflowFreeze(agentFreezePort.getCurLevel().getReflowFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getReflowFreeze());
+                    freezeRequestDetail.setMonthlyFreeze(agentFreezePort.getCurLevel().getMonthlyFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getMonthlyFreeze());
+                    freezeRequestDetail.setDailyFreeze(agentFreezePort.getCurLevel().getDailyFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getDailyFreeze());
+                    freezeRequestDetail.setStopProfitFreeze(agentFreezePort.getCurLevel().getStopProfitFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getStopProfitFreeze());
+                    freezeRequestDetail.setCashFreeze(agentFreezePort.getCurLevel().getCashFreeze()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getCashFreeze());
+                    freezeRequestDetail.setStopCount(agentFreezePort.getCurLevel().getStopCount()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getStopCount());
+                }else if (freeType.compareTo(FreeType.SUB_AGENT.code)==0){
+                    freezeRequestDetail.setBusFreeze(agentFreezePort.getSubLevel().getBusFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getBusFreeze());
+                    freezeRequestDetail.setProfitFreeze(agentFreezePort.getSubLevel().getProfitFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getProfitFreeze());
+                    freezeRequestDetail.setReflowFreeze(agentFreezePort.getSubLevel().getReflowFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getReflowFreeze());
+                    freezeRequestDetail.setMonthlyFreeze(agentFreezePort.getSubLevel().getMonthlyFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getMonthlyFreeze());
+                    freezeRequestDetail.setDailyFreeze(agentFreezePort.getSubLevel().getDailyFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getDailyFreeze());
+                    freezeRequestDetail.setStopProfitFreeze(agentFreezePort.getSubLevel().getStopProfitFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getStopProfitFreeze());
+                    freezeRequestDetail.setCashFreeze(agentFreezePort.getSubLevel().getCashFreeze()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getCashFreeze());
+                    freezeRequestDetail.setStopCount(agentFreezePort.getSubLevel().getStopCount()==null?BigDecimal.ZERO:agentFreezePort.getSubLevel().getStopCount());
+                }
+                if(StringUtils.isNotBlank(agentFreezePort.getRemark())){//备注
+                    freezeRequestDetail.setRemark(agentFreezePort.getRemark());
+                }
+                if (freezeRequestDetailMapper.insert(freezeRequestDetail)!=1){
+                    throw new MessageException("代理商冻结申请明细保存失败!");
+                }
+                if (agentBusInfo!=null){
+                    PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+                    if (platForm.getPlatformType().equals("RJPOS") || platForm.getPlatformType().equals("RJQZ")) {
+                        userMap.put("RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"RJ").getdItemvalue());
+                    }else {
+                        userMap.put("NOT_RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"NOT_RJ").getdItemvalue());
+                    }
+                }else {
+                    throw new MessageException("业务平台不存在");
+                }
             }
         }
+
         //流程中的部门参数
         Map startPar = agentEnterService.startPar(freezeRequest.getcUserId());
         if (null == startPar) {
             logger.info("========用户{}{}启动部门参数为空", freezeRequest.getcUserId(), freezeRequest.getId());
             throw new MessageException("启动部门参数为空！");
         }
+        List<String> userList = new ArrayList<>();
+        if (userMap.get("RJ")!=null){
+            userList.add(String.valueOf(userMap.get("RJ")));
+        }
+        if(userMap.get("NOT_RJ")!=null){
+            userList.add(String.valueOf(userMap.get("NOT_RJ")));
+        }
         //Todo:增加判断是否为瑞+方法
-        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentFreezePort.getBusPlatform().get(0));
-        getUserList(agentBusInfo,startPar);
+        startPar.put("userList",userList);
         //启动审批
         String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("agentFreeze"), null, null, startPar);
         if (proce == null) {
@@ -206,10 +250,10 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         if(agent!=null) {
             record.setAgentName(agent.getAgName());
         }
-        record.setNetInBusType("ACTIVITY_"+agentBusInfo.getBusPlatform());//数据权限
+//        record.setNetInBusType("ACTIVITY_"+agentBusInfo.getBusPlatform());//数据权限
         record.setDataShiro(BusActRelBusType.freeze.key);
-        record.setAgDocPro(agentBusInfo.getAgDocPro());
-        record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
+//        record.setAgDocPro(agentBusInfo.getAgDocPro());
+//        record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("冻结申请提交审批，启动审批异常，添加审批关系失败{}:{}", freezeRequest.getId(), proce);
             throw new MessageException("冻结申请审批流启动失败：添加审批关系失败！");
@@ -226,6 +270,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         if(StringUtils.isBlank(agentFreezePort.getUnfreezeCause())){
             return AgentResult.fail("解冻原因必填");
         }
+        Map userMap = new HashMap();
         FreezeRequest freezeRequest = new FreezeRequest();
         freezeRequest.setId(idService.genId(TabId.a_freeze_request));
         freezeRequest.setReqType(FreezeRequestType.UnFreeze.code);
@@ -250,19 +295,40 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 criteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
                 criteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
                 criteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                criteria.andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
             }
             agentFreezeExample.or()
                     .andFreezeTypeEqualTo(freeType)
                     .andStatusEqualTo(Status.STATUS_1.status)
                     .andAgentIdEqualTo(agentFreezePort.getAgentId())
                     .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
-                    .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                    .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
+                    .andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
             List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
             if(agentFreezes.size()==0){
                 return AgentResult.fail("解冻信息不存在");
             }
             if(agentFreezes.size()!=1){
                 return AgentResult.fail("解冻信息不唯一,请联系管理员");
+            }
+            //检查是否有在审批中的解冻申请
+            FreezeRequestDetailExample freezeRequestDetailExample = new FreezeRequestDetailExample();
+            freezeRequestDetailExample.or()
+                    .andAgentIdEqualTo(agentFreezePort.getAgentId())
+                    .andFreezeTypeEqualTo(freeType)
+                    .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
+                    .andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0))
+                    .andStatusEqualTo(Status.STATUS_1.status);
+            List<FreezeRequestDetail> freezeRequestDetails = freezeRequestDetailMapper.selectByExample(freezeRequestDetailExample);
+            if (freezeRequestDetails!=null && freezeRequestDetails.size()>0){
+                for (FreezeRequestDetail freezeRequestDetail : freezeRequestDetails) {
+                    String freezeReqId = freezeRequestDetail.getFreezeReqId();
+                    FreezeRequest freezeRequestApp = freezeRequestMapper.selectByPrimaryKey(freezeReqId);
+                    if (freezeRequestApp !=null && freezeRequestApp.getReviewsStat().compareTo(AgStatus.Approving.status)==0 && freezeRequestApp.getStatus().compareTo(Status.STATUS_1.status)==0){
+                        throw new MessageException("代理商此原因已申请冻结:"+FreeType.getmsg(freeType));
+                    }
+                }
+
             }
             AgentFreeze curAgentFreeze = agentFreezes.get(0);
             busId = curAgentFreeze.getBusId();
@@ -284,7 +350,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             freezeRequestDetail.setFreezeType(freeType);
             freezeRequestDetail.setNewBusFreeze(curAgentFreeze.getNewBusFreeze());
             freezeRequestDetail.setBusPlatform(curAgentFreeze.getBusPlatform());
-            freezeRequestDetail.setBusId(curAgentFreeze.getBusPlatform());
+            freezeRequestDetail.setBusId(curAgentFreeze.getBusId());
             freezeRequestDetail.setBusNum(curAgentFreeze.getBusNum());
             freezeRequestDetail.setBusFreeze(curAgentFreeze.getBusFreeze()==null?BigDecimal.ZERO:curAgentFreeze.getBusFreeze());
             freezeRequestDetail.setProfitFreeze(curAgentFreeze.getProfitFreeze()==null?BigDecimal.ZERO:curAgentFreeze.getProfitFreeze());
@@ -297,6 +363,17 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             if (freezeRequestDetailMapper.insert(freezeRequestDetail)!=1){
                 throw new MessageException("代理商解冻冻结申请明细保存失败!");
             }
+            AgentBusInfo agentBusInfo = agentBusinfoService.queryAgentBusInfoById(freezeRequestDetail.getBusId());
+            if (agentBusInfo!=null){
+                PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+                if (platForm.getPlatformType().equals("RJPOS") || platForm.getPlatformType().equals("RJQZ")) {
+                    userMap.put("RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"RJ").getdItemvalue());
+                }else {
+                    userMap.put("NOT_RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"NOT_RJ").getdItemvalue());
+                }
+            }else {
+                throw new MessageException("业务平台不存在");
+            }
         }
         //流程中的部门参数
         Map startPar = agentEnterService.startPar(freezeRequest.getcUserId());
@@ -306,7 +383,14 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         }
         //Todo:增加判断是否为瑞+方法
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
-        getUserList(agentBusInfo,startPar);
+        List<String> userList = new ArrayList<>();
+        if (userMap.get("RJ")!=null){
+            userList.add(String.valueOf(userMap.get("RJ")));
+        }
+        if(userMap.get("NOT_RJ")!=null){
+            userList.add(String.valueOf(userMap.get("NOT_RJ")));
+        }
+        startPar.put("userList",userList);
         //启动审批
         String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("agentFreeze"), null, null, startPar);
         if (proce == null) {
@@ -488,7 +572,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                     agentFreeze.setFreezeType(freeType);
                     agentFreeze.setNewBusFreeze(new BigDecimal(agentFreezePort.getNewBusFreeze()));
                     /** 保存新增字段 **/
-                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(busPlatform);
+                    AgentBusInfo agentBusInfo = agentBusinfoService.queryAgentBusInfoById(busPlatform);
                     agentFreeze.setBusPlatform(agentBusInfo.getBusPlatform());
                     agentFreeze.setBusId(busPlatform);
                     agentFreeze.setBusNum(agentBusInfo.getBusNum());
@@ -532,11 +616,61 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception {
         try {
             FreezeRequest freezeRequest = freezeRequestMapper.selectByPrimaryKey(agentVo.getAgentBusId());
-            freezeRequest.setReviewsStat(AgStatus.Approved.status);
+            if(Objects.equals("pass",agentVo.getApprovalResult())
+                    && StringUtils.isBlank(agentVo.getOrderAprDept())){
+                freezeRequest.setReviewsStat(AgStatus.Approved.status);
+            }else {
+                freezeRequest.setReviewsStat(AgStatus.Refuse.status);
+            }
             freezeRequest.setReviewsDate(new Date());
             freezeRequest.setReviewsUser(userId);
             freezeRequestMapper.updateByPrimaryKeySelective(freezeRequest);
-            try {
+            AgentResult agentResult = new AgentResult();
+            //保存冻结信息
+            FreezeRequestDetailExample detailExample = new FreezeRequestDetailExample() ;
+            detailExample.or().andFreezeReqIdEqualTo(freezeRequest.getId())
+                    .andStatusEqualTo(Status.STATUS_1.status);
+            List<FreezeRequestDetail> freezeRequestDetails = freezeRequestDetailMapper.selectByExample(detailExample);
+            for (FreezeRequestDetail freezeRequestDetail : freezeRequestDetails) {
+                AgentFreezePort agentFreezePort = new AgentFreezePort();
+                agentFreezePort.setAgentId(freezeRequestDetail.getAgentId());
+                agentFreezePort.setFreeType(Arrays.asList(freezeRequestDetail.getFreezeType()));
+                agentFreezePort.setFreezeCause(freezeRequestDetail.getFreezeCause());
+                agentFreezePort.setBusPlatform(Arrays.asList(freezeRequestDetail.getBusId()));
+                agentFreezePort.setOperationPerson(freezeRequestDetail.getFreezePerson());
+                agentFreezePort.setRemark(freezeRequestDetail.getRemark());
+                agentFreezePort.setNewBusFreeze(String.valueOf(freezeRequestDetail.getNewBusFreeze()));
+                agentFreezePort.setUnfreezeCause(freezeRequestDetail.getUnfreezeCause());
+                FreezeDetail curDetail = new FreezeDetail();
+                curDetail.setBusFreeze(freezeRequestDetail.getBusFreeze());
+                curDetail.setProfitFreeze(freezeRequestDetail.getProfitFreeze());
+                curDetail.setReflowFreeze(freezeRequestDetail.getReflowFreeze());
+                curDetail.setMonthlyFreeze(freezeRequestDetail.getMonthlyFreeze());
+                curDetail.setDailyFreeze(freezeRequestDetail.getDailyFreeze());
+                curDetail.setStopProfitFreeze(freezeRequestDetail.getStopProfitFreeze());
+                curDetail.setStopCount(freezeRequestDetail.getStopCount());
+                curDetail.setNewBusFreeze(freezeRequestDetail.getNewBusFreeze());
+                curDetail.setCashFreeze(freezeRequestDetail.getCashFreeze());
+                agentFreezePort.setCurLevel(curDetail);
+                agentFreezePort.setFreezeNum(agentVo.getAgentBusId());
+                if (freezeRequest.getReqType().compareTo(FreezeRequestType.Freeze.code)== 0 ){
+                    agentResult  = agentFreezeService.agentFreeze(agentFreezePort);
+                }else if (freezeRequest.getReqType().compareTo(FreezeRequestType.UnFreeze.code) == 0){
+                    agentResult = agentFreezeService.agentUnFreeze(agentFreezePort);
+                }else if (freezeRequest.getReqType().compareTo(FreezeRequestType.Modify.code)== 0){
+                    agentFreezePort.setUnfreezeCause("申请变更解冻");
+                    agentResult = agentFreezeService.agentUnFreeze(agentFreezePort);
+                    agentFreezePort.setUnfreezeCause(freezeRequestDetail.getUnfreezeCause());
+                    agentResult  = agentFreezeService.agentFreeze(agentFreezePort);
+                }
+                if (!agentResult.isOK()){
+                    throw new MessageException(FreezeRequestType.getMsg(freezeRequest.getReqType())+"代理商失败！");
+                }
+                Map mapData = (Map) agentResult.getData();
+                AgentFreeze date = (AgentFreeze)mapData.get("data");
+                AgentResult agentResult1 = agentBusinfoFreezeService.agentBusinfoFreeze(date, freezeRequest.getcUserId());
+
+            }
                 Map<String, Object> reqMap = new HashMap<>();
                 reqMap.put("rs", agentVo.getApprovalResult());
                 reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
@@ -547,13 +681,6 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 if (map == null) {
                     throw new MessageException("工作流处理任务异常");
                 }
-            } catch (MessageException | ProcessException e) {
-                e.printStackTrace();
-                throw new MessageException(e.getLocalizedMessage());
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new MessageException("catch工作流处理任务异常!");
-            }
         } catch (MessageException | ProcessException e) {
             e.printStackTrace();
             throw new MessageException(e.getLocalizedMessage());
@@ -570,7 +697,6 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         try {
             logger.info("申请冻结审批完成:{},{}", insid, actname);
             //审批流关系
-            AgentResult agentResult = new AgentResult();
             BusActRel busActRel = busActRelService.findById(insid);
             if (actname.equals("finish_end")) { //审批完成
                 logger.info("审批通过{}", busActRel.getBusId());
@@ -578,49 +704,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 if (1 != busActRelService.updateByPrimaryKey(busActRel)) {
                     throw new MessageException("请重新提交！");
                 }
-                FreezeRequest freezeRequest = freezeRequestMapper.selectByPrimaryKey(busActRel.getBusId());
-                //保存冻结信息
-                FreezeRequestDetailExample detailExample = new FreezeRequestDetailExample() ;
-                detailExample.or().andFreezeReqIdEqualTo(freezeRequest.getId())
-                        .andStatusEqualTo(Status.STATUS_1.status);
-                List<FreezeRequestDetail> freezeRequestDetails = freezeRequestDetailMapper.selectByExample(detailExample);
-                for (FreezeRequestDetail freezeRequestDetail : freezeRequestDetails) {
-                    AgentFreezePort agentFreezePort = new AgentFreezePort();
-                    agentFreezePort.setAgentId(freezeRequestDetail.getAgentId());
-                    agentFreezePort.setFreeType(Arrays.asList(freezeRequestDetail.getFreezeType()));
-                    agentFreezePort.setFreezeCause(freezeRequestDetail.getFreezeCause());
-                    agentFreezePort.setBusPlatform(Arrays.asList(freezeRequestDetail.getBusId()));
-                    agentFreezePort.setOperationPerson(freezeRequestDetail.getFreezePerson());
-                    agentFreezePort.setRemark(freezeRequestDetail.getRemark());
-                    agentFreezePort.setNewBusFreeze(String.valueOf(freezeRequestDetail.getNewBusFreeze()));
-                    agentFreezePort.setUnfreezeCause(freezeRequestDetail.getUnfreezeCause());
-                    FreezeDetail curDetail = new FreezeDetail();
-                    curDetail.setBusFreeze(freezeRequestDetail.getBusFreeze());
-                    curDetail.setProfitFreeze(freezeRequestDetail.getProfitFreeze());
-                    curDetail.setReflowFreeze(freezeRequestDetail.getReflowFreeze());
-                    curDetail.setMonthlyFreeze(freezeRequestDetail.getMonthlyFreeze());
-                    curDetail.setDailyFreeze(freezeRequestDetail.getDailyFreeze());
-                    curDetail.setStopProfitFreeze(freezeRequestDetail.getStopProfitFreeze());
-                    curDetail.setStopCount(freezeRequestDetail.getStopCount());
-                    curDetail.setNewBusFreeze(freezeRequestDetail.getNewBusFreeze());
-                    curDetail.setCashFreeze(freezeRequestDetail.getCashFreeze());
-                    agentFreezePort.setCurLevel(curDetail);
-                    agentFreezePort.setFreezeNum(busActRel.getBusId());
-                    if (freezeRequest.getReqType().compareTo(FreezeRequestType.Freeze.code)== 0 ){
-                        agentResult  = agentFreezeService.agentFreeze(agentFreezePort);
-                    }else if (freezeRequest.getReqType().compareTo(FreezeRequestType.UnFreeze.code) == 0){
-                        agentResult = agentFreezeService.agentUnFreeze(agentFreezePort);
-                    }else if (freezeRequest.getReqType().compareTo(FreezeRequestType.Modify.code)== 0){
-                        agentResult  = agentFreezeService.agentFreeze(agentFreezePort);
-                    }
-                    if (!agentResult.isOK()){
-                        throw new MessageException(FreezeRequestType.getMsg(freezeRequest.getReqType())+"代理商失败！");
-                    }
-                    Map mapData = (Map) agentResult.getData();
-                    AgentFreeze date = (AgentFreeze)mapData.get("data");
-                    AgentResult agentResult1 = agentBusinfoFreezeService.agentBusinfoFreeze(date, freezeRequest.getcUserId());
 
-                }
             } else if(actname.equals("reject_end")) { //审批拒绝
                 logger.info("审批完审批拒绝{}", busActRel.getBusId());
                 busActRel.setActivStatus(AgStatus.Refuse.name());
@@ -810,13 +894,15 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                     criteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
                     criteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
                     criteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                    criteria.andBusIdEqualTo(freezeRequestDetail.getBusId());
                 }
                 agentFreezeExample.or()
                         .andFreezeTypeEqualTo(freeType)
                         .andStatusEqualTo(Status.STATUS_1.status)
                         .andAgentIdEqualTo(agentFreezePort.getAgentId())
                         .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
-                        .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                        .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
+                        .andBusIdEqualTo(freezeRequestDetail.getBusId());
                 List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
                 if(agentFreezes.size()!=0){
                     throw new MessageException("第[" + numFreeze + "]行,代理商此原因已被冻结:"+FreeType.getmsg(freeType));
@@ -923,15 +1009,4 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         return AgentResult.ok();
     }
 
-    public Map getUserList(AgentBusInfo agentBusInfo,Map map){
-        PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
-        List<String> userList = new ArrayList<>();
-        if (platForm.getPlatformType().equals("RJPOS") || platForm.getPlatformType().equals("RJQZ")) {
-            userList.add(dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"RJ").getdItemname());
-        }else {
-            userList.add(dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"NOT_RJ").getdItemname());
-        }
-        map.put("userList",userList);
-        return  map;
-    }
 }
