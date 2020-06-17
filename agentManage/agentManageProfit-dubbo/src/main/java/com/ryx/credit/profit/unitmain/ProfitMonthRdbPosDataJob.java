@@ -69,7 +69,7 @@ public class ProfitMonthRdbPosDataJob {
      * transDate 交易日期（空则为上一月）
      * 每月3号上午11点
      */
-    @Scheduled(cron = "${shoushua_yuejie_job_cron}")
+    /*@Scheduled(cron = "${shoushua_yuejie_job_cron}")*/
     public void doCron() {
         if (!"preproduction".equals(environment)) {
             String transDate = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);

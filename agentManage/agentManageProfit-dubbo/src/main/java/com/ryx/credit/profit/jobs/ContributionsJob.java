@@ -34,7 +34,7 @@ public class ContributionsJob {
     /**
      * 每月6日凌晨1点
      */
-    @Scheduled(cron = "0 0 1 6 * ?")
+    /*@Scheduled(cron = "0 0 1 6 * ?")*/
     public void getEarnestMoney(){
         //获取系统当前时间
         String deductDate = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
