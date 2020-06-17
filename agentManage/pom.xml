@@ -576,7 +576,6 @@
             </plugin>
         </plugins>
     </build>
-
     <repositories>
         <repository>
             <releases>
