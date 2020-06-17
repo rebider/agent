@@ -1197,7 +1197,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             String orgId = "";
             String busProCode = "";
 
-            List col = Arrays.asList(ReceiptPlanExportColum.LogisticsDetail_column.col);
+            List<String> col = Arrays.asList(ReceiptPlanExportColum.LogisticsDetail_column.col);
             snNum = String.valueOf(objectList.get(col.indexOf("SN_NUM"))).trim();
             orgId = String.valueOf(objectList.get(col.indexOf("ORG_ID"))).trim();
             busProCode = String.valueOf(objectList.get(col.indexOf("BUS_PRO_CODE"))).trim();
@@ -1218,13 +1218,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
             //存储物流明细
             OLogisticsDetail insLogisticsDetail = oLogisticsDetails.get(0);
             OLogisticsDetail upLogisticsDetail = oLogisticsDetails.get(0);
-
-            //修改之前物流明细状态
-            upLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
-            upLogisticsDetail.setuTime(new Date());
-            if (1 != oLogisticsDetailMapper.updateByPrimaryKeySelective(upLogisticsDetail)) {
-                throw new MessageException("更新物流明细失败:" + upLogisticsDetail.getId());
-            }
 
             //查询与sn对应的活动
             OActivityExample oActivityExample = new OActivityExample();
@@ -1278,6 +1271,13 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 insLogisticsDetail.setStandTime(oActivities.get(0).getStandTime());
                 insLogisticsDetail.setSbusStatus(Status.STATUS_1.status);
                 insLogisticsDetail.setSbusMsg("导入数据（可用）");
+
+                //修改之前物流明细状态
+                upLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
+                upLogisticsDetail.setuTime(new Date());
+                if (1 != oLogisticsDetailMapper.updateByPrimaryKeySelective(upLogisticsDetail)) {
+                    throw new MessageException("更新物流明细失败:" + upLogisticsDetail.getId());
+                }
             } else if (oActivities.size() > 1) {
                 insLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
                 insLogisticsDetail.setcTime(new Date());
@@ -1286,6 +1286,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 insLogisticsDetail.setVersion(Status.STATUS_0.status);
                 insLogisticsDetail.setSbusStatus(Status.STATUS_2.status);
                 insLogisticsDetail.setSbusMsg("活动不唯一");
+
+                //导入数据不可用，只记录，不修改之前物流明细状态
             } else {
                 insLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
                 insLogisticsDetail.setcTime(new Date());
@@ -1294,6 +1296,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 insLogisticsDetail.setVersion(Status.STATUS_0.status);
                 insLogisticsDetail.setSbusStatus(Status.STATUS_2.status);
                 insLogisticsDetail.setSbusMsg("活动未配置");
+
+                //导入数据不可用，只记录，不修改之前物流明细状态
             }
             if (1 != oLogisticsDetailMapper.insertSelective(insLogisticsDetail)) {
                 logger.info("导入物流明细失败，物流明细SN=={}",insLogisticsDetail.getId());
