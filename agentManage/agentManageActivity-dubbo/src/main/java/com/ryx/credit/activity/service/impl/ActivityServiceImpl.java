@@ -364,7 +364,7 @@ public class ActivityServiceImpl implements ActivityService {
         page.setBegin(0);
         page.setEnd(10);
         ActRuTask actRuTask = new ActRuTask();
-        actRuTask.setExecutionId(executionId);
+        actRuTask.setProcInstId(executionId);
         HashMap<String,Object> hashMap = actRuTaskService.configExample(page, actRuTask);
         List<ActRuTask> actRuTaskList = (List<ActRuTask>) hashMap.get("list");
         if(actRuTaskList.size()>0){

@@ -33,6 +33,4 @@ public interface FreezeRequestService {
 
     AgentResult addList(List<List<Object>> list, String userid) throws Exception;
 
-    AgentResult agentFreezeBatch( List<FreezeRequestDetail> freezeRequestDetails,AgentFreezePort agentFreezePort)throws MessageException;
-
 }
