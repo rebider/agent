@@ -952,7 +952,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 throw new MessageException("换活动抵扣欠款失败!id"+oRefundPriceDiff.getId()+","+agentResult.getMsg());
             }
             //调用接口调整
-            AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust", "0");
+            AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust", "1");
             if(!synOrVerifyResult.isOK()) throw new ProcessException(synOrVerifyResult.getMsg());
         }
         return AgentResult.ok();

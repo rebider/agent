@@ -754,7 +754,7 @@ public class CompensateServiceImpl implements CompensateService {
             }
 
             //业务平台接口，校验并冻结
-            AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check", "1");
+            AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check", "0");
             if(!synOrVerifyResult.isOK()){
                 throw new ProcessException(synOrVerifyResult.getMsg());
             }
@@ -1574,8 +1574,8 @@ public class CompensateServiceImpl implements CompensateService {
             }
 
             //每次执行前校验
-            AgentResult synOrVerifyResult_check = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check", "0");
-            if (!synOrVerifyResult_check.isOK()) throw new MessageException(synOrVerifyResult_check.getMsg());
+            AgentResult synOrVerifyResultCheck = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "check", "0");
+            if (!synOrVerifyResultCheck.isOK()) throw new MessageException(synOrVerifyResultCheck.getMsg());
 
             AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(oRefundPriceDiffDetails, "adjust", "1");
             if (!synOrVerifyResult.isOK()) throw new MessageException(synOrVerifyResult.getMsg());

@@ -411,7 +411,8 @@ public class MposTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
-        try {
+        return AgentResult.ok();
+        /*try {
             String httpString = JSONObject.toJSONString(pamMap);
             logger.info("手刷换活动解锁参数:{},{}", AppConfig.getProperty("mpos.termUnlock"), httpString);
             String retString = HttpClientUtil.doPostJson(AppConfig.getProperty("mpos.termUnlock"), httpString);
@@ -435,7 +436,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
-        }
+        }*/
     }
 
     @Override
