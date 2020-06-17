@@ -37,7 +37,7 @@ public class ToolsDeductJob {
      * @Description: 每月6号凌晨1点执行
      * @Date: 11:49 2019/1/24
      */
-    @Scheduled(cron = "0 0 1 6 * ?")
+    /*@Scheduled(cron = "0 0 1 6 * ?")*/
     public void execut(){
         String deductDate = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
         try {

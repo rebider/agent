@@ -68,7 +68,7 @@ public class ProfitMposDiffDataJob {
      * @Description: 手刷补差数据同步，每月3号10:30
      * @Date: 11:04 2019/1/24
      */
-    @Scheduled(cron = "${shoushua_diffdata_job_cron}")
+    /*@Scheduled(cron = "${shoushua_diffdata_job_cron}")*/
     public void doCron(){
         if (!"preproduction".equals(environment)) {
             String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
