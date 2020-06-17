@@ -577,7 +577,8 @@
     cu2.NAME as UNFREEZE_PERSON_MSG,
     FRD.UNFREEZE_CAUSE,
     frd.FREEZE_DATE,
-    frd.REMARK as FREEZE_CAUSE_MSG
+    frd.REMARK as FREEZE_CAUSE_MSG,
+    frd.FREEZE_NUM
     FROM
     A_FREEZE_REQUEST_DETAIL FRD
     LEFT JOIN A_FREEZE_REQUEST FR
@@ -594,6 +595,18 @@
       </if>
       <if test="map.reqType != null and map.reqType != ''">
        and fr.req_type = #{map.reqType}
+      </if>
+      <if test="map.userId !=null and map.userId != '' ">
+        and frd.BUS_PLATFORM in (
+        select e.PLATFORM_NUM from A_PLATFORM e
+        inner join c_resource a on ('AGENT_LIST_PLATFORM_'||e.PLATFORM_NUM ) = a.URL
+        left join c_role_resource b  on a.id=b.resource_id
+        left join c_role c on c.id=b.role_id
+        left join c_user_role d on d.role_id=c.id
+        <where>
+          <if test="map.userId != null and map.userId != ''">and d.user_id =#{map.userId} </if>
+        </where>
+        )
       </if>
     </trim>
   </sql>

@@ -118,7 +118,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             resultMap.put("FREEZE_CAUSE_MSG",FreeCause.getContentByValue(resultMap.get("FREEZE_CAUSE")));
             resultMap.put("FREEZE_STATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREEZE_STATUS"))));
             resultMap.put("FREEZE_TYPE",FreeType.getmsg(new BigDecimal(String.valueOf(resultMap.get("FREEZE_TYPE")))));
-            resultMap.put("UNFREEZE_CAUSE",UnfreeCause.getContentByValue(resultMap.get("UNFREEZE_CAUSE")));
+            resultMap.put("UNFREEZE_CAUSE",UnfreeCause.getContentByValue(resultMap.get("UNFREEZE_CAUSE")).equals("")?resultMap.get("UNFREEZE_CAUSE"):UnfreeCause.getContentByValue(resultMap.get("UNFREEZE_CAUSE")));
             if(StringUtils.isNotBlank(resultMap.get("FREEZE_PERSON"))){
                 if(resultMap.get("FREEZE_PERSON").equals(String.valueOf(FreePerson.XTDJ.getValue()))){
                     resultMap.put("FREEZE_PERSON_MSG",FreePerson.getContentByValue(new BigDecimal(resultMap.get("FREEZE_PERSON"))));
@@ -163,6 +163,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
 
         log.info("代理商冻结请求参数：{}",JsonUtil.objectToJson(agentFreezePort));
         String indentifier = "";
+        Map resMap = new HashMap();
         try {
             indentifier = redisService.lockWithTimeout(RedisCachKey.AGENT_FREEZE_LOCK + agentFreezePort.getOperationPerson()+agentFreezePort.getFreezeNum(), RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
             if (StringUtils.isBlank(indentifier)) {
@@ -211,7 +212,6 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     agentFreeze.setBusPlatform(agentBusInfo.getBusPlatform());
                     agentFreeze.setBusId(agentFreezePort.getBusPlatform().get(0));
                     agentFreeze.setBusNum(agentBusInfo.getBusNum());
-//                    if (freeType.compareTo(FreeType.AGNET.code)==0){
                     agentFreeze.setNewBusFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getNewBusFreeze());
                     agentFreeze.setBusFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getBusFreeze());
                     agentFreeze.setProfitFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getProfitFreeze());
@@ -221,16 +221,6 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     agentFreeze.setStopProfitFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getStopProfitFreeze());
                     agentFreeze.setCashFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getCashFreeze());
                     agentFreeze.setStopCount(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getStopCount());
-//                    }else if (freeType.compareTo(FreeType.SUB_AGENT.code)==0){
-//                        agentFreeze.setBusFreeze(agentFreezePort.getSubLevel().getBusFreeze());
-//                        agentFreeze.setProfitFreeze(agentFreezePort.getSubLevel().getProfitFreeze());
-//                        agentFreeze.setReflowFreeze(agentFreezePort.getSubLevel().getReflowFreeze());
-//                        agentFreeze.setMonthlyFreeze(agentFreezePort.getSubLevel().getMonthlyFreeze());
-//                        agentFreeze.setDailyFreeze(agentFreezePort.getSubLevel().getDailyFreeze());
-//                        agentFreeze.setStopProfitFreeze(agentFreezePort.getSubLevel().getStopProfitFreeze());
-//                        agentFreeze.setCashFreeze(agentFreezePort.getSubLevel().getCashFreeze());
-//                        agentFreeze.setStopCount(agentFreezePort.getSubLevel().getStopCount());
-//                    }
                     if(StringUtils.isNotBlank(agentFreezePort.getRemark())){//备注
                         agentFreeze.setRemark(agentFreezePort.getRemark());
                     }
@@ -246,11 +236,12 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                             }
                         }
                     }
+                    resMap.put("data",agentFreeze);
                 }
 //            }
 
 
-            return AgentResult.ok("冻结成功");
+            return AgentResult.ok(resMap);
         }finally {
             if(StringUtils.isNotBlank(indentifier)){
                 redisService.releaseLock(RedisCachKey.AGENT_FREEZE_LOCK + agentFreezePort.getOperationPerson()+agentFreezePort.getFreezeNum(), indentifier);
@@ -271,6 +262,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
 
         log.info("代理商解冻请求参数：{}",JsonUtil.objectToJson(agentFreezePort));
         String indentifier = "";
+        Map resMap = new HashMap();
         try {
             indentifier = redisService.lockWithTimeout(RedisCachKey.AGENT_UN_FREEZE_LOCK + agentFreezePort.getOperationPerson(), RedisService.ACQUIRE_TIME_OUT, RedisService.TIME_OUT);
             if (StringUtils.isBlank(indentifier)) {
@@ -347,9 +339,10 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                             throw new MessageException("更新代理商信息解冻失败");
                         }
                     }
+                    resMap.put("data",agentFreeze);
                 }
             }
-            return AgentResult.ok("解冻成功");
+            return AgentResult.ok(resMap);
         }finally {
             if(StringUtils.isNotBlank(indentifier)){
                 redisService.releaseLock(RedisCachKey.AGENT_UN_FREEZE_LOCK + agentFreezePort.getOperationPerson(), indentifier);
