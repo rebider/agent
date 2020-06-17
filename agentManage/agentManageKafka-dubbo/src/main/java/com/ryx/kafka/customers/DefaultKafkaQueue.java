@@ -116,6 +116,7 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
                     ex.printStackTrace();
                 }
 
+
                 @Override
                 public void onSuccess(SendResult<String, String> result) {
                     try {
