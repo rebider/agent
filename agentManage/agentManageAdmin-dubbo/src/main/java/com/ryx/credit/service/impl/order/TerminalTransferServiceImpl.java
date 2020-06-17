@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
@@ -618,11 +619,26 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId, boolean tf) throws Exception {
+    public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId, boolean tf,boolean isno) throws Exception {
         try {
-            if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
+            List<TerminalTransferDetail> terminalTransferDetails = queryDetailByTerminalId(busId);
+            if(isno){
+                if(terminalTransferDetails.get(0).getPlatformType().compareTo(TerminalPlatformType.POS.getValue())==0||terminalTransferDetails.get(0).getPlatformType().compareTo(TerminalPlatformType.ZHPOS.getValue())==0){
+                    List<String> allAgent = new ArrayList<>();
+                    for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
+                        allAgent.add(terminalTransferDetail.getId().trim());
+                    }
 
-                List<TerminalTransferDetail> terminalTransferDetails = queryDetailByTerminalId(busId);
+                    //判断代理商是否被禁用
+                    List<String> terminalTransferFNoorbidde = agentVo.getTerminalTransferFNoorbidde();
+                    agentFNoorbidde(terminalTransferFNoorbidde,allAgent);
+                }
+
+            }
+            TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransferDetails.get(0).getTerminalTransferId());
+
+
+            if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
                 log.info("本次提交的明细SN:{}", JSONObject.toJSON(terminalTransferDetails));
                 //判断sn是否重复提交
                 repetitionSN(terminalTransferDetails);
@@ -651,6 +667,69 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
         return AgentResult.ok();
     }
+
+    /**
+     * 是否的禁用的判断
+     * @param terminalTransferFNoorbidde
+     * @throws Exception
+     */
+    public void agentFNoorbidde(List<String> terminalTransferFNoorbidde,List<String> allAgent) throws MessageException {
+
+        for (String agent : terminalTransferFNoorbidde) {
+            allAgent.remove(agent);
+        }
+        Set<String> agent = new HashSet<>();
+        for (String ttd : allAgent) {
+            TerminalTransferDetail terminalTransferDetail = terminalTransferDetailMapper.selectByPrimaryKey(ttd);
+            String type = String.valueOf(terminalTransferDetail.getPlatformType());
+            List<String>  lists = new ArrayList<>();
+            lists.add(terminalTransferDetail.getOriginalOrgId().trim());
+            lists.add(terminalTransferDetail.getGoalOrgId().trim());
+            AgentResult agentResult = null;
+                try {
+                    agentResult = termMachineService.agentFNoorbidde(lists, type);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.error("调用代理商是否禁用接口异常"+e.getMessage());
+                    throw new MessageException("调用代理商是否禁用接口异常");
+                }
+                if (agentResult.isOK()) {
+                    JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
+                    JSONObject dataMap = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
+                    List<Map<String, Object>> datas = (List<Map<String, Object>>) dataMap.get("organList");
+                    for (Map<String, Object> m : datas) {
+                        /*开启*/
+                        if("01".equals(String.valueOf(m.get("status")))){
+                            if ("01".equals(String.valueOf(m.get("cancelStatus")))){
+                                agent.add(String.valueOf(m.get("orgId")));
+                            }else {
+                                continue;
+                            }
+                            /*关闭*/
+                        }else if("02".equals(String.valueOf(m.get("status")))){
+                            if ("01".equals(String.valueOf(m.get("cancelStatus")))){
+                                agent.add(String.valueOf(m.get("orgId")));
+                            }else {
+                                agent.add(String.valueOf(m.get("orgId")));
+                            }
+                        }else {
+                            throw  new MessageException(m.get("orgId")+"未查到状态");
+                        }
+                    }
+
+                }else {
+                    log.error("调用代理商是否禁用接口失败"+JSONObject.toJSON(agentResult));
+                    throw new MessageException("调用代理商是否禁用接口失败");
+                }
+
+                if(agent.size()>0){
+                    throw new MessageException(agent.toString()+"：这些代理商已经注销或者禁用，不支持直接划拨");
+                }
+
+        }
+
+    }
+
 
     @Override
     public List<Map<String, Object>> queryToolsFloor(Map<String, String> param) {

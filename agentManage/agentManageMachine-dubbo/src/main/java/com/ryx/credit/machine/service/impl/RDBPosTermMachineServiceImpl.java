@@ -501,4 +501,9 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
             throw e;
         }
     }
+
+    @Override
+    public AgentResult agentFNoorbidde(List<String> pamMap, String platformType) throws Exception {
+        return null;
+    }
 }
