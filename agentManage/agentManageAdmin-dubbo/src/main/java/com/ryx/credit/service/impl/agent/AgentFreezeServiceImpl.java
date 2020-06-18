@@ -829,4 +829,163 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         return resultMap;
     }
 
+    @Override
+    public PageInfo agentFreezeListAll(AgentFreeze agentFreeze, Page page){
+
+        Map<String, Object> reqMap = new HashMap<>();
+        if(StringUtils.isNotBlank(agentFreeze.getId())){
+            reqMap.put("id",agentFreeze.getId());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getAgentId())){
+            String agentIdS = String.valueOf(agentFreeze.getAgentId());
+            String[] split = agentIdS.split(",");
+            reqMap.put("agentId",split);
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getAgentName())){
+            reqMap.put("agentName",agentFreeze.getAgentName());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getIncomTimeBegin())){
+            reqMap.put("incomTimeBegin",agentFreeze.getIncomTimeBegin());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getIncomTimeEnd())){
+            reqMap.put("incomTimeEnd",agentFreeze.getIncomTimeEnd());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreezeDateBegin())){
+            reqMap.put("freezeDateBegin",agentFreeze.getFreezeDateBegin());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreezeDateEnd())){
+            reqMap.put("freezeDateEnd",agentFreeze.getFreezeDateEnd());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getUnFreezeDateBegin())){
+            reqMap.put("unFreezeDateBegin",agentFreeze.getUnFreezeDateBegin());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getUnFreezeDateEnd())){
+            reqMap.put("unFreezeDateEnd",agentFreeze.getUnFreezeDateEnd());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreeStatus())){
+            reqMap.put("freeStatus",agentFreeze.getFreeStatus());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreezeCause())){
+            reqMap.put("freezeCause",agentFreeze.getFreezeCause());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreezeStatus())){
+            reqMap.put("freezeStatus",agentFreeze.getFreezeStatus());
+        }
+        List<Map<String, String>> resultMaps = agentFreezeMapper.queryAgentFreezeList(reqMap,page);
+        for (Map<String, String> resultMap : resultMaps) {
+            resultMap.put("FREESTATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREESTATUS"))));
+            resultMap.put("FREEZE_CAUSE_MSG",FreeCause.getContentByValue(resultMap.get("FREEZE_CAUSE")));
+            resultMap.put("FREEZE_STATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREEZE_STATUS"))));
+            resultMap.put("FREEZE_TYPE",FreeType.getmsg(new BigDecimal(String.valueOf(resultMap.get("FREEZE_TYPE")))));
+            resultMap.put("UNFREEZE_CAUSE",UnfreeCause.getContentByValue(resultMap.get("UNFREEZE_CAUSE")).equals("")?resultMap.get("UNFREEZE_CAUSE"):UnfreeCause.getContentByValue(resultMap.get("UNFREEZE_CAUSE")));
+            if(StringUtils.isNotBlank(resultMap.get("FREEZE_PERSON"))){
+                if(resultMap.get("FREEZE_PERSON").equals(String.valueOf(FreePerson.XTDJ.getValue()))){
+                    resultMap.put("FREEZE_PERSON_MSG",FreePerson.getContentByValue(new BigDecimal(resultMap.get("FREEZE_PERSON"))));
+                }else{
+                    CUser cUser = userService.selectById(Long.valueOf(resultMap.get("FREEZE_PERSON")));
+                    if(null!=cUser){
+                        resultMap.put("FREEZE_PERSON_MSG",cUser.getName());
+                    }
+                }
+            }
+            if(StringUtils.isNotBlank(resultMap.get("UNFREEZE_PERSON"))){
+                if(resultMap.get("UNFREEZE_PERSON").equals(String.valueOf(UnfreePerson.XTJD.getValue()))){
+                    resultMap.put("UNFREEZE_PERSON_MSG",UnfreePerson.getContentByValue(new BigDecimal(resultMap.get("UNFREEZE_PERSON"))));
+                }else{
+                    CUser cUser1 = userService.selectById(Long.valueOf(resultMap.get("UNFREEZE_PERSON")));
+                    if(null!=cUser1){
+                        resultMap.put("UNFREEZE_PERSON_MSG",cUser1.getName());
+                    }
+                }
+            }
+            if (StringUtils.isNotBlank(resultMap.get("BUS_PLATFORM"))){
+                PlatForm busPlatform = platFormService.selectByPlatformNum(String.valueOf(resultMap.get("BUS_PLATFORM")));
+                resultMap.put("BUS_PLATFORM",busPlatform.getPlatformName());
+            }
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(resultMaps);
+        pageInfo.setTotal(agentFreezeMapper.queryAgentFreezeCount(reqMap));
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo agentFreezeListRegion(AgentFreeze agentFreeze, Page page){
+        Map<String, Object> reqMap = new HashMap<>();
+        if(StringUtils.isNotBlank(agentFreeze.getId())){
+            reqMap.put("id",agentFreeze.getId());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getAgentId())){
+            String agentIdS = String.valueOf(agentFreeze.getAgentId());
+            String[] split = agentIdS.split(",");
+            reqMap.put("agentId",split);
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getAgentName())){
+            reqMap.put("agentName",agentFreeze.getAgentName());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getIncomTimeBegin())){
+            reqMap.put("incomTimeBegin",agentFreeze.getIncomTimeBegin());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getIncomTimeEnd())){
+            reqMap.put("incomTimeEnd",agentFreeze.getIncomTimeEnd());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreezeDateBegin())){
+            reqMap.put("freezeDateBegin",agentFreeze.getFreezeDateBegin());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreezeDateEnd())){
+            reqMap.put("freezeDateEnd",agentFreeze.getFreezeDateEnd());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getUnFreezeDateBegin())){
+            reqMap.put("unFreezeDateBegin",agentFreeze.getUnFreezeDateBegin());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getUnFreezeDateEnd())){
+            reqMap.put("unFreezeDateEnd",agentFreeze.getUnFreezeDateEnd());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreeStatus())){
+            reqMap.put("freeStatus",agentFreeze.getFreeStatus());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreezeCause())){
+            reqMap.put("freezeCause",agentFreeze.getFreezeCause());
+        }
+        if(StringUtils.isNotBlank(agentFreeze.getFreezeStatus())){
+            reqMap.put("freezeStatus",agentFreeze.getFreezeStatus());
+        }
+        reqMap.put("userId",agentFreeze.getFreezePerson());
+        List<Map<String, String>> resultMaps = agentFreezeMapper.queryAgentFreezeListRegion(reqMap,page);
+        for (Map<String, String> resultMap : resultMaps) {
+            resultMap.put("FREESTATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREESTATUS"))));
+            resultMap.put("FREEZE_CAUSE_MSG",FreeCause.getContentByValue(resultMap.get("FREEZE_CAUSE")));
+            resultMap.put("FREEZE_STATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREEZE_STATUS"))));
+            resultMap.put("FREEZE_TYPE",FreeType.getmsg(new BigDecimal(String.valueOf(resultMap.get("FREEZE_TYPE")))));
+            resultMap.put("UNFREEZE_CAUSE",UnfreeCause.getContentByValue(resultMap.get("UNFREEZE_CAUSE")).equals("")?resultMap.get("UNFREEZE_CAUSE"):UnfreeCause.getContentByValue(resultMap.get("UNFREEZE_CAUSE")));
+            if(StringUtils.isNotBlank(resultMap.get("FREEZE_PERSON"))){
+                if(resultMap.get("FREEZE_PERSON").equals(String.valueOf(FreePerson.XTDJ.getValue()))){
+                    resultMap.put("FREEZE_PERSON_MSG",FreePerson.getContentByValue(new BigDecimal(resultMap.get("FREEZE_PERSON"))));
+                }else{
+                    CUser cUser = userService.selectById(Long.valueOf(resultMap.get("FREEZE_PERSON")));
+                    if(null!=cUser){
+                        resultMap.put("FREEZE_PERSON_MSG",cUser.getName());
+                    }
+                }
+            }
+            if(StringUtils.isNotBlank(resultMap.get("UNFREEZE_PERSON"))){
+                if(resultMap.get("UNFREEZE_PERSON").equals(String.valueOf(UnfreePerson.XTJD.getValue()))){
+                    resultMap.put("UNFREEZE_PERSON_MSG",UnfreePerson.getContentByValue(new BigDecimal(resultMap.get("UNFREEZE_PERSON"))));
+                }else{
+                    CUser cUser1 = userService.selectById(Long.valueOf(resultMap.get("UNFREEZE_PERSON")));
+                    if(null!=cUser1){
+                        resultMap.put("UNFREEZE_PERSON_MSG",cUser1.getName());
+                    }
+                }
+            }
+            if (StringUtils.isNotBlank(resultMap.get("BUS_PLATFORM"))){
+                PlatForm busPlatform = platFormService.selectByPlatformNum(String.valueOf(resultMap.get("BUS_PLATFORM")));
+                resultMap.put("BUS_PLATFORM",busPlatform.getPlatformName());
+            }
+        }
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(resultMaps);
+        pageInfo.setTotal(agentFreezeMapper.queryAgentFreezeCountRegion(reqMap));
+        return pageInfo;
+    }
 }

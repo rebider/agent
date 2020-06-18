@@ -580,4 +580,143 @@
     group by agent_id,freeze_type,BUS_PLATFORM,BUS_NUM)a
     left join A_agent_freeze b on a.id=b.id where b.bus_num is not null
   </select>
+
+  <sql id="queryAgentFreezeRegionSql">
+    select * from (
+    select t.ID,t.AGENT_ID,t.FREEZE_STATUS,t.FREEZE_PERSON,
+    t.FREEZE_DATE,t.FREEZE_CAUSE,t.UNFREEZE_PERSON,
+    t.UNFREEZE_DATE,t.UNFREEZE_CAUSE,t.FREEZE_NUM,
+    t.REMARK,t.STATUS,t.VERSION,nvl(t.FREEZE_TYPE,'1') as FREEZE_TYPE,
+    a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS,
+    t.BUS_PLATFORM,t.BUS_NUM,t.BUS_FREEZE,t.PROFIT_FREEZE,
+    t.REFLOW_FREEZE,t.MONTHLY_FREEZE,t.DAILY_FREEZE,
+    t.STOP_PROFIT_FREEZE,t.CASH_FREEZE,t.STOP_COUNT,t.NEW_BUS_FREEZE
+    from a_agent_freeze t
+    left join a_agent a on a.id=t.agent_id
+    <where>
+      <if test="1==1"> and t.status = 1 and a.status = 1 </if>
+      <if test="map.id!=null and map.agentId != ''">
+        and t.id = #{map.id,jdbcType=VARCHAR}
+      </if>
+      <if test="map.agentId != null and map.agentId != '' ">
+        and t.agent_Id in
+        <foreach collection="map.agentId" item="listItem" open="(" close=")" separator="," >
+          #{listItem}
+        </foreach>
+      </if>
+      <if test="map.agentName != null and map.agentName != '' ">
+        and a.ag_name LIKE CONCAT(CONCAT('%',#{map.agentName}),'%')
+      </if>
+      <if test="map.incomTimeBegin!=null and map.incomTimeBegin!=''">
+        and a.c_incom_time >= to_date(#{map.incomTimeBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.incomTimeEnd!=null and map.incomTimeEnd!=''">
+        and a.c_incom_time &lt;= to_date(#{map.incomTimeEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freezeDateBegin!=null and map.freezeDateBegin!=''">
+        and t.freeze_Date >= to_date(#{map.freezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freezeDateEnd!=null and map.freezeDateEnd!=''">
+        and t.freeze_Date &lt;= to_date(#{map.freezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.unFreezeDateBegin!=null and map.unFreezeDateBegin!=''">
+        and t.unFreeze_Date >= to_date(#{map.unFreezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.unFreezeDateEnd!=null and map.unFreezeDateEnd!=''">
+        and t.unFreeze_Date &lt;= to_date(#{map.unFreezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freeStatus != null and map.freeStatus != '' ">
+        and a.freestatus = #{map.freeStatus,jdbcType=VARCHAR}
+      </if>
+      <if test="map.freezeCause != null and map.freezeCause != '' ">
+        and t.freeze_Cause = #{map.freezeCause,jdbcType=VARCHAR}
+      </if>
+      <if test="map.freezeStatus != null and map.freezeStatus != '' ">
+        and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
+      </if>
+      <if test="map.userId != null and map.userId != '' ">
+        and t.freeze_person = #{map.userId,jdbcType=VARCHAR}
+      </if>
+    </where>
+    union
+    select t.ID,t.AGENT_ID,t.FREEZE_STATUS,t.FREEZE_PERSON,
+    t.FREEZE_DATE,t.FREEZE_CAUSE,t.UNFREEZE_PERSON,
+    t.UNFREEZE_DATE,t.UNFREEZE_CAUSE,t.FREEZE_NUM,
+    t.REMARK,t.STATUS,t.VERSION,nvl(t.FREEZE_TYPE,'1') as FREEZE_TYPE,
+    a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS,
+    t.BUS_PLATFORM,t.BUS_NUM,t.BUS_FREEZE,t.PROFIT_FREEZE,
+    t.REFLOW_FREEZE,t.MONTHLY_FREEZE,t.DAILY_FREEZE,
+    t.STOP_PROFIT_FREEZE,t.CASH_FREEZE,t.STOP_COUNT,t.NEW_BUS_FREEZE
+    from a_agent_freeze t
+    left join a_agent a on a.id=t.agent_id
+    <where>
+      <if test="1==1"> and t.status = 1 and a.status = 1 </if>
+      <if test="map.id!=null and map.agentId != ''">
+        and t.id = #{map.id,jdbcType=VARCHAR}
+      </if>
+      <if test="map.agentId != null and map.agentId != '' ">
+        and t.agent_Id in
+        <foreach collection="map.agentId" item="listItem" open="(" close=")" separator="," >
+          #{listItem}
+        </foreach>
+      </if>
+      <if test="map.agentName != null and map.agentName != '' ">
+        and a.ag_name LIKE CONCAT(CONCAT('%',#{map.agentName}),'%')
+      </if>
+      <if test="map.incomTimeBegin!=null and map.incomTimeBegin!=''">
+        and a.c_incom_time >= to_date(#{map.incomTimeBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.incomTimeEnd!=null and map.incomTimeEnd!=''">
+        and a.c_incom_time &lt;= to_date(#{map.incomTimeEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freezeDateBegin!=null and map.freezeDateBegin!=''">
+        and t.freeze_Date >= to_date(#{map.freezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freezeDateEnd!=null and map.freezeDateEnd!=''">
+        and t.freeze_Date &lt;= to_date(#{map.freezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.unFreezeDateBegin!=null and map.unFreezeDateBegin!=''">
+        and t.unFreeze_Date >= to_date(#{map.unFreezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.unFreezeDateEnd!=null and map.unFreezeDateEnd!=''">
+        and t.unFreeze_Date &lt;= to_date(#{map.unFreezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freeStatus != null and map.freeStatus != '' ">
+        and a.freestatus = #{map.freeStatus,jdbcType=VARCHAR}
+      </if>
+      <if test="map.freezeCause != null and map.freezeCause != '' ">
+        and t.freeze_Cause = #{map.freezeCause,jdbcType=VARCHAR}
+      </if>
+      <if test="map.freezeStatus != null and map.freezeStatus != '' ">
+        and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
+      </if>
+      <if test="map.userId != null and map.userId != '' ">
+        and t.freeze_person in(SELECT cu.id
+        FROM C_USER cu
+        WHERE cu.ORGANIZATION_ID IN(SELECT pro.ID
+        FROM C_ORGANIZATION pro
+        WHERE pro.PID LIKE CONCAT((SELECT t.id
+        FROM c_organization t
+        LEFT JOIN c_user cu
+        ON cu.organization_id =
+        t.id
+        WHERE cu.id = #{map.userId,jdbcType=VARCHAR} AND
+        cu.status = 0), '%') ))
+      </if>
+    </where>
+    ) t
+    order by t.agent_id,t.freeze_date desc
+  </sql>
+
+  <select id="queryAgentFreezeListRegion" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="queryAgentFreezeRegionSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryAgentFreezeCountRegion" parameterType="map" resultType="int">
+    select count(*) from (
+    <include refid="queryAgentFreezeRegionSql"/>
+    )
+  </select>
 </mapper>
