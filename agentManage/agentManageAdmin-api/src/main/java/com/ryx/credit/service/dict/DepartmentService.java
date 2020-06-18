@@ -52,4 +52,11 @@ public interface DepartmentService {
      * @return
      */
     public COrganization getByLoginName(String loginName);
+
+    /**
+     * 根据 uesrId 查询部门
+     * @param userId
+     * @return
+     */
+    public COrganization getByUserId(long userId);
 }
