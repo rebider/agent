@@ -412,7 +412,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             }else {
                 logger.info("冻结记录业务平台不存在{}",curAgentFreeze.getId());
                 userMap.put("RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"RJ").getdItemvalue());
-                userMap.put("NOT_RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"NOT_RJ").getdItemvalue());
+//                userMap.put("NOT_RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"NOT_RJ").getdItemvalue());
             }
         }
         //流程中的部门参数
@@ -773,6 +773,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
 
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     public AgentResult agentFreezeFinish(String insid, String actname) throws Exception {
         try {
             logger.info("申请冻结审批完成:{},{}", insid, actname);
