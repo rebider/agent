@@ -290,14 +290,29 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     freezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
                     freezeCriteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
                     freezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
-                    freezeCriteria.andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
+                    if (agentFreezePort.getBusPlatform().get(0)!=null){
+                        freezeCriteria.andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
+                    }else {
+                        freezeCriteria.andBusIdIsNull();
+                    }
+
                 }
-                freezeExample.or().andFreezeTypeEqualTo(freeType)
-                        .andStatusEqualTo(Status.STATUS_1.status)
-                        .andAgentIdEqualTo(agentFreezePort.getAgentId())
-                        .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
-                        .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
-                        .andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
+                if (agentFreezePort.getBusPlatform().get(0)!=null){
+                    freezeExample.or().andFreezeTypeEqualTo(freeType)
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andAgentIdEqualTo(agentFreezePort.getAgentId())
+                            .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
+                            .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
+                            .andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
+                }else {
+                    freezeExample.or().andFreezeTypeEqualTo(freeType)
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andAgentIdEqualTo(agentFreezePort.getAgentId())
+                            .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
+                            .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
+                            .andBusIdIsNull();
+                }
+
                 List<AgentFreeze> agentFreezeList = agentFreezeMapper.selectByExample(freezeExample);
                 if(agentFreezeList.size()==0){
                     return AgentResult.fail("解冻信息不存在");

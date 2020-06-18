@@ -625,7 +625,7 @@
        and fr.req_type = #{map.reqType}
       </if>
       <if test="map.userId !=null and map.userId != '' ">
-        and frd.BUS_PLATFORM in (
+        and (frd.BUS_PLATFORM in (
         select e.PLATFORM_NUM from A_PLATFORM e
         inner join c_resource a on ('AGENT_LIST_PLATFORM_'||e.PLATFORM_NUM ) = a.URL
         left join c_role_resource b  on a.id=b.resource_id
@@ -634,7 +634,7 @@
         <where>
           <if test="map.userId != null and map.userId != ''">and d.user_id =#{map.userId} </if>
         </where>
-        )
+        ) or frd.BUS_PLATFORM is null )
       </if>
     </trim>
   </sql>
