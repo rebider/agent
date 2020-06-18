@@ -130,6 +130,13 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                         .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
                         .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
                         .andBusIdEqualTo(busPlatform);
+                agentFreezeExample.or()
+                        .andFreezeTypeEqualTo(freeType)
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andAgentIdEqualTo(agentFreezePort.getAgentId())
+                        .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
+                        .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
+                        .andBusIdIsNull();
                 List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
                 if(agentFreezes.size()!=0){
                     throw new MessageException("代理商此原因已被冻结:"+FreeType.getmsg(freeType));
