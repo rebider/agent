@@ -851,6 +851,9 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             }
             logger.info("申请冻结审批结束", busActRel.getBusId());
             return AgentResult.ok();
+        }catch (MessageException messageexception){
+            logger.error(messageexception.toString());
+            throw messageexception;
         }catch (Exception e){
             logger.error(e.toString());
             throw new MessageException("请重新提交！");
