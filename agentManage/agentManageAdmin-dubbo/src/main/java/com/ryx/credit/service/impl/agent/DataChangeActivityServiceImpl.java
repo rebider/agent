@@ -146,6 +146,11 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         if (dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Colinfo.name())) {
             AgentVo preAgentVo = JSONObject.parseObject(dateChangeRequest.getDataPreContent(), AgentVo.class);
             List<AgentColinfoVo> preColinfoVoList = preAgentVo.getColinfoVoList();
+            List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agentVo.getAgent().getId());
+            List<String> busList = new LinkedList<>();
+            for (AgentBusInfo busInfo : aginfo) {
+                busList.add(busInfo.getId());
+            }
             if (preColinfoVoList.size() != 0 && preColinfoVoList != null) {
                 AgentColinfoVo preAgentColinfoVo = preColinfoVoList.get(0); // 变更前
                 AgentColinfoVo agentColinfoVo = colinfoVoList.get(0); // 变更后
@@ -158,6 +163,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     agentFreezePort.setOperationPerson(String.valueOf(FreePerson.XTDJ.getValue()));
                     agentFreezePort.setFreezeNum(dateChangeRequest.getId());
                     agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+                    agentFreezePort.setBusPlatform(busList);
+                    agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ONE));
                     AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
                     if (!agentResult.isOK()) {
                         throw new MessageException(agentResult.getMsg());
@@ -171,6 +178,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 agentFreezePort.setOperationPerson(String.valueOf(FreePerson.XTDJ.getValue()));
                 agentFreezePort.setFreezeNum(dateChangeRequest.getId());
                 agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+                agentFreezePort.setBusPlatform(busList);
+                agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ONE));
                 AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
                 if (!agentResult.isOK()) {
                     throw new MessageException(agentResult.getMsg());
