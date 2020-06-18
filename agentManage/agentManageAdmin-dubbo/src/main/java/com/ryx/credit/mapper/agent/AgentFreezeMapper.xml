@@ -421,7 +421,7 @@
              a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS,
              t.BUS_PLATFORM,t.BUS_NUM,t.BUS_FREEZE,t.PROFIT_FREEZE,
              t.REFLOW_FREEZE,t.MONTHLY_FREEZE,t.DAILY_FREEZE,
-             t.STOP_PROFIT_FREEZE,t.CASH_FREEZE,t.STOP_COUNT
+             t.STOP_PROFIT_FREEZE,t.CASH_FREEZE,t.STOP_COUNT,t.NEW_BUS_FREEZE
       from a_agent_freeze t
       left join a_agent a on a.id=t.agent_id
       <where>
