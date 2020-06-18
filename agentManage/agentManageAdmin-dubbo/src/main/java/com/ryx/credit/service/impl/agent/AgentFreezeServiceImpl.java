@@ -173,7 +173,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             if(!verify.isOK()){
                 return verify;
             }
-//            for(String busPlatform:agentFreezePort.getBusPlatform()){
+            for(String busPlatform:agentFreezePort.getBusPlatform()){
                 for (BigDecimal freeType:agentFreezePort.getFreeType()){
                     log.info("冻结类型为[{}]",FreeType.getmsg(freeType));
                     AgentFreezeExample agentFreezeExample = new AgentFreezeExample();
@@ -184,7 +184,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                         criteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
                         criteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
                         criteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
-                        criteria.andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
+                        criteria.andBusIdEqualTo(busPlatform);
                     }
                     agentFreezeExample.or()
                             .andFreezeTypeEqualTo(freeType)
@@ -192,7 +192,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                             .andAgentIdEqualTo(agentFreezePort.getAgentId())
                             .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
                             .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
-                            .andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
+                            .andBusIdEqualTo(busPlatform);
                     List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
                     if(agentFreezes.size()!=0){
                         throw new MessageException("代理商此原因已被冻结:"+FreeType.getmsg(freeType));
@@ -210,9 +210,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     agentFreeze.setVersion(BigDecimal.ONE);
                     agentFreeze.setFreezeType(freeType);
                     /** 保存新增字段 **/
-                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentFreezePort.getBusPlatform().get(0));
+                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(busPlatform);
                     agentFreeze.setBusPlatform(agentBusInfo.getBusPlatform());
-                    agentFreeze.setBusId(agentFreezePort.getBusPlatform().get(0));
+                    agentFreeze.setBusId(busPlatform);
                     agentFreeze.setBusNum(agentBusInfo.getBusNum());
                     agentFreeze.setNewBusFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getNewBusFreeze());
                     agentFreeze.setBusFreeze(agentFreezePort.getCurLevel()==null?BigDecimal.ZERO:agentFreezePort.getCurLevel().getBusFreeze());
@@ -240,7 +240,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     }
                     resMap.put("data",agentFreeze);
                 }
-//            }
+            }
 
 
             return AgentResult.ok(resMap);
