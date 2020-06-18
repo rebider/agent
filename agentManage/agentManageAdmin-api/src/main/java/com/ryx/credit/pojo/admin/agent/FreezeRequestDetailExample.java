@@ -2566,6 +2566,136 @@ public class FreezeRequestDetailExample {
             addCriterion("NEW_BUS_FREEZE_ORG not between", value1, value2, "newBusFreezeOrg");
             return (Criteria) this;
         }
+
+        public Criteria andReviewsUserIsNull() {
+            addCriterion("REVIEWS_USER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserIsNotNull() {
+            addCriterion("REVIEWS_USER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserEqualTo(String value) {
+            addCriterion("REVIEWS_USER =", value, "reviewsUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserNotEqualTo(String value) {
+            addCriterion("REVIEWS_USER <>", value, "reviewsUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserGreaterThan(String value) {
+            addCriterion("REVIEWS_USER >", value, "reviewsUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserGreaterThanOrEqualTo(String value) {
+            addCriterion("REVIEWS_USER >=", value, "reviewsUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserLessThan(String value) {
+            addCriterion("REVIEWS_USER <", value, "reviewsUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserLessThanOrEqualTo(String value) {
+            addCriterion("REVIEWS_USER <=", value, "reviewsUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserLike(String value) {
+            addCriterion("REVIEWS_USER like", value, "reviewsUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserNotLike(String value) {
+            addCriterion("REVIEWS_USER not like", value, "reviewsUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserIn(List<String> values) {
+            addCriterion("REVIEWS_USER in", values, "reviewsUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserNotIn(List<String> values) {
+            addCriterion("REVIEWS_USER not in", values, "reviewsUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserBetween(String value1, String value2) {
+            addCriterion("REVIEWS_USER between", value1, value2, "reviewsUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsUserNotBetween(String value1, String value2) {
+            addCriterion("REVIEWS_USER not between", value1, value2, "reviewsUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsDateIsNull() {
+            addCriterion("REVIEWS_DATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsDateIsNotNull() {
+            addCriterion("REVIEWS_DATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsDateEqualTo(Date value) {
+            addCriterion("REVIEWS_DATE =", value, "reviewsDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsDateNotEqualTo(Date value) {
+            addCriterion("REVIEWS_DATE <>", value, "reviewsDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsDateGreaterThan(Date value) {
+            addCriterion("REVIEWS_DATE >", value, "reviewsDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsDateGreaterThanOrEqualTo(Date value) {
+            addCriterion("REVIEWS_DATE >=", value, "reviewsDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsDateLessThan(Date value) {
+            addCriterion("REVIEWS_DATE <", value, "reviewsDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsDateLessThanOrEqualTo(Date value) {
+            addCriterion("REVIEWS_DATE <=", value, "reviewsDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsDateIn(List<Date> values) {
+            addCriterion("REVIEWS_DATE in", values, "reviewsDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsDateNotIn(List<Date> values) {
+            addCriterion("REVIEWS_DATE not in", values, "reviewsDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsDateBetween(Date value1, Date value2) {
+            addCriterion("REVIEWS_DATE between", value1, value2, "reviewsDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andReviewsDateNotBetween(Date value1, Date value2) {
+            addCriterion("REVIEWS_DATE not between", value1, value2, "reviewsDate");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
