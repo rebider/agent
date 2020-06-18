@@ -65,11 +65,11 @@
               END) AS BALANCE_ACCT_NAME,
            NVL(P.BALANCE_BANK_NO,
               CASE  WHEN P.BUS_CODE = '6000' THEN AC600.BANKID
-              ELSE C.CLO_BANK_BRANCH
+              ELSE C.BRANCH_LINE_NUM
               END) AS BALANCE_BANK_NO,
            NVL(P.BALANCE_BANK_NAME,
               CASE  WHEN P.BUS_CODE = '6000' THEN AC600.ACCOUNTBANK
-              ELSE C.CLO_BANK
+              ELSE C.CLO_BANK_BRANCH
               END) AS BALANCE_BANK_NAME,
         P.REALITY_AG_ID, P.REALITY_AG_NAME, P.END_TIME
   </sql>
