@@ -290,14 +290,14 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     freezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
                     freezeCriteria.andFreezeCauseEqualTo(agentFreezePort.getFreezeCause());
                     freezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
-                    if (agentFreezePort.getBusPlatform().get(0)!=null){
+                    if (agentFreezePort.getBusPlatform()!= null && agentFreezePort.getBusPlatform().get(0)!=null){
                         freezeCriteria.andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
                     }else {
                         freezeCriteria.andBusIdIsNull();
                     }
 
                 }
-                if (agentFreezePort.getBusPlatform().get(0)!=null){
+                if (agentFreezePort.getBusPlatform()!= null && agentFreezePort.getBusPlatform().get(0)!=null){
                     freezeExample.or().andFreezeTypeEqualTo(freeType)
                             .andStatusEqualTo(Status.STATUS_1.status)
                             .andAgentIdEqualTo(agentFreezePort.getAgentId())
