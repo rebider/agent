@@ -331,6 +331,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     if(j!=1){
                         throw new MessageException("更新解冻失败");
                     }
+                    resMap.put("data",agentFreeze);
                 }
                 if (freeType.compareTo(FreeType.AGNET.code) == 0){
 
@@ -358,7 +359,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                             throw new MessageException("更新代理商信息解冻失败");
                         }
                     }
-                    resMap.put("data",agentFreeze);
+
                 }
             }
             return AgentResult.ok(resMap);
