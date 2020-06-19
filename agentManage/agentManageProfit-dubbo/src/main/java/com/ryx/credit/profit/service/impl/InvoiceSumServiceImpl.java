@@ -455,7 +455,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
      */
     @Override
     public boolean invocationIntFreeze(String agentId, String user,String id,String reason) throws MessageException{
-        List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agentId);
+        List<AgentBusInfo> aginfo = agentBusinfoService.queryAgentBusInfoFreeze(agentId);
         List<String> busList = new LinkedList<>();
         for (AgentBusInfo busInfo : aginfo) {
             busList.add(busInfo.getId());

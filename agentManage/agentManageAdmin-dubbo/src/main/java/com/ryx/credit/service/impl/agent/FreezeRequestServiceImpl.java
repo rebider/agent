@@ -684,6 +684,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 agentFreeze.setCashFreezeOrg(orgAgentFreezeList.get(0).getCashFreeze());
                 agentFreeze.setStopCountOrg(orgAgentFreezeList.get(0).getStopCount());
                 agentFreeze.setNewBusFreezeOrg(orgAgentFreezeList.get(0).getNewBusFreeze());
+                agentFreeze.setFreezeId(orgAgentFreezeList.get(0).getId());
 
                 if(StringUtils.isNotBlank(agentFreezePort.getRemark())){//备注
                     agentFreeze.setRemark(agentFreezePort.getRemark());
@@ -867,7 +868,9 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 FreezeRequest freezeRequest = freezeRequestMapper.selectByPrimaryKey(busActRel.getBusId());
                 freezeRequest.setReviewsStat(AgStatus.Refuse.status);
                 freezeRequest.setReviewsDate(new Date());
-                freezeRequestMapper.updateByPrimaryKeySelective(freezeRequest);
+                if (1==freezeRequestMapper.updateByPrimaryKeySelective(freezeRequest)){
+                    throw new MessageException("请重新提交！");
+                };
             }
             logger.info("申请冻结审批结束", busActRel.getBusId());
             return AgentResult.ok();

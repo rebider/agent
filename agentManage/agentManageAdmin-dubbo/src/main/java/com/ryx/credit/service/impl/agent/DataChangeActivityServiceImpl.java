@@ -146,7 +146,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         if (dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Colinfo.name())) {
             AgentVo preAgentVo = JSONObject.parseObject(dateChangeRequest.getDataPreContent(), AgentVo.class);
             List<AgentColinfoVo> preColinfoVoList = preAgentVo.getColinfoVoList();
-            List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agentVo.getAgent().getId());
+            List<AgentBusInfo> aginfo = agentBusinfoService.queryAgentBusInfoFreeze(agentVo.getAgent().getId());
             List<String> busList = new LinkedList<>();
             for (AgentBusInfo busInfo : aginfo) {
                 busList.add(busInfo.getId());
