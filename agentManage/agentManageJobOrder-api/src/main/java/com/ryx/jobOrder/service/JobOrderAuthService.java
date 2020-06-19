@@ -48,4 +48,10 @@ public interface JobOrderAuthService {
      */
     List<JobKeyManageNodeVo> getViewJobKeyManageNodes(String userId);
 
+    /**
+     *
+     * @param code 查询是否是内部部门 区分省区与内部部门
+     * @return
+     */
+    Boolean isInnerDept(String code);
 }

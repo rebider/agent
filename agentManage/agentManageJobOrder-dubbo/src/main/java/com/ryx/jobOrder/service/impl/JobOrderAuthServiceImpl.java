@@ -1,5 +1,6 @@
 package com.ryx.jobOrder.service.impl;
 
+import com.ryx.credit.common.enumc.JoPowerGroup;
 import com.ryx.credit.common.enumc.QueryAcceptType;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -170,4 +171,14 @@ public class JobOrderAuthServiceImpl implements JobOrderAuthService {
         return parentNodes;
     }
 
+    @Override
+    public Boolean isInnerDept(String userId){
+        Map<String,Object> acceptInfo = jobOrderAuthMapper.getAcceptByuserid(userId);
+        String group = (String)acceptInfo.get("DESCRIPTION");
+        if(JoPowerGroup.SQ.key.equals(group) || JoPowerGroup.DLS.key.equals(group)){
+            return false;
+        }else{
+            return true;
+        }
+    }
 }
