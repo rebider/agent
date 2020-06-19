@@ -200,6 +200,18 @@ public class AgentPayServiceImpl implements IAgentPayService {
         return balanceApprovalMapper.updateBalanceApprovalAcct(approval);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public void backBalance(String balanceId, String batchNo, String remitFailReason) {
+        updateAgentPayByBalanceIdAndBatchNo(balanceId, batchNo, "03");  //将状态改为审批退回
+
+        PmsProfit pmsProfit = new PmsProfit();
+        pmsProfit.setBalanceId(balanceId);
+        pmsProfit.setBillStatus("05");
+        pmsProfit.setRemitFailReason(remitFailReason);
+        pmsProfitMapper.updateByPrimaryKeySelective(pmsProfit);
+    }
+
     /**
      * 更新审批状态
      * @param batchNo
@@ -211,8 +223,6 @@ public class AgentPayServiceImpl implements IAgentPayService {
         if ("0".equals(approvalResult)){    //审批通过
             //将审批中改为审批通过
             result = result + balanceApprovalMapper.updateBalanceApproval(batchNo, "00", "01");
-            //将退回中改为审批退回
-            result = result + balanceApprovalMapper.updateBalanceApproval(batchNo, "02", "03");
         }else if ("1".equals(approvalResult)){  //审批退回
             //将此次审批的所有记录改为审批退回
             result = result + balanceApprovalMapper.updateBalanceApproval(batchNo, null, "03");
@@ -277,11 +287,6 @@ public class AgentPayServiceImpl implements IAgentPayService {
                         String approvalStatus = String.valueOf(approvalMap.get("APPROVAL_STATUS"));
                         String balanceId = String.valueOf(approvalMap.get("BALANCE_ID"));
                         if ("03".equals(approvalStatus)) {//审批退回的
-                            PmsProfit pmsProfit = new PmsProfit();
-                            pmsProfit.setBalanceId(balanceId);
-                            pmsProfit.setBillStatus("05");
-                            pmsProfitMapper.updateByPrimaryKeySelective(pmsProfit);
-
                             BalanceApproval upApproval = new BalanceApproval();
                             upApproval.setBalanceId(balanceId);
                             upApproval.setEndTime(endTime);
@@ -289,7 +294,6 @@ public class AgentPayServiceImpl implements IAgentPayService {
 
                             continue;
                         }
-
 
                         String balanceAcctNo = String.valueOf(approvalMap.get("BALANCE_ACCT_NO"));
                         String balanceAcctName = String.valueOf(approvalMap.get("BALANCE_ACCT_NAME"));
@@ -351,32 +355,30 @@ public class AgentPayServiceImpl implements IAgentPayService {
                         pBalanceSerial.setBalanceBankVersion(varsion);
                         pBalanceSerialMapper.insert(pBalanceSerial);
 
-
                     }
 
                     rel.setActivStatus(AgStatus.Approved.name());
                 }else if ("1".equals(status)){  //审批拒绝
                     //业务相关
-                    updateBalanceApproval(batchNo, "1");   //审批流表状态更新
                     List<Map<String, Object>> approvalList = getBalanceApprovalList(approval);  //此批次的所有出款审批
                     for (int i = 0; i < approvalList.size(); i++) {
                         Map<String, Object> approvalMap = approvalList.get(i);
 
                         String approvalStatus = String.valueOf(approvalMap.get("APPROVAL_STATUS"));
                         String balanceId = String.valueOf(approvalMap.get("BALANCE_ID"));
-                        if ("03".equals(approvalStatus)) {//审批退回的
+                        if ("00".equals(approvalStatus)) {//审批中的
                             PmsProfit pmsProfit = new PmsProfit();
                             pmsProfit.setBalanceId(balanceId);
                             pmsProfit.setBillStatus("05");
+                            pmsProfit.setRemitFailReason("审批集体退回");
                             pmsProfitMapper.updateByPrimaryKeySelective(pmsProfit);
-
+                        }
                             BalanceApproval upApproval = new BalanceApproval();
                             upApproval.setBalanceId(balanceId);
                             upApproval.setEndTime(endTime);
                             updateBalanceApprovalAcct(upApproval);
-                        }
                     }
-
+                    updateBalanceApproval(batchNo, "1");   //审批流表状态更新
                     rel.setActivStatus(AgStatus.Refuse.name());
                 }else throw new RuntimeException("审批流异常");
                 logger.info("更新审批流与业务对象");

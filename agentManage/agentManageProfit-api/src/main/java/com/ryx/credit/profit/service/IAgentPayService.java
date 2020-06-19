@@ -37,4 +37,6 @@ public interface IAgentPayService {
     BigDecimal countAmtByBatchNo(String batchNo);
 
     int updateBalanceApprovalAcct(BalanceApproval approval);
+
+    void backBalance(String balanceId,String batchNo,String remitFailReason);
 }
