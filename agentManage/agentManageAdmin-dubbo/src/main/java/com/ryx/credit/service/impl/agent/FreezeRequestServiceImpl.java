@@ -71,7 +71,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
     @Autowired
     private AgentBusinfoFreezeService agentBusinfoFreezeService;
     @Autowired
-    private ActRuTaskService actRuTaskService;
+    private IUserService iUserService;
 
 
     @Override
@@ -213,9 +213,9 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 if (agentBusInfo!=null){
                     PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
                     if (platForm.getPlatformType().equals("RJPOS") || platForm.getPlatformType().equals("RJQZ")) {
-                        userMap.put("RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"RJ").getdItemvalue());
+                        userMap.put("RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),FreeApprovalUser.RJ.key).getdItemvalue());
                     }else {
-                        userMap.put("NOT_RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"NOT_RJ").getdItemvalue());
+                        userMap.put("NOT_RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),FreeApprovalUser.NOT_RJ.key).getdItemvalue());
                     }
                 }else {
                     throw new MessageException("业务平台不存在");
@@ -226,7 +226,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         //流程中的部门参数
         Map startPar = agentEnterService.startPar(freezeRequest.getcUserId());
         if (null == startPar) {
-            logger.info("========用户{}{}启动部门参数为空", freezeRequest.getcUserId(), freezeRequest.getId());
+            logger.info("========用户{}启动{}部门参数为空", freezeRequest.getcUserId(), freezeRequest.getId());
             throw new MessageException("启动部门参数为空！");
         }
         List<String> userList = new ArrayList<>();
@@ -235,6 +235,16 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         }
         if(userMap.get("NOT_RJ")!=null){
             userList.add(String.valueOf(userMap.get("NOT_RJ")));
+        }
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(agentFreezePort.getOperationPerson()));
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            throw new MessageException("部门参数为空");
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        if(orgCode.equals("finance")){
+            userList.clear();
+            userList.add(dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),FreeApprovalUser.FINANCE.key).getdItemvalue());
         }
         //Todo:增加判断是否为瑞+方法
         startPar.put("userList",userList);
@@ -405,20 +415,20 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             if (agentBusInfo!=null){
                 PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
                 if (platForm.getPlatformType().equals("RJPOS") || platForm.getPlatformType().equals("RJQZ")) {
-                    userMap.put("RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"RJ").getdItemvalue());
+                    userMap.put("RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),FreeApprovalUser.RJ.key).getdItemvalue());
                 }else {
-                    userMap.put("NOT_RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"NOT_RJ").getdItemvalue());
+                    userMap.put("NOT_RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),FreeApprovalUser.NOT_RJ.key).getdItemvalue());
                 }
             }else {
                 logger.info("冻结记录业务平台不存在{}",curAgentFreeze.getId());
-                userMap.put("RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"RJ").getdItemvalue());
+                userMap.put(FreeApprovalUser.RJ.key,dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),FreeApprovalUser.RJ.key).getdItemvalue());
 //                userMap.put("NOT_RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"NOT_RJ").getdItemvalue());
             }
         }
         //流程中的部门参数
         Map startPar = agentEnterService.startPar(freezeRequest.getcUserId());
         if (null == startPar) {
-            logger.info("========用户{}{}启动部门参数为空", freezeRequest.getcUserId(), freezeRequest.getId());
+            logger.info("========用户{}启动{}部门参数为空", freezeRequest.getcUserId(), freezeRequest.getId());
             throw new MessageException("启动部门参数为空！");
         }
         //Todo:增加判断是否为瑞+方法
@@ -429,6 +439,16 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         }
         if(userMap.get("NOT_RJ")!=null){
             userList.add(String.valueOf(userMap.get("NOT_RJ")));
+        }
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(agentFreezePort.getOperationPerson()));
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            throw new MessageException("部门参数为空");
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        if(orgCode.equals("finance")){
+            userList.clear();
+            userList.add(dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),FreeApprovalUser.FINANCE.key).getdItemvalue());
         }
         startPar.put("userList",userList);
         //启动审批
@@ -674,9 +694,9 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 if (agentBusInfo!=null){
                     PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
                     if (platForm.getPlatformType().equals("RJPOS") || platForm.getPlatformType().equals("RJQZ")) {
-                        userMap.put("RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"RJ").getdItemvalue());
+                        userMap.put(FreeApprovalUser.RJ.key,dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),FreeApprovalUser.RJ.key).getdItemvalue());
                     }else {
-                        userMap.put("NOT_RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"NOT_RJ").getdItemvalue());
+                        userMap.put(FreeApprovalUser.NOT_RJ.key,dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),FreeApprovalUser.NOT_RJ.key).getdItemvalue());
                     }
                 }else {
                     throw new MessageException("业务平台不存在");
@@ -686,17 +706,17 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         //流程中的部门参数
         Map startPar = agentEnterService.startPar(freezeRequest.getcUserId());
         if (null == startPar) {
-            logger.info("========用户{}{}启动部门参数为空", freezeRequest.getcUserId(), freezeRequest.getId());
+            logger.info("========用户{}启动{}部门参数为空", freezeRequest.getcUserId(), freezeRequest.getId());
             throw new MessageException("启动部门参数为空！");
         }
         //Todo:增加判断是否为瑞+方法
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentFreezePort.getBusPlatform().get(0));
         List<String> userList = new ArrayList<>();
-        if (userMap.get("RJ")!=null){
-            userList.add(String.valueOf(userMap.get("RJ")));
+        if (userMap.get(FreeApprovalUser.RJ.key)!=null){
+            userList.add(String.valueOf(userMap.get(FreeApprovalUser.RJ.key)));
         }
-        if(userMap.get("NOT_RJ")!=null){
-            userList.add(String.valueOf(userMap.get("NOT_RJ")));
+        if(userMap.get(FreeApprovalUser.NOT_RJ.key)!=null){
+            userList.add(String.valueOf(userMap.get(FreeApprovalUser.NOT_RJ.key)));
         }
         startPar.put("userList",userList);
         //启动审批
@@ -1070,7 +1090,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             //流程中的部门参数
             Map startPar = agentEnterService.startPar(agentFreezePort.getOperationPerson());
             if (null == startPar) {
-                logger.info("========用户{}{}启动部门参数为空", agentFreezePort.getOperationPerson(), freezeRequest.getId());
+                logger.info("========用户{}启动{}部门参数为空", agentFreezePort.getOperationPerson(), freezeRequest.getId());
                 throw new MessageException("启动部门参数为空！");
             }
             List<String> userList = new ArrayList<>();
