@@ -309,28 +309,28 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                             .andStatusEqualTo(Status.STATUS_1.status)
                             .andAgentIdEqualTo(agentFreezePort.getAgentId())
                             .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
-                            .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
-                            .andBusIdIsNull();
+                            .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
                 }
 
                 List<AgentFreeze> agentFreezeList = agentFreezeMapper.selectByExample(freezeExample);
                 if(agentFreezeList.size()==0){
                     return AgentResult.fail("解冻信息不存在");
                 }
-                if(agentFreezeList.size()!=1){
-                    return AgentResult.fail("解冻信息不唯一,请联系管理员");
-                }
-                AgentFreeze agentFreeze = agentFreezeList.get(0);
-                agentFreeze.setUnfreezePerson(agentFreezePort.getOperationPerson());
-                agentFreeze.setUnfreezeDate(new Date());
-                agentFreeze.setUnfreezeCause(agentFreezePort.getUnfreezeCause());
-                agentFreeze.setFreezeStatus(FreeStatus.JD.getValue().toString());
-                if(StringUtils.isNotBlank(agentFreezePort.getRemark())){//备注
-                    agentFreeze.setRemark(agentFreezePort.getRemark());
-                }
-                int j = agentFreezeMapper.updateByPrimaryKeySelective(agentFreeze);
-                if(j!=1){
-                    throw new MessageException("更新解冻失败");
+//                if(agentFreezeList.size()!=1){
+//                    return AgentResult.fail("解冻信息不唯一,请联系管理员");
+//                }
+                for (AgentFreeze agentFreeze : agentFreezeList) {
+                    agentFreeze.setUnfreezePerson(agentFreezePort.getOperationPerson());
+                    agentFreeze.setUnfreezeDate(new Date());
+                    agentFreeze.setUnfreezeCause(agentFreezePort.getUnfreezeCause());
+                    agentFreeze.setFreezeStatus(FreeStatus.JD.getValue().toString());
+                    if(StringUtils.isNotBlank(agentFreezePort.getRemark())){//备注
+                        agentFreeze.setRemark(agentFreezePort.getRemark());
+                    }
+                    int j = agentFreezeMapper.updateByPrimaryKeySelective(agentFreeze);
+                    if(j!=1){
+                        throw new MessageException("更新解冻失败");
+                    }
                 }
                 if (freeType.compareTo(FreeType.AGNET.code) == 0){
 
