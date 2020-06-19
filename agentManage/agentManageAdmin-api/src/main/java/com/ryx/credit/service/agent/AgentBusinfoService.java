@@ -166,4 +166,7 @@ public interface AgentBusinfoService {
      * @return
      */
     public  List<Map> agentBusByDict(FastMap reqMap);
+
+    public List<Map> agentFreezeBus(String agentId,Long userId);
+
 }

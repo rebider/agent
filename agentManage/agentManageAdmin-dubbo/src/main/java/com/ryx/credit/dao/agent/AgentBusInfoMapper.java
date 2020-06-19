@@ -135,4 +135,6 @@ public interface AgentBusInfoMapper {
     List<String> selectBusNumByBusProCode(Map<String, Object> reqMap);
 
     List<Map<String, Object>> queryRegionByAccount(Map<String,Object> map);
+
+    List<Map<String,Object>> queryFreezeBusInfo(Map<String,Object> reqMap);
 }
