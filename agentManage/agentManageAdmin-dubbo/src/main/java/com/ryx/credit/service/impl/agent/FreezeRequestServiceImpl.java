@@ -794,7 +794,6 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
 
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     public AgentResult agentFreezeFinish(String insid, String actname) throws Exception {
         try {
             logger.info("申请冻结审批完成:{},{}", insid, actname);

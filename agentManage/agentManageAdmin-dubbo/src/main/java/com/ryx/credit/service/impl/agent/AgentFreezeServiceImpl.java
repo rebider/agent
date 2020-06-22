@@ -18,6 +18,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.pojo.admin.vo.AgentFreezeVo;
+import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentFreezeService;
@@ -67,6 +68,10 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     private FreezeRequestMapper freezeRequestMapper;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private IUserService iUserService;
+    @Autowired
+    private IResourceService iResourceService;
 
 
     @Override
@@ -112,6 +117,18 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             reqMap.put("freezeStatus",agentFreeze.getFreezeStatus());
         }
         reqMap.put("userId",agentFreeze.getFreezePerson());
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.parseLong(agentFreeze.getFreezePerson()));
+        if (orgCodeRes == null && orgCodeRes.size() != 1) {
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        reqMap.put("orgId", orgId);
+        reqMap.put("userId", agentFreeze.getFreezePerson());
+        reqMap.put("organizationCode", organizationCode);
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(Long.parseLong(agentFreeze.getFreezePerson()));
+        reqMap.put("platfromPerm",platfromPerm);
         List<Map<String, String>> resultMaps = agentFreezeMapper.queryAgentFreezeList(reqMap,page);
         for (Map<String, String> resultMap : resultMaps) {
             resultMap.put("FREESTATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREESTATUS"))));
@@ -143,6 +160,14 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 PlatForm busPlatform = platFormService.selectByPlatformNum(String.valueOf(resultMap.get("BUS_PLATFORM")));
                 resultMap.put("BUS_PLATFORM",busPlatform.getPlatformName());
             }
+            List<Map<String, Object>> orgCodeResTmp = iUserService.orgCode(Long.parseLong(resultMap.get("FREEZE_PERSON")));
+            if (orgCodeResTmp == null || orgCodeResTmp.size() != 1) {
+                continue;
+            }
+            Map<String, Object> stringObjectMapTmp = orgCodeResTmp.get(0);
+            String organizationCodeTmp = String.valueOf(stringObjectMapTmp.get("ORGANIZATIONCODE"));
+            resultMap.put("ORGANIZATIONCODE_C", organizationCodeTmp);
+            resultMap.put("ORGANIZATIONCODE_Q",organizationCode);
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(resultMaps);
@@ -976,7 +1001,18 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         if(StringUtils.isNotBlank(agentFreeze.getFreezeStatus())){
             reqMap.put("freezeStatus",agentFreeze.getFreezeStatus());
         }
-        reqMap.put("userId",agentFreeze.getFreezePerson());
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.parseLong(agentFreeze.getFreezePerson()));
+        if (orgCodeRes == null && orgCodeRes.size() != 1) {
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        reqMap.put("orgId", orgId);
+        reqMap.put("userId", agentFreeze.getFreezePerson());
+        reqMap.put("organizationCode", organizationCode);
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(Long.parseLong(agentFreeze.getFreezePerson()));
+        reqMap.put("platfromPerm",platfromPerm);
         List<Map<String, String>> resultMaps = agentFreezeMapper.queryAgentFreezeListRegion(reqMap,page);
         for (Map<String, String> resultMap : resultMaps) {
             resultMap.put("FREESTATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREESTATUS"))));
@@ -1008,6 +1044,15 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 PlatForm busPlatform = platFormService.selectByPlatformNum(String.valueOf(resultMap.get("BUS_PLATFORM")));
                 resultMap.put("BUS_PLATFORM",busPlatform.getPlatformName());
             }
+            List<Map<String, Object>> orgCodeResTmp = iUserService.orgCode(Long.parseLong(resultMap.get("FREEZE_PERSON")));
+            if (orgCodeResTmp == null || orgCodeResTmp.size() != 1) {
+                continue;
+            }
+            Map<String, Object> stringObjectMapTmp = orgCodeResTmp.get(0);
+            String organizationCodeTmp = String.valueOf(stringObjectMapTmp.get("ORGANIZATIONCODE"));
+            resultMap.put("ORGANIZATIONCODE_C", organizationCodeTmp);
+            resultMap.put("ORGANIZATIONCODE_Q",organizationCode);
+
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(resultMaps);

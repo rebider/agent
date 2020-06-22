@@ -465,8 +465,25 @@
         <if test="map.freezeStatus != null and map.freezeStatus != '' ">
           and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
         </if>
-        <if test="map.userId != null and map.userId != '' ">
-          and t.freeze_person = #{map.userId,jdbcType=VARCHAR}
+        <!--<if test="map.userId != null and map.userId != '' ">-->
+          <!--and t.freeze_person = #{map.userId,jdbcType=VARCHAR}-->
+        <!--</if>-->
+        <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
+          and EXISTS(
+          select A_AGENT_BUSINFO.ID from A_AGENT_BUSINFO
+          left join C_ORGANIZATION oa on oa.id=A_AGENT_BUSINFO.ag_doc_pro
+          left join C_ORGANIZATION ob on ob.id=A_AGENT_BUSINFO.AG_DOC_DISTRICT
+          where a.id=A_AGENT_BUSINFO.AGENT_ID and A_AGENT_BUSINFO.BUS_PLATFORM in
+          <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+            #{platfromPermItem.PLATFORM_NUM}
+          </foreach>
+          <if test="map.organizationCode!=null and map.organizationCode!=''">
+            and (oa.CODE like concat(#{map.organizationCode},'%') or ob.CODE like concat(#{map.organizationCode},'%') )
+          </if>
+          )
+        </if>
+        <if test="map.platfromPerm==null or map.platfromPerm.size==0">
+          and  1=-1
         </if>
       </where>
       order by t.agent_id,t.freeze_date desc
@@ -690,18 +707,22 @@
       <if test="map.freezeStatus != null and map.freezeStatus != '' ">
         and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
       </if>
-      <if test="map.userId != null and map.userId != '' ">
-        and t.freeze_person in(SELECT cu.id
-        FROM C_USER cu
-        WHERE cu.ORGANIZATION_ID IN(SELECT pro.ID
-        FROM C_ORGANIZATION pro
-        WHERE pro.PID LIKE CONCAT((SELECT t.id
-        FROM c_organization t
-        LEFT JOIN c_user cu
-        ON cu.organization_id =
-        t.id
-        WHERE cu.id = #{map.userId,jdbcType=VARCHAR} AND
-        cu.status = 0), '%') ))
+      <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
+        and EXISTS(
+        select A_AGENT_BUSINFO.ID from A_AGENT_BUSINFO
+        left join C_ORGANIZATION oa on oa.id=A_AGENT_BUSINFO.ag_doc_pro
+        left join C_ORGANIZATION ob on ob.id=A_AGENT_BUSINFO.AG_DOC_DISTRICT
+        where a.id=A_AGENT_BUSINFO.AGENT_ID and A_AGENT_BUSINFO.BUS_PLATFORM in
+        <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+        <if test="map.organizationCode!=null and map.organizationCode!=''">
+          and (oa.CODE like concat(#{map.organizationCode},'%') or ob.CODE like concat(#{map.organizationCode},'%') )
+        </if>
+        )
+      </if>
+      <if test="map.platfromPerm==null or map.platfromPerm.size==0">
+        and  1=-1
       </if>
     </where>
     ) t

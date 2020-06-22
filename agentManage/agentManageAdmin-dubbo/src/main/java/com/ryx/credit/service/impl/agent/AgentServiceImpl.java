@@ -1121,7 +1121,6 @@ public class AgentServiceImpl implements AgentService {
         String orgId = String.valueOf(stringObjectMap.get("ORGID"));
         String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
         map.put("orgId", orgId);
-        map.put("userId", userId);
         map.put("organizationCode", organizationCode);
         List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
         map.put("platfromPerm",platfromPerm);
