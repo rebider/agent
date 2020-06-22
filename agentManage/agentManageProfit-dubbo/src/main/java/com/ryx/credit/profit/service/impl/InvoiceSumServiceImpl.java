@@ -8,12 +8,14 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.profit.dao.FreezeAgentMapper;
 import com.ryx.credit.profit.dao.FreezeOperationRecordMapper;
 import com.ryx.credit.profit.dao.InvoiceSumMapper;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IInvoiceSumService;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentFreezeService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.IdService;
@@ -25,12 +27,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -55,6 +54,8 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
     private AgentService agentService;
     @Autowired
     private AgentFreezeService agentFreezeService;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
 
 
     /**
@@ -454,6 +455,11 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
      */
     @Override
     public boolean invocationIntFreeze(String agentId, String user,String id,String reason) throws MessageException{
+        List<AgentBusInfo> aginfo = agentBusinfoService.queryAgentBusInfoFreeze(agentId);
+        List<String> busList = new LinkedList<>();
+        for (AgentBusInfo busInfo : aginfo) {
+            busList.add(busInfo.getId());
+        }
         AgentFreezePort agentFreezePort = new AgentFreezePort();
         agentFreezePort.setAgentId(agentId);
         agentFreezePort.setOperationPerson(user);
@@ -461,6 +467,8 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         agentFreezePort.setFreezeNum(agentId);
         agentFreezePort.setRemark(reason);
         agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+        agentFreezePort.setBusPlatform(busList);
+        agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
         AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
         if("200".equals(agentResult.getStatus())){
             logger.info("欠票冻结："+agentId+",代理商冻结成功！");

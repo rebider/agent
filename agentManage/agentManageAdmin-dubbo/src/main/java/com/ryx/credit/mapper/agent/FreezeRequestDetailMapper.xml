@@ -40,6 +40,8 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="NEW_BUS_FREEZE_ORG" jdbcType="DECIMAL" property="newBusFreezeOrg" />
+    <result column="REVIEWS_USER" jdbcType="VARCHAR" property="reviewsUser" />
+    <result column="REVIEWS_DATE" jdbcType="TIMESTAMP" property="reviewsDate" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -76,7 +78,8 @@
     FREEZE_NUM, REMARK, BUS_PLATFORM, BUS_ID, BUS_NUM, BUS_FREEZE, PROFIT_FREEZE, REFLOW_FREEZE, 
     MONTHLY_FREEZE, DAILY_FREEZE, STOP_PROFIT_FREEZE, CASH_FREEZE, STOP_COUNT, NEW_BUS_FREEZE, 
     BUS_FREEZE_ORG, PROFIT_FREEZE_ORG, REFLOW_FREEZE_ORG, MONTHLY_FREEZE_ORG, DAILY_FREEZE_ORG, 
-    STOP_PROFIT_FREEZE_ORG, CASH_FREEZE_ORG, STOP_COUNT_ORG, STATUS, VERSION, NEW_BUS_FREEZE_ORG
+    STOP_PROFIT_FREEZE_ORG, CASH_FREEZE_ORG, STOP_COUNT_ORG, STATUS, VERSION, NEW_BUS_FREEZE_ORG, 
+    REVIEWS_USER, REVIEWS_DATE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -119,7 +122,8 @@
       BUS_FREEZE_ORG, PROFIT_FREEZE_ORG, REFLOW_FREEZE_ORG, 
       MONTHLY_FREEZE_ORG, DAILY_FREEZE_ORG, STOP_PROFIT_FREEZE_ORG, 
       CASH_FREEZE_ORG, STOP_COUNT_ORG, STATUS, 
-      VERSION, NEW_BUS_FREEZE_ORG)
+      VERSION, NEW_BUS_FREEZE_ORG, REVIEWS_USER, 
+      REVIEWS_DATE)
     values (#{id,jdbcType=VARCHAR}, #{freezeReqId,jdbcType=VARCHAR}, #{freezeId,jdbcType=VARCHAR}, 
       #{agentId,jdbcType=VARCHAR}, #{agentFreezeStatus,jdbcType=VARCHAR}, #{freezeType,jdbcType=DECIMAL}, 
       #{freezeStatus,jdbcType=VARCHAR}, #{freezePerson,jdbcType=VARCHAR}, #{freezeDate,jdbcType=TIMESTAMP}, 
@@ -132,7 +136,8 @@
       #{busFreezeOrg,jdbcType=DECIMAL}, #{profitFreezeOrg,jdbcType=DECIMAL}, #{reflowFreezeOrg,jdbcType=DECIMAL}, 
       #{monthlyFreezeOrg,jdbcType=DECIMAL}, #{dailyFreezeOrg,jdbcType=DECIMAL}, #{stopProfitFreezeOrg,jdbcType=DECIMAL}, 
       #{cashFreezeOrg,jdbcType=DECIMAL}, #{stopCountOrg,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL}, #{newBusFreezeOrg,jdbcType=DECIMAL})
+      #{version,jdbcType=DECIMAL}, #{newBusFreezeOrg,jdbcType=DECIMAL}, #{reviewsUser,jdbcType=VARCHAR}, 
+      #{reviewsDate,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
     insert into A_FREEZE_REQUEST_DETAIL
@@ -251,6 +256,12 @@
       <if test="newBusFreezeOrg != null">
         NEW_BUS_FREEZE_ORG,
       </if>
+      <if test="reviewsUser != null">
+        REVIEWS_USER,
+      </if>
+      <if test="reviewsDate != null">
+        REVIEWS_DATE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -366,6 +377,12 @@
       </if>
       <if test="newBusFreezeOrg != null">
         #{newBusFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="reviewsUser != null">
+        #{reviewsUser,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewsDate != null">
+        #{reviewsDate,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -489,6 +506,12 @@
       <if test="newBusFreezeOrg != null">
         NEW_BUS_FREEZE_ORG = #{newBusFreezeOrg,jdbcType=DECIMAL},
       </if>
+      <if test="reviewsUser != null">
+        REVIEWS_USER = #{reviewsUser,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewsDate != null">
+        REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -530,7 +553,9 @@
       STOP_COUNT_ORG = #{stopCountOrg,jdbcType=DECIMAL},
       STATUS = #{status,jdbcType=DECIMAL},
       VERSION = #{version,jdbcType=DECIMAL},
-      NEW_BUS_FREEZE_ORG = #{newBusFreezeOrg,jdbcType=DECIMAL}
+      NEW_BUS_FREEZE_ORG = #{newBusFreezeOrg,jdbcType=DECIMAL},
+      REVIEWS_USER = #{reviewsUser,jdbcType=VARCHAR},
+      REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -577,7 +602,10 @@
     cu2.NAME as UNFREEZE_PERSON_MSG,
     FRD.UNFREEZE_CAUSE,
     frd.FREEZE_DATE,
-    frd.REMARK as FREEZE_CAUSE_MSG
+    frd.REMARK as FREEZE_CAUSE_MSG,
+    frd.FREEZE_NUM,
+    cu3.NAME as REVIEWS_USER_NAME,
+    frd.REVIEWS_DATE
     FROM
     A_FREEZE_REQUEST_DETAIL FRD
     LEFT JOIN A_FREEZE_REQUEST FR
@@ -588,12 +616,25 @@
     ON p.PLATFORM_NUM = frd.BUS_PLATFORM
     LEFT JOIN C_USER CU ON frd.FREEZE_PERSON = cu.id
     left join C_USER cu2 on frd.UNFREEZE_PERSON = cu2.ID
+    left join C_USER cu3 on frd.REVIEWS_USER = cu3.ID
     <trim prefix="where" prefixOverrides="and | or">
       <if test="map.id != null and map.id !=''">
         fr.id = #{map.id}
       </if>
       <if test="map.reqType != null and map.reqType != ''">
        and fr.req_type = #{map.reqType}
+      </if>
+      <if test="map.userId !=null and map.userId != '' ">
+        and (frd.BUS_PLATFORM in (
+        select e.PLATFORM_NUM from A_PLATFORM e
+        inner join c_resource a on ('AGENT_LIST_PLATFORM_'||e.PLATFORM_NUM ) = a.URL
+        left join c_role_resource b  on a.id=b.resource_id
+        left join c_role c on c.id=b.role_id
+        left join c_user_role d on d.role_id=c.id
+        <where>
+          <if test="map.userId != null and map.userId != ''">and d.user_id =#{map.userId} </if>
+        </where>
+        ) or frd.BUS_PLATFORM is null )
       </if>
     </trim>
   </sql>

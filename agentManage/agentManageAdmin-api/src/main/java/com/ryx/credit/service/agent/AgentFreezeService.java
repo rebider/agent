@@ -58,4 +58,8 @@ public interface AgentFreezeService {
 
     Map<String,Object> selectAgentFreeze(HashMap map)throws MessageException;
 
+    PageInfo agentFreezeListAll(AgentFreeze agentFreeze, Page page);
+
+    PageInfo agentFreezeListRegion(AgentFreeze agentFreeze, Page page);
+
 }

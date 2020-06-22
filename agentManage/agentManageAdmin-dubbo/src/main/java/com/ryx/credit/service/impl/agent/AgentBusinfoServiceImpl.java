@@ -213,6 +213,35 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return agentBusInfoMapper.selectByExample(example);
 	}
 
+	@Override
+	public List<AgentBusInfo> queryAgentBusInfo(String agentId) {
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+		criteria.andAgentIdEqualTo(agentId);
+		criteria.andStatusEqualTo(Status.STATUS_1.status);
+		criteria.andCloReviewStatusIn(Arrays.asList(AgStatus.Approving.status, AgStatus.Approved.status));
+		criteria.andBusStatusIn(Arrays.asList(BusStatus.WQY.status, BusStatus.QY.status, BusStatus.WJH.status, BusStatus.SD.status));
+		return agentBusInfoMapper.selectByExample(agentBusInfoExample);
+	}
+
+	/**
+	 * 查询业务数据
+	 * AG码, 有效状态, 审批通过, 业务编码不为空, 业务状态(启用 未启用 未激活 锁定)
+	 * @param agentId
+	 * @return
+	 */
+	@Override
+	public List<AgentBusInfo> queryAgentBusInfoFreeze(String agentId) {
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+		criteria.andBusNumIsNotNull();
+		criteria.andAgentIdEqualTo(agentId);
+		criteria.andStatusEqualTo(Status.STATUS_1.status);
+		criteria.andCloReviewStatusIn(Arrays.asList(AgStatus.Approved.status));
+		criteria.andBusStatusIn(Arrays.asList(BusStatus.WQY.status, BusStatus.QY.status, BusStatus.WJH.status, BusStatus.SD.status));
+		return agentBusInfoMapper.selectByExample(agentBusInfoExample);
+	}
+
 
 	@Override
 	public List<AgentBusInfo> agentAvbBusInfoList(String agentId) {
@@ -1317,4 +1346,21 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return data;
 	}
 
+	@Override
+	public List<Map> agentFreezeBus(String agentId,Long userId) {
+		List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+		if (orgCodeRes == null && orgCodeRes.size() != 1) {
+			return null;
+		}
+		Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+		String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+		FastMap reqMap = FastMap.fastMap("agentId", agentId);
+		if(organizationCode.contains("city"))
+			reqMap.putKeyV("organizationCode", organizationCode);
+		List<Map> data = agentBusInfoMapper.queryFreezeBusInfo(reqMap);
+		for (Map datum : data) {
+			datum.put("BUS_TYPE_NAME",BusType.getContentByValue(String.valueOf(datum.get("BUS_TYPE"))));
+		}
+		return data;
+	}
 }

@@ -235,12 +235,16 @@
       fr.reviews_stat,
       fr.reviews_date,
       fr.reviews_user,
-      cur.name as r_name
+      cur.name as r_name,
+      frd.AGENT_ID,
+      (select AG_NAME from A_AGENT where ID = frd.AGENT_ID) as ag_name
       FROM a_freeze_request fr
       LEFT JOIN c_user cu
       ON cu.id = fr.c_user_id
       LEFT JOIN c_user cur
       ON cur.id = fr.reviews_user
+      left join A_FREEZE_REQUEST_DETAIL frd
+      on frd.FREEZE_REQ_ID = fr.id
       <where>
         and fr.status = '1'
         <if test="map.agentId !=null and map.agentId!=''">
@@ -256,10 +260,16 @@
           and fr.REQ_TYPE = #{map.reqType}
         </if>
         <if test="map.reqTimeBegin != null and map.reqTimeBegin != ''">
-          and fr.C_TM &gt;= to_date(#{#{map.reqTimeBegin}}, 'yyyy-mm-dd hh24:mi:ss')
+          and fr.C_TM &gt;= to_date(#{map.reqTimeBegin}, 'yyyy-mm-dd hh24:mi:ss')
         </if>
         <if test="map.reqTimeEnd != null and map.reqTimeEnd != ''">
-          and fr.C_TM &lt;= to_date(#{#{map.reqTimeEnd}}, 'yyyy-mm-dd hh24:mi:ss')
+          and fr.C_TM &lt;= to_date(#{map.reqTimeEnd}, 'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.reviewsTimeBegin != null and map.reviewsTimeBegin != ''">
+          and fr.REVIEWS_DATE &gt;= to_date(#{map.reviewsTimeBegin}, 'yyyy-mm-dd hh24:mi:ss')
+        </if>
+        <if test="map.reviewsTimeEnd != null and map.reviewsTimeEnd != ''">
+          and fr.REVIEWS_DATE &lt;= to_date(#{map.reviewsTimeEnd}, 'yyyy-mm-dd hh24:mi:ss')
         </if>
         <if test="map.userId != null and map.userId != ''">
           and fr.c_user_id = #{map.userId}

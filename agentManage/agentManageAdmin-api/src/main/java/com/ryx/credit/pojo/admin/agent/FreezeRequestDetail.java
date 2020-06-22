@@ -81,6 +81,10 @@ public class FreezeRequestDetail implements Serializable {
 
     private BigDecimal newBusFreezeOrg;
 
+    private String reviewsUser;
+
+    private Date reviewsDate;
+
     public String getId() {
         return id;
     }
@@ -383,5 +387,21 @@ public class FreezeRequestDetail implements Serializable {
 
     public void setNewBusFreezeOrg(BigDecimal newBusFreezeOrg) {
         this.newBusFreezeOrg = newBusFreezeOrg;
+    }
+
+    public String getReviewsUser() {
+        return reviewsUser;
+    }
+
+    public void setReviewsUser(String reviewsUser) {
+        this.reviewsUser = reviewsUser == null ? null : reviewsUser.trim();
+    }
+
+    public Date getReviewsDate() {
+        return reviewsDate;
+    }
+
+    public void setReviewsDate(Date reviewsDate) {
+        this.reviewsDate = reviewsDate;
     }
 }
