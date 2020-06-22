@@ -227,7 +227,8 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
         agentBusInfoExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status)
                 .andAgentIdEqualTo(agentId)
                 .andCloReviewStatusEqualTo(AgStatus.Approved.status)
-                .andBusStatusIn(Arrays.asList(BusinessStatus.Enabled.status,BusinessStatus.inactive.status,BusinessStatus.lock.status,BusinessStatus.pause.status));
+                .andBusStatusIn(Arrays.asList(BusinessStatus.Enabled.status,BusinessStatus.inactive.status,BusinessStatus.lock.status,BusinessStatus.pause.status))
+                .andBusNumIsNotNull();
         List<AgentBusInfo> busInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
         logger.info("业务平台数据查询结果{}",busInfoList != null && !busInfoList.isEmpty() ?busInfoList.size() :0);
         ArrayList<String> busList = new ArrayList<>();
