@@ -370,7 +370,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                           agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
                           agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
                           agentFreezePort.setBusPlatform(busList);
-                          agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ONE));
+                          agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
                           agentFreezePort.setRemark("认证结果非在营");
                           logger.info("代理商{}开始冻结",agent.getId());
                           AgentResult agentFreeze = agentFreeze(agentFreezePort);
@@ -613,7 +613,7 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
                  agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
                  agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
                  agentFreezePort.setBusPlatform(busList);
-                 agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ONE));
+                 agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
                  if(null!=map && StringUtils.isNotBlank(String.valueOf(map.get("remark")))){
                      agentFreezePort.setRemark(String.valueOf(map.get("remark")));
                  }

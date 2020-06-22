@@ -1099,7 +1099,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             agentFreezePort.setFreezeNum(agent.getId());
             agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
             agentFreezePort.setBusPlatform(busList);
-            agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ONE));
+            agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
             AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
             if(!agentResult.isOK()){
                 throw new ProcessException(agentResult.getMsg());

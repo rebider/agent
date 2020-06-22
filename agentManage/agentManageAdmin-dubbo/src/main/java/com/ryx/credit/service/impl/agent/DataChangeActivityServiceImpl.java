@@ -164,7 +164,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     agentFreezePort.setFreezeNum(dateChangeRequest.getId());
                     agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
                     agentFreezePort.setBusPlatform(busList);
-                    agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ONE));
+                    agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
                     AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
                     if (!agentResult.isOK()) {
                         throw new MessageException(agentResult.getMsg());
@@ -179,7 +179,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 agentFreezePort.setFreezeNum(dateChangeRequest.getId());
                 agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
                 agentFreezePort.setBusPlatform(busList);
-                agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ONE));
+                agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
                 AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
                 if (!agentResult.isOK()) {
                     throw new MessageException(agentResult.getMsg());

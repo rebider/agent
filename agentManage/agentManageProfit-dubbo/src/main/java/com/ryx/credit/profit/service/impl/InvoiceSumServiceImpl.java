@@ -468,7 +468,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         agentFreezePort.setRemark(reason);
         agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
         agentFreezePort.setBusPlatform(busList);
-        agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ONE));
+        agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
         AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
         if("200".equals(agentResult.getStatus())){
             logger.info("欠票冻结："+agentId+",代理商冻结成功！");
