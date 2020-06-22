@@ -173,6 +173,17 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             if(!verify.isOK()){
                 return verify;
             }
+            if (agentFreezePort.getBusPlatform() == null || agentFreezePort.getBusPlatform().size()==0){
+                return AgentResult.fail("代理商业务平台参数未传入");
+            }else {
+                for (String  BusId:agentFreezePort.getBusPlatform()){
+                    AgentBusInfo agentBusInfo = agentBusinfoService.queryAgentBusInfoById(BusId);
+                    if (agentBusInfo.getBusNum()==null){
+                        return AgentResult.fail("代理商业务平台码不能为空");
+                    }
+                }
+
+            }
             for(String busPlatform:agentFreezePort.getBusPlatform()){
                 for (BigDecimal freeType:agentFreezePort.getFreeType()){
                     log.info("冻结类型为[{}]",FreeType.getmsg(freeType));
@@ -292,9 +303,8 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     freezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
                     if (agentFreezePort.getBusPlatform()!= null && agentFreezePort.getBusPlatform().get(0)!=null){
                         freezeCriteria.andBusIdEqualTo(agentFreezePort.getBusPlatform().get(0));
-                    }else {
-                        freezeCriteria.andBusIdIsNull();
                     }
+                    //不传入业务平台码则查找AG+层级+冻结原因类型的冻结
 
                 }
                 if (agentFreezePort.getBusPlatform()!= null && agentFreezePort.getBusPlatform().get(0)!=null){
