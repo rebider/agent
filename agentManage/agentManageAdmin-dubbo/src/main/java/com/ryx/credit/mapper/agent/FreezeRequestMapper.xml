@@ -225,7 +225,7 @@
     </if>
   </sql>
     <sql id="queryAgentFreezeRequestListSql">
-      SELECT fr.id,
+      SELECT distinct(fr.id),
       fr.c_tm,
       fr.req_type,
       fr.c_user_id,
