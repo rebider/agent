@@ -62,4 +62,6 @@ public interface AgentFreezeService {
 
     PageInfo agentFreezeListRegion(AgentFreeze agentFreeze, Page page);
 
+    AgentResult freezeNewBus(AgentFreezePort agentFreezePort);
+
 }

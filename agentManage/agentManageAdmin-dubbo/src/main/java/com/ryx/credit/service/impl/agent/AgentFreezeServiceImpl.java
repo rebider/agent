@@ -72,6 +72,8 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     private IUserService iUserService;
     @Autowired
     private IResourceService iResourceService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
 
     @Override
@@ -1058,5 +1060,62 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         pageInfo.setRows(resultMaps);
         pageInfo.setTotal(agentFreezeMapper.queryAgentFreezeCountRegion(reqMap));
         return pageInfo;
+    }
+
+    @Override
+    public AgentResult freezeNewBus(AgentFreezePort agentFreezePort) {
+        log.info("新增业务平台开始冻结{},{}",agentFreezePort.getAgentId(),agentFreezePort.getBusPlatform());
+        if (agentFreezePort.getBusPlatform() == null || agentFreezePort.getBusPlatform().size() == 0){
+            for (String busId:agentFreezePort.getBusPlatform()){
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+                if (agentBusInfo == null){
+                    return  AgentResult.fail("业务信息不存在");
+                }
+                AgentFreezeExample agentFreezeExample = new AgentFreezeExample();
+                agentFreezeExample.or().andStatusEqualTo(Status.STATUS_1.status)
+                        .andAgentIdEqualTo(agentFreezePort.getAgentId())
+                        .andNewBusFreezeEqualTo(Status.STATUS_1.status)
+                        .andFreezeStatusEqualTo(String.valueOf(FreeStatus.DJ.getValue()));
+                agentFreezeExample.setOrderByClause("FREEZE_DATE desc");
+
+                List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
+                if (agentFreezes== null || agentFreezes.size() == 0){
+                    return AgentResult.ok("不需要冻结新增业务");
+                }else {
+                    AgentFreeze agentFreeze = new AgentFreeze();
+                    agentFreeze.setId(idService.genId(TabId.a_agent_freeze));
+                    agentFreeze.setAgentId(agentFreezePort.getAgentId());
+                    agentFreeze.setFreezeStatus(FreeStatus.DJ.getValue().toString());
+                    agentFreeze.setFreezeCause(agentFreezes.get(0).getFreezeCause());
+                    agentFreeze.setFreezeDate(new Date());
+                    agentFreeze.setFreezePerson(agentFreezePort.getOperationPerson());
+                    agentFreeze.setFreezeNum(agentFreezePort.getFreezeNum());
+                    agentFreeze.setRemark(agentFreezePort.getRemark());
+                    agentFreeze.setStatus(Status.STATUS_1.status);
+                    agentFreeze.setVersion(BigDecimal.ONE);
+                    agentFreeze.setFreezeType(FreeType.AGNET.code);
+                    /** 保存新增字段 **/
+                    AgentBusInfo agentBusInfoTmp = agentBusinfoService.getById(busId);
+                    agentFreeze.setBusPlatform(agentBusInfoTmp.getBusPlatform());
+                    agentFreeze.setBusId(busId);
+                    agentFreeze.setBusNum(agentBusInfoTmp.getBusNum());
+                    agentFreeze.setNewBusFreeze(BigDecimal.ZERO);
+                    agentFreeze.setBusFreeze(agentFreezes.get(0).getBusFreeze());
+                    agentFreeze.setProfitFreeze(agentFreezes.get(0).getProfitFreeze());
+                    agentFreeze.setReflowFreeze(agentFreezes.get(0).getReflowFreeze());
+                    agentFreeze.setMonthlyFreeze(agentFreezes.get(0).getMonthlyFreeze());
+                    agentFreeze.setDailyFreeze(agentFreezes.get(0).getDailyFreeze());
+                    agentFreeze.setStopProfitFreeze(agentFreezes.get(0).getStopProfitFreeze());
+                    agentFreeze.setCashFreeze(agentFreezes.get(0).getCashFreeze());
+                    agentFreeze.setStopCount(agentFreezes.get(0).getStopCount());
+                    if (1!=agentFreezeMapper.insert(agentFreeze)){
+                        return AgentResult.fail("冻结信息保存失败!");
+                    }
+                }
+            }
+            return AgentResult.ok();
+        }else {
+            return AgentResult.fail("缺少业务平台码(AB码)");
+        }
     }
 }
