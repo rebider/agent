@@ -9,8 +9,8 @@
         <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
         <result column="SHEET_NAME" jdbcType="VARCHAR" property="sheetName" />
         <result column="SHEET_COLUMN" jdbcType="DECIMAL" property="sheetColumn" />
-        <result column="SHEET_HEAD" jdbcType="VARCHAR" property="sheetHead" />
-        <result column="SHEET_DATA" jdbcType="VARCHAR" property="sheetData" />
+        <result column="SHEET_HEAD" jdbcType="OTHER" property="sheetHead" />
+        <result column="SHEET_DATA" jdbcType="OTHER" property="sheetData" />
         <result column="PROFIT_TYPE" jdbcType="VARCHAR" property="profitType" />
         <result column="BILL_STATUS" jdbcType="VARCHAR" property="billStatus" />
         <result column="BALANCE_AMT" jdbcType="DECIMAL" property="balanceAmt" />
@@ -33,6 +33,8 @@
         <result column="REALITY_AG_ID" jdbcType="VARCHAR" property="realityAgId" />
         <result column="REALITY_AG_NAME" jdbcType="VARCHAR" property="realityAgName" />
         <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+        <result column="ORG_ID" jdbcType="VARCHAR" property="orgId" />
+        <result column="RENIT_STATUS" jdbcType="VARCHAR" property="renitStatus" />
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -68,7 +70,8 @@
     SHEET_HEAD, SHEET_DATA, PROFIT_TYPE, BILL_STATUS, BALANCE_AMT, IMPORT_TIME, IMPORT_PERSON,
     UPDATE_TIME, UPDATE_PERSON, SHEET_ORDER, ORDER_NUMBER, BATCH_NO, REMIT_FAIL_REASON,
     BALANCE_BANK_NO, BALANCE_BANK_NAME, BALANCE_ACCT_NAME, BALANCE_ACCT_NO, SUNBMIT_CHECK_TIME,
-    SUNBMIT_REMIT_TIME, SETTLE_DATE, IMPORT_BATCH, REALITY_AG_ID, REALITY_AG_NAME, REMARK
+    SUNBMIT_REMIT_TIME, SETTLE_DATE, IMPORT_BATCH, REALITY_AG_ID, REALITY_AG_NAME, REMARK,
+    ORG_ID, RENIT_STATUS
   </sql>
     <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitExample" resultMap="BaseResultMap">
         <include refid="OracleDialectPrefix" />
@@ -109,10 +112,11 @@
       BALANCE_BANK_NAME, BALANCE_ACCT_NAME, BALANCE_ACCT_NO,
       SUNBMIT_CHECK_TIME, SUNBMIT_REMIT_TIME, SETTLE_DATE,
       IMPORT_BATCH, REALITY_AG_ID, REALITY_AG_NAME,
-      REMARK)
+      REMARK, ORG_ID, RENIT_STATUS
+      )
     values (#{balanceId,jdbcType=VARCHAR}, #{settleMonth,jdbcType=VARCHAR}, #{uniqueFlag,jdbcType=VARCHAR},
       #{agentName,jdbcType=VARCHAR}, #{busCode,jdbcType=VARCHAR}, #{sheetName,jdbcType=VARCHAR},
-      #{sheetColumn,jdbcType=DECIMAL}, #{sheetHead,jdbcType=VARCHAR}, #{sheetData,jdbcType=VARCHAR},
+      #{sheetColumn,jdbcType=DECIMAL}, #{sheetHead,jdbcType=OTHER}, #{sheetData,jdbcType=OTHER},
       #{profitType,jdbcType=VARCHAR}, #{billStatus,jdbcType=VARCHAR}, #{balanceAmt,jdbcType=DECIMAL},
       #{importTime,jdbcType=VARCHAR}, #{importPerson,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR},
       #{updatePerson,jdbcType=VARCHAR}, #{sheetOrder,jdbcType=DECIMAL}, #{orderNumber,jdbcType=DECIMAL},
@@ -120,7 +124,8 @@
       #{balanceBankName,jdbcType=VARCHAR}, #{balanceAcctName,jdbcType=VARCHAR}, #{balanceAcctNo,jdbcType=VARCHAR},
       #{sunbmitCheckTime,jdbcType=VARCHAR}, #{sunbmitRemitTime,jdbcType=VARCHAR}, #{settleDate,jdbcType=VARCHAR},
       #{importBatch,jdbcType=VARCHAR}, #{realityAgId,jdbcType=VARCHAR}, #{realityAgName,jdbcType=VARCHAR},
-      #{remark,jdbcType=VARCHAR})
+      #{remark,jdbcType=VARCHAR}, #{orgId,jdbcType=VARCHAR}, #{renitStatus,jdbcType=VARCHAR}
+      )
   </insert>
     <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PmsProfit">
         insert into PMS_PROFIT
@@ -218,6 +223,12 @@
             <if test="remark != null">
                 REMARK,
             </if>
+            <if test="orgId != null">
+                ORG_ID,
+            </if>
+            <if test="renitStatus != null">
+                RENIT_STATUS,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="balanceId != null">
@@ -242,10 +253,10 @@
                 #{sheetColumn,jdbcType=DECIMAL},
             </if>
             <if test="sheetHead != null">
-                #{sheetHead,jdbcType=VARCHAR},
+                #{sheetHead,jdbcType=OTHER},
             </if>
             <if test="sheetData != null">
-                #{sheetData,jdbcType=VARCHAR},
+                #{sheetData,jdbcType=OTHER},
             </if>
             <if test="profitType != null">
                 #{profitType,jdbcType=VARCHAR},
@@ -313,6 +324,12 @@
             <if test="remark != null">
                 #{remark,jdbcType=VARCHAR},
             </if>
+            <if test="orgId != null">
+                #{orgId,jdbcType=VARCHAR},
+            </if>
+            <if test="renitStatus != null">
+                #{renitStatus,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PmsProfitExample" resultType="java.lang.Long">
@@ -343,10 +360,10 @@
                 SHEET_COLUMN = #{sheetColumn,jdbcType=DECIMAL},
             </if>
             <if test="sheetHead != null">
-                SHEET_HEAD = #{sheetHead,jdbcType=VARCHAR},
+                SHEET_HEAD = #{sheetHead,jdbcType=OTHER},
             </if>
             <if test="sheetData != null">
-                SHEET_DATA = #{sheetData,jdbcType=VARCHAR},
+                SHEET_DATA = #{sheetData,jdbcType=OTHER},
             </if>
             <if test="profitType != null">
                 PROFIT_TYPE = #{profitType,jdbcType=VARCHAR},
@@ -414,6 +431,12 @@
             <if test="remark != null">
                 REMARK = #{remark,jdbcType=VARCHAR},
             </if>
+            <if test="orgId != null">
+                ORG_ID = #{orgId,jdbcType=VARCHAR},
+            </if>
+            <if test="renitStatus != null">
+                RENIT_STATUS = #{renitStatus,jdbcType=VARCHAR},
+            </if>
         </set>
         where BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
     </update>
@@ -425,8 +448,8 @@
       BUS_CODE = #{busCode,jdbcType=VARCHAR},
       SHEET_NAME = #{sheetName,jdbcType=VARCHAR},
       SHEET_COLUMN = #{sheetColumn,jdbcType=DECIMAL},
-      SHEET_HEAD = #{sheetHead,jdbcType=VARCHAR},
-      SHEET_DATA = #{sheetData,jdbcType=VARCHAR},
+      SHEET_HEAD = #{sheetHead,jdbcType=OTHER},
+      SHEET_DATA = #{sheetData,jdbcType=OTHER},
       PROFIT_TYPE = #{profitType,jdbcType=VARCHAR},
       BILL_STATUS = #{billStatus,jdbcType=VARCHAR},
       BALANCE_AMT = #{balanceAmt,jdbcType=DECIMAL},
@@ -448,7 +471,9 @@
       IMPORT_BATCH = #{importBatch,jdbcType=VARCHAR},
       REALITY_AG_ID = #{realityAgId,jdbcType=VARCHAR},
       REALITY_AG_NAME = #{realityAgName,jdbcType=VARCHAR},
-      REMARK = #{remark,jdbcType=VARCHAR}
+      REMARK = #{remark,jdbcType=VARCHAR},
+      ORG_ID = #{orgId,jdbcType=VARCHAR},
+      RENIT_STATUS = #{renitStatus,jdbcType=VARCHAR}
     where BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
   </update>
     <sql id="OracleDialectPrefix">
@@ -468,7 +493,7 @@
         <include refid="OracleDialectPrefix"/>
         select t.IMPORT_BATCH,t.PROFIT_TYPE,t.BALANCE_ID,t.SETTLE_MONTH,t.unique_flag,t.AGENT_NAME,t.bus_code,
         t.BALANCE_AMT,t.REALITY_AG_ID,t.REMARK,
-        t.REALITY_AG_NAME,t.BILL_STATUS,t.REMIT_FAIL_REASON,aa.FREESTATUS,ap.PLATFORM_NAME
+        t.REALITY_AG_NAME,t.BILL_STATUS,t.REMIT_FAIL_REASON,aa.FREESTATUS,ap.PLATFORM_NAME,t.ORG_ID,t.RENIT_STATUS
         from pms_profit t left join A_AGENT aa on t.unique_flag = aa.ID left join A_PLATFORM ap on
         ap.PLATFORM_NUM=t.BUS_CODE
         where t.sheet_name='汇总' and aa.STATUS = '1'
@@ -522,7 +547,7 @@
         select count(1) from (
         select t.IMPORT_BATCH,t.PROFIT_TYPE,t.BALANCE_ID,t.SETTLE_MONTH,t.unique_flag,t.AGENT_NAME,t.bus_code,
         t.BALANCE_AMT,t.REALITY_AG_ID,t.REMARK,
-        t.REALITY_AG_NAME,t.BILL_STATUS,t.REMIT_FAIL_REASON,aa.FREESTATUS,ap.PLATFORM_NAME
+        t.REALITY_AG_NAME,t.BILL_STATUS,t.REMIT_FAIL_REASON,aa.FREESTATUS,ap.PLATFORM_NAME,t.ORG_ID,t.RENIT_STATUS
         from pms_profit t left join A_AGENT aa on t.unique_flag = aa.ID left join A_PLATFORM ap on
         ap.PLATFORM_NUM=t.BUS_CODE
         where t.sheet_name='汇总' and aa.STATUS = '1'
@@ -578,7 +603,7 @@
         <include refid="OracleDialectPrefix"/>
         select t.IMPORT_BATCH,t.PROFIT_TYPE,t.BALANCE_ID,t.SETTLE_MONTH,t.unique_flag,t.AGENT_NAME,t.bus_code,
         t.BALANCE_AMT,t.REALITY_AG_ID,t.REMARK,
-        t.REALITY_AG_NAME,t.BILL_STATUS,t.REMIT_FAIL_REASON,aa.FREESTATUS,ap.PLATFORM_NAME
+        t.REALITY_AG_NAME,t.BILL_STATUS,t.REMIT_FAIL_REASON,aa.FREESTATUS,ap.PLATFORM_NAME,t.ORG_ID,t.RENIT_STATUS
         from pms_profit t left join A_AGENT aa on t.unique_flag = aa.ID left join A_PLATFORM ap on
         ap.PLATFORM_NUM=t.BUS_CODE
         where t.sheet_name='汇总' and aa.STATUS = '1'
@@ -625,7 +650,7 @@
         select count (1) from (
         select t.IMPORT_BATCH,t.PROFIT_TYPE,t.BALANCE_ID,t.SETTLE_MONTH,t.unique_flag,t.AGENT_NAME,t.bus_code,
         t.BALANCE_AMT,t.REALITY_AG_ID,t.REMARK,
-        t.REALITY_AG_NAME,t.BILL_STATUS,t.REMIT_FAIL_REASON,aa.FREESTATUS,ap.PLATFORM_NAME
+        t.REALITY_AG_NAME,t.BILL_STATUS,t.REMIT_FAIL_REASON,aa.FREESTATUS,ap.PLATFORM_NAME,t.ORG_ID,t.RENIT_STATUS
         from pms_profit t left join A_AGENT aa on t.unique_flag = aa.ID left join A_PLATFORM ap on
         ap.PLATFORM_NUM=t.BUS_CODE
         where t.sheet_name='汇总' and aa.STATUS = '1'

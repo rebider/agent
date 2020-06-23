@@ -11,9 +11,10 @@ import java.math.BigDecimal;
 public enum ProfitDataImportType {
     FRSJDR("00", "分润数据导入"),
     FXSJDR("01", "返现数据导入"),
-    DYDL("77", "一次请款"),
+    DYDL("77", "一次请款（月份润汇总表）"),
     DEDL("88", "二次请款"),
-    DSDL("99", "补出款");
+    DSDL("99", "补出款"),
+    MXDL("66", "月份润明细表");
 
     public String key;
 

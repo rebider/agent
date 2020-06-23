@@ -263,15 +263,17 @@
     <result column="IMPORT_BATCH" jdbcType="VARCHAR" property="importBatch"/>
     <result column="REALITY_AG_ID" jdbcType="VARCHAR" property="realityAgId"/>
     <result column="REALITY_AG_NAME" jdbcType="VARCHAR" property="realityAgName"/>
+    <result column="ORG_ID" jdbcType="VARCHAR" property="orgId" />
+    <result column="RENIT_STATUS" jdbcType="VARCHAR" property="renitStatus" />
   </resultMap>
 
 
 
 
 
+<!-- and  aa.STATUS = '1' and bb.STATUS='1' and bb.BUS_STATUS ='1' and bb.CLO_REVIEW_STATUS='3'-->
 
-
-  <select id="checkoutData" parameterType="java.lang.String" resultType="java.util.Map">
+  <select id="checkoutData" parameterType="java.util.Map" resultType="java.util.Map">
 
  select aa.ID,aa.AG_NAME,bb.BUS_PLATFORM,cc.PLATFORM_NAME  from A_AGENT aa,A_AGENT_BUSINFO bb,A_PLATFORM cc
  where aa.ID = bb.AGENT_ID and bb.BUS_PLATFORM = cc.PLATFORM_NUM and  aa.STATUS = '1'
@@ -280,6 +282,9 @@
     </if>
     <if test="busCode != null and busCode != ''">
       and bb.BUS_PLATFORM = #{busCode,jdbcType=VARCHAR}
+    </if>
+    <if test="orgID != null and orgID != ''">
+      and bb.BUS_NUM = #{orgID,jdbcType=VARCHAR}
     </if>
   </select>
 
@@ -293,7 +298,7 @@
 		insert into pms_profit (SETTLE_MONTH, UNIQUE_FLAG, AGENT_NAME, BUS_CODE,SHEET_NAME,
 		SHEET_COLUMN, SHEET_HEAD, SHEET_DATA, PROFIT_TYPE,
 		BILL_STATUS, BALANCE_AMT, IMPORT_TIME,IMPORT_PERSON,IMPORT_BATCH,REALITY_AG_ID,REALITY_AG_NAME,
-		UPDATE_TIME, UPDATE_PERSON, sheet_Order,order_number,BALANCE_ID)
+		UPDATE_TIME, UPDATE_PERSON, sheet_Order,order_number,BALANCE_ID,ORG_ID,RENIT_STATUS)
 		values (#{settleMonth,jdbcType=VARCHAR},#{ uniqueFlag,jdbcType=VARCHAR},#{
 		agentName,jdbcType=VARCHAR},#{busCode,jdbcType=VARCHAR},#{ sheetName,jdbcType=VARCHAR},#{
 		sheetColumn,jdbcType=INTEGER}, xmlType((
@@ -303,7 +308,7 @@
 		 )),#{ profitType,jdbcType=VARCHAR},#{billStatus,jdbcType=VARCHAR},#{
 		balanceAmt,jdbcType=VARCHAR},#{ importTime,jdbcType=VARCHAR},#{importPerson,jdbcType=VARCHAR},#{importBatch,jdbcType=VARCHAR}
 		,#{realityAgId,jdbcType=VARCHAR},#{realityAgName,jdbcType=VARCHAR},#{updateTime,jdbcType=VARCHAR},#{
-		updatePerson,jdbcType=VARCHAR},#{sheetOrder,jdbcType=INTEGER},#{orderNumber,jdbcType=INTEGER},#{balanceId,jdbcType=VARCHAR})
+		updatePerson,jdbcType=VARCHAR},#{sheetOrder,jdbcType=INTEGER},#{orderNumber,jdbcType=INTEGER},#{balanceId,jdbcType=VARCHAR},#{orgId,jdbcType=VARCHAR},#{renitStatus,jdbcType=VARCHAR})
 	</insert>
 
 

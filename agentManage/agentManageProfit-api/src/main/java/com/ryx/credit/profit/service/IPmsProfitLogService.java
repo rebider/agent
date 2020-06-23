@@ -38,7 +38,7 @@ public interface IPmsProfitLogService {
 
     int updateByPrimaryKeySelective(PmsProfit record);
 
-    List<Map<String,Object>> checkoutData(String agentId , String busCode);
+    List<Map<String,Object>> checkoutData(Map<String,Object> param);
 
    int insertSelectiveTemp(PmsProfitTempWithBLOBs record) ;
 

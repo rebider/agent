@@ -2,12 +2,11 @@ package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PmsProfitExample implements Serializable {
+public class PmsProfitExample {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -2245,6 +2244,146 @@ public class PmsProfitExample implements Serializable {
 
         public Criteria andRemarkNotBetween(String value1, String value2) {
             addCriterion("REMARK not between", value1, value2, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdIsNull() {
+            addCriterion("ORG_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdIsNotNull() {
+            addCriterion("ORG_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdEqualTo(String value) {
+            addCriterion("ORG_ID =", value, "orgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdNotEqualTo(String value) {
+            addCriterion("ORG_ID <>", value, "orgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdGreaterThan(String value) {
+            addCriterion("ORG_ID >", value, "orgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdGreaterThanOrEqualTo(String value) {
+            addCriterion("ORG_ID >=", value, "orgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdLessThan(String value) {
+            addCriterion("ORG_ID <", value, "orgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdLessThanOrEqualTo(String value) {
+            addCriterion("ORG_ID <=", value, "orgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdLike(String value) {
+            addCriterion("ORG_ID like", value, "orgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdNotLike(String value) {
+            addCriterion("ORG_ID not like", value, "orgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdIn(List<String> values) {
+            addCriterion("ORG_ID in", values, "orgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdNotIn(List<String> values) {
+            addCriterion("ORG_ID not in", values, "orgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdBetween(String value1, String value2) {
+            addCriterion("ORG_ID between", value1, value2, "orgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrgIdNotBetween(String value1, String value2) {
+            addCriterion("ORG_ID not between", value1, value2, "orgId");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusIsNull() {
+            addCriterion("RENIT_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusIsNotNull() {
+            addCriterion("RENIT_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusEqualTo(String value) {
+            addCriterion("RENIT_STATUS =", value, "renitStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusNotEqualTo(String value) {
+            addCriterion("RENIT_STATUS <>", value, "renitStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusGreaterThan(String value) {
+            addCriterion("RENIT_STATUS >", value, "renitStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusGreaterThanOrEqualTo(String value) {
+            addCriterion("RENIT_STATUS >=", value, "renitStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusLessThan(String value) {
+            addCriterion("RENIT_STATUS <", value, "renitStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusLessThanOrEqualTo(String value) {
+            addCriterion("RENIT_STATUS <=", value, "renitStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusLike(String value) {
+            addCriterion("RENIT_STATUS like", value, "renitStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusNotLike(String value) {
+            addCriterion("RENIT_STATUS not like", value, "renitStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusIn(List<String> values) {
+            addCriterion("RENIT_STATUS in", values, "renitStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusNotIn(List<String> values) {
+            addCriterion("RENIT_STATUS not in", values, "renitStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusBetween(String value1, String value2) {
+            addCriterion("RENIT_STATUS between", value1, value2, "renitStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andRenitStatusNotBetween(String value1, String value2) {
+            addCriterion("RENIT_STATUS not between", value1, value2, "renitStatus");
             return (Criteria) this;
         }
     }

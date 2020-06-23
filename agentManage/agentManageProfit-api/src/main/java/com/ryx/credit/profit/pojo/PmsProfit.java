@@ -66,6 +66,10 @@ public class PmsProfit implements Serializable {
 
     private String remark;
 
+    private String orgId;
+
+    private String renitStatus;
+
     public String getBalanceId() {
         return balanceId;
     }
@@ -312,5 +316,21 @@ public class PmsProfit implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
+    }
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId == null ? null : orgId.trim();
+    }
+
+    public String getRenitStatus() {
+        return renitStatus;
+    }
+
+    public void setRenitStatus(String renitStatus) {
+        this.renitStatus = renitStatus == null ? null : renitStatus.trim();
     }
 }
