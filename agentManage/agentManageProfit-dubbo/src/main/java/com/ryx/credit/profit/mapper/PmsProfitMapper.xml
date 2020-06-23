@@ -714,7 +714,7 @@
   </select>
     <!--查询存在多少tab页 -->
     <select id="getTabCounts" resultMap="BaseResultMap">
-        select SETTLE_MONTH,sheet_name,sheet_order from pms_profit
+        select distinct sheet_name,SETTLE_MONTH,sheet_order from pms_profit
         where SETTLE_MONTH=#{settleMonth,jdbcType=VARCHAR}
         <if test="uniqueFlag != null and uniqueFlag != ''">
             and unique_flag=#{uniqueFlag,jdbcType=VARCHAR}
