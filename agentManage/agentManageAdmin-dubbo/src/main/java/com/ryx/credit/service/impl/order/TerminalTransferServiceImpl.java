@@ -101,7 +101,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
 
     @Override
-    public PageInfo terminalTransferList(com.ryx.credit.pojo.admin.order.TerminalTransfer terminalTransfer, Page page, String agName, String dataRole, Long userId) {
+    public PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page, String agName, String dataRole, Long userId) {
 
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("status", Status.STATUS_1.status);
@@ -620,7 +620,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             List<TerminalTransferDetail> terminalTransferDetails = queryDetailByTerminalId(busId);
             if(isno){
                 if(terminalTransferDetails.get(0).getPlatformType().compareTo(TerminalPlatformType.POS.getValue())==0||terminalTransferDetails.get(0).getPlatformType().compareTo(TerminalPlatformType.ZHPOS.getValue())==0){
-                    List<String> allAgent = new ArrayList<>();
+                   List<String> allAgent = new ArrayList<>();
                     for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
                         allAgent.add(terminalTransferDetail.getId().trim());
                     }
@@ -633,7 +633,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
             TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransferDetails.get(0).getTerminalTransferId());
 
-
             if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
                 log.info("本次提交的明细SN:{}", JSONObject.toJSON(terminalTransferDetails));
                 //判断sn是否重复提交
@@ -642,9 +641,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     platformSame(terminalTransferDetails, SaveFlag.TJSP.getValue());
                 }
 
-            List<String> detailIds = agentVo.getTerminalTransferDetailID();
-            //更新是否支付，为不影响审批流运行单独开启一个事务
-            terminalTransferDetail2.updateIsNoPay(terminalTransferDetails, detailIds, userId);
+                List<String> detailIds = agentVo.getTerminalTransferDetailID();
+                //更新是否支付，为不影响审批流运行单独开启一个事务
+                terminalTransferDetail2.updateIsNoPay(terminalTransferDetails, detailIds, userId);
 
             }else if (agentVo.getApprovalResult().equals(ApprovalType.BACK.getValue())) {
                 //解锁 todo
@@ -654,23 +653,22 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     throw new MessageException("审批退回，解锁失败!" + agentResult.getMsg());
                 }
             }
-        AgentResult result = null;
-        try {
-            result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new MessageException("工作流处理任务异常，请退回或者重新申请，同一审批只能一人审批切勿多人同审!");
-        }
-        if (!result.isOK()) {
-            //解锁 todo
-            AgentResult agentResultUnlock = terminalTransferunlock(terminalTransfer.getTaskId(), null, terminalTransferDetails.get(0).getPlatformType().toString());
-            if (!agentResultUnlock.isOK()) {
-                log.info("工作流处理任务异常，且解冻失败!：" + agentResultUnlock.getMsg());
-                throw new MessageException("工作流处理任务异常，且解冻失败!" + agentResultUnlock.getMsg());
+            AgentResult result = null;
+            try {
+                result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new MessageException("工作流处理任务异常，请退回或者重新申请，同一审批只能一人审批切勿多人同审!");
             }
-            log.info(result.getMsg());
-            throw new MessageException("工作流处理任务异常");
-        }
+            if (!result.isOK()) {
+                AgentResult agentResultUnlock = terminalTransferunlock(terminalTransfer.getTaskId(), null, terminalTransferDetails.get(0).getPlatformType().toString());
+                if (!agentResultUnlock.isOK()) {
+                    log.info("工作流处理任务异常，且解冻失败!：" + agentResultUnlock.getMsg());
+                    throw new MessageException("工作流处理任务异常，且解冻失败!" + agentResultUnlock.getMsg());
+                }
+                log.info(result.getMsg());
+                throw new MessageException("工作流处理任务异常");
+            }
         return AgentResult.ok();
     }
 
@@ -694,6 +692,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             AgentResult agentResult = null;
                 try {
                     agentResult = termMachineService.agentFNoorbidde(lists, type);
+                    log.info("判断禁用返回结果{},请求参数{}{}",JSONObject.toJSONString(agentResult),lists,type);
                 } catch (Exception e) {
                     e.printStackTrace();
                     log.error("调用代理商是否禁用接口异常"+e.getMessage());
@@ -727,11 +726,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                     log.error("调用代理商是否禁用接口失败"+JSONObject.toJSON(agentResult));
                     throw new MessageException("调用代理商是否禁用接口失败");
                 }
-
-                if(agent.size()>0){
-                    throw new MessageException(agent.toString()+"：这些代理商已经注销或者禁用，不支持直接划拨");
-                }
-
+        }
+        if(agent.size()>0){
+            throw new MessageException(agent.toString()+"：这些代理商已经注销或者禁用，不支持直接划拨");
         }
 
     }
