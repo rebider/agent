@@ -924,7 +924,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         if(StringUtils.isNotBlank(agentFreeze.getFreezeStatus())){
             reqMap.put("freezeStatus",agentFreeze.getFreezeStatus());
         }
-        List<Map<String, String>> resultMaps = agentFreezeMapper.queryAgentFreezeList(reqMap,page);
+        List<Map<String, String>> resultMaps = agentFreezeMapper.queryAgentFreezeAll(reqMap,page);
         for (Map<String, String> resultMap : resultMaps) {
             resultMap.put("FREESTATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREESTATUS"))));
             resultMap.put("FREEZE_CAUSE_MSG",FreeCause.getContentByValue(resultMap.get("FREEZE_CAUSE")));
@@ -958,7 +958,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(resultMaps);
-        pageInfo.setTotal(agentFreezeMapper.queryAgentFreezeCount(reqMap));
+        pageInfo.setTotal(agentFreezeMapper.queryAgentFreezeCountAll(reqMap));
         return pageInfo;
     }
 
