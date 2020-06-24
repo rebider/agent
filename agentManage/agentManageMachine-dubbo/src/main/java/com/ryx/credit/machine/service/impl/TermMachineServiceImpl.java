@@ -24,7 +24,7 @@ import java.util.Map;
  * 描述： 业务系统极具终端操作接口
  */
 @Service("termMachineService")
-public class TermMachineServiceImpl  implements TermMachineService {
+public class TermMachineServiceImpl implements TermMachineService {
 
     private Logger logger = LoggerFactory.getLogger(TermMachineServiceImpl.class);
 
@@ -40,7 +40,7 @@ public class TermMachineServiceImpl  implements TermMachineService {
     private TermMachineService rjTermMachineServiceImpl;
 
     @Override
-    public List<TermMachineVo> queryTermMachine(PlatformType platformType,Map<String,String> par) throws Exception{
+    public List<TermMachineVo> queryTermMachine(PlatformType platformType, Map<String, String> par) throws Exception {
         //封装异常返回，或者未实现的平台查询
         List<TermMachineVo> list = new ArrayList<>();
         TermMachineVo vo = new TermMachineVo();
@@ -50,17 +50,17 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
         //分平台查询
         try {
-            if(PlatformType.whetherPOS(platformType.code)){
-                return posTermMachineServiceImpl.queryTermMachine(platformType,par);
-            }else  if(PlatformType.MPOS.code.equals(platformType.code)){
-                return mposTermMachineServiceImpl.queryTermMachine(platformType,par);
-            }else  if(PlatformType.SSPOS.code.equals(platformType.code)){
-                return sPosTermMachineServiceImpl.queryTermMachine(platformType,par);
-            }else  if(PlatformType.RDBPOS.code.equals(platformType.code)) {
+            if (PlatformType.whetherPOS(platformType.code)) {
+                return posTermMachineServiceImpl.queryTermMachine(platformType, par);
+            } else if (PlatformType.MPOS.code.equals(platformType.code)) {
+                return mposTermMachineServiceImpl.queryTermMachine(platformType, par);
+            } else if (PlatformType.SSPOS.code.equals(platformType.code)) {
+                return sPosTermMachineServiceImpl.queryTermMachine(platformType, par);
+            } else if (PlatformType.RDBPOS.code.equals(platformType.code)) {
                 return rdbTermMachineServiceImpl.queryTermMachine(platformType, par);
-            }else if (PlatformType.RJPOS.code.equals(platformType.code)){
+            } else if (PlatformType.RJPOS.code.equals(platformType.code)) {
                 return rjTermMachineServiceImpl.queryTermMachine(platformType, par);
-            }else {
+            } else {
                 return list;
             }
         }catch (Exception e){
@@ -178,30 +178,95 @@ public class TermMachineServiceImpl  implements TermMachineService {
         return AgentResult.fail("未知业务平台");
     }
 
+    /**
+     * 终端划拨校验
+     * @param terminalTransferDetailLists
+     * @param operation
+     * @return
+     * @throws Exception
+     */
     @Override
-    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailLists, String operation) throws Exception {
+    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailLists, String operation,String taskId) throws Exception {
         String type = terminalTransferDetailLists.get(0).getPlatformType().toString();
-        logger.info("本次联动请求类型为:{}",type);
-      if(String.valueOf(TerminalPlatformType.POS.getValue()).equals(type)||String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)){//pos
-            return   posTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
-        }else if(String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)){//手刷
-            return   mposTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists,operation);
-        }else if(String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)){//瑞大宝
-            return   AgentResult.fail("未联动");
+        logger.info("本次联动请求类型为:{}", type);
+        if (String.valueOf(TerminalPlatformType.POS.getValue()).equals(type) || String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)) {
+            return posTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists, operation,taskId);
+        } else if (String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)) {
+            return mposTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists, operation, taskId);
+        } else if (String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)) {
+            return AgentResult.fail("未联动");
+        } else if (String.valueOf(TerminalPlatformType.RJPOS.getValue()).equals(type)) {
+            return rjTermMachineServiceImpl.queryTerminalTransfer(terminalTransferDetailLists, operation, taskId);
         }
         return AgentResult.fail("未知业务平台");
     }
 
+    /**
+     * 终端划拨查询
+     * @param serialNumber
+     * @param type
+     * @return
+     * @throws Exception
+     */
     @Override
-    public AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception {
-        AgentResult agentResult=null;
-        logger.info("本次联动查询结果类型为:{}",type);
-        if(String.valueOf(TerminalPlatformType.POS.getValue()).equals(type)||String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)){//pos
-         agentResult =  posTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
-        }else if(String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)){//手刷
-            agentResult =  mposTermMachineServiceImpl.queryTerminalTransferResult(serialNumber,type);
-        }else if(String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)){//瑞大宝
+    public AgentResult queryTerminalTransferResult(String serialNumber, String type) throws Exception {
+        AgentResult agentResult = null;
+        logger.info("本次联动查询结果类型为:{}", type);
+        if (String.valueOf(TerminalPlatformType.POS.getValue()).equals(type) || String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)) {
+            agentResult = posTermMachineServiceImpl.queryTerminalTransferResult(serialNumber, type);
+        } else if (String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)) {
+            agentResult = mposTermMachineServiceImpl.queryTerminalTransferResult(serialNumber, type);
+        } else if (String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)) {
 
+        }else if (String.valueOf(TerminalPlatformType.RJPOS.getValue()).equals(type)) {
+            return rjTermMachineServiceImpl.queryTerminalTransferResult(serialNumber, type);
+        }
+        return agentResult;
+    }
+
+    /**
+     * 终端划拨解锁
+     * @param taskId  总批次号
+     * @param serialNumber  单个批次号
+     * @param type
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public AgentResult terminalTransferunlock(String taskId, String serialNumber,String type) throws Exception {
+        AgentResult agentResult = null;
+        logger.info("本次联动查询结果类型为:{}", type);
+        if (String.valueOf(TerminalPlatformType.POS.getValue()).equals(type) || String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)) {
+
+        } else if (String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)) {
+            return mposTermMachineServiceImpl.terminalTransferunlock(taskId,serialNumber,type);
+        } else if (String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)) {
+
+        }else if (String.valueOf(TerminalPlatformType.RJPOS.getValue()).equals(type)) {
+            return rjTermMachineServiceImpl.terminalTransferunlock(taskId,serialNumber,type);
+        }
+        return agentResult;
+    }
+
+    /**
+     *
+     * @param param
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public AgentResult terminalTransAgain(Map<String,Object>  param) throws Exception {
+        AgentResult agentResult = null;
+        String type = (String) param.get("type");
+        logger.info("本次联动查询结果类型为:{}", type);
+        if (String.valueOf(TerminalPlatformType.POS.getValue()).equals(type) || String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(type)) {
+
+        } else if (String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(type)) {
+            return mposTermMachineServiceImpl.terminalTransAgain(param);
+        } else if (String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(type)) {
+
+        }else if (String.valueOf(TerminalPlatformType.RJPOS.getValue()).equals(type)) {
+            return rjTermMachineServiceImpl.terminalTransAgain(param);
         }
         return agentResult;
     }
@@ -287,7 +352,6 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return AgentResult.ok();
         }
     }
-
     @Override
     public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
         if (PlatformType.RJPOS.getValue().equals(platformType)) {

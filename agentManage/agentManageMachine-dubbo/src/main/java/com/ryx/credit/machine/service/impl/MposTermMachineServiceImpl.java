@@ -214,62 +214,117 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList, String operation) throws Exception {
+    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList, String operation, String taskId) throws Exception {
+
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type",operation);
-        List<Map<String,String>> mapList = new ArrayList<>();
-        for (TerminalTransferDetail terminalTransferDetail:terminalTransferDetailList) {
-            Map map = new HashMap();
-            map.put("busPlatform",terminalTransferDetail.getPlatFrom());
-            map.put("startTerm",terminalTransferDetail.getSnBeginNum());
-            map.put("endTerm",terminalTransferDetail.getSnEndNum());
-            map.put("oldAgencyId",terminalTransferDetail.getOriginalOrgId());
-            map.put("newAgencyId",terminalTransferDetail.getGoalOrgId());
-            map.put("num", String.valueOf(terminalTransferDetail.getComSnNum().intValue()));
-            map.put("limitNum", String.valueOf(terminalTransferDetail.getSnCount().intValue()));
-            map.put("batchId",terminalTransferDetail.getId());
-            mapList.add(map);
+        jsonObject.put("operation", operation);
+        jsonObject.put("taskId", taskId);
+
+        List<Map<String, Object>> listDetail = new ArrayList<>();
+        for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
+            Map<String, Object> mapDetail = new HashMap<>();
+            mapDetail.put("agentOrgId", terminalTransferDetail.getOriginalOrgId());
+            mapDetail.put("newOrgId", terminalTransferDetail.getGoalOrgId());
+            mapDetail.put("posNum", String.valueOf(terminalTransferDetail.getSnCount()));
+            mapDetail.put("posSnBegin", terminalTransferDetail.getSnBeginNum());
+            mapDetail.put("posSnEnd", terminalTransferDetail.getSnEndNum());
+            mapDetail.put("serialNumber", terminalTransferDetail.getId());
+            mapDetail.put("num", String.valueOf(terminalTransferDetail.getComSnNum()));
+            mapDetail.put("busPlatform", terminalTransferDetail.getPlatFrom());
+            listDetail.add(mapDetail);
         }
-        jsonObject.put("info",mapList);
-        logger.info("机具终端划拨通知查询类型:{}",operation);
-        logger.info("机具终端划拨通知查询参数:{}",mapList);
-        JSONObject res=null;
-        try{
-           res = request(jsonObject, AppConfig.getProperty("mpos.termMachine"));
-        }catch (Exception e){
-            logger.info("机具终端划拨通知查询类型调用远程接口:{}失败",AppConfig.getProperty("mpos.termMachine"));
-            return AgentResult.fail("机具终端划拨通知查询类型调用远程接口失败");
+        jsonObject.put("snList", listDetail);
+        JSONObject res = null;
+        if ("check".equals(operation)) {
+            jsonObject.put("isfeeze", "1");
+            logger.info("MPOS的请求参数==请求参数:{}", JSONObject.toJSON(jsonObject));
+            res = request(jsonObject, AppConfig.getProperty("mpos.termMachine"));
+        } else {
+            logger.info("MPOS的请求参数==请求参数:{}", JSONObject.toJSON(jsonObject));
+            res = request(jsonObject, AppConfig.getProperty("mpos.termMachine"));
         }
 
-        if(null!=res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))){
-            logger.info("机具终端划拨通知查询成功:{}{}{}",AppConfig.getProperty("mpos.termMachine"),res.getString("respMsg"),res.toJSONString());
-            List<Map<String,Object>> codeType =(List<Map<String,Object>>) JSONArray.parse(String.valueOf(res.get("data")));
+        if (null != res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))) {
+            logger.info("机具终端划拨通知查询成功:{}{}{}", AppConfig.getProperty("mpos.termMachine"), res.getString("respMsg"), res.toJSONString());
+            List<Map<String, Object>> codeType = (List<Map<String, Object>>) JSONArray.parse(String.valueOf(res.get("data")));
             return AgentResult.ok(codeType);
-        }else{
-            logger.info("机具终端划拨通知查询失败:{}{}{}",AppConfig.getProperty("mpos.termMachine"),res.getString("respMsg"),res.toJSONString());
+        } else {
+            logger.info("机具终端划拨通知查询失败:{}{}{}", AppConfig.getProperty("mpos.termMachine"), res.getString("respMsg"), res.toJSONString());
             return AgentResult.fail(res.getString("respMsg"));
         }
     }
 
     @Override
-    public AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception {
+    public AgentResult queryTerminalTransferResult(String serialNumber, String type) throws Exception {
         JSONObject data = new JSONObject();
-        data.put("batchId", serialNumber);
-        JSONObject res=null;
-        try{
+        data.put("serialnumber", serialNumber);
+        JSONObject res = null;
+        try {
             res = request(data, AppConfig.getProperty("mpos.termMachineResult"));
-        }catch (Exception e){
-            logger.info("机具终端划拨查询结果调用远程接口:{}失败",AppConfig.getProperty("mpos.termMachineResult"));
-            return AgentResult.fail("机具终端划拨查询结果调用远程接口失败");
+        } catch (Exception e) {
+            logger.info("MPOS机具终端划拨查询结果调用远程接口失败:{}", AppConfig.getProperty("mpos.termMachineResult"));
+            return AgentResult.fail("MPOS机具终端划拨查询结果调用远程接口失败");
         }
-        if(null!=res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))){
-            logger.info("机具终端划拨结果查询成功:{}{}{}",AppConfig.getProperty("mpos.termMachineResult"),res.getString("respMsg"),res.toJSONString());
-            JSONObject codeType = JSONObject.parseObject(String.valueOf(res.get("data")));
+        if (null != res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))) {
+            logger.info("MPOS机具终端划拨结果查询成功:{}{}{}", AppConfig.getProperty("mpos.termMachineResult"), res.getString("respMsg"), res.toJSONString());
+            List<Map<String,Object>> codeType = (List<Map<String, Object>>) JSONArray.parse(String.valueOf(res.get("data")));
             return AgentResult.ok(codeType);
-        }else{
-            logger.info("机具终端划拨结果查询失败:{}{}{}",AppConfig.getProperty("mpos.termMachineResult"),res.getString("respMsg"),res.toJSONString());
+        } else {
+            logger.info("MPOS机具终端划拨结果查询失败:{}{}{}", AppConfig.getProperty("mpos.termMachineResult"), res.getString("respMsg"), res.toJSONString());
             return AgentResult.fail(res.getString("respMsg"));
         }
+    }
+
+    /**
+     * 终端划拨解锁
+     *
+     * @param taskId       总批次号
+     * @param serialNumber 单个批次号
+     * @param type
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public AgentResult terminalTransferunlock(String taskId, String serialNumber, String type) throws Exception {
+        JSONObject data = new JSONObject();
+        data.put("taskId", taskId);
+        data.put("serialNumber", serialNumber);
+        logger.info("MPOS终端划拨解锁参数" + JSONObject.toJSON(data));
+        JSONObject res = null;
+        try {
+            res = request(data, AppConfig.getProperty("mpos.terminalTransferunlock"));
+        } catch (Exception e) {
+            logger.info("MPOS机具终端划拨解锁调用远程接口:{}失败", AppConfig.getProperty("mpos.terminalTransferunlock"));
+            return AgentResult.fail("MPOS机具终端划拨解锁调用远程接口失败");
+        }
+        logger.info("MPOS机具终端划拨解锁调用远程接口返回:{}{}", AppConfig.getProperty("mpos.terminalTransferunlock"), res.toJSONString());
+        return AgentResult.build(200, res.toString(),res.toString());
+    }
+
+    /**
+     *重新发起
+     * @param param
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public AgentResult terminalTransAgain(Map<String,Object>  param) throws Exception {
+
+        JSONObject data = new JSONObject();
+        data.put("taskId",param.get("taskId"));
+        data.put("serialNumber",param.get("serialNumber"));
+        data.put("posNum",param.get("posNum"));
+        data.put("busPlatForm",param.get("busPlatForm"));
+        logger.info("MPOS终端划拨重新发起参数"+JSONObject.toJSON(data));
+        JSONObject res = null;
+        try {
+            res = request(data, AppConfig.getProperty("mpos.terminalTransferAgain"));
+        } catch (Exception e) {
+            logger.info("MPOS机具终端划拨重新发起调用远程接口:{}失败", AppConfig.getProperty("mpos.terminalTransferAgain"));
+            return AgentResult.fail("MPOS机具终端划拨重新发起调用远程接口失败");
+        }
+        logger.info("MPOS机具终端划拨重新发起调用远程接口返回:{}{}", AppConfig.getProperty("mpos.terminalTransferAgain"), res.toJSONString());
+        return AgentResult.build(200, res.toString(),res.toString());
     }
 
     @Override

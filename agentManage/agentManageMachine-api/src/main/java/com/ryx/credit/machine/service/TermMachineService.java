@@ -84,7 +84,7 @@ public interface TermMachineService {
      * @param terminalTransferDetailList
      * @return
      */
-   AgentResult  queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList,String operation)throws Exception;
+   AgentResult  queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList,String operation,String taskId)throws Exception;
 
     /**
      * 查询划拨结果
@@ -133,6 +133,25 @@ public interface TermMachineService {
      * @throws Exception
      */
     AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception;
+
+
+    /**
+     * 终端划拨解锁
+     * @param taskId  总批次号
+     * @param serialNumber  单个批次号
+     * @return
+     * @throws Exception
+     */
+    AgentResult terminalTransferunlock(String taskId, String serialNumber,String type) throws Exception;
+
+
+    /**
+     * 终端划拨重新发起
+     * @param param
+     * @return
+     * @throws Exception
+     */
+    AgentResult terminalTransAgain(Map<String,Object> param) throws Exception;
 
 
     /**

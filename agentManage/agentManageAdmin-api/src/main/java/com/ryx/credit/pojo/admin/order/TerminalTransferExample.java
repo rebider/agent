@@ -857,6 +857,76 @@ public class TerminalTransferExample {
             addCriterion("PLATFORM_TYPE not between", value1, value2, "platformType");
             return (Criteria) this;
         }
+
+        public Criteria andTaskIdIsNull() {
+            addCriterion("TASK_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdIsNotNull() {
+            addCriterion("TASK_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdEqualTo(String value) {
+            addCriterion("TASK_ID =", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdNotEqualTo(String value) {
+            addCriterion("TASK_ID <>", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdGreaterThan(String value) {
+            addCriterion("TASK_ID >", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdGreaterThanOrEqualTo(String value) {
+            addCriterion("TASK_ID >=", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdLessThan(String value) {
+            addCriterion("TASK_ID <", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdLessThanOrEqualTo(String value) {
+            addCriterion("TASK_ID <=", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdLike(String value) {
+            addCriterion("TASK_ID like", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdNotLike(String value) {
+            addCriterion("TASK_ID not like", value, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdIn(List<String> values) {
+            addCriterion("TASK_ID in", values, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdNotIn(List<String> values) {
+            addCriterion("TASK_ID not in", values, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdBetween(String value1, String value2) {
+            addCriterion("TASK_ID between", value1, value2, "taskId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskIdNotBetween(String value1, String value2) {
+            addCriterion("TASK_ID not between", value1, value2, "taskId");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

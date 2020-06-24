@@ -36,6 +36,16 @@ public class TerminalTransfer implements Serializable{
 
     private List<Attachment> attachments;
 
+    private String taskId;
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
     public String getPlatformType() {
         return platformType;
     }

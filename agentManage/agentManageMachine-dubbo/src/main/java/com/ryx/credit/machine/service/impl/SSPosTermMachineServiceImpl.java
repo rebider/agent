@@ -357,7 +357,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList, String operation) throws Exception {
+    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList, String operation,String taskId) throws Exception {
         return AgentResult.fail("未联动");
     }
 
@@ -623,6 +623,24 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public AgentResult agentFNoorbidde(List<String> pamMap, String platformType) throws Exception {
+        return null;
+    }
+
+    /**
+     * 终端划拨解锁
+     * @param taskId  总批次号
+     * @param serialNumber  单个批次号
+     * @param type
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public AgentResult terminalTransferunlock(String taskId, String serialNumber, String type) throws Exception {
+        return null;
+    }
+
+    @Override
+    public AgentResult terminalTransAgain(Map<String,Object>  param) throws Exception {
         return null;
     }
 }
