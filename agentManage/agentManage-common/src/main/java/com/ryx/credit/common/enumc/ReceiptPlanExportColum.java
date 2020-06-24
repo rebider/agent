@@ -25,7 +25,11 @@ public enum ReceiptPlanExportColum {
 
     //导出活动调整明细
     RefundPriceDiffDetail_Column("id,refundPriceDiffId,proName,changeCount,activityName,frontPrice,price,beginSn,endSn,pre_activity_activityName,pre_activity_act_code,pre_activity_bus_pro_code,pre_activity_price,orderType,oldOrgId,oldOrgName,newOrgId,newOrgName,oldSupdOrgId,oldSupdOrgName,newSupdOrgId,newSupdOrgName,uTime","活动调整明细导出字段"),
-    RefundPriceDiffDetail_Title("编号,申请单号,商品名称,变更数量,活动名称,前价格,价格,开始SN,结束SN,原活动,原活动代码,原机具编号,原价格,订单类型,原机构编号,原机构名称,目标机构编号,目标机构名称,原机构直签类上级平台码,原机构直签类上级,目标机构直签类上级平台码,目标机构直签类上级,更新时间","活动调整明细导出标题");
+    RefundPriceDiffDetail_Title("编号,申请单号,商品名称,变更数量,活动名称,前价格,价格,开始SN,结束SN,原活动,原活动代码,原机具编号,原价格,订单类型,原机构编号,原机构名称,目标机构编号,目标机构名称,原机构直签类上级平台码,原机构直签类上级,目标机构直签类上级平台码,目标机构直签类上级,更新时间","活动调整明细导出标题"),
+
+    //导入物流明细
+    LogisticsDetail_column("SN_NUM,ORG_ID,BUS_PRO_CODE", "物流明细导入字段"),
+    LogisticsDetail_title("机具编号,平台编号,活动对应业务平台编号","物流明细导入标题");
 
     public String code;
 
