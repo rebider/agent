@@ -1215,8 +1215,13 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 throw new MessageException("物流明细异常sn：" + snNum);
             }
 
-            //存储物流明细
+            //存储插入的物流明细和要更新的物流明细
             OLogisticsDetail insLogisticsDetail = oLogisticsDetails.get(0);
+            OLogisticsDetail upLogisticsDetail = new OLogisticsDetail();
+            upLogisticsDetail.setId(oLogisticsDetails.get(0).getId());
+            upLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
+            upLogisticsDetail.setuTime(new Date());
+            upLogisticsDetail.setVersion(oLogisticsDetails.get(0).getVersion());
 
             //查询与sn对应的活动
             OActivityExample oActivityExample = new OActivityExample();
@@ -1272,11 +1277,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 insLogisticsDetail.setSbusMsg("导入数据（可用）");
 
                 //修改之前物流明细状态
-                OLogisticsDetail upLogisticsDetail = new OLogisticsDetail();
-                upLogisticsDetail.setId(oLogisticsDetails.get(0).getId());
-                upLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
-                upLogisticsDetail.setuTime(new Date());
-                upLogisticsDetail.setVersion(oLogisticsDetails.get(0).getVersion());
                 if (1 != oLogisticsDetailMapper.updateByPrimaryKeySelective(upLogisticsDetail)) {
                     throw new MessageException("更新物流明细失败:" + upLogisticsDetail.getId());
                 }
