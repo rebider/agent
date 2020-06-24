@@ -15,6 +15,7 @@ public enum JoPowerGroup {
     DLS("Group_Agent","代理商"),
     FKB("Group_RiskManage","风控部"),
     QDB("Group_Channel","渠道部"),
+    KFZX("Group_Kefu","客服中心"),
     SQ("Group_Pro","省区");
 
     public String key;
