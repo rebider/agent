@@ -867,7 +867,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 FreezeRequest freezeRequest = freezeRequestMapper.selectByPrimaryKey(busActRel.getBusId());
                 freezeRequest.setReviewsStat(AgStatus.Refuse.status);
                 freezeRequest.setReviewsDate(new Date());
-                if (1==freezeRequestMapper.updateByPrimaryKeySelective(freezeRequest)){
+                if (1!=freezeRequestMapper.updateByPrimaryKeySelective(freezeRequest)){
                     throw new MessageException("请重新提交！");
                 };
             }
