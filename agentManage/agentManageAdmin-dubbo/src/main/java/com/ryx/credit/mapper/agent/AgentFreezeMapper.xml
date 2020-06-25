@@ -465,9 +465,9 @@
         <if test="map.freezeStatus != null and map.freezeStatus != '' ">
           and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
         </if>
-        <!--<if test="map.userId != null and map.userId != '' ">-->
-          <!--and t.freeze_person = #{map.userId,jdbcType=VARCHAR}-->
-        <!--</if>-->
+        <if test="map.userId != null and map.userId != '' ">
+          and t.freeze_person = #{map.userId,jdbcType=VARCHAR}
+        </if>
         <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
           and EXISTS(
           select A_AGENT_BUSINFO.ID from A_AGENT_BUSINFO
