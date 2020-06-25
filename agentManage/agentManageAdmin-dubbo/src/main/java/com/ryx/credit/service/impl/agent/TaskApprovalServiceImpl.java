@@ -17,6 +17,7 @@ import com.ryx.credit.pojo.admin.order.OOrderExample;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.order.OrganizationExample;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
+import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.CapitalVo;
 import com.ryx.credit.service.ActivityService;
@@ -80,6 +81,8 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     private PlatFormService platFormService;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private AgentFreezeService agentFreezeService;
 
 
      @Override
@@ -491,6 +494,16 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
                     if (i != 1) {
                         throw new ProcessException("更新借记费率等信息失败");
+                    }
+                    AgentFreezePort agentFreezePort = new AgentFreezePort();
+                    agentFreezePort.setAgentId(agentBusInfo.getAgentId());
+                    agentFreezePort.setBusPlatform(Arrays.asList(String.valueOf(agentBusInfo.getId())));
+                    agentFreezePort.setFreezeNum(agentBusInfo.getId());
+                    agentFreezePort.setOperationPerson(agentBusInfo.getcUser());
+                    agentFreezePort.setRemark("新增业务冻结");
+                    AgentResult agentResult = agentFreezeService.freezeNewBus(agentFreezePort);
+                    if (!agentResult.isOK()){
+                        throw new ProcessException("更新代理商冻结信息失败");
                     }
                 }
                 //业务部输入瑞大宝终端数量下线

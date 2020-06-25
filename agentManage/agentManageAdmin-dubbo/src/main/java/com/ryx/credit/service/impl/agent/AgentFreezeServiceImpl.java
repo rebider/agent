@@ -1065,7 +1065,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     @Override
     public AgentResult freezeNewBus(AgentFreezePort agentFreezePort) {
         log.info("新增业务平台开始冻结{},{}",agentFreezePort.getAgentId(),agentFreezePort.getBusPlatform());
-        if (agentFreezePort.getBusPlatform() == null || agentFreezePort.getBusPlatform().size() == 0){
+        if (agentFreezePort.getBusPlatform() != null && agentFreezePort.getBusPlatform().size() != 0){
             for (String busId:agentFreezePort.getBusPlatform()){
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
                 if (agentBusInfo == null){
