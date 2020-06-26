@@ -1248,12 +1248,20 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
 
                 //检查是否有在审批中的解冻申请
                 FreezeRequestDetailExample freezeRequestDetailExample = new FreezeRequestDetailExample();
-                freezeRequestDetailExample.or()
-                        .andAgentIdEqualTo(agentFreezes.get(0).getAgentId())
-                        .andFreezeTypeEqualTo(agentFreezes.get(0).getFreezeType())
-                        .andFreezeCauseEqualTo(agentFreezes.get(0).getFreezeCause())
-                        .andBusIdEqualTo(agentFreezes.get(0).getBusId())
-                        .andStatusEqualTo(Status.STATUS_1.status);
+                if (agentFreezes.get(0).getBusId() == null){
+                    freezeRequestDetailExample.or()
+                            .andAgentIdEqualTo(agentFreezes.get(0).getAgentId())
+                            .andFreezeTypeEqualTo(agentFreezes.get(0).getFreezeType())
+                            .andFreezeCauseEqualTo(agentFreezes.get(0).getFreezeCause())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                }else {
+                    freezeRequestDetailExample.or()
+                            .andAgentIdEqualTo(agentFreezes.get(0).getAgentId())
+                            .andFreezeTypeEqualTo(agentFreezes.get(0).getFreezeType())
+                            .andFreezeCauseEqualTo(agentFreezes.get(0).getFreezeCause())
+                            .andBusIdEqualTo(agentFreezes.get(0).getBusId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                }
                 List<FreezeRequestDetail> freezeRequestDetails = freezeRequestDetailMapper.selectByExample(freezeRequestDetailExample);
                 if (freezeRequestDetails!=null && freezeRequestDetails.size()>0){
                     for (FreezeRequestDetail freezeRequestDetailTmp : freezeRequestDetails) {
