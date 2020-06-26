@@ -1309,7 +1309,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 freezeRequestDetail.setVersion(Status.STATUS_1.status);
 
                 if (freezeRequestDetailMapper.insert(freezeRequestDetail)!=1){
-                    throw new MessageException("第[" + num + "]行,代理商冻结申请明细保存失败!");
+                    throw new MessageException("代理商[" + freezeRequestDetail.getAgentId() + "],代理商冻结申请明细保存失败!");
                 }
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(freezeRequestDetail.getBusId());
                 if (agentBusInfo!=null){
