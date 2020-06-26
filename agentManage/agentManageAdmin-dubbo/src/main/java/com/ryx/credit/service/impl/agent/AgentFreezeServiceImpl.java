@@ -1096,6 +1096,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                     agentFreeze.setFreezeType(FreeType.AGNET.code);
                     /** 保存新增字段 **/
                     AgentBusInfo agentBusInfoTmp = agentBusinfoService.getById(busId);
+                    if (agentBusInfoTmp.getBusNum() == null || agentBusInfoTmp.getBusPlatform() == null){
+                        return AgentResult.fail("业务平台信息不完整!");
+                    }
                     agentFreeze.setBusPlatform(agentBusInfoTmp.getBusPlatform());
                     agentFreeze.setBusId(busId);
                     agentFreeze.setBusNum(agentBusInfoTmp.getBusNum());

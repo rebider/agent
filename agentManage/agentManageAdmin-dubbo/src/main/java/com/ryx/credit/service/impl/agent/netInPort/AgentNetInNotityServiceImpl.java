@@ -13,7 +13,9 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
+import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.service.agent.AgentFreezeService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInHttpService;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
@@ -72,6 +74,8 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Autowired
     private BusActRelMapper busActRelMapper;
+    @Autowired
+    private AgentFreezeService agentFreezeService;
 
 
     /**
@@ -344,6 +348,22 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
             updateAgent.setcUtime(nowDate);
             int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);
+
+            try {
+                AgentFreezePort agentFreezePort = new AgentFreezePort();
+                agentFreezePort.setAgentId(agentBusInfo.getAgentId());
+                agentFreezePort.setBusPlatform(Arrays.asList(String.valueOf(agentBusInfo.getId())));
+                agentFreezePort.setFreezeNum(agentBusInfo.getId());
+                agentFreezePort.setOperationPerson(agentBusInfo.getcUser());
+                agentFreezePort.setRemark("新增业务冻结");
+                AgentResult agentResult = agentFreezeService.freezeNewBus(agentFreezePort);
+                if (!agentResult.isOK()){
+                    log.info("入网新增业务调用冻结接口操作: 代理商id：{},返回结果:{},更新数据库失败",agentBusInfo.getAgentId(),agentResult.getMsg());
+                }
+            }catch (Exception e){
+                log.info("入网新增业务调用冻结接口操作异常{}",e);
+            }
+
         }else{
             log.info("入网开户修改操作: 接收入网更新入网状态开始,业务id：{},返回结果:{}",busId,"开通业务失败");
             //更新业务编号
