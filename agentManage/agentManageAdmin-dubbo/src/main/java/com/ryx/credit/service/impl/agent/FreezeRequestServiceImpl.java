@@ -1320,7 +1320,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                         userMap.put("NOT_RJ",dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),"NOT_RJ").getdItemvalue());
                     }
                 }else {
-                    throw new MessageException("第[" + num + "]行,业务平台不存在");
+                    throw new MessageException("代理商[" + freezeRequestDetail.getAgentId() + "],业务平台不存在");
                 }
             }
             //流程中的部门参数
