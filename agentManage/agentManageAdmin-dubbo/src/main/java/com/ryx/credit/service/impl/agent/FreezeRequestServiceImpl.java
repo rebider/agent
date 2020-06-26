@@ -1219,8 +1219,8 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             freezeRequest.setReqType(FreezeRequestType.UnFreeze.code);
             freezeRequest.setcTm(new Date());
             freezeRequest.setcUserId(userid);
-            freezeRequest.setFreezeCause(agentUnFreezeBatcthVo.getFreezeCause());
-            freezeRequest.setReqReason(userid);
+            freezeRequest.setFreezeCause("");
+            freezeRequest.setReqReason(agentUnFreezeBatcthVo.getFreezeCause());
             freezeRequest.setReviewsStat(AgStatus.Approving.status);
             freezeRequest.setStatus(Status.STATUS_1.status);
             freezeRequest.setVersion(BigDecimal.ONE);
@@ -1275,6 +1275,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 freezeRequestDetail.setFreezeId(agentFreezeId);
                 freezeRequestDetail.setFreezeStatus(agentFreezes.get(0).getFreezeStatus());
                 freezeRequestDetail.setFreezePerson(agentFreezes.get(0).getFreezePerson());
+                freezeRequestDetail.setUnfreezePerson(userid);
                 freezeRequestDetail.setFreezeCause(agentFreezes.get(0).getFreezeCause());
                 freezeRequestDetail.setUnfreezeCause(agentUnFreezeBatcthVo.getUnfreezeCause());
                 freezeRequestDetail.setFreezeNum(freezeRequest.getId());
