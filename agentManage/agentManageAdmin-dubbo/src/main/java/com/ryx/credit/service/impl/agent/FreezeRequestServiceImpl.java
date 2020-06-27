@@ -891,7 +891,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
     public AgentResult addList(List<List<Object>> list, String userid) throws Exception {
         try {
             AgentResult agentResult = AgentResult.ok();
-        if (null == list && list.size() == 0) {
+        if (null == list || list.size() == 0) {
             logger.info("导入的数据为空");
             throw new MessageException("导入的数据为空");
         }
