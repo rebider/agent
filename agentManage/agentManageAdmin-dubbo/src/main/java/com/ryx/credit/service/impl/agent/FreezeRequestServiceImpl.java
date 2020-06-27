@@ -989,6 +989,27 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 throw new MessageException("第[" + num + "]行," + String.valueOf(objectList.get(0)) + "代理商已有相同冻结记录");
             }
 
+            //检查是否有在审批中的冻结申请
+            FreezeRequestDetailExample freezeRequestDetailExample = new FreezeRequestDetailExample();
+            freezeRequestDetailExample.or()
+                    .andAgentIdEqualTo(String.valueOf(objectList.get(0)))
+                    .andFreezeTypeEqualTo(freeType)
+                    .andFreezeCauseEqualTo(freeCause)
+                    .andBusIdEqualTo(agentBusInfos.get(0).getId())
+                    .andStatusEqualTo(Status.STATUS_1.status);
+            List<FreezeRequestDetail> freezeRequestDetails = freezeRequestDetailMapper.selectByExample(freezeRequestDetailExample);
+            if (freezeRequestDetails!=null && freezeRequestDetails.size()>0){
+                for (FreezeRequestDetail freezeRequestDetail : freezeRequestDetails) {
+                    String freezeReqId = freezeRequestDetail.getFreezeReqId();
+                    FreezeRequest freezeRequestApp = freezeRequestMapper.selectByPrimaryKey(freezeReqId);
+                    if (freezeRequestApp !=null && freezeRequestApp.getReviewsStat().compareTo(AgStatus.Approving.status)==0 && freezeRequestApp.getStatus().compareTo(Status.STATUS_1.status)==0){
+                        throw new MessageException("代理商此原因已申请冻结:"+String.valueOf(objectList.get(2)));
+                    }
+                }
+
+            }
+
+
             FreezeRequestDetail freezeRequestDetail = new FreezeRequestDetail();
             freezeRequestDetail.setAgentId(String.valueOf(objectList.get(0)));
             freezeRequestDetail.setFreezeCause(freeCause);
