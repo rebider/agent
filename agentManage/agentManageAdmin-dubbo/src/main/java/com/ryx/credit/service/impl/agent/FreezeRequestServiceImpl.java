@@ -969,8 +969,8 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             agentBusInfo.setAgentId(String.valueOf(objectList.get(0)));
             List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
             if (agentBusInfos == null || agentBusInfos.size() == 0) {
-                logger.info("找不到的业务平台码:{}", String.valueOf(objectList.get(4)));
-                throw new MessageException("第[" + num + "]行,找不到的业务平台码" + String.valueOf(objectList.get(4)));
+                logger.info("找不到的业务平台码:{}", String.valueOf(objectList.get(3)));
+                throw new MessageException("第[" + num + "]行,找不到的业务平台码" + String.valueOf(objectList.get(3)));
             }
 
             if (StringUtils.isBlank(String.valueOf(objectList.get(15)))) {
