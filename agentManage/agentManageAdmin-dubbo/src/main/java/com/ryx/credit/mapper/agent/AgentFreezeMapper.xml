@@ -581,16 +581,17 @@
     select
     b.AGENT_ID,b.FREEZE_TYPE,b.BUS_PLATFORM,b.BUS_NUM,b.bus_id,a.BUS_FREEZE,
     a.PROFIT_FREEZE,a.REFLOW_FREEZE,a.MONTHLY_FREEZE,a.DAILY_FREEZE,a.STOP_PROFIT_FREEZE,a.CASH_FREEZE
-    ,a.STOP_COUNT
+    ,a.STOP_COUNT,a.NEW_BUS_FREEZE
     from (select
-    sum(BUS_FREEZE)as BUS_FREEZE,
-    sum(PROFIT_FREEZE)as PROFIT_FREEZE,
-    sum(REFLOW_FREEZE)as REFLOW_FREEZE,
-    sum(MONTHLY_FREEZE)as MONTHLY_FREEZE,
-    sum(DAILY_FREEZE)as DAILY_FREEZE,
-    sum(STOP_PROFIT_FREEZE)as STOP_PROFIT_FREEZE,
-    sum(CASH_FREEZE)as CASH_FREEZE,
-    sum(STOP_COUNT)as STOP_COUNT,
+    nvl(sum(BUS_FREEZE),0)as BUS_FREEZE,
+    nvl(sum(PROFIT_FREEZE),0)as PROFIT_FREEZE,
+    nvl(sum(REFLOW_FREEZE),0)as REFLOW_FREEZE,
+    nvl(sum(MONTHLY_FREEZE),0)as MONTHLY_FREEZE,
+    nvl(sum(DAILY_FREEZE),0)as DAILY_FREEZE,
+    nvl(sum(STOP_PROFIT_FREEZE),0)as STOP_PROFIT_FREEZE,
+    nvl(sum(CASH_FREEZE),0)as CASH_FREEZE,
+    nvl(sum(STOP_COUNT),0)as STOP_COUNT,
+    nvl(sum(NEW_BUS_FREEZE),0)as NEW_BUS_FREEZE,
     min(id) as id,agent_id,freeze_type,BUS_PLATFORM,BUS_NUM from A_agent_freeze
     where  freeze_status=0
     <if test="agentId!=null and agentId!=''">and agent_id = #{agentId}</if>
