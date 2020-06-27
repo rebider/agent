@@ -970,7 +970,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
             if (agentBusInfos == null || agentBusInfos.size() == 0) {
                 logger.info("找不到的业务平台码:{}", String.valueOf(objectList.get(3)));
-                throw new MessageException("第[" + num + "]行,找不到的业务平台码" + String.valueOf(objectList.get(3)));
+                throw new MessageException("第[" + num + "]行,找不到的业务平台信息:业务平台编号[" + String.valueOf(objectList.get(3))+"],业务平台["+String.valueOf(objectList.get(4))+"']");
             }
 
             if (StringUtils.isBlank(String.valueOf(objectList.get(15)))) {
