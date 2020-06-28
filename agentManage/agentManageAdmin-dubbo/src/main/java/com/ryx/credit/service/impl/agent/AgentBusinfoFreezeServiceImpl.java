@@ -142,7 +142,7 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
 
             }else{
                 logger.info("查询无数据");
-                return    AgentResult.fail("查询无数据");
+                return    AgentResult.ok("查询无数据");
             }
         }else{
             logger.info("请传入代理商唯一编码");
