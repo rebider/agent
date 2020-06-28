@@ -568,16 +568,6 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         if(!verify.isOK()){
             return verify;
         }
-        //查询原冻结信息
-        AgentFreezeExample orgFreezeExample = new AgentFreezeExample();
-        orgFreezeExample.or().andAgentIdEqualTo(agentFreezePort.getAgentId())
-                .andFreezeCauseEqualTo(agentFreezePort.getFreezeCause())
-                .andFreezeTypeEqualTo(agentFreezePort.getFreeType().get(0))
-                .andStatusEqualTo(Status.STATUS_1.status);
-        List<AgentFreeze> orgAgentFreezeList = agentFreezeMapper.selectByExample(orgFreezeExample);
-        if (orgAgentFreezeList == null || orgAgentFreezeList.size() == 0){
-            throw new MessageException("代理商冻结信息不存在!");
-        }
         //创建新的冻结任务
         FreezeRequest freezeRequest = new FreezeRequest();
         freezeRequest.setId(idService.genId(TabId.a_freeze_request));
@@ -614,8 +604,8 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                         .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
                         .andBusIdEqualTo(busPlatform);
                 List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
-                if(agentFreezes.size()==0){
-                    throw new MessageException("代理商无原因冻结记录:"+FreeType.getmsg(freeType));
+                if(agentFreezes.size()!=1 ){
+                    throw new MessageException("代理商此原因冻结记录:"+FreeType.getmsg(freeType)+"不唯一");
                 }
 
                 //检查是否有在审批中的解冻申请
@@ -672,16 +662,16 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 /**
                  * 保存原信息
                  */
-                agentFreeze.setBusFreezeOrg(orgAgentFreezeList.get(0).getBusFreeze());
-                agentFreeze.setProfitFreezeOrg(orgAgentFreezeList.get(0).getProfitFreeze());
-                agentFreeze.setReflowFreezeOrg(orgAgentFreezeList.get(0).getReflowFreeze());
-                agentFreeze.setMonthlyFreezeOrg(orgAgentFreezeList.get(0).getMonthlyFreeze());
-                agentFreeze.setDailyFreezeOrg(orgAgentFreezeList.get(0).getDailyFreeze());
-                agentFreeze.setStopProfitFreezeOrg(orgAgentFreezeList.get(0).getStopProfitFreeze());
-                agentFreeze.setCashFreezeOrg(orgAgentFreezeList.get(0).getCashFreeze());
-                agentFreeze.setStopCountOrg(orgAgentFreezeList.get(0).getStopCount());
-                agentFreeze.setNewBusFreezeOrg(orgAgentFreezeList.get(0).getNewBusFreeze());
-                agentFreeze.setFreezeId(orgAgentFreezeList.get(0).getId());
+                agentFreeze.setBusFreezeOrg(agentFreezes.get(0).getBusFreeze());
+                agentFreeze.setProfitFreezeOrg(agentFreezes.get(0).getProfitFreeze());
+                agentFreeze.setReflowFreezeOrg(agentFreezes.get(0).getReflowFreeze());
+                agentFreeze.setMonthlyFreezeOrg(agentFreezes.get(0).getMonthlyFreeze());
+                agentFreeze.setDailyFreezeOrg(agentFreezes.get(0).getDailyFreeze());
+                agentFreeze.setStopProfitFreezeOrg(agentFreezes.get(0).getStopProfitFreeze());
+                agentFreeze.setCashFreezeOrg(agentFreezes.get(0).getCashFreeze());
+                agentFreeze.setStopCountOrg(agentFreezes.get(0).getStopCount());
+                agentFreeze.setNewBusFreezeOrg(agentFreezes.get(0).getNewBusFreeze());
+                agentFreeze.setFreezeId(agentFreezes.get(0).getId());
 
                 if(StringUtils.isNotBlank(agentFreezePort.getRemark())){//备注
                     agentFreeze.setRemark(agentFreezePort.getRemark());
