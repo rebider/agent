@@ -1371,4 +1371,22 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		return data;
 	}
+
+	@Override
+	public List<Map> agentmanageFreezeBus(String agentId,Long userId) {
+		List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+		if (orgCodeRes == null && orgCodeRes.size() != 1) {
+			return null;
+		}
+		Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+		String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+		FastMap reqMap = FastMap.fastMap("agentId", agentId);
+		if(organizationCode.contains("city"))
+			reqMap.putKeyV("organizationCode", organizationCode);
+		List<Map> data = agentBusInfoMapper.queryManageFreezeBusInfo(reqMap);
+		for (Map datum : data) {
+			datum.put("BUS_TYPE_NAME",BusType.getContentByValue(String.valueOf(datum.get("BUS_TYPE"))));
+		}
+		return data;
+	}
 }

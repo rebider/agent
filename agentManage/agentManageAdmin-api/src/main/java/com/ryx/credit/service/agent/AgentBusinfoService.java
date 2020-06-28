@@ -171,4 +171,6 @@ public interface AgentBusinfoService {
 
     public List<Map> agentFreezeBus(String agentId,Long userId);
 
+    public List<Map> agentmanageFreezeBus(String agentId,Long userId);
+
 }
