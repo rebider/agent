@@ -123,6 +123,33 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         if (orgCodeRes == null && orgCodeRes.size() != 1) {
             return null;
         }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getBusFreeze()))){
+            reqMap.put("busFreeze",agentFreeze.getBusFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getProfitFreeze()))){
+            reqMap.put("profitFreeze",agentFreeze.getProfitFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getReflowFreeze()))){
+            reqMap.put("reflowFreeze",agentFreeze.getReflowFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getMonthlyFreeze()))){
+            reqMap.put("monthlyFreeze",agentFreeze.getMonthlyFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getDailyFreeze()))){
+            reqMap.put("dailyFreeze",agentFreeze.getDailyFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getStopProfitFreeze()))){
+            reqMap.put("stopProfitFreeze",agentFreeze.getStopProfitFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getCashFreeze()))){
+            reqMap.put("cashFreeze",agentFreeze.getCashFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getStopCount()))){
+            reqMap.put("stopCount",agentFreeze.getStopCount());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getBusPlatform()))){
+            reqMap.put("busPlatform",agentFreeze.getBusPlatform());
+        }
         Map<String, Object> stringObjectMap = orgCodeRes.get(0);
         String orgId = String.valueOf(stringObjectMap.get("ORGID"));
         String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
@@ -924,6 +951,33 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         if(StringUtils.isNotBlank(agentFreeze.getFreezeStatus())){
             reqMap.put("freezeStatus",agentFreeze.getFreezeStatus());
         }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getBusFreeze()))){
+            reqMap.put("busFreeze",agentFreeze.getBusFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getProfitFreeze()))){
+            reqMap.put("profitFreeze",agentFreeze.getProfitFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getReflowFreeze()))){
+            reqMap.put("reflowFreeze",agentFreeze.getReflowFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getMonthlyFreeze()))){
+            reqMap.put("monthlyFreeze",agentFreeze.getMonthlyFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getDailyFreeze()))){
+            reqMap.put("dailyFreeze",agentFreeze.getDailyFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getStopProfitFreeze()))){
+            reqMap.put("stopProfitFreeze",agentFreeze.getStopProfitFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getCashFreeze()))){
+            reqMap.put("cashFreeze",agentFreeze.getCashFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getStopCount()))){
+            reqMap.put("stopCount",agentFreeze.getStopCount());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getBusPlatform()))){
+            reqMap.put("busPlatform",agentFreeze.getBusPlatform());
+        }
         List<Map<String, String>> resultMaps = agentFreezeMapper.queryAgentFreezeAll(reqMap,page);
         for (Map<String, String> resultMap : resultMaps) {
             resultMap.put("FREESTATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREESTATUS"))));
@@ -1006,6 +1060,33 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.parseLong(agentFreeze.getFreezePerson()));
         if (orgCodeRes == null && orgCodeRes.size() != 1) {
             return null;
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getBusFreeze()))){
+            reqMap.put("busFreeze",agentFreeze.getBusFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getProfitFreeze()))){
+            reqMap.put("profitFreeze",agentFreeze.getProfitFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getReflowFreeze()))){
+            reqMap.put("reflowFreeze",agentFreeze.getReflowFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getMonthlyFreeze()))){
+            reqMap.put("monthlyFreeze",agentFreeze.getMonthlyFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getDailyFreeze()))){
+            reqMap.put("dailyFreeze",agentFreeze.getDailyFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getStopProfitFreeze()))){
+            reqMap.put("stopProfitFreeze",agentFreeze.getStopProfitFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getCashFreeze()))){
+            reqMap.put("cashFreeze",agentFreeze.getCashFreeze());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getStopCount()))){
+            reqMap.put("stopCount",agentFreeze.getStopCount());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getBusPlatform()))){
+            reqMap.put("busPlatform",agentFreeze.getBusPlatform());
         }
         Map<String, Object> stringObjectMap = orgCodeRes.get(0);
         String orgId = String.valueOf(stringObjectMap.get("ORGID"));

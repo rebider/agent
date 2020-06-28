@@ -485,6 +485,33 @@
         <if test="map.platfromPerm==null or map.platfromPerm.size==0">
           and  1=-1
         </if>
+        <if test="map.busFreeze != null and map.busFreeze != '' ">
+          and t.BUS_FREEZE = #{map.busFreeze}
+        </if>
+        <if test="map.profitFreeze != null and map.profitFreeze != '' ">
+          and t.PROFIT_FREEZE = #{map.profitFreeze}
+        </if>
+        <if test="map.reflowFreeze != null and map.reflowFreeze != '' ">
+          and t.REFLOW_FREEZE = #{map.reflowFreeze}
+        </if>
+        <if test="map.monthlyFreeze != null and map.monthlyFreeze != '' ">
+          and t.MONTHLY_FREEZE = #{map.monthlyFreeze}
+        </if>
+        <if test="map.dailyFreeze != null and map.dailyFreeze != '' ">
+          and t.DAILY_FREEZE = #{map.dailyFreeze}
+        </if>
+        <if test="map.stopProfitFreeze != null and map.stopProfitFreeze != '' ">
+          and t.STOP_PROFIT_FREEZE = #{map.stopProfitFreeze}
+        </if>
+        <if test="map.cashFreeze != null and map.cashFreeze != '' ">
+          and t.CASH_FREEZE = #{map.cashFreeze}
+        </if>
+        <if test="map.stopCount != null and map.stopCount != '' ">
+          and t.STOP_COUNT = #{map.stopCount}
+        </if>
+        <if test="map.busPlatform != null and map.busPlatform != '' ">
+          and t.BUS_PLATFORM = #{map.busPlatform}
+        </if>
       </where>
       order by t.agent_id,t.freeze_date desc
   </sql>
@@ -655,6 +682,33 @@
       <if test="map.userId != null and map.userId != '' ">
         and t.freeze_person = #{map.userId,jdbcType=VARCHAR}
       </if>
+      <if test="map.busFreeze != null and map.busFreeze != '' ">
+        and t.BUS_FREEZE = #{map.busFreeze}
+      </if>
+      <if test="map.profitFreeze != null and map.profitFreeze != '' ">
+        and t.PROFIT_FREEZE = #{map.profitFreeze}
+      </if>
+      <if test="map.reflowFreeze != null and map.reflowFreeze != '' ">
+        and t.REFLOW_FREEZE = #{map.reflowFreeze}
+      </if>
+      <if test="map.monthlyFreeze != null and map.monthlyFreeze != '' ">
+        and t.MONTHLY_FREEZE = #{map.monthlyFreeze}
+      </if>
+      <if test="map.dailyFreeze != null and map.dailyFreeze != '' ">
+        and t.DAILY_FREEZE = #{map.dailyFreeze}
+      </if>
+      <if test="map.stopProfitFreeze != null and map.stopProfitFreeze != '' ">
+        and t.STOP_PROFIT_FREEZE = #{map.stopProfitFreeze}
+      </if>
+      <if test="map.cashFreeze != null and map.cashFreeze != '' ">
+        and t.CASH_FREEZE = #{map.cashFreeze}
+      </if>
+      <if test="map.stopCount != null and map.stopCount != '' ">
+        and t.STOP_COUNT = #{map.stopCount}
+      </if>
+      <if test="map.busPlatform != null and map.busPlatform != '' ">
+        and t.BUS_PLATFORM = #{map.busPlatform}
+      </if>
     </where>
     union
     select t.ID,t.AGENT_ID,t.FREEZE_STATUS,t.FREEZE_PERSON,
@@ -725,6 +779,33 @@
       <if test="map.platfromPerm==null or map.platfromPerm.size==0">
         and  1=-1
       </if>
+      <if test="map.busFreeze != null and map.busFreeze != '' ">
+        and t.BUS_FREEZE = #{map.busFreeze}
+      </if>
+      <if test="map.profitFreeze != null and map.profitFreeze != '' ">
+        and t.PROFIT_FREEZE = #{map.profitFreeze}
+      </if>
+      <if test="map.reflowFreeze != null and map.reflowFreeze != '' ">
+        and t.REFLOW_FREEZE = #{map.reflowFreeze}
+      </if>
+      <if test="map.monthlyFreeze != null and map.monthlyFreeze != '' ">
+        and t.MONTHLY_FREEZE = #{map.monthlyFreeze}
+      </if>
+      <if test="map.dailyFreeze != null and map.dailyFreeze != '' ">
+        and t.DAILY_FREEZE = #{map.dailyFreeze}
+      </if>
+      <if test="map.stopProfitFreeze != null and map.stopProfitFreeze != '' ">
+        and t.STOP_PROFIT_FREEZE = #{map.stopProfitFreeze}
+      </if>
+      <if test="map.cashFreeze != null and map.cashFreeze != '' ">
+        and t.CASH_FREEZE = #{map.cashFreeze}
+      </if>
+      <if test="map.stopCount != null and map.stopCount != '' ">
+        and t.STOP_COUNT = #{map.stopCount}
+      </if>
+      <if test="map.busPlatform != null and map.busPlatform != '' ">
+          and t.BUS_PLATFORM = #{map.busPlatform}
+        </if>
     </where>
     ) t
     order by t.agent_id,t.freeze_date desc
@@ -793,6 +874,33 @@
       </if>
       <if test="map.freezeStatus != null and map.freezeStatus != '' ">
         and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
+      </if>
+      <if test="map.busFreeze != null and map.busFreeze != '' ">
+        and t.BUS_FREEZE = #{map.busFreeze}
+      </if>
+      <if test="map.profitFreeze != null and map.profitFreeze != '' ">
+        and t.PROFIT_FREEZE = #{map.profitFreeze}
+      </if>
+      <if test="map.reflowFreeze != null and map.reflowFreeze != '' ">
+        and t.REFLOW_FREEZE = #{map.reflowFreeze}
+      </if>
+      <if test="map.monthlyFreeze != null and map.monthlyFreeze != '' ">
+        and t.MONTHLY_FREEZE = #{map.monthlyFreeze}
+      </if>
+      <if test="map.dailyFreeze != null and map.dailyFreeze != '' ">
+        and t.DAILY_FREEZE = #{map.dailyFreeze}
+      </if>
+      <if test="map.stopProfitFreeze != null and map.stopProfitFreeze != '' ">
+        and t.STOP_PROFIT_FREEZE = #{map.stopProfitFreeze}
+      </if>
+      <if test="map.cashFreeze != null and map.cashFreeze != '' ">
+        and t.CASH_FREEZE = #{map.cashFreeze}
+      </if>
+      <if test="map.stopCount != null and map.stopCount != '' ">
+        and t.STOP_COUNT = #{map.stopCount}
+      </if>
+      <if test="map.busPlatform != null and map.busPlatform != '' ">
+        and t.BUS_PLATFORM = #{map.busPlatform}
       </if>
       </where>
     order by t.agent_id,t.freeze_date desc
