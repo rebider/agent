@@ -902,7 +902,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         agentFreezePort.setRemark("批量冻结");
         List<FreezeRequestDetail> freezeRequestDetaillist = new ArrayList<FreezeRequestDetail>();
         for (List<Object> objectList : list) {
-            num = +1;
+            num = num+1;
             if (StringUtils.isBlank(String.valueOf(objectList.get(0)))) {
                 logger.info("请填写代理商唯一码:{}", String.valueOf(objectList.get(0)));
                 throw new MessageException("第[" + num + "]行,请填写代理商唯一码");
@@ -915,9 +915,9 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             if (StringUtils.isBlank(String.valueOf(objectList.get(1)))) {
                 logger.info("代理商名称为空:{}", String.valueOf(objectList.get(1)));
                 throw new MessageException("第[" + num + "]行,请填写代理商名称");
-            } else if (!agentById.getAgName().equals(String.valueOf(objectList.get(1)))) {
-                logger.info("代理商名称不匹配:{}", String.valueOf(objectList.get(1)));
-                throw new MessageException("第[" + num + "]行,代理商名称不匹配");
+            } else if (!agentById.getAgName().equals(String.valueOf(objectList.get(1)).replaceAll("\r|\n", ""))) {
+                logger.info("代理商名称不匹配:{}", String.valueOf(objectList.get(1)).replaceAll("\r|\n", ""));
+                throw new MessageException("第[" + num + "]行,代理商名称不匹配:"+String.valueOf(objectList.get(1)).replaceAll("\r|\n", ""));
             }
             if (StringUtils.isBlank(String.valueOf(objectList.get(2)))) {
                 logger.info("冻结类型为空:{}", String.valueOf(objectList.get(2)));
@@ -958,19 +958,19 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 logger.info("业务平台为空:{}", String.valueOf(objectList.get(4)));
                 throw new MessageException("第[" + num + "]行,请填写业务平台");
             }
-            PlatForm platForm = platFormService.selectByPlatformName(String.valueOf(objectList.get(4)));
+            PlatForm platForm = platFormService.selectByPlatformName(String.valueOf(objectList.get(4)).replaceAll("\r|\n", ""));
             if (platForm == null) {
-                logger.info("业务平台不存在:{}", String.valueOf(objectList.get(4)));
-                throw new MessageException("第[" + num + "]行,业务平台不存在");
+                logger.info("业务平台不存在:{}", String.valueOf(objectList.get(4)).replaceAll("\r|\n", ""));
+                throw new MessageException("第[" + num + "]行,业务平台不存在:"+String.valueOf(objectList.get(4)).replaceAll("\r|\n", ""));
             }
             AgentBusInfo agentBusInfo = new AgentBusInfo();
-            agentBusInfo.setBusNum(String.valueOf(objectList.get(3)));
+            agentBusInfo.setBusNum(String.valueOf(objectList.get(3)).replaceAll("\r|\n", ""));
             agentBusInfo.setBusPlatform(platForm.getPlatformNum());
             agentBusInfo.setAgentId(String.valueOf(objectList.get(0)));
             List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
             if (agentBusInfos == null || agentBusInfos.size() == 0) {
-                logger.info("找不到的业务平台码:{}", String.valueOf(objectList.get(3)));
-                throw new MessageException("第[" + num + "]行,找不到的业务平台信息:业务平台编号[" + String.valueOf(objectList.get(3))+"],业务平台["+String.valueOf(objectList.get(4))+"']");
+                logger.info("找不到的业务平台码:{}", String.valueOf(objectList.get(3)).replaceAll("\r|\n", ""));
+                throw new MessageException("第[" + num + "]行,找不到的业务平台信息:业务平台编号[" + String.valueOf(objectList.get(3)).replaceAll("\r|\n", "")+"],业务平台["+String.valueOf(objectList.get(4)).replaceAll("\r|\n", "")+"']");
             }
 
             if (StringUtils.isBlank(String.valueOf(objectList.get(15)))) {
@@ -980,7 +980,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             AgentFreezeExample agentFreezeExample = new AgentFreezeExample();
             agentFreezeExample.or().andStatusEqualTo(Status.STATUS_1.status)
                     .andFreezeTypeEqualTo(freeType)
-                    .andBusNumEqualTo(String.valueOf(objectList.get(4)))
+                    .andBusNumEqualTo(String.valueOf(objectList.get(4)).replaceAll("\r|\n", ""))
                     .andFreezeCauseEqualTo(FreeCause.getcodeBymsg(String.valueOf(objectList.get(2))))
                     .andAgentIdEqualTo(String.valueOf(objectList.get(0)));
             List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
@@ -1017,7 +1017,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
 
             freezeRequestDetail.setBusPlatform(platForm.getPlatformNum());//
             freezeRequestDetail.setBusId(agentBusInfos.get(0).getId());//AB码
-            freezeRequestDetail.setBusNum(String.valueOf(objectList.get(3)));//业务平台码,O码
+            freezeRequestDetail.setBusNum(String.valueOf(objectList.get(3)).replaceAll("\r|\n", ""));//业务平台码,O码
 
             freezeRequestDetail.setBusFreeze(String.valueOf(objectList.get(6)).equals("是") ? BigDecimal.ONE : BigDecimal.ZERO);
             freezeRequestDetail.setProfitFreeze(String.valueOf(objectList.get(7)).equals("是") ? BigDecimal.ONE : BigDecimal.ZERO);
