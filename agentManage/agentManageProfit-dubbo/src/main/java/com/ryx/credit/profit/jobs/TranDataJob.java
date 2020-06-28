@@ -77,7 +77,7 @@ public class TranDataJob {
      * 每月3号12点执行
      * @Date: 11:33 2019/1/24
      */
-    @Scheduled(cron = "${profit_checkdata_job_cron}")
+    /*@Scheduled(cron = "${profit_checkdata_job_cron}")*/
     public void doCron() {
        if (!"preproduction".equals(environment)){
            String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
@@ -251,7 +251,7 @@ public class TranDataJob {
      * 每月3号12点执行
      * @Date: 15:05 2019/4/2
      */
-    @Scheduled(cron = "${profit_checkdata_job_cron}")
+    /*@Scheduled(cron = "${profit_checkdata_job_cron}")*/
     public void doSynchronizeTranCheckData() {
         if (!"preproduction".equals(environment)) {
             synchronizeTranCheckData();

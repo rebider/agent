@@ -192,5 +192,10 @@ public class DepartmentServiceImpl implements DepartmentService {
         return null;
     }
 
+    @Override
+    public COrganization getByUserId(long userId) {
+         return cOrganizationMapper.selectCOrganizationByUserId(userId);
+    }
+
 
 }

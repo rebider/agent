@@ -471,4 +471,12 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
         return null;
     }
+
+    @Override
+    public AgentResult agentFNoorbidde(List<String> pamMap, String platformType) throws Exception {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("orgList", pamMap);
+        log.info("代理商禁用pos的请求参数==请求参数:{}",JSONObject.toJSON(jsonObject));
+        return  request("ORG023", jsonObject);
+    }
 }

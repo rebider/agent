@@ -133,4 +133,14 @@ public interface TermMachineService {
      * @throws Exception
      */
     AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception;
+
+
+    /**
+     * 判断代理商是否被禁用
+     * @param pamMap
+     * @param platformType
+     * @return
+     * @throws Exception
+     */
+    AgentResult agentFNoorbidde (List<String> pamMap, String platformType) throws Exception;
 }

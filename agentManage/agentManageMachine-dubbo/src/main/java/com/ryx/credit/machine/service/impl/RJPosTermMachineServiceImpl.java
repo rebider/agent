@@ -208,6 +208,11 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
         }
     }
 
+    @Override
+    public AgentResult agentFNoorbidde(List<String> pamMap, String platformType) throws Exception {
+        return null;
+    }
+
     /**
      * 查询活动
      * @param platformType

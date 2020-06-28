@@ -315,11 +315,12 @@ public class AgentServiceImpl implements AgentService {
     @Override
     public Agent queryAgentByUserId(String userId) {
         List<CuserAgent> cas = queryByUserId(userId);
+        if(cas.size()!=1)return null;
         for (CuserAgent ca : cas) {
             if (StringUtils.isNotEmpty(ca.getAgentid())) {
                 Agent agent = agentMapper.selectByPrimaryKey(ca.getAgentid());
                 if (agent != null){
-//                    if(agent.getStatus().compareTo(Status.STATUS_1.status)==0)
+                    if(Status.STATUS_1.status.compareTo(agent.getStatus())==0)
                     return agent;
                 }
             }
