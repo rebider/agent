@@ -824,25 +824,26 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                     curDetail.setCashFreeze(freezeRequestDetail.getCashFreeze());
                     agentFreezePort.setCurLevel(curDetail);
                     agentFreezePort.setFreezeNum(busActRel.getBusId());
-                    if (freezeRequest.getReqType().compareTo(FreezeRequestType.Freeze.code)== 0 ){
-                        agentResult  = agentFreezeService.agentFreeze(agentFreezePort);
-                    }else if (freezeRequest.getReqType().compareTo(FreezeRequestType.UnFreeze.code) == 0){
-                        agentResult = agentFreezeService.agentUnFreeze(agentFreezePort);
-                    }else if (freezeRequest.getReqType().compareTo(FreezeRequestType.Modify.code)== 0){
-                        agentFreezePort.setUnfreezeCause("申请变更解冻");
-                        agentResult = agentFreezeService.agentUnFreeze(agentFreezePort);
-                        agentFreezePort.setUnfreezeCause(freezeRequestDetail.getUnfreezeCause());
-                        agentResult  = agentFreezeService.agentFreeze(agentFreezePort);
+                    try {
+                        if (freezeRequest.getReqType().compareTo(FreezeRequestType.Freeze.code)== 0 ){
+                            agentResult  = agentFreezeService.agentFreeze(agentFreezePort);
+                        }else if (freezeRequest.getReqType().compareTo(FreezeRequestType.UnFreeze.code) == 0){
+                            agentResult = agentFreezeService.agentUnFreeze(agentFreezePort);
+                        }else if (freezeRequest.getReqType().compareTo(FreezeRequestType.Modify.code)== 0){
+                            agentFreezePort.setUnfreezeCause("申请变更解冻");
+                            agentResult = agentFreezeService.agentUnFreeze(agentFreezePort);
+                            agentFreezePort.setUnfreezeCause(freezeRequestDetail.getUnfreezeCause());
+                            agentResult  = agentFreezeService.agentFreeze(agentFreezePort);
+                        }
+                    }catch (MessageException m){
+                        if (!m.getCode().equals("2000")){
+                            throw m;
+                        }
+                    }catch (Exception m){
+                       throw m;
                     }
-                    if (!agentResult.isOK()){
-                        throw new MessageException(FreezeRequestType.getMsg(freezeRequest.getReqType())+"代理商失败！");
-                    }
-                    Map mapData = (Map) agentResult.getData();
-                    AgentFreeze date = (AgentFreeze)mapData.get("data");
-                    AgentResult notifyResult = agentBusinfoFreezeService.agentBusinfoFreeze(date, freezeRequest.getcUserId());
-                    if (!notifyResult.isOK()){
-                        throw new MessageException("通知汇总异常");
-                    }
+
+
                 }
 
             } else if(actname.equals("reject_end")) { //审批拒绝

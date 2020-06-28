@@ -64,4 +64,8 @@ public interface AgentFreezeService {
 
     AgentResult freezeNewBus(AgentFreezePort agentFreezePort);
 
+    AgentResult agentFreezeLocal(AgentFreezePort agentFreezePort)throws MessageException;
+
+    AgentResult agentUnFreezeLocal(AgentFreezePort agentFreezePort)throws MessageException;
+
 }

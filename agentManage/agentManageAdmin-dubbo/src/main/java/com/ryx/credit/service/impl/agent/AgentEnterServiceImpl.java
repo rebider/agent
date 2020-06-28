@@ -1090,24 +1090,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             busList.add(agentBusInfo.getId());
         }
-        //入网合同冻结
-        try {
-            AgentFreezePort agentFreezePort = new AgentFreezePort();
-            agentFreezePort.setAgentId(agent.getId());
-            agentFreezePort.setFreezeCause(FreeCause.HTDJ.getValue());
-            agentFreezePort.setOperationPerson(agent.getcUser());
-            agentFreezePort.setFreezeNum(agent.getId());
-            agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-            agentFreezePort.setBusPlatform(busList);
-            agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
-            AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
-            if(!agentResult.isOK()){
-                throw new ProcessException(agentResult.getMsg());
-            }
-        } catch (MessageException e) {
-            e.printStackTrace();
-            throw new ProcessException(e.getMsg());
-        }
         //代理商有效新建的合同
         List<AgentContract> ag = agentContractService.queryAgentContract(agent.getId(), null, AgStatus.Approving.status);
         for (AgentContract contract : ag) {
