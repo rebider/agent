@@ -358,10 +358,11 @@
     <include refid="OracleDialectSuffix"/>
   </select>
   <sql id="queryAbfreezeListSql">
-    SELECT   a.*,c.ID as agentId,C.AG_NAME FROM  A_AGENT_BUSINFOFREEZE a
+    SELECT   a.*,c.ID as agentId,C.AG_NAME,d. platform_name FROM  A_AGENT_BUSINFOFREEZE a
     left join a_agent_businfo b on A.BUS_ID=b.id
     left join a_agent c on c.id=b.agent_id
-    where b.status=1 and c.status=1
+    left join a_platform d on d.platform_num=a.plat_id
+    where b.status=1 and c.status=1 and d.status=1
     <if test="map.agId!=null and map.agId!=''">and c.ID = #{map.agId}</if>
     <if test="map.agName!=null and map.agName!=''">and c.AG_NAME LIKE CONCAT(CONCAT('%',#{map.agName}),'%')</if>
     <if test="map.freezeType!=null and map.freezeType!=''">and a.FREEZE_TYPE = #{map.freezeType}</if>
