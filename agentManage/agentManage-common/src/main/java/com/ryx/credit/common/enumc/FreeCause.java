@@ -20,7 +20,9 @@ public enum FreeCause {
     RZDJ("RZDJ","认证冻结"),
     QTDJ("QTDJ","其他原因"),
     XXQS("XXQS","基本信息缺失"),
-    JSKBG("JSKBG","结算卡变更冻结");
+    JSKBG("JSKBG","结算卡变更冻结"),
+    FRFX("FRFX","分润返现冻结"),
+    AGFR("AGFR","AG码冻结");
 
     public String code;
 
@@ -41,6 +43,22 @@ public enum FreeCause {
         for (FreeCause cc : freeCause) {
             if(cc.code.equals(value)){
                 return cc.msg;
+            }
+        }
+        return "";
+    }
+
+
+    /**
+     * 根据值获取内容
+     * @param msg
+     * @return
+     */
+    public static String getcodeBymsg(String msg) {
+        FreeCause[] freeCause = FreeCause.values();
+        for (FreeCause cc : freeCause) {
+            if(cc.msg.equals(msg)){
+                return cc.code;
             }
         }
         return "";

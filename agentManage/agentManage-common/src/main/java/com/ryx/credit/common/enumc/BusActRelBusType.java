@@ -42,7 +42,8 @@ public enum BusActRelBusType {
     orderAdjust("/BusActRelBusType/orderAdj","机具数量调整申请"),
     cashierApprove("/BusActRelBusType/cashierApprove","订单调整出纳申请"),
     cardRenew("/BusActRelBusType/cardRenew","物联网卡续费申请"),
-    cardLogout("/BusActRelBusType/cardLogout","物联网卡注销申请");
+    cardLogout("/BusActRelBusType/cardLogout","物联网卡注销申请"),
+    freeze("/BusActRelBusType/agentFreezeApproval","冻结解冻申请");
 
 
     public String key;

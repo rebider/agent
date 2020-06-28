@@ -1478,4 +1478,58 @@ union
     where p.status = '1' and ab.status = '1' and ab.clo_review_status = '3' and ab.bus_status = '1'
     and ab.bus_num = #{busNum} and p.platform_type = #{platformType}
   </select>
+
+  <select id="queryFreezeBusInfo"  parameterType="map" resultType="map">
+    select
+    A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,
+    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME,(C.PLATFORM_NAME||'-'||A.BUS_NUM||'-'||D.D_ITEMNAME) as FIELDSHOW,c.PLATFORM_TYPE
+    from
+    a_agent_businfo a
+    left join a_agent b on a.agent_id=b.id
+    left join a_platform c on c.platform_num = a.bus_platform
+    left join d_dict d on d.d_group='AGENT' AND d.d_artifact = 'BUS_TYPE' and d.d_itemvalue = a.bus_type
+    left join C_ORGANIZATION oa on oa.id=a.ag_doc_pro
+    left join C_ORGANIZATION ob on ob.id=a.AG_DOC_DISTRICT
+    <where>
+      a.status=1 and b.status=1 and (a.bus_status=1 or a.bus_status=2 or a.bus_status=0 or a.bus_status=3) and a.CLO_REVIEW_STATUS = 3 and a.BUS_NUM is not null
+      <if test="map.agentId!=null and map.agentId!=''">and a.agent_id = #{map.agentId}</if>
+      <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
+        and EXISTS(
+        select A_AGENT_BUSINFO.ID from A_AGENT_BUSINFO
+        left join C_ORGANIZATION oa on oa.id=A_AGENT_BUSINFO.ag_doc_pro
+        left join C_ORGANIZATION ob on ob.id=A_AGENT_BUSINFO.AG_DOC_DISTRICT
+        where b.id=A_AGENT_BUSINFO.AGENT_ID and A_AGENT_BUSINFO.BUS_PLATFORM in
+        <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+        )
+      </if>
+      <if test="map.organizationCode!=null and map.organizationCode!=''">
+        and (oa.CODE like concat(#{map.organizationCode},'%') or ob.CODE like concat(#{map.organizationCode},'%') )
+      </if>
+      <if test="map.platfromPerm==null or map.platfromPerm.size==0">
+        and  1=-1
+      </if>
+    </where>
+  </select>
+
+  <select id="queryManageFreezeBusInfo"  parameterType="map" resultType="map">
+    select
+    A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,
+    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME,(C.PLATFORM_NAME||'-'||A.BUS_NUM||'-'||D.D_ITEMNAME) as FIELDSHOW,c.PLATFORM_TYPE
+    from
+    a_agent_businfo a
+    left join a_agent b on a.agent_id=b.id
+    left join a_platform c on c.platform_num = a.bus_platform
+    left join d_dict d on d.d_group='AGENT' AND d.d_artifact = 'BUS_TYPE' and d.d_itemvalue = a.bus_type
+    left join C_ORGANIZATION oa on oa.id=a.ag_doc_pro
+    left join C_ORGANIZATION ob on ob.id=a.AG_DOC_DISTRICT
+    <where>
+      a.status=1 and b.status=1 and (a.bus_status=1 or a.bus_status=2 or a.bus_status=0 or a.bus_status=3) and a.CLO_REVIEW_STATUS = 3 and a.BUS_NUM is not null
+      <if test="id!=null and id!=''"> and a.id=#{id}</if>
+      <if test="busPlatform!=null and busPlatform!=''">and a.bus_platform =#{busPlatform}</if>
+      <if test="agentId!=null and agentId!=''">and a.agent_id = #{agentId}</if>
+      <if test="busParent!=null and busParent!=''">and a.bus_parent= #{busParent}</if>
+    </where>
+  </select>
 </mapper>

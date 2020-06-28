@@ -121,8 +121,12 @@ public enum DictGroup {
     PASSKEY("密码AES_KEY"),
     JOBORDER("工单模块"),
     JOKEYTYPE("关键词类型"),
+    ACTIVITY_ADJUST("活动调整已付允许划拨品牌"),
     APPROVAL_OPINION("订单审批意见"),
-    ACTIVITY_ADJUST("活动调整已付允许划拨品牌");
+    FREE_TYPE("冻结层级"),
+    FREE_CAUSE("冻结原因"),
+    FREEZE_RULE("冻结规则"),
+    FREE_APPROVAL_USER("冻结审批人id");
 
 
 

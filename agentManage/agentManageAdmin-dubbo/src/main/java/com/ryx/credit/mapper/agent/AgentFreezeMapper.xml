@@ -16,6 +16,18 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="FREEZE_TYPE" jdbcType="DECIMAL" property="freezeType" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_FREEZE" jdbcType="DECIMAL" property="busFreeze" />
+    <result column="PROFIT_FREEZE" jdbcType="DECIMAL" property="profitFreeze" />
+    <result column="REFLOW_FREEZE" jdbcType="DECIMAL" property="reflowFreeze" />
+    <result column="MONTHLY_FREEZE" jdbcType="DECIMAL" property="monthlyFreeze" />
+    <result column="DAILY_FREEZE" jdbcType="DECIMAL" property="dailyFreeze" />
+    <result column="STOP_PROFIT_FREEZE" jdbcType="DECIMAL" property="stopProfitFreeze" />
+    <result column="CASH_FREEZE" jdbcType="DECIMAL" property="cashFreeze" />
+    <result column="STOP_COUNT" jdbcType="DECIMAL" property="stopCount" />
+    <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
+    <result column="NEW_BUS_FREEZE" jdbcType="DECIMAL" property="newBusFreeze" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -48,7 +60,9 @@
   </sql>
   <sql id="Base_Column_List">
     ID, AGENT_ID, FREEZE_STATUS, FREEZE_PERSON, FREEZE_DATE, FREEZE_CAUSE, UNFREEZE_PERSON, 
-    UNFREEZE_DATE, UNFREEZE_CAUSE, FREEZE_NUM, REMARK, STATUS, VERSION, FREEZE_TYPE
+    UNFREEZE_DATE, UNFREEZE_CAUSE, FREEZE_NUM, REMARK, STATUS, VERSION, FREEZE_TYPE, 
+    BUS_PLATFORM, BUS_NUM, BUS_FREEZE, PROFIT_FREEZE, REFLOW_FREEZE, MONTHLY_FREEZE, 
+    DAILY_FREEZE, STOP_PROFIT_FREEZE, CASH_FREEZE, STOP_COUNT, BUS_ID, NEW_BUS_FREEZE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreezeExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -83,12 +97,20 @@
       FREEZE_PERSON, FREEZE_DATE, FREEZE_CAUSE, 
       UNFREEZE_PERSON, UNFREEZE_DATE, UNFREEZE_CAUSE, 
       FREEZE_NUM, REMARK, STATUS, 
-      VERSION, FREEZE_TYPE)
+      VERSION, FREEZE_TYPE, BUS_PLATFORM, 
+      BUS_NUM, BUS_FREEZE, PROFIT_FREEZE, 
+      REFLOW_FREEZE, MONTHLY_FREEZE, DAILY_FREEZE, 
+      STOP_PROFIT_FREEZE, CASH_FREEZE, STOP_COUNT, 
+      BUS_ID, NEW_BUS_FREEZE)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{freezeStatus,jdbcType=VARCHAR}, 
       #{freezePerson,jdbcType=VARCHAR}, #{freezeDate,jdbcType=TIMESTAMP}, #{freezeCause,jdbcType=VARCHAR}, 
       #{unfreezePerson,jdbcType=VARCHAR}, #{unfreezeDate,jdbcType=TIMESTAMP}, #{unfreezeCause,jdbcType=VARCHAR}, 
       #{freezeNum,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL}, #{freezeType,jdbcType=DECIMAL})
+      #{version,jdbcType=DECIMAL}, #{freezeType,jdbcType=DECIMAL}, #{busPlatform,jdbcType=VARCHAR}, 
+      #{busNum,jdbcType=VARCHAR}, #{busFreeze,jdbcType=DECIMAL}, #{profitFreeze,jdbcType=DECIMAL}, 
+      #{reflowFreeze,jdbcType=DECIMAL}, #{monthlyFreeze,jdbcType=DECIMAL}, #{dailyFreeze,jdbcType=DECIMAL}, 
+      #{stopProfitFreeze,jdbcType=DECIMAL}, #{cashFreeze,jdbcType=DECIMAL}, #{stopCount,jdbcType=DECIMAL}, 
+      #{busId,jdbcType=VARCHAR}, #{newBusFreeze,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreeze">
     insert into A_AGENT_FREEZE
@@ -135,6 +157,42 @@
       <if test="freezeType != null">
         FREEZE_TYPE,
       </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="busFreeze != null">
+        BUS_FREEZE,
+      </if>
+      <if test="profitFreeze != null">
+        PROFIT_FREEZE,
+      </if>
+      <if test="reflowFreeze != null">
+        REFLOW_FREEZE,
+      </if>
+      <if test="monthlyFreeze != null">
+        MONTHLY_FREEZE,
+      </if>
+      <if test="dailyFreeze != null">
+        DAILY_FREEZE,
+      </if>
+      <if test="stopProfitFreeze != null">
+        STOP_PROFIT_FREEZE,
+      </if>
+      <if test="cashFreeze != null">
+        CASH_FREEZE,
+      </if>
+      <if test="stopCount != null">
+        STOP_COUNT,
+      </if>
+      <if test="busId != null">
+        BUS_ID,
+      </if>
+      <if test="newBusFreeze != null">
+        NEW_BUS_FREEZE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -178,6 +236,42 @@
       </if>
       <if test="freezeType != null">
         #{freezeType,jdbcType=DECIMAL},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busFreeze != null">
+        #{busFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="profitFreeze != null">
+        #{profitFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="reflowFreeze != null">
+        #{reflowFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="monthlyFreeze != null">
+        #{monthlyFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="dailyFreeze != null">
+        #{dailyFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="stopProfitFreeze != null">
+        #{stopProfitFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="cashFreeze != null">
+        #{cashFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="stopCount != null">
+        #{stopCount,jdbcType=DECIMAL},
+      </if>
+      <if test="busId != null">
+        #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="newBusFreeze != null">
+        #{newBusFreeze,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -229,6 +323,42 @@
       <if test="freezeType != null">
         FREEZE_TYPE = #{freezeType,jdbcType=DECIMAL},
       </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busFreeze != null">
+        BUS_FREEZE = #{busFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="profitFreeze != null">
+        PROFIT_FREEZE = #{profitFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="reflowFreeze != null">
+        REFLOW_FREEZE = #{reflowFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="monthlyFreeze != null">
+        MONTHLY_FREEZE = #{monthlyFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="dailyFreeze != null">
+        DAILY_FREEZE = #{dailyFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="stopProfitFreeze != null">
+        STOP_PROFIT_FREEZE = #{stopProfitFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="cashFreeze != null">
+        CASH_FREEZE = #{cashFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="stopCount != null">
+        STOP_COUNT = #{stopCount,jdbcType=DECIMAL},
+      </if>
+      <if test="busId != null">
+        BUS_ID = #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="newBusFreeze != null">
+        NEW_BUS_FREEZE = #{newBusFreeze,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -245,8 +375,20 @@
       FREEZE_NUM = #{freezeNum,jdbcType=VARCHAR},
       REMARK = #{remark,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      FREEZE_TYPE = #{freezeType,jdbcType=DECIMAL}
+      VERSION = VERSION + 1,
+      FREEZE_TYPE = #{freezeType,jdbcType=DECIMAL},
+      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      BUS_FREEZE = #{busFreeze,jdbcType=DECIMAL},
+      PROFIT_FREEZE = #{profitFreeze,jdbcType=DECIMAL},
+      REFLOW_FREEZE = #{reflowFreeze,jdbcType=DECIMAL},
+      MONTHLY_FREEZE = #{monthlyFreeze,jdbcType=DECIMAL},
+      DAILY_FREEZE = #{dailyFreeze,jdbcType=DECIMAL},
+      STOP_PROFIT_FREEZE = #{stopProfitFreeze,jdbcType=DECIMAL},
+      CASH_FREEZE = #{cashFreeze,jdbcType=DECIMAL},
+      STOP_COUNT = #{stopCount,jdbcType=DECIMAL},
+      BUS_ID = #{busId,jdbcType=VARCHAR},
+      NEW_BUS_FREEZE = #{newBusFreeze,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -276,7 +418,10 @@
              t.FREEZE_DATE,t.FREEZE_CAUSE,t.UNFREEZE_PERSON,
              t.UNFREEZE_DATE,t.UNFREEZE_CAUSE,t.FREEZE_NUM,
              t.REMARK,t.STATUS,t.VERSION,nvl(t.FREEZE_TYPE,'1') as FREEZE_TYPE,
-             a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS
+             a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS,
+             t.BUS_PLATFORM,t.BUS_NUM,t.BUS_FREEZE,t.PROFIT_FREEZE,
+             t.REFLOW_FREEZE,t.MONTHLY_FREEZE,t.DAILY_FREEZE,
+             t.STOP_PROFIT_FREEZE,t.CASH_FREEZE,t.STOP_COUNT,t.NEW_BUS_FREEZE
       from a_agent_freeze t
       left join a_agent a on a.id=t.agent_id
       <where>
@@ -319,6 +464,56 @@
         </if>
         <if test="map.freezeStatus != null and map.freezeStatus != '' ">
           and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="map.userId != null and map.userId != '' ">
+          and t.freeze_person = #{map.userId,jdbcType=VARCHAR}
+        </if>
+        <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
+          and EXISTS(
+          select A_AGENT_BUSINFO.ID from A_AGENT_BUSINFO
+          left join C_ORGANIZATION oa on oa.id=A_AGENT_BUSINFO.ag_doc_pro
+          left join C_ORGANIZATION ob on ob.id=A_AGENT_BUSINFO.AG_DOC_DISTRICT
+          where a.id=A_AGENT_BUSINFO.AGENT_ID and A_AGENT_BUSINFO.BUS_PLATFORM in
+          <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+            #{platfromPermItem.PLATFORM_NUM}
+          </foreach>
+          <if test="map.organizationCode!=null and map.organizationCode!=''">
+            and (oa.CODE like concat(#{map.organizationCode},'%') or ob.CODE like concat(#{map.organizationCode},'%') )
+          </if>
+          )
+        </if>
+        <if test="map.platfromPerm==null or map.platfromPerm.size==0">
+          and  1=-1
+        </if>
+        <if test="map.busFreeze != null  ">
+          and t.BUS_FREEZE = #{map.busFreeze}
+        </if>
+        <if test="map.profitFreeze != null  ">
+          and t.PROFIT_FREEZE = #{map.profitFreeze}
+        </if>
+        <if test="map.reflowFreeze != null  ">
+          and t.REFLOW_FREEZE = #{map.reflowFreeze}
+        </if>
+        <if test="map.monthlyFreeze != null  ">
+          and t.MONTHLY_FREEZE = #{map.monthlyFreeze}
+        </if>
+        <if test="map.dailyFreeze != null ">
+          and t.DAILY_FREEZE = #{map.dailyFreeze}
+        </if>
+        <if test="map.stopProfitFreeze != null ">
+          and t.STOP_PROFIT_FREEZE = #{map.stopProfitFreeze}
+        </if>
+        <if test="map.cashFreeze != null ">
+          and t.CASH_FREEZE = #{map.cashFreeze}
+        </if>
+        <if test="map.stopCount != null ">
+          and t.STOP_COUNT = #{map.stopCount}
+        </if>
+        <if test="map.busPlatform != null  ">
+          and t.BUS_PLATFORM = #{map.busPlatform}
+        </if>
+        <if test="map.freezeType != null  ">
+          and t.FREEZE_TYPE = #{map.freezeType}
         </if>
       </where>
       order by t.agent_id,t.freeze_date desc
@@ -410,4 +605,328 @@
     <result column="ac_ag_legal_cernum" property="acAgLegalCernum" jdbcType="VARCHAR"/>
     <result column="clo_review_status" property="cloReviewStatus" jdbcType="VARCHAR"/>
   </resultMap>
+
+
+  <select id="queryFreeByAgentId" parameterType="string" resultMap="BaseResultMap">
+    select
+    b.AGENT_ID,b.FREEZE_TYPE,b.BUS_PLATFORM,b.BUS_NUM,b.bus_id,a.BUS_FREEZE,
+    a.PROFIT_FREEZE,a.REFLOW_FREEZE,a.MONTHLY_FREEZE,a.DAILY_FREEZE,a.STOP_PROFIT_FREEZE,a.CASH_FREEZE
+    ,a.STOP_COUNT,a.NEW_BUS_FREEZE
+    from (select
+    nvl(sum(BUS_FREEZE),0)as BUS_FREEZE,
+    nvl(sum(PROFIT_FREEZE),0)as PROFIT_FREEZE,
+    nvl(sum(REFLOW_FREEZE),0)as REFLOW_FREEZE,
+    nvl(sum(MONTHLY_FREEZE),0)as MONTHLY_FREEZE,
+    nvl(sum(DAILY_FREEZE),0)as DAILY_FREEZE,
+    nvl(sum(STOP_PROFIT_FREEZE),0)as STOP_PROFIT_FREEZE,
+    nvl(sum(CASH_FREEZE),0)as CASH_FREEZE,
+    nvl(sum(STOP_COUNT),0)as STOP_COUNT,
+    nvl(sum(NEW_BUS_FREEZE),0)as NEW_BUS_FREEZE,
+    min(id) as id,agent_id,freeze_type,BUS_PLATFORM,BUS_NUM from A_agent_freeze
+    where  freeze_status=0
+    <if test="agentId!=null and agentId!=''">and agent_id = #{agentId}</if>
+    group by agent_id,freeze_type,BUS_PLATFORM,BUS_NUM)a
+    left join A_agent_freeze b on a.id=b.id where b.bus_num is not null
+  </select>
+
+  <sql id="queryAgentFreezeRegionSql">
+    select * from (
+    select t.ID,t.AGENT_ID,t.FREEZE_STATUS,t.FREEZE_PERSON,
+    t.FREEZE_DATE,t.FREEZE_CAUSE,t.UNFREEZE_PERSON,
+    t.UNFREEZE_DATE,t.UNFREEZE_CAUSE,t.FREEZE_NUM,
+    t.REMARK,t.STATUS,t.VERSION,nvl(t.FREEZE_TYPE,'1') as FREEZE_TYPE,
+    a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS,
+    t.BUS_PLATFORM,t.BUS_NUM,t.BUS_FREEZE,t.PROFIT_FREEZE,
+    t.REFLOW_FREEZE,t.MONTHLY_FREEZE,t.DAILY_FREEZE,
+    t.STOP_PROFIT_FREEZE,t.CASH_FREEZE,t.STOP_COUNT,t.NEW_BUS_FREEZE
+    from a_agent_freeze t
+    left join a_agent a on a.id=t.agent_id
+    <where>
+      <if test="1==1"> and t.status = 1 and a.status = 1 </if>
+      <if test="map.id!=null and map.agentId != ''">
+        and t.id = #{map.id,jdbcType=VARCHAR}
+      </if>
+      <if test="map.agentId != null and map.agentId != '' ">
+        and t.agent_Id in
+        <foreach collection="map.agentId" item="listItem" open="(" close=")" separator="," >
+          #{listItem}
+        </foreach>
+      </if>
+      <if test="map.agentName != null and map.agentName != '' ">
+        and a.ag_name LIKE CONCAT(CONCAT('%',#{map.agentName}),'%')
+      </if>
+      <if test="map.incomTimeBegin!=null and map.incomTimeBegin!=''">
+        and a.c_incom_time >= to_date(#{map.incomTimeBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.incomTimeEnd!=null and map.incomTimeEnd!=''">
+        and a.c_incom_time &lt;= to_date(#{map.incomTimeEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freezeDateBegin!=null and map.freezeDateBegin!=''">
+        and t.freeze_Date >= to_date(#{map.freezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freezeDateEnd!=null and map.freezeDateEnd!=''">
+        and t.freeze_Date &lt;= to_date(#{map.freezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.unFreezeDateBegin!=null and map.unFreezeDateBegin!=''">
+        and t.unFreeze_Date >= to_date(#{map.unFreezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.unFreezeDateEnd!=null and map.unFreezeDateEnd!=''">
+        and t.unFreeze_Date &lt;= to_date(#{map.unFreezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freeStatus != null and map.freeStatus != '' ">
+        and a.freestatus = #{map.freeStatus,jdbcType=VARCHAR}
+      </if>
+      <if test="map.freezeCause != null and map.freezeCause != '' ">
+        and t.freeze_Cause = #{map.freezeCause,jdbcType=VARCHAR}
+      </if>
+      <if test="map.freezeStatus != null and map.freezeStatus != '' ">
+        and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
+      </if>
+      <if test="map.userId != null and map.userId != '' ">
+        and t.freeze_person = #{map.userId,jdbcType=VARCHAR}
+      </if>
+      <if test="map.busFreeze != null  ">
+        and t.BUS_FREEZE = #{map.busFreeze}
+      </if>
+      <if test="map.profitFreeze != null  ">
+        and t.PROFIT_FREEZE = #{map.profitFreeze}
+      </if>
+      <if test="map.reflowFreeze != null  ">
+        and t.REFLOW_FREEZE = #{map.reflowFreeze}
+      </if>
+      <if test="map.monthlyFreeze != null  ">
+        and t.MONTHLY_FREEZE = #{map.monthlyFreeze}
+      </if>
+      <if test="map.dailyFreeze != null  ">
+        and t.DAILY_FREEZE = #{map.dailyFreeze}
+      </if>
+      <if test="map.stopProfitFreeze != null  ">
+        and t.STOP_PROFIT_FREEZE = #{map.stopProfitFreeze}
+      </if>
+      <if test="map.cashFreeze != null  ">
+        and t.CASH_FREEZE = #{map.cashFreeze}
+      </if>
+      <if test="map.stopCount != null  ">
+        and t.STOP_COUNT = #{map.stopCount}
+      </if>
+      <if test="map.busPlatform != null  ">
+        and t.BUS_PLATFORM = #{map.busPlatform}
+      </if>
+      <if test="map.freezeType != null ">
+        and t.FREEZE_TYPE = #{map.freezeType}
+      </if>
+    </where>
+    union
+    select t.ID,t.AGENT_ID,t.FREEZE_STATUS,t.FREEZE_PERSON,
+    t.FREEZE_DATE,t.FREEZE_CAUSE,t.UNFREEZE_PERSON,
+    t.UNFREEZE_DATE,t.UNFREEZE_CAUSE,t.FREEZE_NUM,
+    t.REMARK,t.STATUS,t.VERSION,nvl(t.FREEZE_TYPE,'1') as FREEZE_TYPE,
+    a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS,
+    t.BUS_PLATFORM,t.BUS_NUM,t.BUS_FREEZE,t.PROFIT_FREEZE,
+    t.REFLOW_FREEZE,t.MONTHLY_FREEZE,t.DAILY_FREEZE,
+    t.STOP_PROFIT_FREEZE,t.CASH_FREEZE,t.STOP_COUNT,t.NEW_BUS_FREEZE
+    from a_agent_freeze t
+    left join a_agent a on a.id=t.agent_id
+    <where>
+      <if test="1==1"> and t.status = 1 and a.status = 1 </if>
+      <if test="map.id!=null and map.agentId != ''">
+        and t.id = #{map.id,jdbcType=VARCHAR}
+      </if>
+      <if test="map.agentId != null and map.agentId != '' ">
+        and t.agent_Id in
+        <foreach collection="map.agentId" item="listItem" open="(" close=")" separator="," >
+          #{listItem}
+        </foreach>
+      </if>
+      <if test="map.agentName != null and map.agentName != '' ">
+        and a.ag_name LIKE CONCAT(CONCAT('%',#{map.agentName}),'%')
+      </if>
+      <if test="map.incomTimeBegin!=null and map.incomTimeBegin!=''">
+        and a.c_incom_time >= to_date(#{map.incomTimeBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.incomTimeEnd!=null and map.incomTimeEnd!=''">
+        and a.c_incom_time &lt;= to_date(#{map.incomTimeEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freezeDateBegin!=null and map.freezeDateBegin!=''">
+        and t.freeze_Date >= to_date(#{map.freezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freezeDateEnd!=null and map.freezeDateEnd!=''">
+        and t.freeze_Date &lt;= to_date(#{map.freezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.unFreezeDateBegin!=null and map.unFreezeDateBegin!=''">
+        and t.unFreeze_Date >= to_date(#{map.unFreezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.unFreezeDateEnd!=null and map.unFreezeDateEnd!=''">
+        and t.unFreeze_Date &lt;= to_date(#{map.unFreezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freeStatus != null and map.freeStatus != '' ">
+        and a.freestatus = #{map.freeStatus,jdbcType=VARCHAR}
+      </if>
+      <if test="map.freezeCause != null and map.freezeCause != '' ">
+        and t.freeze_Cause = #{map.freezeCause,jdbcType=VARCHAR}
+      </if>
+      <if test="map.freezeStatus != null and map.freezeStatus != '' ">
+        and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
+      </if>
+      <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
+        and EXISTS(
+        select A_AGENT_BUSINFO.ID from A_AGENT_BUSINFO
+        left join C_ORGANIZATION oa on oa.id=A_AGENT_BUSINFO.ag_doc_pro
+        left join C_ORGANIZATION ob on ob.id=A_AGENT_BUSINFO.AG_DOC_DISTRICT
+        where a.id=A_AGENT_BUSINFO.AGENT_ID and A_AGENT_BUSINFO.BUS_PLATFORM in
+        <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+        <if test="map.organizationCode!=null and map.organizationCode!=''">
+          and (oa.CODE like concat(#{map.organizationCode},'%') or ob.CODE like concat(#{map.organizationCode},'%') )
+        </if>
+        )
+      </if>
+      <if test="map.platfromPerm==null or map.platfromPerm.size==0">
+        and  1=-1
+      </if>
+      <if test="map.busFreeze != null  ">
+        and t.BUS_FREEZE = #{map.busFreeze}
+      </if>
+      <if test="map.profitFreeze != null  ">
+        and t.PROFIT_FREEZE = #{map.profitFreeze}
+      </if>
+      <if test="map.reflowFreeze != null  ">
+        and t.REFLOW_FREEZE = #{map.reflowFreeze}
+      </if>
+      <if test="map.monthlyFreeze != null  ">
+        and t.MONTHLY_FREEZE = #{map.monthlyFreeze}
+      </if>
+      <if test="map.dailyFreeze != null  ">
+        and t.DAILY_FREEZE = #{map.dailyFreeze}
+      </if>
+      <if test="map.stopProfitFreeze != null  ">
+        and t.STOP_PROFIT_FREEZE = #{map.stopProfitFreeze}
+      </if>
+      <if test="map.cashFreeze != null  ">
+        and t.CASH_FREEZE = #{map.cashFreeze}
+      </if>
+      <if test="map.stopCount != null  ">
+        and t.STOP_COUNT = #{map.stopCount}
+      </if>
+      <if test="map.busPlatform != null  ">
+          and t.BUS_PLATFORM = #{map.busPlatform}
+        </if>
+      <if test="map.freezeType != null  ">
+        and t.FREEZE_TYPE = #{map.freezeType}
+      </if>
+    </where>
+    ) t
+    order by t.agent_id,t.freeze_date desc
+  </sql>
+
+  <select id="queryAgentFreezeListRegion" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="queryAgentFreezeRegionSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryAgentFreezeCountRegion" parameterType="map" resultType="int">
+    select count(*) from (
+    <include refid="queryAgentFreezeRegionSql"/>
+    )
+  </select>
+
+  <sql id="queryAgentFreezeAllSql">
+    select t.ID,t.AGENT_ID,t.FREEZE_STATUS,t.FREEZE_PERSON,
+    t.FREEZE_DATE,t.FREEZE_CAUSE,t.UNFREEZE_PERSON,
+    t.UNFREEZE_DATE,t.UNFREEZE_CAUSE,t.FREEZE_NUM,
+    t.REMARK,t.STATUS,t.VERSION,nvl(t.FREEZE_TYPE,'1') as FREEZE_TYPE,
+    a.ag_name,a.c_incom_time,to_char(a.freestatus) as FREESTATUS,
+    t.BUS_PLATFORM,t.BUS_NUM,t.BUS_FREEZE,t.PROFIT_FREEZE,
+    t.REFLOW_FREEZE,t.MONTHLY_FREEZE,t.DAILY_FREEZE,
+    t.STOP_PROFIT_FREEZE,t.CASH_FREEZE,t.STOP_COUNT,t.NEW_BUS_FREEZE
+    from a_agent_freeze t
+    left join a_agent a on a.id=t.agent_id
+    <where>
+      <if test="1==1"> and t.status = 1 and a.status = 1 </if>
+      <if test="map.id!=null and map.agentId != ''">
+        and t.id = #{map.id,jdbcType=VARCHAR}
+      </if>
+      <if test="map.agentId != null and map.agentId != '' ">
+        and t.agent_Id in
+        <foreach collection="map.agentId" item="listItem" open="(" close=")" separator="," >
+          #{listItem}
+        </foreach>
+      </if>
+      <if test="map.agentName != null and map.agentName != '' ">
+        and a.ag_name LIKE CONCAT(CONCAT('%',#{map.agentName}),'%')
+      </if>
+      <if test="map.incomTimeBegin!=null and map.incomTimeBegin!=''">
+        and a.c_incom_time >= to_date(#{map.incomTimeBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.incomTimeEnd!=null and map.incomTimeEnd!=''">
+        and a.c_incom_time &lt;= to_date(#{map.incomTimeEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freezeDateBegin!=null and map.freezeDateBegin!=''">
+        and t.freeze_Date >= to_date(#{map.freezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freezeDateEnd!=null and map.freezeDateEnd!=''">
+        and t.freeze_Date &lt;= to_date(#{map.freezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.unFreezeDateBegin!=null and map.unFreezeDateBegin!=''">
+        and t.unFreeze_Date >= to_date(#{map.unFreezeDateBegin}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.unFreezeDateEnd!=null and map.unFreezeDateEnd!=''">
+        and t.unFreeze_Date &lt;= to_date(#{map.unFreezeDateEnd}, 'yy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="map.freeStatus != null and map.freeStatus != '' ">
+        and a.freestatus = #{map.freeStatus,jdbcType=VARCHAR}
+      </if>
+      <if test="map.freezeCause != null and map.freezeCause != '' ">
+        and t.freeze_Cause = #{map.freezeCause,jdbcType=VARCHAR}
+      </if>
+      <if test="map.freezeStatus != null and map.freezeStatus != '' ">
+        and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
+      </if>
+      <if test="map.busFreeze != null  ">
+        and t.BUS_FREEZE = #{map.busFreeze}
+      </if>
+      <if test="map.profitFreeze != null  ">
+        and t.PROFIT_FREEZE = #{map.profitFreeze}
+      </if>
+      <if test="map.reflowFreeze != null">
+        and t.REFLOW_FREEZE = #{map.reflowFreeze}
+      </if>
+      <if test="map.monthlyFreeze != null  ">
+        and t.MONTHLY_FREEZE = #{map.monthlyFreeze}
+      </if>
+      <if test="map.dailyFreeze != null  ">
+        and t.DAILY_FREEZE = #{map.dailyFreeze}
+      </if>
+      <if test="map.stopProfitFreeze != null  ">
+        and t.STOP_PROFIT_FREEZE = #{map.stopProfitFreeze}
+      </if>
+      <if test="map.cashFreeze != null  ">
+        and t.CASH_FREEZE = #{map.cashFreeze}
+      </if>
+      <if test="map.stopCount != null  ">
+        and t.STOP_COUNT = #{map.stopCount}
+      </if>
+      <if test="map.busPlatform != null  ">
+        and t.BUS_PLATFORM = #{map.busPlatform}
+      </if>
+      <if test="map.freezeType != null ">
+        and t.FREEZE_TYPE = #{map.freezeType}
+      </if>
+      </where>
+    order by t.agent_id,t.freeze_date desc
+  </sql>
+
+  <select id="queryAgentFreezeAll" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="queryAgentFreezeAllSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryAgentFreezeCountAll" parameterType="map" resultType="int">
+    select count(*) from (
+    <include refid="queryAgentFreezeAllSql"/>
+    )
+  </select>
 </mapper>

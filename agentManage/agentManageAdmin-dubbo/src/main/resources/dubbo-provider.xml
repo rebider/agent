@@ -162,7 +162,11 @@
     <dubbo:service interface="com.ryx.credit.service.order.OsnOperateReturnService" ref="osnOperateReturnService"  timeout="1200000" registry="myGroup" />
     <dubbo:service interface="com.ryx.credit.service.agent.AgentFreezeService" ref="agentFreezeService"  timeout="1200000" registry="myGroup" />
     <dubbo:reference interface="com.ryx.credit.machine.service.LmsUserService" id="lmsUserService"  timeout="1200000" registry="myGroup" check="false" />
+    <dubbo:service interface="com.ryx.credit.service.agent.FreezeRequestService" ref="freezeRequestService" timeout="1200000" registry="myGroup" />
+    <dubbo:service interface="com.ryx.credit.service.agent.FreezeRequestDetailService" ref="freezeRequestDetailService" timeout="1200000" registry="myGroup" />
 
     <!-- 图表数据 -->
     <dubbo:service interface="com.ryx.credit.service.data.EchartDataService" ref="echartDataService"  timeout="1200000" registry="myGroup" />
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentBusinfoFreezeService" ref="agentBusinfoFreezeService"  timeout="1200000" registry="myGroup" />
+
 </beans>

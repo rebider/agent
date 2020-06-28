@@ -35,6 +35,8 @@ public interface AgentBusinfoService {
      */
     public List<AgentBusInfo> agentBusInfoList(String agentId);
     public List<AgentBusInfo> agentBusInfoList(String agentId, String id, BigDecimal appStatus);
+    public List<AgentBusInfo> queryAgentBusInfo(String agentId);
+    public List<AgentBusInfo> queryAgentBusInfoFreeze(String agentId);
 
     /**
      * 查询代理商的可用业务
@@ -166,4 +168,9 @@ public interface AgentBusinfoService {
      * @return
      */
     public  List<Map> agentBusByDict(FastMap reqMap);
+
+    public List<Map> agentFreezeBus(String agentId,Long userId);
+
+    public List<Map> agentmanageFreezeBus(String agentId,Long userId);
+
 }

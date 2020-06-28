@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.FreezeRequestDetailMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="FREEZE_REQ_ID" jdbcType="VARCHAR" property="freezeReqId" />
+    <result column="FREEZE_ID" jdbcType="VARCHAR" property="freezeId" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_FREEZE_STATUS" jdbcType="VARCHAR" property="agentFreezeStatus" />
+    <result column="FREEZE_TYPE" jdbcType="DECIMAL" property="freezeType" />
+    <result column="FREEZE_STATUS" jdbcType="VARCHAR" property="freezeStatus" />
+    <result column="FREEZE_PERSON" jdbcType="VARCHAR" property="freezePerson" />
+    <result column="FREEZE_DATE" jdbcType="TIMESTAMP" property="freezeDate" />
+    <result column="FREEZE_CAUSE" jdbcType="VARCHAR" property="freezeCause" />
+    <result column="UNFREEZE_PERSON" jdbcType="VARCHAR" property="unfreezePerson" />
+    <result column="UNFREEZE_DATE" jdbcType="TIMESTAMP" property="unfreezeDate" />
+    <result column="UNFREEZE_CAUSE" jdbcType="VARCHAR" property="unfreezeCause" />
+    <result column="FREEZE_NUM" jdbcType="VARCHAR" property="freezeNum" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_FREEZE" jdbcType="DECIMAL" property="busFreeze" />
+    <result column="PROFIT_FREEZE" jdbcType="DECIMAL" property="profitFreeze" />
+    <result column="REFLOW_FREEZE" jdbcType="DECIMAL" property="reflowFreeze" />
+    <result column="MONTHLY_FREEZE" jdbcType="DECIMAL" property="monthlyFreeze" />
+    <result column="DAILY_FREEZE" jdbcType="DECIMAL" property="dailyFreeze" />
+    <result column="STOP_PROFIT_FREEZE" jdbcType="DECIMAL" property="stopProfitFreeze" />
+    <result column="CASH_FREEZE" jdbcType="DECIMAL" property="cashFreeze" />
+    <result column="STOP_COUNT" jdbcType="DECIMAL" property="stopCount" />
+    <result column="NEW_BUS_FREEZE" jdbcType="DECIMAL" property="newBusFreeze" />
+    <result column="BUS_FREEZE_ORG" jdbcType="DECIMAL" property="busFreezeOrg" />
+    <result column="PROFIT_FREEZE_ORG" jdbcType="DECIMAL" property="profitFreezeOrg" />
+    <result column="REFLOW_FREEZE_ORG" jdbcType="DECIMAL" property="reflowFreezeOrg" />
+    <result column="MONTHLY_FREEZE_ORG" jdbcType="DECIMAL" property="monthlyFreezeOrg" />
+    <result column="DAILY_FREEZE_ORG" jdbcType="DECIMAL" property="dailyFreezeOrg" />
+    <result column="STOP_PROFIT_FREEZE_ORG" jdbcType="DECIMAL" property="stopProfitFreezeOrg" />
+    <result column="CASH_FREEZE_ORG" jdbcType="DECIMAL" property="cashFreezeOrg" />
+    <result column="STOP_COUNT_ORG" jdbcType="DECIMAL" property="stopCountOrg" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="NEW_BUS_FREEZE_ORG" jdbcType="DECIMAL" property="newBusFreezeOrg" />
+    <result column="REVIEWS_USER" jdbcType="VARCHAR" property="reviewsUser" />
+    <result column="REVIEWS_DATE" jdbcType="TIMESTAMP" property="reviewsDate" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, FREEZE_REQ_ID, FREEZE_ID, AGENT_ID, AGENT_FREEZE_STATUS, FREEZE_TYPE, FREEZE_STATUS, 
+    FREEZE_PERSON, FREEZE_DATE, FREEZE_CAUSE, UNFREEZE_PERSON, UNFREEZE_DATE, UNFREEZE_CAUSE, 
+    FREEZE_NUM, REMARK, BUS_PLATFORM, BUS_ID, BUS_NUM, BUS_FREEZE, PROFIT_FREEZE, REFLOW_FREEZE, 
+    MONTHLY_FREEZE, DAILY_FREEZE, STOP_PROFIT_FREEZE, CASH_FREEZE, STOP_COUNT, NEW_BUS_FREEZE, 
+    BUS_FREEZE_ORG, PROFIT_FREEZE_ORG, REFLOW_FREEZE_ORG, MONTHLY_FREEZE_ORG, DAILY_FREEZE_ORG, 
+    STOP_PROFIT_FREEZE_ORG, CASH_FREEZE_ORG, STOP_COUNT_ORG, STATUS, VERSION, NEW_BUS_FREEZE_ORG, 
+    REVIEWS_USER, REVIEWS_DATE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetailExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_FREEZE_REQUEST_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from A_FREEZE_REQUEST_DETAIL
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetailExample">
+    delete from A_FREEZE_REQUEST_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
+    insert into A_FREEZE_REQUEST_DETAIL (ID, FREEZE_REQ_ID, FREEZE_ID, 
+      AGENT_ID, AGENT_FREEZE_STATUS, FREEZE_TYPE, 
+      FREEZE_STATUS, FREEZE_PERSON, FREEZE_DATE, 
+      FREEZE_CAUSE, UNFREEZE_PERSON, UNFREEZE_DATE, 
+      UNFREEZE_CAUSE, FREEZE_NUM, REMARK, 
+      BUS_PLATFORM, BUS_ID, BUS_NUM, 
+      BUS_FREEZE, PROFIT_FREEZE, REFLOW_FREEZE, 
+      MONTHLY_FREEZE, DAILY_FREEZE, STOP_PROFIT_FREEZE, 
+      CASH_FREEZE, STOP_COUNT, NEW_BUS_FREEZE, 
+      BUS_FREEZE_ORG, PROFIT_FREEZE_ORG, REFLOW_FREEZE_ORG, 
+      MONTHLY_FREEZE_ORG, DAILY_FREEZE_ORG, STOP_PROFIT_FREEZE_ORG, 
+      CASH_FREEZE_ORG, STOP_COUNT_ORG, STATUS, 
+      VERSION, NEW_BUS_FREEZE_ORG, REVIEWS_USER, 
+      REVIEWS_DATE)
+    values (#{id,jdbcType=VARCHAR}, #{freezeReqId,jdbcType=VARCHAR}, #{freezeId,jdbcType=VARCHAR}, 
+      #{agentId,jdbcType=VARCHAR}, #{agentFreezeStatus,jdbcType=VARCHAR}, #{freezeType,jdbcType=DECIMAL}, 
+      #{freezeStatus,jdbcType=VARCHAR}, #{freezePerson,jdbcType=VARCHAR}, #{freezeDate,jdbcType=TIMESTAMP}, 
+      #{freezeCause,jdbcType=VARCHAR}, #{unfreezePerson,jdbcType=VARCHAR}, #{unfreezeDate,jdbcType=TIMESTAMP}, 
+      #{unfreezeCause,jdbcType=VARCHAR}, #{freezeNum,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{busPlatform,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, 
+      #{busFreeze,jdbcType=DECIMAL}, #{profitFreeze,jdbcType=DECIMAL}, #{reflowFreeze,jdbcType=DECIMAL}, 
+      #{monthlyFreeze,jdbcType=DECIMAL}, #{dailyFreeze,jdbcType=DECIMAL}, #{stopProfitFreeze,jdbcType=DECIMAL}, 
+      #{cashFreeze,jdbcType=DECIMAL}, #{stopCount,jdbcType=DECIMAL}, #{newBusFreeze,jdbcType=DECIMAL}, 
+      #{busFreezeOrg,jdbcType=DECIMAL}, #{profitFreezeOrg,jdbcType=DECIMAL}, #{reflowFreezeOrg,jdbcType=DECIMAL}, 
+      #{monthlyFreezeOrg,jdbcType=DECIMAL}, #{dailyFreezeOrg,jdbcType=DECIMAL}, #{stopProfitFreezeOrg,jdbcType=DECIMAL}, 
+      #{cashFreezeOrg,jdbcType=DECIMAL}, #{stopCountOrg,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, 
+      #{version,jdbcType=DECIMAL}, #{newBusFreezeOrg,jdbcType=DECIMAL}, #{reviewsUser,jdbcType=VARCHAR}, 
+      #{reviewsDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
+    insert into A_FREEZE_REQUEST_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="freezeReqId != null">
+        FREEZE_REQ_ID,
+      </if>
+      <if test="freezeId != null">
+        FREEZE_ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentFreezeStatus != null">
+        AGENT_FREEZE_STATUS,
+      </if>
+      <if test="freezeType != null">
+        FREEZE_TYPE,
+      </if>
+      <if test="freezeStatus != null">
+        FREEZE_STATUS,
+      </if>
+      <if test="freezePerson != null">
+        FREEZE_PERSON,
+      </if>
+      <if test="freezeDate != null">
+        FREEZE_DATE,
+      </if>
+      <if test="freezeCause != null">
+        FREEZE_CAUSE,
+      </if>
+      <if test="unfreezePerson != null">
+        UNFREEZE_PERSON,
+      </if>
+      <if test="unfreezeDate != null">
+        UNFREEZE_DATE,
+      </if>
+      <if test="unfreezeCause != null">
+        UNFREEZE_CAUSE,
+      </if>
+      <if test="freezeNum != null">
+        FREEZE_NUM,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="busId != null">
+        BUS_ID,
+      </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="busFreeze != null">
+        BUS_FREEZE,
+      </if>
+      <if test="profitFreeze != null">
+        PROFIT_FREEZE,
+      </if>
+      <if test="reflowFreeze != null">
+        REFLOW_FREEZE,
+      </if>
+      <if test="monthlyFreeze != null">
+        MONTHLY_FREEZE,
+      </if>
+      <if test="dailyFreeze != null">
+        DAILY_FREEZE,
+      </if>
+      <if test="stopProfitFreeze != null">
+        STOP_PROFIT_FREEZE,
+      </if>
+      <if test="cashFreeze != null">
+        CASH_FREEZE,
+      </if>
+      <if test="stopCount != null">
+        STOP_COUNT,
+      </if>
+      <if test="newBusFreeze != null">
+        NEW_BUS_FREEZE,
+      </if>
+      <if test="busFreezeOrg != null">
+        BUS_FREEZE_ORG,
+      </if>
+      <if test="profitFreezeOrg != null">
+        PROFIT_FREEZE_ORG,
+      </if>
+      <if test="reflowFreezeOrg != null">
+        REFLOW_FREEZE_ORG,
+      </if>
+      <if test="monthlyFreezeOrg != null">
+        MONTHLY_FREEZE_ORG,
+      </if>
+      <if test="dailyFreezeOrg != null">
+        DAILY_FREEZE_ORG,
+      </if>
+      <if test="stopProfitFreezeOrg != null">
+        STOP_PROFIT_FREEZE_ORG,
+      </if>
+      <if test="cashFreezeOrg != null">
+        CASH_FREEZE_ORG,
+      </if>
+      <if test="stopCountOrg != null">
+        STOP_COUNT_ORG,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+      <if test="newBusFreezeOrg != null">
+        NEW_BUS_FREEZE_ORG,
+      </if>
+      <if test="reviewsUser != null">
+        REVIEWS_USER,
+      </if>
+      <if test="reviewsDate != null">
+        REVIEWS_DATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeReqId != null">
+        #{freezeReqId,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeId != null">
+        #{freezeId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentFreezeStatus != null">
+        #{agentFreezeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeType != null">
+        #{freezeType,jdbcType=DECIMAL},
+      </if>
+      <if test="freezeStatus != null">
+        #{freezeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="freezePerson != null">
+        #{freezePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeDate != null">
+        #{freezeDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="freezeCause != null">
+        #{freezeCause,jdbcType=VARCHAR},
+      </if>
+      <if test="unfreezePerson != null">
+        #{unfreezePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="unfreezeDate != null">
+        #{unfreezeDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="unfreezeCause != null">
+        #{unfreezeCause,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeNum != null">
+        #{freezeNum,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null">
+        #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busFreeze != null">
+        #{busFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="profitFreeze != null">
+        #{profitFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="reflowFreeze != null">
+        #{reflowFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="monthlyFreeze != null">
+        #{monthlyFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="dailyFreeze != null">
+        #{dailyFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="stopProfitFreeze != null">
+        #{stopProfitFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="cashFreeze != null">
+        #{cashFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="stopCount != null">
+        #{stopCount,jdbcType=DECIMAL},
+      </if>
+      <if test="newBusFreeze != null">
+        #{newBusFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="busFreezeOrg != null">
+        #{busFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="profitFreezeOrg != null">
+        #{profitFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="reflowFreezeOrg != null">
+        #{reflowFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="monthlyFreezeOrg != null">
+        #{monthlyFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="dailyFreezeOrg != null">
+        #{dailyFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="stopProfitFreezeOrg != null">
+        #{stopProfitFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="cashFreezeOrg != null">
+        #{cashFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="stopCountOrg != null">
+        #{stopCountOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="newBusFreezeOrg != null">
+        #{newBusFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="reviewsUser != null">
+        #{reviewsUser,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewsDate != null">
+        #{reviewsDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetailExample" resultType="java.lang.Long">
+    select count(*) from A_FREEZE_REQUEST_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
+    update A_FREEZE_REQUEST_DETAIL
+    <set>
+      <if test="freezeReqId != null">
+        FREEZE_REQ_ID = #{freezeReqId,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeId != null">
+        FREEZE_ID = #{freezeId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentFreezeStatus != null">
+        AGENT_FREEZE_STATUS = #{agentFreezeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeType != null">
+        FREEZE_TYPE = #{freezeType,jdbcType=DECIMAL},
+      </if>
+      <if test="freezeStatus != null">
+        FREEZE_STATUS = #{freezeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="freezePerson != null">
+        FREEZE_PERSON = #{freezePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeDate != null">
+        FREEZE_DATE = #{freezeDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="freezeCause != null">
+        FREEZE_CAUSE = #{freezeCause,jdbcType=VARCHAR},
+      </if>
+      <if test="unfreezePerson != null">
+        UNFREEZE_PERSON = #{unfreezePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="unfreezeDate != null">
+        UNFREEZE_DATE = #{unfreezeDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="unfreezeCause != null">
+        UNFREEZE_CAUSE = #{unfreezeCause,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeNum != null">
+        FREEZE_NUM = #{freezeNum,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null">
+        BUS_ID = #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busFreeze != null">
+        BUS_FREEZE = #{busFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="profitFreeze != null">
+        PROFIT_FREEZE = #{profitFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="reflowFreeze != null">
+        REFLOW_FREEZE = #{reflowFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="monthlyFreeze != null">
+        MONTHLY_FREEZE = #{monthlyFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="dailyFreeze != null">
+        DAILY_FREEZE = #{dailyFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="stopProfitFreeze != null">
+        STOP_PROFIT_FREEZE = #{stopProfitFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="cashFreeze != null">
+        CASH_FREEZE = #{cashFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="stopCount != null">
+        STOP_COUNT = #{stopCount,jdbcType=DECIMAL},
+      </if>
+      <if test="newBusFreeze != null">
+        NEW_BUS_FREEZE = #{newBusFreeze,jdbcType=DECIMAL},
+      </if>
+      <if test="busFreezeOrg != null">
+        BUS_FREEZE_ORG = #{busFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="profitFreezeOrg != null">
+        PROFIT_FREEZE_ORG = #{profitFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="reflowFreezeOrg != null">
+        REFLOW_FREEZE_ORG = #{reflowFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="monthlyFreezeOrg != null">
+        MONTHLY_FREEZE_ORG = #{monthlyFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="dailyFreezeOrg != null">
+        DAILY_FREEZE_ORG = #{dailyFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="stopProfitFreezeOrg != null">
+        STOP_PROFIT_FREEZE_ORG = #{stopProfitFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="cashFreezeOrg != null">
+        CASH_FREEZE_ORG = #{cashFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="stopCountOrg != null">
+        STOP_COUNT_ORG = #{stopCountOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="newBusFreezeOrg != null">
+        NEW_BUS_FREEZE_ORG = #{newBusFreezeOrg,jdbcType=DECIMAL},
+      </if>
+      <if test="reviewsUser != null">
+        REVIEWS_USER = #{reviewsUser,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewsDate != null">
+        REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.FreezeRequestDetail">
+    update A_FREEZE_REQUEST_DETAIL
+    set FREEZE_REQ_ID = #{freezeReqId,jdbcType=VARCHAR},
+      FREEZE_ID = #{freezeId,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_FREEZE_STATUS = #{agentFreezeStatus,jdbcType=VARCHAR},
+      FREEZE_TYPE = #{freezeType,jdbcType=DECIMAL},
+      FREEZE_STATUS = #{freezeStatus,jdbcType=VARCHAR},
+      FREEZE_PERSON = #{freezePerson,jdbcType=VARCHAR},
+      FREEZE_DATE = #{freezeDate,jdbcType=TIMESTAMP},
+      FREEZE_CAUSE = #{freezeCause,jdbcType=VARCHAR},
+      UNFREEZE_PERSON = #{unfreezePerson,jdbcType=VARCHAR},
+      UNFREEZE_DATE = #{unfreezeDate,jdbcType=TIMESTAMP},
+      UNFREEZE_CAUSE = #{unfreezeCause,jdbcType=VARCHAR},
+      FREEZE_NUM = #{freezeNum,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      BUS_ID = #{busId,jdbcType=VARCHAR},
+      BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      BUS_FREEZE = #{busFreeze,jdbcType=DECIMAL},
+      PROFIT_FREEZE = #{profitFreeze,jdbcType=DECIMAL},
+      REFLOW_FREEZE = #{reflowFreeze,jdbcType=DECIMAL},
+      MONTHLY_FREEZE = #{monthlyFreeze,jdbcType=DECIMAL},
+      DAILY_FREEZE = #{dailyFreeze,jdbcType=DECIMAL},
+      STOP_PROFIT_FREEZE = #{stopProfitFreeze,jdbcType=DECIMAL},
+      CASH_FREEZE = #{cashFreeze,jdbcType=DECIMAL},
+      STOP_COUNT = #{stopCount,jdbcType=DECIMAL},
+      NEW_BUS_FREEZE = #{newBusFreeze,jdbcType=DECIMAL},
+      BUS_FREEZE_ORG = #{busFreezeOrg,jdbcType=DECIMAL},
+      PROFIT_FREEZE_ORG = #{profitFreezeOrg,jdbcType=DECIMAL},
+      REFLOW_FREEZE_ORG = #{reflowFreezeOrg,jdbcType=DECIMAL},
+      MONTHLY_FREEZE_ORG = #{monthlyFreezeOrg,jdbcType=DECIMAL},
+      DAILY_FREEZE_ORG = #{dailyFreezeOrg,jdbcType=DECIMAL},
+      STOP_PROFIT_FREEZE_ORG = #{stopProfitFreezeOrg,jdbcType=DECIMAL},
+      CASH_FREEZE_ORG = #{cashFreezeOrg,jdbcType=DECIMAL},
+      STOP_COUNT_ORG = #{stopCountOrg,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL},
+      NEW_BUS_FREEZE_ORG = #{newBusFreezeOrg,jdbcType=DECIMAL},
+      REVIEWS_USER = #{reviewsUser,jdbcType=VARCHAR},
+      REVIEWS_DATE = #{reviewsDate,jdbcType=TIMESTAMP}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+  <sql id="selectReqDetails">
+
+    SELECT
+    FRD.AGENT_ID,
+    AG.AG_NAME,
+    AG.C_INCOM_TIME,
+    p.PLATFORM_NAME,
+    frd.BUS_PLATFORM,
+    frd.BUS_NUM,
+    frd.FREEZE_CAUSE,
+    frd.FREEZE_TYPE,
+    frd.BUS_FREEZE,
+    frd.PROFIT_FREEZE,
+    frd.REFLOW_FREEZE,
+    frd.MONTHLY_FREEZE,
+    frd.DAILY_FREEZE,
+    frd.STOP_PROFIT_FREEZE,
+    frd.CASH_FREEZE,
+    frd.STOP_COUNT,
+    frd.NEW_BUS_FREEZE,
+    fr.REQ_TYPE,
+    frd.BUS_FREEZE_ORG,
+    frd.PROFIT_FREEZE_ORG,
+    frd.REFLOW_FREEZE_ORG,
+    frd.MONTHLY_FREEZE_ORG,
+    frd.DAILY_FREEZE_ORG,
+    frd.STOP_PROFIT_FREEZE_ORG,
+    frd.CASH_FREEZE_ORG,
+    frd.STOP_COUNT_ORG,
+    frd.NEW_BUS_FREEZE_ORG,
+    fr.C_TM,
+    frd.remark,
+    cu.name as FREEZE_PERSON_MSG,
+    cu2.NAME as UNFREEZE_PERSON_MSG,
+    FRD.UNFREEZE_CAUSE,
+    frd.FREEZE_DATE,
+    frd.REMARK as FREEZE_CAUSE_MSG,
+    frd.FREEZE_NUM,
+    cu3.NAME as REVIEWS_USER_NAME,
+    frd.REVIEWS_DATE
+    FROM
+    A_FREEZE_REQUEST_DETAIL FRD
+    LEFT JOIN A_FREEZE_REQUEST FR
+    ON FRD.FREEZE_REQ_ID = FR.ID
+    LEFT JOIN A_AGENT AG
+    ON AG.ID = FRD.AGENT_ID
+    LEFT JOIN A_PLATFORM p
+    ON p.PLATFORM_NUM = frd.BUS_PLATFORM
+    LEFT JOIN C_USER CU ON frd.FREEZE_PERSON = cu.id
+    left join C_USER cu2 on frd.UNFREEZE_PERSON = cu2.ID
+    left join C_USER cu3 on frd.REVIEWS_USER = cu3.ID
+    <trim prefix="where" prefixOverrides="and | or">
+      <if test="map.id != null and map.id !=''">
+        fr.id = #{map.id}
+      </if>
+      <if test="map.reqType != null and map.reqType != ''">
+       and fr.req_type = #{map.reqType}
+      </if>
+      <if test="map.userId !=null and map.userId != '' ">
+        and (frd.BUS_PLATFORM in (
+        select e.PLATFORM_NUM from A_PLATFORM e
+        inner join c_resource a on ('AGENT_LIST_PLATFORM_'||e.PLATFORM_NUM ) = a.URL
+        left join c_role_resource b  on a.id=b.resource_id
+        left join c_role c on c.id=b.role_id
+        left join c_user_role d on d.role_id=c.id
+        <where>
+          <if test="map.userId != null and map.userId != ''">and d.user_id =#{map.userId} </if>
+        </where>
+        ) or frd.BUS_PLATFORM is null )
+      </if>
+    </trim>
+  </sql>
+  <select id="queryFreezeDetials"  parameterType="map" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="selectReqDetails"/>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+
+  <select id="queryFreezeDetialsCount"  parameterType="map" resultType="int">
+    select count(*)from (
+    <include refid="selectReqDetails"/>)
+  </select>
+</mapper>

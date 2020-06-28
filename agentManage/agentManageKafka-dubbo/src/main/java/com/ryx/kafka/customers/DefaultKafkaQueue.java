@@ -82,9 +82,9 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
 				kfkSendMessage.setStatus(Status.STATUS_4.status);
 			}
 			if(1==kfkSendMessageMapper.updateByPrimaryKeySelective(kfkSendMessage)){
-				LOG.info("接收到结算卡变更通知:{} {}",msg.topic(),key,"更新结果完成");
+				LOG.info("接收通知:{} {}",msg.topic(),key,"更新结果完成");
 			}else{
-				LOG.info("接收到结算卡变更通知:{} {}",msg.topic(),key,"更新结果失败");
+				LOG.info("接收通知:{} {}",msg.topic(),key,"更新结果失败");
 			}
 		}catch (Exception e){
 			e.printStackTrace();

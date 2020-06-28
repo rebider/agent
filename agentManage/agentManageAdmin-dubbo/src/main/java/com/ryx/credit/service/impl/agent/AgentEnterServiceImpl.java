@@ -1074,24 +1074,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             logger.info("代理商审批通过，代理商信息失败{}:{}", processingId, agent.getId());
             throw new ProcessException("代理商信息失败");
         }
-        //入网合同冻结
-        try {
-            AgentFreezePort agentFreezePort = new AgentFreezePort();
-            agentFreezePort.setAgentId(agent.getId());
-            agentFreezePort.setFreezeCause(FreeCause.HTDJ.getValue());
-            agentFreezePort.setOperationPerson(agent.getcUser());
-            agentFreezePort.setFreezeNum(agent.getId());
-            agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-            AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
-            if(!agentResult.isOK()){
-                throw new ProcessException(agentResult.getMsg());
-            }
-        } catch (MessageException e) {
-            e.printStackTrace();
-            throw new ProcessException(e.getMsg());
-        }
         //获取代理商有效的业务
         List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agent.getId(), null, AgStatus.Approving.status);
+        List<String> busList = new LinkedList<>();
         for (AgentBusInfo agentBusInfo : aginfo) {
             if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
                 agentBusInfo.setBusStatus(BusinessStatus.pause.status);
@@ -1103,8 +1088,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 logger.info("代理商审批通过，更新业务本信息失败{}:{}", processingId, agentBusInfo.getId());
                 throw new ProcessException("代理商审批通过，更新业务本信息失败");
             }
+            busList.add(agentBusInfo.getId());
         }
-
         //代理商有效新建的合同
         List<AgentContract> ag = agentContractService.queryAgentContract(agent.getId(), null, AgStatus.Approving.status);
         for (AgentContract contract : ag) {

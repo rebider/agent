@@ -12,6 +12,7 @@ import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.pojo.admin.vo.AgentFreezeVo;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,4 +55,17 @@ public interface AgentFreezeService {
     AgentResult queryAgentIdByFreezeNum(String agentId, String freeNum);
 
     List<Map> approvedVerify(Agent agent, AgentColinfoVo agentColinfoVo);
+
+    Map<String,Object> selectAgentFreeze(HashMap map)throws MessageException;
+
+    PageInfo agentFreezeListAll(AgentFreeze agentFreeze, Page page);
+
+    PageInfo agentFreezeListRegion(AgentFreeze agentFreeze, Page page);
+
+    AgentResult freezeNewBus(AgentFreezePort agentFreezePort);
+
+    AgentResult agentFreezeLocal(AgentFreezePort agentFreezePort)throws MessageException;
+
+    AgentResult agentUnFreezeLocal(AgentFreezePort agentFreezePort)throws MessageException;
+
 }
