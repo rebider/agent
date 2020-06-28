@@ -1160,6 +1160,9 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         }
         FreezeDetail cur = agentFreezePort.getCurLevel();
         FreezeDetail sub = agentFreezePort.getSubLevel();
+        if(cur==null && sub ==null){
+            return AgentResult.fail("至少选择一个冻结层级");
+        }
         if (cur!= null){
             Map curMap = TransformUnderlineUtils.transform(cur);
             //1:对比本级代理商
@@ -1187,29 +1190,38 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         switch (agentFreezePort.getFreezeCause()){
             case "FRFX": //分润返现
                 if (cur!= null){
-                    if ((cur.getProfitFreeze().compareTo(BigDecimal.ZERO)==0 &&  cur.getReflowFreeze().compareTo(BigDecimal.ZERO) ==0 )){
-                        return AgentResult.fail("分润与返现最少二选一");
+                    if (cur.getProfitFreeze() !=null && cur.getReflowFreeze() != null){
+                        if ((cur.getProfitFreeze().compareTo(BigDecimal.ZERO)==0 &&  cur.getReflowFreeze().compareTo(BigDecimal.ZERO) ==0 )){
+                            return AgentResult.fail("分润与返现最少二选一");
+                        }
                     }
-
-                    if (cur.getDailyFreeze().compareTo(BigDecimal.ZERO) == 0 && cur.getMonthlyFreeze().compareTo(BigDecimal.ZERO) == 0){
-                        return AgentResult.fail("日结与月结最少二选一");
+                    if (cur.getDailyFreeze()!=null && cur.getMonthlyFreeze()!=null){
+                        if (cur.getDailyFreeze().compareTo(BigDecimal.ZERO) == 0 && cur.getMonthlyFreeze().compareTo(BigDecimal.ZERO) == 0){
+                            return AgentResult.fail("日结与月结最少二选一");
+                        }
                     }
-
-                    if (cur.getStopProfitFreeze().compareTo(BigDecimal.ONE) == 0 && cur.getStopCount().compareTo(BigDecimal.ONE) == 0){
-                        return AgentResult.fail("停发与停算不可同时选择");
+                    if (cur.getStopProfitFreeze()!=null && cur.getStopCount()!=null){
+                        if (cur.getStopProfitFreeze().compareTo(BigDecimal.ONE) == 0 && cur.getStopCount().compareTo(BigDecimal.ONE) == 0){
+                            return AgentResult.fail("停发与停算不可同时选择");
+                        }
                     }
                 }
                 if (sub!= null){
-                    if ((sub.getProfitFreeze().compareTo(BigDecimal.ZERO)==0 &&  sub.getReflowFreeze().compareTo(BigDecimal.ZERO) ==0 )){
-                        return AgentResult.fail("分润与返现最少二选一");
+                    if (sub.getReflowFreeze()!=null && sub.getProfitFreeze()!=null){
+                        if ( (sub.getProfitFreeze().compareTo(BigDecimal.ZERO)==0 &&  sub.getReflowFreeze().compareTo(BigDecimal.ZERO) ==0 )){
+                            return AgentResult.fail("分润与返现最少二选一");
+                        }
+                    }
+                    if (sub.getDailyFreeze()!=null && sub.getMonthlyFreeze()!= null){
+                        if (sub.getDailyFreeze().compareTo(BigDecimal.ZERO) == 0 && sub.getMonthlyFreeze().compareTo(BigDecimal.ZERO) == 0){
+                            return AgentResult.fail("日结与月结最少二选一");
+                        }
                     }
 
-                    if (sub.getDailyFreeze().compareTo(BigDecimal.ZERO) == 0 && sub.getMonthlyFreeze().compareTo(BigDecimal.ZERO) == 0){
-                        return AgentResult.fail("日结与月结最少二选一");
-                    }
-
-                    if (sub.getStopProfitFreeze().compareTo(BigDecimal.ONE) == 0 && sub.getStopCount().compareTo(BigDecimal.ONE) == 0){
-                        return AgentResult.fail("停发与停算不可同时选择");
+                    if (sub.getStopProfitFreeze()!=null && sub.getStopCount()!=null){
+                        if (sub.getStopProfitFreeze().compareTo(BigDecimal.ONE) == 0 && sub.getStopCount().compareTo(BigDecimal.ONE) == 0){
+                            return AgentResult.fail("停发与停算不可同时选择");
+                        }
                     }
                 }
                 break;
