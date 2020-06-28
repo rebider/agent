@@ -635,6 +635,11 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 for (Map map : stringList) {
                     String agent_id = String.valueOf(map.get("agent_id"));
                     String str_remark = String.valueOf(map.get("str_remark"));
+                    List<AgentBusInfo> agentBusInfos = agentBusinfoService.queryAgentBusInfoFreeze(agent_id);
+                    List<String> businfoList = new LinkedList<>();
+                    for (AgentBusInfo busInfo : agentBusInfos) {
+                        businfoList.add(busInfo.getId());
+                    }
                     if (StringUtils.isNotBlank(str_remark)) {
                         String freeze_cause = FreeCause.XXQS.getValue();
                         BigDecimal freeze_type = FreeType.AGNET.code;
@@ -649,8 +654,11 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                             agentFreezePort.setFreezeNum(agent_id);
                             agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
                             agentFreezePort.setRemark(str_remark);
+                            agentFreezePort.setBusPlatform(businfoList);
+                            agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
                             AgentResult agentResult = agentFreeze(agentFreezePort);
                             if (!agentResult.isOK()) {
+                                log.info("批量冻结基本信息缺失代理商{},冻结失败:{}", agent_id, agentResult.getMsg());
                                 throw new ProcessException(agentResult.getMsg());
                             }
                         }

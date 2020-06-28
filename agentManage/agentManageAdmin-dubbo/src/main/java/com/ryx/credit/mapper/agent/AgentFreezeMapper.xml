@@ -485,34 +485,34 @@
         <if test="map.platfromPerm==null or map.platfromPerm.size==0">
           and  1=-1
         </if>
-        <if test="map.busFreeze != null and map.busFreeze != '' ">
+        <if test="map.busFreeze != null  ">
           and t.BUS_FREEZE = #{map.busFreeze}
         </if>
-        <if test="map.profitFreeze != null and map.profitFreeze != '' ">
+        <if test="map.profitFreeze != null  ">
           and t.PROFIT_FREEZE = #{map.profitFreeze}
         </if>
-        <if test="map.reflowFreeze != null and map.reflowFreeze != '' ">
+        <if test="map.reflowFreeze != null  ">
           and t.REFLOW_FREEZE = #{map.reflowFreeze}
         </if>
-        <if test="map.monthlyFreeze != null and map.monthlyFreeze != '' ">
+        <if test="map.monthlyFreeze != null  ">
           and t.MONTHLY_FREEZE = #{map.monthlyFreeze}
         </if>
-        <if test="map.dailyFreeze != null and map.dailyFreeze != '' ">
+        <if test="map.dailyFreeze != null ">
           and t.DAILY_FREEZE = #{map.dailyFreeze}
         </if>
-        <if test="map.stopProfitFreeze != null and map.stopProfitFreeze != '' ">
+        <if test="map.stopProfitFreeze != null ">
           and t.STOP_PROFIT_FREEZE = #{map.stopProfitFreeze}
         </if>
-        <if test="map.cashFreeze != null and map.cashFreeze != '' ">
+        <if test="map.cashFreeze != null ">
           and t.CASH_FREEZE = #{map.cashFreeze}
         </if>
-        <if test="map.stopCount != null and map.stopCount != '' ">
+        <if test="map.stopCount != null ">
           and t.STOP_COUNT = #{map.stopCount}
         </if>
-        <if test="map.busPlatform != null and map.busPlatform != '' ">
+        <if test="map.busPlatform != null  ">
           and t.BUS_PLATFORM = #{map.busPlatform}
         </if>
-        <if test="map.freezeType != null and map.freezeType != '' ">
+        <if test="map.freezeType != null  ">
           and t.FREEZE_TYPE = #{map.freezeType}
         </if>
       </where>
@@ -685,34 +685,34 @@
       <if test="map.userId != null and map.userId != '' ">
         and t.freeze_person = #{map.userId,jdbcType=VARCHAR}
       </if>
-      <if test="map.busFreeze != null and map.busFreeze != '' ">
+      <if test="map.busFreeze != null  ">
         and t.BUS_FREEZE = #{map.busFreeze}
       </if>
-      <if test="map.profitFreeze != null and map.profitFreeze != '' ">
+      <if test="map.profitFreeze != null  ">
         and t.PROFIT_FREEZE = #{map.profitFreeze}
       </if>
-      <if test="map.reflowFreeze != null and map.reflowFreeze != '' ">
+      <if test="map.reflowFreeze != null  ">
         and t.REFLOW_FREEZE = #{map.reflowFreeze}
       </if>
-      <if test="map.monthlyFreeze != null and map.monthlyFreeze != '' ">
+      <if test="map.monthlyFreeze != null  ">
         and t.MONTHLY_FREEZE = #{map.monthlyFreeze}
       </if>
-      <if test="map.dailyFreeze != null and map.dailyFreeze != '' ">
+      <if test="map.dailyFreeze != null  ">
         and t.DAILY_FREEZE = #{map.dailyFreeze}
       </if>
-      <if test="map.stopProfitFreeze != null and map.stopProfitFreeze != '' ">
+      <if test="map.stopProfitFreeze != null  ">
         and t.STOP_PROFIT_FREEZE = #{map.stopProfitFreeze}
       </if>
-      <if test="map.cashFreeze != null and map.cashFreeze != '' ">
+      <if test="map.cashFreeze != null  ">
         and t.CASH_FREEZE = #{map.cashFreeze}
       </if>
-      <if test="map.stopCount != null and map.stopCount != '' ">
+      <if test="map.stopCount != null  ">
         and t.STOP_COUNT = #{map.stopCount}
       </if>
-      <if test="map.busPlatform != null and map.busPlatform != '' ">
+      <if test="map.busPlatform != null  ">
         and t.BUS_PLATFORM = #{map.busPlatform}
       </if>
-      <if test="map.freezeType != null and map.freezeType != '' ">
+      <if test="map.freezeType != null ">
         and t.FREEZE_TYPE = #{map.freezeType}
       </if>
     </where>
@@ -785,34 +785,34 @@
       <if test="map.platfromPerm==null or map.platfromPerm.size==0">
         and  1=-1
       </if>
-      <if test="map.busFreeze != null and map.busFreeze != '' ">
+      <if test="map.busFreeze != null  ">
         and t.BUS_FREEZE = #{map.busFreeze}
       </if>
-      <if test="map.profitFreeze != null and map.profitFreeze != '' ">
+      <if test="map.profitFreeze != null  ">
         and t.PROFIT_FREEZE = #{map.profitFreeze}
       </if>
-      <if test="map.reflowFreeze != null and map.reflowFreeze != '' ">
+      <if test="map.reflowFreeze != null  ">
         and t.REFLOW_FREEZE = #{map.reflowFreeze}
       </if>
-      <if test="map.monthlyFreeze != null and map.monthlyFreeze != '' ">
+      <if test="map.monthlyFreeze != null  ">
         and t.MONTHLY_FREEZE = #{map.monthlyFreeze}
       </if>
-      <if test="map.dailyFreeze != null and map.dailyFreeze != '' ">
+      <if test="map.dailyFreeze != null  ">
         and t.DAILY_FREEZE = #{map.dailyFreeze}
       </if>
-      <if test="map.stopProfitFreeze != null and map.stopProfitFreeze != '' ">
+      <if test="map.stopProfitFreeze != null  ">
         and t.STOP_PROFIT_FREEZE = #{map.stopProfitFreeze}
       </if>
-      <if test="map.cashFreeze != null and map.cashFreeze != '' ">
+      <if test="map.cashFreeze != null  ">
         and t.CASH_FREEZE = #{map.cashFreeze}
       </if>
-      <if test="map.stopCount != null and map.stopCount != '' ">
+      <if test="map.stopCount != null  ">
         and t.STOP_COUNT = #{map.stopCount}
       </if>
-      <if test="map.busPlatform != null and map.busPlatform != '' ">
+      <if test="map.busPlatform != null  ">
           and t.BUS_PLATFORM = #{map.busPlatform}
         </if>
-      <if test="map.freezeType != null and map.freezeType != '' ">
+      <if test="map.freezeType != null  ">
         and t.FREEZE_TYPE = #{map.freezeType}
       </if>
     </where>
@@ -884,34 +884,34 @@
       <if test="map.freezeStatus != null and map.freezeStatus != '' ">
         and t.freeze_Status = #{map.freezeStatus,jdbcType=VARCHAR}
       </if>
-      <if test="map.busFreeze != null and map.busFreeze != '' ">
+      <if test="map.busFreeze != null  ">
         and t.BUS_FREEZE = #{map.busFreeze}
       </if>
-      <if test="map.profitFreeze != null and map.profitFreeze != '' ">
+      <if test="map.profitFreeze != null  ">
         and t.PROFIT_FREEZE = #{map.profitFreeze}
       </if>
-      <if test="map.reflowFreeze != null and map.reflowFreeze != '' ">
+      <if test="map.reflowFreeze != null">
         and t.REFLOW_FREEZE = #{map.reflowFreeze}
       </if>
-      <if test="map.monthlyFreeze != null and map.monthlyFreeze != '' ">
+      <if test="map.monthlyFreeze != null  ">
         and t.MONTHLY_FREEZE = #{map.monthlyFreeze}
       </if>
-      <if test="map.dailyFreeze != null and map.dailyFreeze != '' ">
+      <if test="map.dailyFreeze != null  ">
         and t.DAILY_FREEZE = #{map.dailyFreeze}
       </if>
-      <if test="map.stopProfitFreeze != null and map.stopProfitFreeze != '' ">
+      <if test="map.stopProfitFreeze != null  ">
         and t.STOP_PROFIT_FREEZE = #{map.stopProfitFreeze}
       </if>
-      <if test="map.cashFreeze != null and map.cashFreeze != '' ">
+      <if test="map.cashFreeze != null  ">
         and t.CASH_FREEZE = #{map.cashFreeze}
       </if>
-      <if test="map.stopCount != null and map.stopCount != '' ">
+      <if test="map.stopCount != null  ">
         and t.STOP_COUNT = #{map.stopCount}
       </if>
-      <if test="map.busPlatform != null and map.busPlatform != '' ">
+      <if test="map.busPlatform != null  ">
         and t.BUS_PLATFORM = #{map.busPlatform}
       </if>
-      <if test="map.freezeType != null and map.freezeType != '' ">
+      <if test="map.freezeType != null ">
         and t.FREEZE_TYPE = #{map.freezeType}
       </if>
       </where>
