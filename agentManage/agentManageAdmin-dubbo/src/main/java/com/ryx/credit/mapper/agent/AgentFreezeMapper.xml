@@ -512,6 +512,9 @@
         <if test="map.busPlatform != null and map.busPlatform != '' ">
           and t.BUS_PLATFORM = #{map.busPlatform}
         </if>
+        <if test="map.freezeType != null and map.freezeType != '' ">
+          and t.FREEZE_TYPE = #{map.freezeType}
+        </if>
       </where>
       order by t.agent_id,t.freeze_date desc
   </sql>
@@ -709,6 +712,9 @@
       <if test="map.busPlatform != null and map.busPlatform != '' ">
         and t.BUS_PLATFORM = #{map.busPlatform}
       </if>
+      <if test="map.freezeType != null and map.freezeType != '' ">
+        and t.FREEZE_TYPE = #{map.freezeType}
+      </if>
     </where>
     union
     select t.ID,t.AGENT_ID,t.FREEZE_STATUS,t.FREEZE_PERSON,
@@ -806,6 +812,9 @@
       <if test="map.busPlatform != null and map.busPlatform != '' ">
           and t.BUS_PLATFORM = #{map.busPlatform}
         </if>
+      <if test="map.freezeType != null and map.freezeType != '' ">
+        and t.FREEZE_TYPE = #{map.freezeType}
+      </if>
     </where>
     ) t
     order by t.agent_id,t.freeze_date desc
@@ -901,6 +910,9 @@
       </if>
       <if test="map.busPlatform != null and map.busPlatform != '' ">
         and t.BUS_PLATFORM = #{map.busPlatform}
+      </if>
+      <if test="map.freezeType != null and map.freezeType != '' ">
+        and t.FREEZE_TYPE = #{map.freezeType}
       </if>
       </where>
     order by t.agent_id,t.freeze_date desc

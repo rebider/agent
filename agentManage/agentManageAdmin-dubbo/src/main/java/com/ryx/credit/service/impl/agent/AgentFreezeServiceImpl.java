@@ -150,6 +150,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getBusPlatform()))){
             reqMap.put("busPlatform",agentFreeze.getBusPlatform());
         }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getFreezeType()))){
+            reqMap.put("freezeType",agentFreeze.getFreezeType());
+        }
         Map<String, Object> stringObjectMap = orgCodeRes.get(0);
         String orgId = String.valueOf(stringObjectMap.get("ORGID"));
         String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
@@ -978,6 +981,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getBusPlatform()))){
             reqMap.put("busPlatform",agentFreeze.getBusPlatform());
         }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getFreezeType()))){
+            reqMap.put("freezeType",agentFreeze.getFreezeType());
+        }
         List<Map<String, String>> resultMaps = agentFreezeMapper.queryAgentFreezeAll(reqMap,page);
         for (Map<String, String> resultMap : resultMaps) {
             resultMap.put("FREESTATUS_MSG",FreeStatus.getContentByValue(new BigDecimal(resultMap.get("FREESTATUS"))));
@@ -1087,6 +1093,9 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         }
         if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getBusPlatform()))){
             reqMap.put("busPlatform",agentFreeze.getBusPlatform());
+        }
+        if(StringUtils.isNotBlank(String.valueOf(agentFreeze.getFreezeType()))){
+            reqMap.put("freezeType",agentFreeze.getFreezeType());
         }
         Map<String, Object> stringObjectMap = orgCodeRes.get(0);
         String orgId = String.valueOf(stringObjectMap.get("ORGID"));
