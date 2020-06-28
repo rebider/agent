@@ -136,5 +136,5 @@ public interface AgentBusInfoMapper {
 
     List<Map<String, Object>> queryRegionByAccount(Map<String,Object> map);
 
-    List<Map<String,Object>> queryFreezeBusInfo(Map<String,Object> reqMap);
+    List<Map<String,Object>> queryFreezeBusInfo(@Param("map") Map<String,Object> reqMap);
 }

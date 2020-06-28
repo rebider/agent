@@ -1492,10 +1492,24 @@ union
     left join C_ORGANIZATION ob on ob.id=a.AG_DOC_DISTRICT
     <where>
       a.status=1 and b.status=1 and (a.bus_status=1 or a.bus_status=2 or a.bus_status=0 or a.bus_status=3) and a.CLO_REVIEW_STATUS = 3 and a.BUS_NUM is not null
-      <if test="id!=null and id!=''"> and a.id=#{id}</if>
-      <if test="busPlatform!=null and busPlatform!=''">and a.bus_platform =#{busPlatform}</if>
-      <if test="agentId!=null and agentId!=''">and a.agent_id = #{agentId}</if>
-      <if test="busParent!=null and busParent!=''">and a.bus_parent= #{busParent}</if>
+      <if test="map.agentId!=null and map.agentId!=''">and a.agent_id = #{map.agentId}</if>
+      <if test="map.platfromPerm!=null and map.platfromPerm.size>0">
+        and EXISTS(
+        select A_AGENT_BUSINFO.ID from A_AGENT_BUSINFO
+        left join C_ORGANIZATION oa on oa.id=A_AGENT_BUSINFO.ag_doc_pro
+        left join C_ORGANIZATION ob on ob.id=A_AGENT_BUSINFO.AG_DOC_DISTRICT
+        where b.id=A_AGENT_BUSINFO.AGENT_ID and A_AGENT_BUSINFO.BUS_PLATFORM in
+        <foreach collection="map.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+          #{platfromPermItem.PLATFORM_NUM}
+        </foreach>
+        )
+      </if>
+      <if test="map.organizationCode!=null and map.organizationCode!=''">
+        and (oa.CODE like concat(#{map.organizationCode},'%') or ob.CODE like concat(#{map.organizationCode},'%') )
+      </if>
+      <if test="map.platfromPerm==null or map.platfromPerm.size==0">
+        and  1=-1
+      </if>
     </where>
   </select>
 </mapper>
