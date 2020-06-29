@@ -543,9 +543,9 @@ public class RDBPosTermMachineServiceImpl implements TermMachineService {
     public AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
         try {
             String httpString = JSONObject.toJSONString(pamMap);
-            logger.info("手刷换活动失败重新发送参数:{},{}", AppConfig.getProperty("rdbpos.retry"), httpString);
+            logger.info("瑞大宝换活动失败重新发送参数:{},{}", AppConfig.getProperty("rdbpos.retry"), httpString);
             String retString = HttpClientUtil.doPostJson(AppConfig.getProperty("rdbpos.retry"), httpString);
-            logger.info("手刷换活动失败重新发送返回值:{}", retString);
+            logger.info("瑞大宝换活动失败重新发送返回值:{}", retString);
 
             //验证返回值
             if (!StringUtils.isNotBlank(retString)) return AgentResult.fail("瑞大宝换活动失败重新发送，返回值为空。");
