@@ -64,9 +64,9 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
             //汇总冻结表的数据
             List<AgentFreeze> agentFreeList = agentFreezeMapper.queryFreeByAgentId(agentFreeze.getAgentId());
             logger.info("冻结数据查询结果{}",agentFreeList != null && !agentFreeList.isEmpty() ?agentFreeList.size() :0);
+            //删除原有数据
+            agentBusinfoFreezeMapper.deleteByAgentId(agentFreeze.getAgentId());
             if(null!=agentFreeList && agentFreeList.size()>0){
-                //删除原有数据
-                agentBusinfoFreezeMapper.deleteByAgentId(agentFreeze.getAgentId());
                 for (AgentFreeze freeze : agentFreeList) {
                     AgentBusinfoFreeze agentBusinfoFreeze = new AgentBusinfoFreeze();
                     agentBusinfoFreeze.setId(idService.genAbFreezeId(TabId.a_agent_businfofreeze,Integer.valueOf(userId)));
