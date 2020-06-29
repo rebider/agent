@@ -1307,7 +1307,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	@Override
 	public List<Map> agentBusByDict(FastMap reqMap) {
-		if(reqMap.get("dictItem").equals("DLS")){
+		List<Dict> listDict = dictOptionsService.dictList("JOB","OTHER");
+		Dict other = listDict.get(0);
+		String otherPlat = other.getdItemvalue();
+		if(otherPlat.contains((String)reqMap.get("dictItem"))){
 			reqMap.putKeyV("dictItem",null);
 		}
 		List<Map> data = agentBusInfoMapper.queryTreeByBusInfoAndDict(reqMap);
