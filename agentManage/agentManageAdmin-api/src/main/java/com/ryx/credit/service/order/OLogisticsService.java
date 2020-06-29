@@ -71,22 +71,4 @@ public interface OLogisticsService {
      * @throws Exception
      */
     AgentResult updateByIdSnInfo(String logsDetailId, String userId) throws Exception;
-
-    /**
-     * 处理上传的物流明细
-     * @param data
-     * @param user
-     * @return
-     * @throws Exception
-     */
-    List<String> upLogisticsDetailList(List<List<Object>> data, String user)throws Exception;
-
-    /**
-     * 单条物流明细上传处理
-     * @param data
-     * @param user
-     * @return
-     * @throws Exception
-     */
-    AgentResult upLogisticsDetailListItem(List<Object> data, String user) throws MessageException;
 }
