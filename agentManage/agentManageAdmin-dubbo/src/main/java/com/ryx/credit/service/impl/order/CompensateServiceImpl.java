@@ -1456,8 +1456,9 @@ public class CompensateServiceImpl implements CompensateService {
                 throw new MessageException("换活动抵扣欠款取消失败!id"+oRefundPriceDiff.getId());
             }
             //审批拒绝，解锁业务系统sn
-            AgentResult unFreezeRes = termMachineService.unFreezeCompensate(FastMap.fastMap("taskId", oRefundPriceDiffDetails.get(0).getRefundPriceDiffId()), oRefundPriceDiffDetails.get(0).getPlatformType());
-            if (!unFreezeRes.isOK()) throw new MessageException(unFreezeRes.getMsg());
+            /*AgentResult unFreezeRes = termMachineService.unFreezeCompensate(FastMap.fastMap("taskId", oRefundPriceDiffDetails.get(0).getRefundPriceDiffId()), oRefundPriceDiffDetails.get(0).getPlatformType());
+            if (!unFreezeRes.isOK()) throw new MessageException(unFreezeRes.getMsg());*/
+            termMachineService.unFreezeCompensate(FastMap.fastMap("taskId", oRefundPriceDiffDetails.get(0).getRefundPriceDiffId()), oRefundPriceDiffDetails.get(0).getPlatformType());
         }else if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
             oRefundPriceDiffDetails.forEach(row->{
                 try {
