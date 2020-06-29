@@ -999,7 +999,6 @@ public class CompensateServiceImpl implements CompensateService {
                         }
                     }
                 }
-                if (agentVo.getFlag().equals("2")) startCompensateActiviy(priceDiffId, cUser);
             }catch (Exception e) {
                 termMachineService.unFreezeCompensate(FastMap.fastMap("taskId", refundPriceDiffDetailList.get(0).getRefundPriceDiffId()), refundPriceDiffDetailList.get(0).getPlatformType());
                 log.info("换活动解冻异常:{}", e.getMessage());
