@@ -367,7 +367,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws ProcessException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("operation", operation);
         jsonObject.put("isFreeze", "0");
@@ -477,7 +477,8 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
+    public AgentResult queryCompensateResult(Map<String, Object> map, String platformType) throws Exception {
+        String serialNumber = map.get("serialNumber").toString();
         JSONObject data = new JSONObject();
         data.put("serialNumber", serialNumber);
         log.info("实时POS活动调整结果查询请求参数：{}", JSONObject.toJSONString(data));
@@ -619,6 +620,16 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     @Override
     public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
         return null;
+    }
+
+    @Override
+    public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        return AgentResult.ok();
+    }
+
+    @Override
+    public AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        return AgentResult.fail("实时POS平台暂不支持重新发送！");
     }
 
     @Override
