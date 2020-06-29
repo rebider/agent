@@ -495,7 +495,7 @@
   <sql id="queryMyTaskWhereCity" >
     <if test="params.group!=null and params.group!=''">
       <!--省区任务查询-->
-      and (
+    and (
         (
           ri.group_id_='city'
           and (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%'))
