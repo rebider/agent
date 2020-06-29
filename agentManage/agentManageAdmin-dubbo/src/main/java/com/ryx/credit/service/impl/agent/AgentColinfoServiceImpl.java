@@ -5,6 +5,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
@@ -807,4 +808,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         return AgentResult.ok();
     }
 
+
+    @Override
+    public FastMap notifyCardChange(String key, String msg) throws Exception {
+        return null;
+    }
 }

@@ -617,6 +617,7 @@
       <if test="map.id!=null and map.id!=''">and jo.id = #{map.id} </if>
       <if test="map.joFirstKeyNum!=null and map.joFirstKeyNum!=''"> and jo.jo_first_key_num = #{map.joFirstKeyNum} </if>
       <if test="map.joSecondKeyNum!=null and map.joSecondKeyNum!=''"> and jo.jo_second_key_num like CONCAT(CONCAT('%',#{map.joSecondKeyNum}),'%') </if>
+      <if test="map.agId!=null and map.agId!=''"> and jo.ag_id = #{map.agId} </if>
       <if test="map.agName!=null and map.agName!=''"> and jo.ag_name like CONCAT(CONCAT('%',#{map.agName}),'%') </if>
       <if test="map.busNum!=null and map.busNum!=''"> and jo.bus_num like CONCAT(CONCAT('%',#{map.busNum}),'%') </if>
       <if test="map.priorityLevel!=null and map.priorityLevel!=''"> and jo.priority_level = #{map.priorityLevel} </if>

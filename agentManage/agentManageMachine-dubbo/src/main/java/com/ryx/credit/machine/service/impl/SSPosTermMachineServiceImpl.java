@@ -620,4 +620,9 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     public AgentResult queryLogisticsResult(Map<String, Object> pamMap, String platformType) throws Exception {
         return null;
     }
+
+    @Override
+    public AgentResult agentFNoorbidde(List<String> pamMap, String platformType) throws Exception {
+        return null;
+    }
 }

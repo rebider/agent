@@ -2,6 +2,7 @@ package com.ryx.credit.common.util;
 
 import java.util.Date;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * 各种id生成策略
@@ -68,5 +69,7 @@ public class IDUtils {
 	public static String getBatchNo(){
 		return "TD"+genTimeMillisId();
 	}
+
+	public static String genUUID(){return UUID.randomUUID().toString().replace("-","");}
 
 }

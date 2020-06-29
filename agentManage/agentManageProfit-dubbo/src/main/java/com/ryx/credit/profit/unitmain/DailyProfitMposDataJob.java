@@ -55,7 +55,7 @@ public class DailyProfitMposDataJob {
      * 分润月份（空则为当前日期上2天）yyyymmdd
      * 每日凌晨5点：@Scheduled(cron = "0 0 5 * * ?")
      */
-    @Scheduled(cron = "${shoushua_rijie_job_cron}")
+    /*@Scheduled(cron = "${shoushua_rijie_job_cron}")*/
     public void doCron() {
         if (!"preproduction".equals(environment)){
             String profitDay = DateUtil.sdfDays.format(DateUtil.addDay(new Date(), -2));

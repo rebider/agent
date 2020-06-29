@@ -298,4 +298,18 @@ public class TermMachineServiceImpl  implements TermMachineService {
             return AgentResult.fail("未实现的物流平台。");
         }
     }
+
+    @Override
+    public AgentResult agentFNoorbidde(List<String> pamMap, String platformType) throws Exception {
+        AgentResult agentResult=null;
+        logger.info("本次联动查询结果类型为:{}",platformType);
+        if(String.valueOf(TerminalPlatformType.POS.getValue()).equals(platformType)||String.valueOf(TerminalPlatformType.ZHPOS.getValue()).equals(platformType)){//pos
+            agentResult =  posTermMachineServiceImpl.agentFNoorbidde(pamMap,platformType);
+        }else if(String.valueOf(TerminalPlatformType.MPOS.getValue()).equals(platformType)){//手刷
+
+        }else if(String.valueOf(TerminalPlatformType.RDBPOS.getValue()).equals(platformType)){//瑞大宝
+
+        }
+        return agentResult;
+    }
 }
