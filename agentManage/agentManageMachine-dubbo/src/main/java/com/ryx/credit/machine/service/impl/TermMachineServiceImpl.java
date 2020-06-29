@@ -272,32 +272,34 @@ public class TermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws ProcessException {
         String platformType = refundPriceDiffDetailList.get(0).getPlatformType();
         if (PlatformType.whetherPOS(platformType)) {
-            return posTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation);
+            return posTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation, isFreeze);
         } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
-            return sPosTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation);
+            return sPosTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation, isFreeze);
         } else if (PlatformType.MPOS.getValue().equals(platformType)) {
-            return mposTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation);
+            return mposTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation, isFreeze);
         } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
-            return rdbTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation);
+            return rdbTermMachineServiceImpl.synOrVerifyCompensate(refundPriceDiffDetailList, operation, isFreeze);
         } else {
             return AgentResult.fail(platformType + "平台活动调整功能未实现");
         }
     }
 
     @Override
-    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
+    public AgentResult queryCompensateResult(Map<String, Object> map, String platformType) throws Exception {
         AgentResult agentResult = AgentResult.fail();
         if(PlatformType.whetherPOS(platformType)){
-            agentResult =  posTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
+            agentResult =  posTermMachineServiceImpl.queryCompensateResult(map,platformType);
         }else if(PlatformType.SSPOS.getValue().equals(platformType)){
-            agentResult =  sPosTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
+            agentResult =  sPosTermMachineServiceImpl.queryCompensateResult(map,platformType);
         }else if(PlatformType.MPOS.getValue().equals(platformType)){
-            agentResult =  mposTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
+            agentResult =  mposTermMachineServiceImpl.queryCompensateResult(map,platformType);
         }else if(PlatformType.RDBPOS.getValue().equals(platformType)){
-            agentResult =  rdbTermMachineServiceImpl.queryCompensateResult(serialNumber,platformType);
+            agentResult =  rdbTermMachineServiceImpl.queryCompensateResult(map,platformType);
+        }else if(PlatformType.RJPOS.getValue().equals(platformType)){
+            agentResult =  rjTermMachineServiceImpl.queryCompensateResult(map,platformType);
         }else {
             //未调整
             return AgentResult.ok("04");
@@ -360,6 +362,38 @@ public class TermMachineServiceImpl implements TermMachineService {
             return rdbTermMachineServiceImpl.queryLogisticsResult(pamMap, platformType);
         } else {
             return AgentResult.fail("未实现的物流平台。");
+        }
+    }
+
+    @Override
+    public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        logger.info("业务平台解锁SN：{},{}", pamMap, platformType);
+        if (PlatformType.whetherPOS(platformType)) {
+            return posTermMachineServiceImpl.unFreezeCompensate(pamMap, platformType);
+        } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
+            return sPosTermMachineServiceImpl.unFreezeCompensate(pamMap, platformType);
+        } else if (PlatformType.MPOS.getValue().equals(platformType)) {
+            return mposTermMachineServiceImpl.unFreezeCompensate(pamMap, platformType);
+        } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
+            return rdbTermMachineServiceImpl.unFreezeCompensate(pamMap, platformType);
+        } else {
+            return AgentResult.ok();
+        }
+    }
+
+    @Override
+    public AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        logger.info("活动调整，重新发送失败的SN：{},{}", pamMap, platformType);
+        if (PlatformType.whetherPOS(platformType)) {
+            return posTermMachineServiceImpl.resendFailedCompensate(pamMap, platformType);
+        } else if (PlatformType.SSPOS.getValue().equals(platformType)) {
+            return sPosTermMachineServiceImpl.resendFailedCompensate(pamMap, platformType);
+        } else if (PlatformType.MPOS.getValue().equals(platformType)) {
+            return mposTermMachineServiceImpl.resendFailedCompensate(pamMap, platformType);
+        } else if (PlatformType.RDBPOS.getValue().equals(platformType)) {
+            return rdbTermMachineServiceImpl.resendFailedCompensate(pamMap, platformType);
+        } else {
+            return AgentResult.fail("平台有误，请再次发送！");
         }
     }
 

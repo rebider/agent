@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 /**
- * 作者：zyd
+ * 作者：zhaoyd
  * 时间：2019/10/18
  * 描述：瑞+平台接口
  */
@@ -209,6 +209,41 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
+    public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        return AgentResult.ok();
+    }
+
+    @Override
+    public AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        return AgentResult.fail("瑞+平台暂不支持重新发送！");
+        /*try {
+            String httpString = JSONObject.toJSONString(pamMap);
+            logger.info("手刷换活动失败重新发送参数:{},{}", AppConfig.getProperty("mpos.termUnlock"), httpString);
+            String retString = HttpClientUtil.doPostJson(AppConfig.getProperty("mpos.termUnlock"), httpString);
+            logger.info("手刷换活动失败重新发送返回值:{}", retString);
+
+            //验证返回值
+            if (!StringUtils.isNotBlank(retString)) return AgentResult.fail("手刷换活动失败重新发送，返回值为空。");
+            JSONObject resJson = JSONObject.parseObject(retString);
+
+            //返回最终查询结果
+            if (null != resJson.getString("code") && resJson.getString("code").equals("00")) {
+                //可以更换活动，封装参参数返回
+                return AgentResult.ok(resJson.get("result"));
+            } else if (null != resJson.getString("code") && resJson.getString("code").equals("9999") && null != resJson.getString("msg")) {
+                //不可以更换活动
+                return AgentResult.fail(resJson.getString("msg") + "，不可以更换活动！");
+            } else {
+                //异常结果
+                return AgentResult.fail("查询手刷换活动返回值异常！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }*/
+    }
+
+    @Override
     public AgentResult agentFNoorbidde(List<String> pamMap, String platformType) throws Exception {
         return null;
     }
@@ -333,13 +368,13 @@ public class RJPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
-        return null;
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws ProcessException {
+        return AgentResult.ok();
     }
 
     @Override
-    public AgentResult queryCompensateResult(String serialNumber, String platformType) throws Exception {
-        return null;
+    public AgentResult queryCompensateResult(Map<String, Object> map, String platformType) throws Exception {
+        return AgentResult.ok("04");
     }
 
     @Override
