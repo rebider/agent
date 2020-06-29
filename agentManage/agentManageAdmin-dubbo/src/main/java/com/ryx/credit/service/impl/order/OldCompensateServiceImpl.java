@@ -477,7 +477,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             }
 
             //校验是否可以调整
-            AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check", "0");
+            AgentResult synOrVerifyResult = termMachineService.synOrVerifyCompensate(refundPriceDiffDetailList, "check", "1");
             if(!synOrVerifyResult.isOK()){
                 throw new ProcessException(synOrVerifyResult.getMsg());
             }
