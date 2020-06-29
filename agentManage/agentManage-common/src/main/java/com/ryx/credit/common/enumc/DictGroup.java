@@ -122,7 +122,12 @@ public enum DictGroup {
     JOBORDER("工单模块"),
     JOKEYTYPE("关键词类型"),
     APPROVAL_OPINION("订单审批意见"),
-    ACTIVITY_ADJUST("活动调整已付允许划拨品牌");
+    ACTIVITY_ADJUST("活动调整已付允许划拨品牌"),
+    DATA_CHANGE("代理商数据变更申请"),
+    MARKET_ONE("市场部审批参数一"),
+    MARKET_TWO("市场部审批参数二"),
+    AMEND_STATUS("修改状态");
+
 
 
 

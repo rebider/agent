@@ -846,7 +846,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     reqMap.put("party", "north");
                 }
             }
-
+            if (agentVo.getApprovalResult().equals(ApprovalType.REJECT.getValue())) {
+                reqMap.put("rejectCount", "1");
+            }
             Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
             Boolean rs = (Boolean) resultMap.get("rs");
             String msg = String.valueOf(resultMap.get("msg"));

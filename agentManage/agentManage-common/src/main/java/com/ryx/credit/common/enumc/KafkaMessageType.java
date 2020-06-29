@@ -7,6 +7,7 @@ package com.ryx.credit.common.enumc;
  */
 public enum KafkaMessageType {
     PAYMENT("PAYMENT","付款信息"),
+    FREEZE("FREEZE","冻结信息"),
     CARD("CARD","结算卡信息");
 
     public String code;

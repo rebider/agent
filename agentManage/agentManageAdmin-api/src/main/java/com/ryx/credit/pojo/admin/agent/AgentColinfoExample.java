@@ -1587,6 +1587,135 @@ public class AgentColinfoExample {
             addCriterion("AG_LEGAL_CERNUM not between", value1, value2, "agLegalCernum");
             return (Criteria) this;
         }
+        public Criteria andUnusualExplainIsNull() {
+            addCriterion("UNUSUAL_EXPLAIN is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainIsNotNull() {
+            addCriterion("UNUSUAL_EXPLAIN is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainEqualTo(String value) {
+            addCriterion("UNUSUAL_EXPLAIN =", value, "unusualExplain");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainNotEqualTo(String value) {
+            addCriterion("UNUSUAL_EXPLAIN <>", value, "unusualExplain");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainGreaterThan(String value) {
+            addCriterion("UNUSUAL_EXPLAIN >", value, "unusualExplain");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainGreaterThanOrEqualTo(String value) {
+            addCriterion("UNUSUAL_EXPLAIN >=", value, "unusualExplain");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainLessThan(String value) {
+            addCriterion("UNUSUAL_EXPLAIN <", value, "unusualExplain");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainLessThanOrEqualTo(String value) {
+            addCriterion("UNUSUAL_EXPLAIN <=", value, "unusualExplain");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainLike(String value) {
+            addCriterion("UNUSUAL_EXPLAIN like", value, "unusualExplain");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainNotLike(String value) {
+            addCriterion("UNUSUAL_EXPLAIN not like", value, "unusualExplain");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainIn(List<String> values) {
+            addCriterion("UNUSUAL_EXPLAIN in", values, "unusualExplain");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainNotIn(List<String> values) {
+            addCriterion("UNUSUAL_EXPLAIN not in", values, "unusualExplain");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainBetween(String value1, String value2) {
+            addCriterion("UNUSUAL_EXPLAIN between", value1, value2, "unusualExplain");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnusualExplainNotBetween(String value1, String value2) {
+            addCriterion("UNUSUAL_EXPLAIN not between", value1, value2, "unusualExplain");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmendStatusIsNull() {
+            addCriterion("AMEND_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmendStatusIsNotNull() {
+            addCriterion("AMEND_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmendStatusEqualTo(BigDecimal value) {
+            addCriterion("AMEND_STATUS =", value, "amendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmendStatusNotEqualTo(BigDecimal value) {
+            addCriterion("AMEND_STATUS <>", value, "amendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmendStatusGreaterThan(BigDecimal value) {
+            addCriterion("AMEND_STATUS >", value, "amendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmendStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("AMEND_STATUS >=", value, "amendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmendStatusLessThan(BigDecimal value) {
+            addCriterion("AMEND_STATUS <", value, "amendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmendStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("AMEND_STATUS <=", value, "amendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmendStatusIn(List<BigDecimal> values) {
+            addCriterion("AMEND_STATUS in", values, "amendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmendStatusNotIn(List<BigDecimal> values) {
+            addCriterion("AMEND_STATUS not in", values, "amendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmendStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("AMEND_STATUS between", value1, value2, "amendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmendStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("AMEND_STATUS not between", value1, value2, "amendStatus");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

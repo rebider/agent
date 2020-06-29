@@ -30,4 +30,8 @@ public interface DateChangeRequestMapper {
     int queryDataCount(@Param("map")Map<String, Object> map);
 
     List<Map<String,Object>> exportDcColinfo(@Param("map") Map map);
+
+    Long serchDataChangeReqByAgCount(Map<String, Object> param);
+
+    List<Map<String,Object>> serchDataChangeReqByAgList(Map<String, Object> param);
 }

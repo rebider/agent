@@ -39,4 +39,6 @@ public interface AgentColinfoMapper {
      * @return
      */
     AgentColinfo selectByAgentId(String agentId);
+
+    List<AgentColinfo> queryByAgentId(String agentId);
 }

@@ -360,30 +360,82 @@
 
 
   <sql id="queryMyTaskField" >
-      rt.ID_,rt.NAME_,br.ACTIV_ID, br.BUS_ID, br.BUS_TYPE, to_char(br.C_TIME, 'yyyy-mm-dd hh24:mi:ss') C_TIME,
-      br.C_USER,br.ACTIV_STATUS, br.STATUS,ri.group_id_, br.agent_id,br.agent_name,br.net_in_bus_type, rt.create_time_ as create_time,br.ag_doc_pro,br.ag_doc_district
-      ,nvl(plat.PLATFORM_NAME,0) PLATFORM_NAME,c.NAME AS C_NAME,br.EXPLAIN
+    rt.ID_,
+    rt.NAME_,
+    br.ACTIV_ID,
+    br.BUS_ID,
+    br.BUS_TYPE,
+    to_char(br.C_TIME, 'yyyy-mm-dd hh24:mi:ss') C_TIME,
+    br.C_USER,
+    br.ACTIV_STATUS,
+    br.STATUS,ri.group_id_, ri.user_id_,rt.assignee_,
+    br.agent_id,
+    br.agent_name,
+    br.net_in_bus_type,
+    br.data_shiro,
+    to_char(rt.create_time_, 'yyyy-mm-dd hh24:mi:ss') as create_time,
+    br.ag_doc_pro,
+    br.ag_doc_district,
+    nvl(plat.PLATFORM_NAME,0) as PLATFORM_NAME,
+    c.NAME AS C_NAME,
+    br.EXPLAIN,
+    act_ex.PROC_INST_ID_,
+    act_ex.id_ as EXECUTION_ID_,
+    act_prodef.name_ as ACT_PRODEF_NAME_,
+    act_prodef.id_ as ACT_PRODEF_ID_
   </sql>
   <sql id="queryMyTaskSql">
       (select
-      <include refid="queryMyTaskField"/>
-      from ACT_RU_TASK rt
-      left join A_bus_act_rel br on  rt.PROC_INST_ID_ = br.activ_id
-      left join act_ru_identitylink ri on ri.task_id_ = rt.id_
-      left join a_agent a on br.agent_id = a.id
-      left join C_ORGANIZATION oa on to_char(oa.id)=br.ag_doc_pro
-      left join C_ORGANIZATION ob on to_char(ob.id)=br.ag_doc_district
-      left join a_platform plat on  plat.PLATFORM_NUM =replace(br.NET_IN_BUS_TYPE,'ACTIVITY_','')
-      left join c_user c on br.c_user=to_char(c.ID)
-    <where>
-        1=1
-        <include refid="queryMyTaskWhere"/>
-        and NET_IN_BUS_TYPE is null
-      </where>
-      UNION
+        <include refid="queryMyTaskField"/>
+        from ACT_RU_TASK rt
+        left join act_ru_execution act_ex on act_ex.proc_inst_id_=rt.proc_inst_id_ and rt.execution_id_=act_ex.id_
+        left join act_re_procdef act_prodef on act_prodef.id_=act_ex.proc_def_id_
+        left join A_bus_act_rel br on  rt.PROC_INST_ID_ = br.activ_id
+        left join act_ru_identitylink ri on ri.task_id_ = rt.id_
+        left join a_agent a on br.agent_id = a.id
+        left join C_ORGANIZATION oa on to_char(oa.id)=br.ag_doc_pro
+        left join C_ORGANIZATION ob on to_char(ob.id)=br.ag_doc_district
+        left join a_platform plat on  plat.PLATFORM_NUM =replace(br.NET_IN_BUS_TYPE,'ACTIVITY_','')
+        left join c_user c on br.c_user=to_char(c.ID)
+        <where>
+          1=1
+
+          <if test="params.group==null or params.group==''">
+            /*没有分组禁止查询*/
+            and 1=-1
+          </if>
+          <if test="params.group=='agent'">
+            /*代理商sql*/
+            <include refid="queryMyTaskWhereAgent"/>
+          </if>
+
+          <if test="params.group=='city'">
+            /*省区*/
+            <include refid="queryMyTaskWhereCity"/>
+          </if>
+
+          <if test="params.group=='region'">
+            /*大区*/
+            <include refid="queryMyTaskWhereRegion"/>
+          </if>
+          <if test="params.group!='region' and params.group!='city' and params.group!='agent'">
+            /*内部*/
+            <include refid="queryMyTaskWhereInno"/>
+          </if>
+          /*通用查询sql*/
+          <include refid="queryMyTaskWhere"/>
+        </where>
+        ORDER by rt.create_time_ desc
+      )
+  </sql>
+
+  <sql id="dontUseThisSql">
+    (
       select
       <include refid="queryMyTaskField"/>
       from ACT_RU_TASK rt
+      left join act_ru_execution act_ex on act_ex.proc_inst_id_=rt.proc_inst_id_ and rt.execution_id_=act_ex.id_
+      left join act_re_procdef act_prodef on act_prodef.id_=act_ex.proc_def_id_
       left join A_bus_act_rel br on  rt.PROC_INST_ID_ = br.activ_id
       left join act_ru_identitylink ri on ri.task_id_ = rt.id_
       left join a_agent a on br.agent_id = a.id
@@ -393,49 +445,149 @@
       left join c_user c on br.c_user=to_char(c.ID)
       <where>
         1=1
+        /*通用查询sql*/
         <include refid="queryMyTaskWhere"/>
-        and NET_IN_BUS_TYPE is not null
-        <if test="params.netInUrls != null and params.netInUrls.size>0">
-          and
-          <foreach collection="params.netInUrls" separator="," item="netInUrl" index="index" open=" NET_IN_BUS_TYPE in ("
-                   close=")">
-            #{netInUrl}
-          </foreach>
-        </if>
-        <if test="params.netInUrls == null or params.netInUrls.size==0">
-          AND 1 = -1
-        </if>
       </where>
-      )
-      ORDER by create_time desc
+      ORDER by rt.create_time_ asc
+    )
   </sql>
+  <!--查询用户任务-->
   <select id="queryMyTaskPage" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
     <include refid="queryMyTaskSql"/>
     <include refid="OracleDialectSuffix" />
   </select>
+  <!--查询用户任务-->
+  <select id="dontUserThisSqlPage" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="dontUseThisSql"/>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="dontUserThisSqlCount" parameterType="map" resultType="int">
+    select count(*) from(
+    <include refid="dontUseThisSql"/>
+    )
+  </select>
 
-  <sql id="queryMyTaskWhere" >
-    <if test="params.cUser != null and params.cUser!='' " >
-      and br.c_user = #{params.cUser,jdbcType=VARCHAR}
-    </if>
-    <if test="params.group != null and params.group!='' and params.group != 'region'" >
-      and (ri.group_id_ = #{params.group}
-      <if test="params.roleNames != null and params.roleNames.size>0 " >
-        or ri.group_id_ in
-        <foreach collection="params.roleNames" separator="," item="roleName" index="index" open="(" close=")">
-            #{roleName}
-        </foreach>
-      </if>
+
+
+
+  <sql id="queryMyTaskWhereAgent" >
+    <if test="params.group!=null and params.group!=''">
+      <!--代理商任务查询条件-->
+      and
+      br.agent_id = #{params.agentId,jdbcType=VARCHAR}
+      and
+      (
+       ri.group_id_='agent'
+       <if test="params.agentId!=null">
+          or ri.user_id_=nvl(#{params.agentId,jdbcType=VARCHAR},'nouser')
+       </if>
+       <if test="params.agentId!=null">
+          or rt.assignee_=nvl(#{params.agentId,jdbcType=VARCHAR},'nouser')
+       </if>
       )
     </if>
-    <if test="params.group == 'city' " >
-      and (oa.CODE like concat(#{params.orgCode},'%') or ob.CODE like concat(#{params.orgCode},'%') )
+    <if test="params.group==null and params.group==''"> and 1==-1</if>
+  </sql>
+
+
+  <sql id="queryMyTaskWhereCity" >
+    <if test="params.group!=null and params.group!=''">
+      <!--省区任务查询-->
+      and (
+        (
+          ri.group_id_='city'
+          and (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%'))
+        )
+        <if test="params.orgCode!=null">
+        or ri.group_id_ = nvl(#{params.orgCode,jdbcType=VARCHAR},'nogroup')
+        </if>
+        <if test="params.userId!=null">
+        or ri.user_id_ = to_char(#{params.userId})
+        </if>
+        <if test="params.userId!=null">
+        or rt.assignee_ = to_char(#{params.userId})
+        </if>
+      )
     </if>
-    <if test="params.group == 'region' " >
-      and br.AG_DOC_DISTRICT = to_char(#{params.orgId,jdbcType=VARCHAR})
-      and ri.group_id_ in ( #{params.group},'south','north')
+    <if test="params.group==null and params.group==''"> and 1==-1</if>
+  </sql>
+
+
+  <sql id="queryMyTaskWhereRegion" >
+    <if test="params.group!=null and params.group!=''">
+      <!--大区任务查询条件-->
+      and (
+        (
+          ri.group_id_='region'
+          and (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%'))
+        )
+        <if test="params.orgCode!=null">
+          or ri.group_id_ = #{params.orgCode,jdbcType=VARCHAR}
+        </if>
+        <if test="params.userId!=null">
+          or ri.user_id_ = to_char(#{params.userId})
+        </if>
+        <if test="params.userId!=null">
+          or rt.assignee_ = to_char(#{params.userId})
+        </if>
+      )
     </if>
+    <if test="params.group==null and params.group==''"> and 1==-1</if>
+  </sql>
+
+
+  <sql id="queryMyTaskWhereInno" >
+    <!--内部人员查询任务条件-->
+    <if test="params.group!=null and params.group!=''">
+      /*分组节点 （支持部门，角色id,用户id）*/
+      and (
+            ri.group_id_=#{params.group,jdbcType=VARCHAR}
+            <if test="params.userId!=null">
+              or ri.user_id_ = to_char(#{params.userId})
+            </if>
+            <if test="params.userId!=null">
+              or rt.assignee_ = to_char(#{params.userId})
+            </if>
+            <if test="params.roleIds != null and params.roleIds.size>0 " >
+              <foreach collection="params.roleIds"  item="roleId" index="index" open=" or ri.group_id_ in (" close=")" separator=",">
+                to_char(#{roleId})
+              </foreach>
+            </if>
+          )
+      and
+        /*审批品牌权限*/
+        (
+          br.NET_IN_BUS_TYPE is null
+          or
+          (
+            br.NET_IN_BUS_TYPE is not null
+            <if test="params.netInUrls != null and params.netInUrls.size>0">
+              <foreach collection="params.netInUrls" separator="," item="netInUrl" index="index" open=" and br.NET_IN_BUS_TYPE in (" close=")">
+                #{netInUrl}
+              </foreach>
+            </if>
+            <if test="params.netInUrls == null or params.netInUrls.size==0">
+              AND 1 = -1
+            </if>
+          )
+        )
+        /*审批类型权限*/
+        <if test="params.dbUrls != null and params.dbUrls.size>0" >
+          <foreach collection="params.dbUrls" separator="," item="dbUrl" index="index" open=" and br.DATA_SHIRO in (" close=")">
+            #{dbUrl}
+          </foreach>
+        </if>
+        <if test="params.dbUrls == null and params.dbUrls.size==0" >
+          and 1=-1
+        </if>
+    </if>
+    <if test="params.group==null and params.group==''"> and 1==-1</if>
+  </sql>
+
+  <sql id="queryMyTaskWhere" >
+    <!--通用任务查询条件-->
     <if test="params.busActRelBusType != null and params.busActRelBusType!='' " >
       and br.BUS_TYPE = #{params.busActRelBusType}
     </if>
@@ -451,12 +603,6 @@
     <if test="params.subEnd != null and params.subEnd!='' " >
       and br.C_TIME <![CDATA[ <= ]]> to_date(#{params.subEnd}, 'yyyy-mm-dd hh24:mi:ss')
     </if>
-    <if test="params.dbUrls != null and params.dbUrls.size>0" >
-      and
-      <foreach collection="params.dbUrls" separator="," item="dbUrl" index="index" open=" DATA_SHIRO in (" close=")">
-        #{dbUrl}
-      </foreach>
-    </if>
     <if test="params.busPlatform != null and params.busPlatform!='' " >
       and  plat.PLATFORM_NUM=#{params.busPlatform}
     </if>
@@ -470,5 +616,9 @@
       <include refid="queryMyTaskSql"/>
     )
   </select>
+
+
+
+
 
 </mapper>

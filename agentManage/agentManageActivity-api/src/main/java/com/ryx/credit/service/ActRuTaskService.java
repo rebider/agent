@@ -35,7 +35,10 @@ public interface ActRuTaskService {
 
     List<Map<String, Object>> queryMyTask(Map<String,Object> param);
 
-    PageInfo queryMyTaskPage(Page page, Map<String,Object> param);
+    PageInfo queryMyTaskPage(Page page, Map<String,Object> param)throws Exception;
 
     List<Map<String,Object>> queryHuddleMyTask(Map<String,Object> params);
+
+    PageInfo dontUserThisSqlPage(Page page, Map<String,Object> param)throws Exception;
+
 }

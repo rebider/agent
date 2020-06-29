@@ -20,6 +20,15 @@ public interface DataChangeActivityService {
     ResultVO startDataChangeActivity(String dataChangeId,String userId)throws Exception;
 
     /**
+     * 代理商启动结算卡变更审批服务
+     * @param dataChangeId
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    ResultVO agentStartDataChangeActivity(String dataChangeId, String userId) throws Exception;
+
+    /**
      * 收款账户修改 审批完成处理
      * @param proIns
      * @param agStatus

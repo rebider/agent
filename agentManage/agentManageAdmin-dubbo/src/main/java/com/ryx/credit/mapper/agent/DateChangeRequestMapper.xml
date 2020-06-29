@@ -296,4 +296,36 @@
     </if>
     order by data.C_UPDATE desc
   </select>
+
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end >0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end >0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
+    </if>
+  </sql>
+  <!--  代理商结算卡管理查看详情-->
+  <select id="serchDataChangeReqByAgList" parameterType="map"  resultType="map">
+    <include refid="PAGING_START" />
+    <include refid="dataChangeReq_Detail"/>
+    <include refid="PAGING_END" />
+  </select>
+
+
+  <select id="serchDataChangeReqByAgCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    select
+    count(1) from
+    (
+    <include refid="dataChangeReq_Detail"/>
+    )a
+  </select>
+  <sql id="dataChangeReq_Detail">
+    select * from DATA_CHANGE_REQUEST
+    where status=1 and DATA_TYPE='DC_AG_Colinfo' and APPY_STATUS in(2,3)
+    <if test="agentId!=null and agentId!=''"> and  DATA_ID = #{agentId} </if>
+  </sql>
 </mapper>

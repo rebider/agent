@@ -35,6 +35,8 @@ public interface AgentBusinfoService {
      */
     public List<AgentBusInfo> agentBusInfoList(String agentId);
     public List<AgentBusInfo> agentBusInfoList(String agentId, String id, BigDecimal appStatus);
+    public List<AgentBusInfo> queryAgentBusInfo(String agentId);
+    public List<AgentBusInfo> queryAgentBusInfoFreeze(String agentId);
 
     /**
      * 查询代理商的可用业务
@@ -160,10 +162,12 @@ public interface AgentBusinfoService {
     PageInfo queyrBusInfoByBusNumAndPlatformTypePage(Page page, String busNum, String platformType)throws MessageException;
 
     List<Map<String,Object>> queryRegionByAccount(String account)throws MessageException;
+
     /**
      * 通过 dict 返回对应的业务数据
      * @param reqMap
      * @return
      */
     public  List<Map> agentBusByDict(FastMap reqMap);
+
 }
