@@ -714,13 +714,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw new ProcessException("解析退货商品失败");
         }
 
-        //检查SN是否允许退货
-        try {
-            checkSn(list, agentId);
-        } catch (ProcessException e) {
-            throw e;
-        }
-
         List<OInvoice> oInvoices = null;
         try {
             oInvoices = JSONObject.parseArray(invoiceList,OInvoice.class);
@@ -729,10 +722,54 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw new ProcessException("解析发票信息失败");
         }
 
-        String returnId = null;
-
+        //检查SN是否允许退货
         try {
-            //生成退货单
+            List<String> orderIdList = new ArrayList();
+            for (Map<String, Object> map : list) {
+                String startSn = (String) map.get("startSn");
+                String endSn = (String) map.get("endSn");
+
+                //检查sn是否在划拨，换活动，退货中
+                FastMap fastMap = osnOperateService.checkSNApproval(FastMap
+                        .fastMap("beginSN", startSn)
+                        .putKeyV("endSN", endSn));
+                if (!FastMap.isSuc(fastMap)) throw new ProcessException(fastMap.get("msg").toString());
+
+                List<String> sns = logisticsDetailService.querySnLList(startSn, endSn);
+                for (String sn : sns) {
+                    //验证是否属于代理商的
+                    Map<String, Object> checkMap = oLogisticsMapper.getOrderAndLogisticsBySn(sn, agentId);
+                    if (checkMap == null || checkMap.size() <= 0) {
+                        throw new ProcessException("sn号" + sn + "不是有效的发货状态，请核实是否属于您的订单或是否发起过退货");
+                    }
+                    //验证是否有效的平台码
+                    List<Map<String, Object>> agentBusInfos = agentBusInfoMapper.queryAgentBusInfoByLogisticsDetailSn(FastMap.fastMap("snNum", sn));
+                    if (null == agentBusInfos || agentBusInfos.size() != 1) {
+                        throw new ProcessException("无效的业务平台，SN：" + sn);
+                    }
+                }
+                //查询SN转发的平台是否相同，不同不允许转发
+                orderIdList.add((String) map.get("orderId"));
+            }
+
+            //查询平台是否相同
+            if (!(orderIdList.size() > 0)) throw new ProcessException("上传sn订单异常，请联系管理员！！！");
+            List<String> platformTypeList = platFormMapper.selectByOrderIdList(orderIdList);
+            if (platformTypeList.size() != 1) {
+                for (String platFormList : platformTypeList) {
+                    if(!PlatformType.whetherPOS(platFormList)){
+                        throw new ProcessException("退货只支持一个业务平台退货，本批次SN中存在多个业务，请分批次提交!");
+                    }
+                }
+            }
+        } catch (ProcessException e) {
+            log.error("查询SN是否允许退货失败", e);
+            throw new ProcessException(e.getMessage());
+        }
+
+        //生成退货单
+        String returnId = null;
+        try {
             returnId = idService.genId(TabId.o_return_order);
             returnOrder.setId(returnId);
             returnOrder.setRetSchedule(new BigDecimal(RetSchedule.SPZ.code));
@@ -745,7 +782,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             returnOrder.setVersion(Status.STATUS_1.status);
             returnOrder.setLogicalVersion(String.valueOf(Status.STATUS_1.status));
             returnOrder.setStatus(Status.STATUS_1.status);
-
             returnOrderMapper.insertSelective(returnOrder);
         } catch (Exception e) {
             log.error("生成退货单失败", e);
@@ -764,18 +800,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         Set<String> agDocPro = new HashSet<>();
         Set<String> busPlatform = new HashSet<>();
         for (Map<String, Object> map : list) {
-
             String orderId = (String) map.get("orderId");
             String startSn = (String) map.get("startSn");
             String endSn = (String) map.get("endSn");
-
-            //检查sn是否在划拨，换活动，退货中
-            FastMap fastMap = osnOperateService.checkSNApproval(FastMap
-                    .fastMap("beginSN", startSn)
-                    .putKeyV("endSN", endSn)
-            );
-            if (!FastMap.isSuc(fastMap)) throw new ProcessException(fastMap.get("msg").toString());
-
             //生成退货明细
             OReturnOrderDetail returnOrderDetail = null;
             try {

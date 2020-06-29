@@ -1478,4 +1478,18 @@ union
     where p.status = '1' and ab.status = '1' and ab.clo_review_status = '3' and ab.bus_status = '1'
     and ab.bus_num = #{busNum} and p.platform_type = #{platformType}
   </select>
+
+  <select id="queryAgentBusInfoByLogisticsDetailSn" resultType="map" parameterType="map">
+      SELECT
+        *
+      FROM
+        a_agent_businfo ab
+        LEFT JOIN o_logistics_detail od ON ab.id = od.bus_id
+      WHERE (ab.status = '1'
+        AND ab.bus_status = '1'
+        AND ab.clo_review_status = '3'
+        AND od.status = '1'
+        AND od.record_status = '1'
+        AND od.sn_num = #{snNum})
+    </select>
 </mapper>
