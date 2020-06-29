@@ -374,6 +374,12 @@ public class AgentQueryServiceImpl implements AgentQueryService {
                 return FastMap.fastSuccessMap().putKeyV("oReturnOrder",oReturnOrder).putKeyV("rel",rel)
                         .putKeyV("agentId",oReturnOrder.getAgentId()).putKeyV("agName",agName);
             }
+            if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.DC_AG_Colinfo.name())){
+                DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(rel.getBusId());
+                String agName = redisService.hGet(RedisCachKey.AGENTINFO.code,dateChangeRequest.getDataId());
+                return FastMap.fastSuccessMap().putKeyV("DateChangeRequest",dateChangeRequest).putKeyV("rel",rel)
+                        .putKeyV("agentId",dateChangeRequest.getDataId()).putKeyV("agName",agName);
+            }
             return FastMap.fastSuccessMap().putKeyV("rel",rel);
         }
         return null;

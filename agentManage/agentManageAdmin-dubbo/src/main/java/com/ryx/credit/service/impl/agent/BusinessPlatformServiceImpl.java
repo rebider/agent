@@ -249,6 +249,40 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return pageInfo;
     }
 
+    @Override
+    public PageInfo queryBusinessPlatformListAgent(Map map, Page page) {
+        PageInfo pageInfo = new PageInfo();
+        if (map == null) return pageInfo;
+        if (map.get("agentId") == null) return pageInfo;
+        if (StringUtils.isBlank(map.get("agentId").toString())) return pageInfo;
+        Map<String, Object> reqMap = new HashMap<>();
+        if (!StringUtils.isBlank((String)map.get("busNum"))) {
+            reqMap.put("busNum", map.get("busNum"));
+        }
+        if (!StringUtils.isBlank((String)map.get("busPlatformList"))) {
+            reqMap.put("busPlatformList", Arrays.asList(((String)map.get("busPlatformList")).split(",")));
+        }
+        if (!StringUtils.isBlank((String)map.get("cloReviewStatusList"))) {
+            List<String> list = Arrays.asList(((String)map.get("cloReviewStatusList")).split(","));
+            List<BigDecimal> voList = list.stream().map(str -> new BigDecimal(str.trim())).collect(Collectors.toList());
+            if(voList!=null && voList.size()>0)
+                reqMap.put("cloReviewStatusList", voList);
+        }
+        if (!StringUtils.isBlank((String)map.get("busTypeList"))) {
+            reqMap.put("busTypeList", Arrays.asList(((String)map.get("busTypeList")).split(",")));
+        }
+        Long userId = Long.valueOf((String) map.get("cUser"));
+        reqMap.put("userId", userId);
+        reqMap.put("agentId", map.get("agentId"));
+        reqMap.put("agStatus", AgStatus.Approved.name());
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        reqMap.put("platfromPerm", platfromPerm);
+        List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformListAgent(reqMap, page);
+        pageInfo.setRows(agentBusInfoList);
+        pageInfo.setTotal(agentBusInfoMapper.queryBusinessPlatformAgentCount(reqMap));
+        return pageInfo;
+    }
+
     /**
      * 根据代理商唯一编号检索
      * @param agUniqNum

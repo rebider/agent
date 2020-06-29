@@ -68,4 +68,7 @@ public interface AgentColinfoService {
      */
     public FastMap notifyCardChange(String key,String msg)throws Exception;
 
+    AgentResult amendAgentColinfo(Map map);
+
+
 }

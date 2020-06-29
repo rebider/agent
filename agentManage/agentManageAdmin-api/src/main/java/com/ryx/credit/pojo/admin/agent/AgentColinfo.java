@@ -58,6 +58,10 @@ public class AgentColinfo implements Serializable {
 
     private boolean isImport = false;
 
+    private String unusualExplain;//异常说明
+
+    private BigDecimal  amendStatus;//修改状态
+
     public List<Attachment> getAttachmentList() {
         return attachmentList;
     }
@@ -264,5 +268,21 @@ public class AgentColinfo implements Serializable {
 
     public void setImport(boolean anImport) {
         isImport = anImport;
+    }
+
+    public String getUnusualExplain() {
+        return unusualExplain;
+    }
+
+    public void setUnusualExplain(String unusualExplain) {
+        this.unusualExplain = unusualExplain;
+    }
+
+    public BigDecimal getAmendStatus() {
+        return amendStatus;
+    }
+
+    public void setAmendStatus(BigDecimal amendStatus) {
+        this.amendStatus = amendStatus;
     }
 }

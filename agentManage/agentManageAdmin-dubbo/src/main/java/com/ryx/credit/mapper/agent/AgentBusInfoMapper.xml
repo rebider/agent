@@ -804,6 +804,69 @@
     order by c_time desc
   </sql>
 
+  <!--代理商登录-我的业务列表-->
+  <select id="queryBusinessPlatformListAgent" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="queryBusinessPlatformAgentSql" />
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="queryBusinessPlatformAgentCount" parameterType="map" resultType="int">
+    select count(*) from(
+    <include refid="queryBusinessPlatformAgentSql" />
+    )
+  </select>
+  <sql id="queryBusinessPlatformAgentSql">
+    select
+    b.id, b.agent_id, b.bus_num, b.bus_platform, b.bus_type, b.bus_status, b.clo_review_status, b.status,
+    b.c_time, b.clo_pay_company, b.bus_Inde_ass, d.ag_name as risk_parent, e.name as ag_doc_pro,
+    to_char(b.approve_time,'yyyy-MM-dd hh24:mi:ss') as approve_time,
+    a.id as ag, a.ag_uniq_num, a.ag_name, a.ag_nature, a.ag_head, a.ag_head_mobile, a.ag_status
+    from a_agent_businfo b
+    left join a_agent a on b.agent_id = a.id
+    left join a_agent_businfo c on c.id = b.bus_risk_parent
+    left join a_agent d on d.id = c.agent_id
+    left join c_organization e on e.id = b.ag_doc_pro
+    left join c_organization g on g.id = b.ag_doc_district
+    where a.id = b.agent_id and a.status = 1 and b.status =1
+    and a.ag_status = #{reqMap.agStatus}
+    and b.agent_id = #{reqMap.agentId}
+    <if test="reqMap.busNum!=null and reqMap.busNum!=''">
+      and b.bus_num = #{reqMap.busNum}
+    </if>
+    <if test="reqMap.busStatus!=null and reqMap.busStatus!=''">
+      and b.bus_status = #{reqMap.busStatus}
+    </if>
+    <if test="reqMap.busPlatformList!=null and reqMap.busPlatformList.size>0">
+      and b.bus_platform
+      <foreach collection="reqMap.busPlatformList" item="busPlatform" open=" in(" close=")" separator=",">
+        #{busPlatform}
+      </foreach>
+    </if>
+    <if test="reqMap.busTypeList!=null and reqMap.busTypeList.size>0">
+      and b.bus_type
+      <foreach collection="reqMap.busTypeList" item="busType" open=" in(" close=")" separator=",">
+        #{busType}
+      </foreach>
+    </if>
+    <if test="reqMap.cloReviewStatusList!=null and reqMap.cloReviewStatusList.size>0">
+      and b.clo_review_status
+      <foreach collection="reqMap.cloReviewStatusList" item="cloReviewStatus" open=" in(" close=")" separator=",">
+        #{cloReviewStatus}
+      </foreach>
+    </if>
+    <if test="reqMap.platfromPerm!=null and reqMap.platfromPerm.size>0">
+      and b.BUS_PLATFORM in
+      <foreach collection="reqMap.platfromPerm" item="platfromPermItem" open="(" separator="," close=")" >
+        #{platfromPermItem.PLATFORM_NUM}
+      </foreach>
+    </if>
+    <if test="reqMap.platfromPerm==null or reqMap.platfromPerm.size==0">
+      and 1=-1
+    </if>
+    order by c_time desc
+  </sql>
+
+
   <select id="businessQuery" parameterType="string" resultMap="BaseResultMap">
     select
       <include refid="Base_Column_List" />

@@ -162,6 +162,7 @@ public interface AgentBusinfoService {
     PageInfo queyrBusInfoByBusNumAndPlatformTypePage(Page page, String busNum, String platformType)throws MessageException;
 
     List<Map<String,Object>> queryRegionByAccount(String account)throws MessageException;
+
     /**
      * 通过 dict 返回对应的业务数据
      * @param reqMap
@@ -172,5 +173,6 @@ public interface AgentBusinfoService {
     public List<Map> agentFreezeBus(String agentId,Long userId);
 
     public List<Map> agentmanageFreezeBus(String agentId,Long userId);
+
 
 }

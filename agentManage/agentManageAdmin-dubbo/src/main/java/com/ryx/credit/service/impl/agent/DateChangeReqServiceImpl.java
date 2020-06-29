@@ -52,7 +52,7 @@ public class DateChangeReqServiceImpl implements DateChangeReqService{
     public ResultVO dateChangeReqIn(String json,String oldJson,String srcId,String type,String userId) {
         try {
 
-            if(DataChangeApyType.DC_Colinfo.name().equals(type)){
+            if(DataChangeApyType.DC_Colinfo.name().equals(type) || DataChangeApyType.DC_AG_Colinfo.name().equals(type)){
                 Agent agent = agentMapper.selectByPrimaryKey(srcId);
                 //检查业务是否有审批通过未启用业务
                 AgentBusInfoExample example = new AgentBusInfoExample();

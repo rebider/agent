@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfoExample;
 import com.ryx.credit.pojo.admin.vo.BusinessOutVo;
 import org.apache.ibatis.annotations.Param;
+import org.apache.kafka.common.protocol.types.Field;
 
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,9 @@ public interface AgentBusInfoMapper {
 
 
     int queryBusinessPlatformCount(@Param("reqMap") Map<String,Object> reqMap);
+
+    List<Map<String,Object>> queryBusinessPlatformListAgent(@Param("reqMap") Map<String, Object> reqMap, @Param("page") Page page);
+    int queryBusinessPlatformAgentCount(@Param("reqMap") Map<String, Object> reqMap);
 
     List<AgentBusInfo> businessQuery(String id);
 
@@ -146,4 +150,6 @@ public interface AgentBusInfoMapper {
 
     List<Map<String,Object>> queryManageFreezeBusInfo( Map<String,Object> reqMap);
 
+
+  
 }

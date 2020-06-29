@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
@@ -11,6 +12,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
+import com.ryx.credit.service.AgentKafkaService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.dict.IdService;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -53,6 +56,10 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
     private AColinfoPaymentMapper colinfoPaymentMapper;
     @Autowired
     private LivenessDetectionService livenessDetectionService;
+    @Autowired
+    private AgentKafkaService agentKafkaService;
+    @Autowired
+    private  AgentMapper agentMapper;
 
 
     /**
@@ -307,6 +314,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     } else {
                         db_AgentColinfo.setAgLegalCernum(agentColinfoVo.getAgLegalCernum());
                     }
+//                    db_AgentColinfo.setAmendStatus(AmendStatus.YXG.status);
                     db_AgentColinfo.setcUtime(Calendar.getInstance().getTime());
                     if (1 != agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)) {
                         throw new MessageException("更新收款信息失败");
@@ -549,6 +557,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         AgentColinfoExample.Criteria criteria = agentColinfoExample.createCriteria();
         criteria.andAgentIdEqualTo(agentId);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andCloReviewStatusEqualTo(AgStatus.Approved.status);
         List<AgentColinfo> agentColinfos = agentColinfoMapper.selectByExample(agentColinfoExample);
         if (null == agentColinfos) {
             return null;
@@ -812,5 +821,142 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
     @Override
     public FastMap notifyCardChange(String key, String msg) throws Exception {
         return null;
+    }
+
+    @Override
+    public AgentResult amendAgentColinfo(Map map) {
+        if(null==map && map.size()==0){
+            logger.info("请传入必要参数");
+            return AgentResult.fail("请传入必要参数");
+        }
+        if (StringUtils.isBlank(String.valueOf(map.get("agent_id")))){
+            logger.info("请传入代理商唯一编码");
+            return AgentResult.fail("请传入代理商唯一编码");
+        }
+        if (null==map.get("pay_status")){
+            logger.info("请传入出款状态");
+            return AgentResult.fail("请传入出款状态");
+        }
+        AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
+        AgentColinfoExample.Criteria agent_id = agentColinfoExample.createCriteria().andAgentIdEqualTo(String.valueOf(map.get("agent_id")))
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andCloReviewStatusEqualTo(AgStatus.Approved.status);
+        List<AgentColinfo> agentColinfoList = agentColinfoMapper.selectByExample(agentColinfoExample);
+        if(null==agentColinfoList || agentColinfoList.size()==0){
+            logger.info("没有查询到结算卡信息");
+            return AgentResult.fail("没有查询到结算卡信息");
+        }
+        AgentColinfo agentColinfo = agentColinfoList.get(0);
+      if(null!=map.get("version")){
+          if(agentColinfo.getVarsion().compareTo((BigDecimal)map.get("version"))==0){
+              //版本一致则可以进行修改
+              AgentResult result = updateAccountCard(map, agentColinfo);
+              if(result.isOK()){
+                  logger.info("版本一致修改成功");
+                  return AgentResult.ok("修改成功");
+              }else {
+                  logger.info("版本一致修改失败");
+                  return AgentResult.fail("修改失败");
+              }
+          }else {
+              //版本不一致 需判断银行卡等信息是否一致
+              AgentResult agentResult = update(map, agentColinfo);
+              if(agentResult.isOK()){
+                  logger.info("修改成功");
+                  return AgentResult.ok("修改成功");
+              }else {
+                  logger.info("修改失败");
+                  return AgentResult.fail("修改失败");
+              }
+          }
+      }else{
+          logger.info("没有版本号进行修改");
+          AgentResult agentResult = update(map, agentColinfo);
+          if(agentResult.isOK()){
+              logger.info("修改成功");
+              return AgentResult.ok("修改成功");
+          }else {
+              logger.info("修改失败");
+              return AgentResult.fail("修改失败");
+          }
+      }
+    }
+
+    AgentResult update(Map map,AgentColinfo agentColinfo){
+        if(StringUtils.isNotBlank(String.valueOf(map.get("clo_realname")))
+                && StringUtils.isNotBlank(String.valueOf(map.get("clo_bank_account")))
+                && StringUtils.isNotBlank(String.valueOf(map.get("branch_line_num")))
+                && StringUtils.isNotBlank(String.valueOf(map.get("clo_bank_branch")))
+                &&
+                String.valueOf(map.get("clo_realname")).equals(agentColinfo.getCloRealname())
+                &&
+                String.valueOf(map.get("clo_bank_account")).equals(agentColinfo.getCloBankAccount())
+                &&
+                String.valueOf(map.get("branch_line_num")).equals(agentColinfo.getBranchLineNum())
+                &&
+                String.valueOf(map.get("clo_bank_branch")).equals(agentColinfo.getCloBankBranch())
+                )
+        {
+            AgentResult result = updateAccountCard(map, agentColinfo);
+            if(result.isOK()){
+                logger.info("版本一致修改成功");
+                return AgentResult.ok("修改成功");
+            }else {
+                logger.info("版本一致修改失败");
+                return AgentResult.fail("修改失败");
+            }
+        }
+        else {
+            AgentColinfo agentColinfo_afterChange = selectByAgentId(agentColinfo.getAgentId());
+            try {
+                logger.info("===================开始执行kafka消息分发");
+                agentKafkaService.sendPayMentMessage(agentColinfo.getAgentId(),
+                        agentColinfo.getId(),
+                        agentColinfo.getId(), "",
+                        KafkaMessageType.CARD,
+                        KafkaMessageTopic.CardChange.code,
+                        JSONObject.toJSONString(agentColinfo_afterChange)
+                );
+                logger.info("===================结束kafka消息分发");
+            } catch (Exception e) {
+                logger.info("kafka接口调用失败,AG码", agentColinfo.getAgentId());
+                e.printStackTrace();
+            }
+        }
+        return AgentResult.ok("修改成功");
+    }
+
+    private AgentResult updateAccountCard(Map map,AgentColinfo agentColinfo){
+        if(StringUtils.isNotBlank(String.valueOf(map.get("clo_realname")))){//收款账户名
+            agentColinfo.setCloRealname(String.valueOf(map.get("clo_realname")));
+        }
+        if(StringUtils.isNotBlank(String.valueOf(map.get("clo_bank_account")))){//收款账号
+            agentColinfo.setCloBankAccount(String.valueOf(map.get("clo_bank_account")));
+        }
+        if(StringUtils.isNotBlank(String.valueOf(map.get("branch_line_num")))){//支行联行号
+            agentColinfo.setBranchLineNum(String.valueOf(map.get("branch_line_num")));
+        }
+        if(StringUtils.isNotBlank(String.valueOf(map.get("clo_bank_branch")))){//支行名
+            agentColinfo.setCloBankBranch(String.valueOf(map.get("clo_bank_branch")));
+        }
+        if(null!=map.get("pay_status")){//出款状态
+            BigDecimal payStatus = (BigDecimal) map.get("pay_status");
+            if(payStatus.compareTo(ColinfoPayStatus.D.code)==0){//验证失败
+                agentColinfo.setPayStatus(ColinfoPayStatus.D.code);
+                agentColinfo.setAmendStatus(AmendStatus.DXG.status);
+            }else if(payStatus.compareTo(ColinfoPayStatus.C.code)==0){
+                agentColinfo.setPayStatus(ColinfoPayStatus.C.code);
+            }
+        }
+        if(StringUtils.isNotBlank(String.valueOf(map.get("unusual_explain")))){//失败原因
+            agentColinfo.setUnusualExplain(String.valueOf(map.get("unusual_explain")));
+        }
+
+        if(1==agentColinfoMapper.updateByPrimaryKeySelective(agentColinfo)){
+            logger.info("修改成功");
+            return AgentResult.ok("修改成功");
+        }
+        logger.info("代理商{}修改失败",agentColinfo.getAgentId());
+        return AgentResult.fail("代理商["+agentColinfo.getAgentId()+"]修改失败");
     }
 }

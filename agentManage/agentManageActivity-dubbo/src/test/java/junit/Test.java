@@ -213,33 +213,24 @@ public class Test {
 
     @org.junit.Test
     public void testKafka(){
-        AgentColinfo agentColinfo = new AgentColinfo();
-        agentColinfo.setId("AC20200422000000000018183");
-        agentColinfo.setAgentId("AG20043770130");
-        agentColinfo.setCloType(Status.STATUS_2.status);
-        agentColinfo.setCloRealname("验证");
-        agentColinfo.setCloBankBranch("华夏银行股份有限公司长春吉林大路支行");
-        agentColinfo.setBranchLineNum("304241012222");
-        agentColinfo.setCloBankAccount("6230200010568765");
-        agentColinfo.setAgLegalCernum("220183199009190876");
-        agentKafkaService.sendPayMentMessage("AG20043770130","瑞嘉AG验证登录","","", KafkaMessageType.CARD,KafkaMessageTopic.CardChange.code, JSONObject.toJSONString(agentColinfo));
-//        ListenableFuture listenableFuture = kafkaTemplate.send(KafkaMessageTopic.CardChange.code,"这是一个测试agent");
-//        listenableFuture.addCallback(new ListenableFutureCallback() {
-//            @Override
-//            public void onFailure(Throwable ex) {
-//                if(ex instanceof KafkaProducerException) {
-//                    ProducerRecord recode = ((KafkaProducerException) ex).getProducerRecord();
-//                    System.out.println(recode.key());
-//                    System.out.println(recode.key());
-//                    ex.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onSuccess(Object result) {
-//                System.out.println(result.toString());
-//            }
-//        });
+
+        ListenableFuture listenableFuture = kafkaTemplate.send("agent","123123213");
+        listenableFuture.addCallback(new ListenableFutureCallback() {
+            @Override
+            public void onFailure(Throwable ex) {
+                if(ex instanceof KafkaProducerException) {
+                    ProducerRecord recode = ((KafkaProducerException) ex).getProducerRecord();
+                    System.out.println(recode.key());
+                    System.out.println(recode.key());
+                    ex.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onSuccess(Object result) {
+                System.out.println(result.toString());
+            }
+        });
 
     }
 
@@ -274,6 +265,11 @@ public class Test {
         taskService.complete("5280011",FastMap.fastMap("provReject","0"));
         taskService.complete("5280015",FastMap.fastMap("provReject","0"));
 //        taskService.complete("4475005",FastMap.fastMap("v",1)
+//                .putKeyV("user1","pass"));
+//        taskService.complete("4475007",FastMap.fastMap("v",1)
+//                .putKeyV("user2","pass"));
+        taskService.complete("5332523",FastMap.fastMap("rejectCount","1").putKeyV("rs","pass"));
+//        taskService.complete("5325033",FastMap.fastMap("v",1)
 //                .putKeyV("user1","pass"));
 //        taskService.complete("4475007",FastMap.fastMap("v",1)
 //                .putKeyV("user2","pass"));
@@ -319,7 +315,7 @@ public class Test {
      * 基础信息及结算卡信息变更申请
      */
     @org.junit.Test
-    public void testAgentAppyChangeCard(){
+    public void testAgentAppyChangeCards(){
         RuntimeService runtimeService = processEngineConfiguration.buildProcessEngine().getRuntimeService();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("appy_change_card",
                 FastMap.fastMap("provList", Arrays.asList("kermit","gonzo","fozzie"))
@@ -327,7 +323,6 @@ public class Test {
                         .putKeyV("distList",Arrays.asList("kermit","gonzo")));
         System.out.println("基础信息及结算卡信息变更申请"+processInstance.getId());
     }
-
 
 }
 

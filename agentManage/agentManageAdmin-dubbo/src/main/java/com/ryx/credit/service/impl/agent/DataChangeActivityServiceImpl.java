@@ -6,19 +6,23 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.RegexUtil;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.OrganizationMapper;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.Organization;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.AgentKafkaService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.agent.netInPort.AgentNetInNotityService;
+import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
@@ -101,19 +105,29 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentFreezeService agentFreezeService;
     @Autowired
     private AgentFreezeMapper agentFreezeMapper;
+    @Autowired
+    private DepartmentService departmentService;
+    @Autowired
+    private AgentKafkaService agentKafkaService;
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public ResultVO startDataChangeActivity(String dataChangeId,String userId) throws Exception{
-        logger.info("========用户{}启动数据修改申请{}",userId,dataChangeId);
+        logger.info("========用户{}启动数据修改申请{}", userId, dataChangeId);
         DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(dataChangeId);
 
+        // 查询省区是否发起数据，状态为审批中的，不能重复提交
         DateChangeRequestExample dateChangeRequestExample = new DateChangeRequestExample();
         DateChangeRequestExample.Criteria criteria = dateChangeRequestExample.createCriteria();
         criteria.andDataIdEqualTo(dateChangeRequest.getDataId());
         criteria.andDataTypeEqualTo(BusActRelBusType.DC_Colinfo.name());
         criteria.andAppyStatusEqualTo(AgStatus.Approving.getValue());
+        // 查询代理商是否发起数据，状态为审批中的，不能重复提交
+        dateChangeRequestExample.or()
+                .andDataIdEqualTo(dateChangeRequest.getDataId())
+                .andDataTypeEqualTo(BusActRelBusType.DC_AG_Colinfo.name())
+                .andAppyStatusEqualTo(AgStatus.Approving.getValue());
         List<DateChangeRequest> dateChangeRequests = dateChangeRequestMapper.selectByExample(dateChangeRequestExample);
         if(null==dateChangeRequests){
             logger.info("数据修改申请:{}", "查询审批状态失败");
@@ -140,50 +154,49 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     logger.info("数据修改申请:{}", "收款账号已验证超过2次请更换银行卡");
                     throw new MessageException("收款账号已验证超过2次请更换银行卡！");
                 }
+               /* AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
+                AgentColinfoExample.Criteria criteria1 = agentColinfoExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status)
+                        .andCloReviewStatusEqualTo(AgStatus.Approved.status)
+                        .andAgentIdEqualTo(agentVo.getAgent().getId());
+                List<AgentColinfo> agentColinfoList = agentColinfoMapper.selectByExample(agentColinfoExample);
+                if(null!=agentColinfoList || agentColinfoList.size()>0){
+                    AgentColinfo agentColinfo = agentColinfoList.get(0);
+                    agentColinfo.setAmendStatus(AmendStatus.XGZ.status);
+                    if(1!=agentColinfoMapper.updateByPrimaryKeySelective(agentColinfo)){
+                        logger.info("数据修改申请:{}", "修改状态修改失败");
+                        throw new MessageException("数据修改申请,修改状态修改失败！");
+                    }
+                }*/
             }
         }
-        // 结算卡申请，提交审批时，校验结算卡字段是否变更，变更则需冻结代理商状态且生成冻结记录
+        // 省区-结算卡申请，提交审批时，校验结算卡字段是否变更，变更则需冻结代理商状态且生成冻结记录
         if (dateChangeRequest.getDataType().equals(BusActRelBusType.DC_Colinfo.name())) {
+            List<AgentBusInfo> agentBusInfos = agentBusinfoService.queryAgentBusInfoFreeze(agentVo.getAgent().getId());
+            List<String> businfoList = new LinkedList<>();
+            for (AgentBusInfo busInfo : agentBusInfos) {
+                businfoList.add(busInfo.getId());
+            }
             AgentVo preAgentVo = JSONObject.parseObject(dateChangeRequest.getDataPreContent(), AgentVo.class);
             List<AgentColinfoVo> preColinfoVoList = preAgentVo.getColinfoVoList();
-            List<AgentBusInfo> aginfo = agentBusinfoService.queryAgentBusInfoFreeze(agentVo.getAgent().getId());
-            List<String> busList = new LinkedList<>();
-            for (AgentBusInfo busInfo : aginfo) {
-                busList.add(busInfo.getId());
-            }
             if (preColinfoVoList.size() != 0 && preColinfoVoList != null) {
                 AgentColinfoVo preAgentColinfoVo = preColinfoVoList.get(0); // 变更前
                 AgentColinfoVo agentColinfoVo = colinfoVoList.get(0); // 变更后
                 AgentResult agentVerify = verifyColinfoIsChange(agentColinfoVo, preAgentColinfoVo);
                 if (agentVerify.isOK()) {
-                    // 调用冻结接口
-                    AgentFreezePort agentFreezePort = new AgentFreezePort();
-                    agentFreezePort.setAgentId(agentVo.getAgent().getId());
-                    agentFreezePort.setFreezeCause(FreeCause.JSKBG.getValue());
-                    agentFreezePort.setOperationPerson(String.valueOf(FreePerson.XTDJ.getValue()));
-                    agentFreezePort.setFreezeNum(dateChangeRequest.getId());
-                    agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-                    agentFreezePort.setBusPlatform(busList);
-                    agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
-                    AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
-                    if (!agentResult.isOK()) {
-                        throw new MessageException(agentResult.getMsg());
-                    }
+                    // 调用冻结接口 (传参：AG, 冻结原因, 冻结人, 数据ID, 冻结业务)
+                    agentFreezeResult(agentVo.getAgent().getId(),
+                            FreeCause.JSKBG.getValue(),
+                            String.valueOf(FreePerson.XTDJ.getValue()),
+                            dateChangeRequest.getId(),
+                            businfoList);
                 }
             } else {
                 // 调用冻结接口(preColinfoVoList为空，代理商变更前没有结算卡信息，也需调用冻结接口)
-                AgentFreezePort agentFreezePort = new AgentFreezePort();
-                agentFreezePort.setAgentId(agentVo.getAgent().getId());
-                agentFreezePort.setFreezeCause(FreeCause.JSKBG.getValue());
-                agentFreezePort.setOperationPerson(String.valueOf(FreePerson.XTDJ.getValue()));
-                agentFreezePort.setFreezeNum(dateChangeRequest.getId());
-                agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-                agentFreezePort.setBusPlatform(busList);
-                agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
-                AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
-                if (!agentResult.isOK()) {
-                    throw new MessageException(agentResult.getMsg());
-                }
+                agentFreezeResult(agentVo.getAgent().getId(),
+                        FreeCause.JSKBG.getValue(),
+                        String.valueOf(FreePerson.XTDJ.getValue()),
+                        dateChangeRequest.getId(),
+                        businfoList);
             }
         }
 
@@ -318,6 +331,241 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         return ResultVO.success(null);
     }
 
+    // 省区/代理商修改申请-调用冻结接口
+    void agentFreezeResult(String agentId, String freezeCause, String freezePerson, String freezeNum, List<String> busPlatform) {
+        try {
+            AgentFreezePort agentFreezePort = new AgentFreezePort();
+            agentFreezePort.setAgentId(agentId);
+            agentFreezePort.setFreezeCause(freezeCause);
+            agentFreezePort.setOperationPerson(freezePerson);
+            agentFreezePort.setFreezeNum(freezeNum);
+            agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+            agentFreezePort.setBusPlatform(busPlatform);
+            agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
+            AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
+            if (!agentResult.isOK()) {
+                logger.info("代理商{},冻结失败:{}", agentId, agentResult.getMsg());
+                throw new MessageException(agentResult.getMsg());
+            }
+            logger.info("代理商{},冻结参数:{}", JSONObject.toJSON(agentFreezePort));
+        } catch (MessageException e) {
+            logger.info("代理商{},调用冻结接口失败:{}", agentId, e.getMsg());
+            e.printStackTrace();
+        }
+    }
+
+    // 省区/代理商修改申请-调用解冻接口
+    void agentUnFreezeResult(String agentId, String UnfreezeCause, String freezeCause, String freezePerson) {
+        try {
+            AgentFreezePort agentFreezePort = new AgentFreezePort();
+            agentFreezePort.setAgentId(agentId);
+            agentFreezePort.setUnfreezeCause(UnfreezeCause);
+            agentFreezePort.setFreezeCause(freezeCause);
+            agentFreezePort.setOperationPerson(freezePerson);
+            agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+            AgentResult agentResult = agentFreezeService.agentUnFreeze(agentFreezePort);
+            if (!agentResult.isOK()) {
+                logger.info("代理商{},解冻失败:{}", agentId, agentResult.getMsg());
+                throw new ProcessException(agentResult.getMsg());
+            }
+            logger.info("代理商{},解冻参数:{}", JSONObject.toJSON(agentFreezePort));
+        } catch (MessageException e) {
+            logger.info("代理商{},调用解冻接口失败:{}", agentId, e.getMsg());
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 代理商启动结算卡变更审批服务
+     * @param dataChangeId
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public ResultVO agentStartDataChangeActivity(String dataChangeId, String userId) throws Exception {
+        logger.info("========用户{}启动数据修改申请{}", userId, dataChangeId);
+        DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(dataChangeId);
+
+        // 查询代理商是否重复发起，状态为审批中的，不能重复提交
+        DateChangeRequestExample dateChangeRequestExample = new DateChangeRequestExample();
+        DateChangeRequestExample.Criteria criteria = dateChangeRequestExample.createCriteria();
+        criteria.andDataIdEqualTo(dateChangeRequest.getDataId());
+        criteria.andDataTypeEqualTo(BusActRelBusType.DC_AG_Colinfo.name());
+        criteria.andAppyStatusEqualTo(AgStatus.Approving.getValue());
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        // 查询省区是否发起数据，状态为审批中的，不能重复提交
+        dateChangeRequestExample.or()
+                .andDataIdEqualTo(dateChangeRequest.getDataId())
+                .andDataTypeEqualTo(BusActRelBusType.DC_Colinfo.name())
+                .andAppyStatusEqualTo(AgStatus.Approving.getValue());
+        List<DateChangeRequest> dateChangeRequests = dateChangeRequestMapper.selectByExample(dateChangeRequestExample);
+        if (null == dateChangeRequests) {
+            logger.info("数据修改申请:{}", "查询审批状态失败");
+            throw new MessageException("查询审批状态失败！");
+        }
+        if (dateChangeRequests.size() > 0) {
+            logger.info("数据修改申请:{}", "数据已申请，审批中请勿重复提交");
+            throw new MessageException("数据已申请，审批中请勿重复提交！");
+        }
+        AgentVo agentVo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
+        if (null == agentVo) {
+            logger.info("数据修改申请:{}", "转换异常");
+            throw new MessageException("修改申请提交审批失败！");
+        }
+        List<AgentColinfoVo> colinfoVoList = agentVo.getColinfoVoList();
+        if (colinfoVoList != null) {
+            for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
+                List<AColinfoPayment> aColinfoPayments = colinfoPaymentService.queryConlifoPaymentList(dateChangeRequest.getDataId(), agentColinfoVo.getCloBankAccount());
+                if (null == aColinfoPayments) {
+                    logger.info("数据修改申请:{}", "收款账号查询失败");
+                    throw new MessageException("收款账号查询失败");
+                }
+                if (aColinfoPayments.size() > 2) {
+                    logger.info("数据修改申请:{}", "收款账号已验证超过2次请更换银行卡");
+                    throw new MessageException("收款账号已验证超过2次请更换银行卡！");
+                }
+            }
+        }
+
+        // 代理商-基础信息变更申请，提交审批时，需校验结算卡字段是否变更，变更则需冻结代理商状态且生成冻结记录
+        List<AgentBusInfo> agentBusInfos = agentBusinfoService.queryAgentBusInfoFreeze(agentVo.getAgent().getId());
+        List<String> businfoList = new LinkedList<>();
+        for (AgentBusInfo busInfo : agentBusInfos) {
+            businfoList.add(busInfo.getId());
+        }
+        AgentVo preAgentVo = JSONObject.parseObject(dateChangeRequest.getDataPreContent(), AgentVo.class);
+        List<AgentColinfoVo> preColinfoVoList = preAgentVo.getColinfoVoList();
+        if (preColinfoVoList.size() != 0 && preColinfoVoList != null) {
+            AgentColinfoVo preAgentColinfoVo = preColinfoVoList.get(0); // 变更前
+            AgentColinfoVo agentColinfoVo = colinfoVoList.get(0); // 变更后
+            AgentResult agentVerify = verifyColinfoIsChange(agentColinfoVo, preAgentColinfoVo);
+            if (agentVerify.isOK()) {
+                // 调用冻结接口 (传参：AG, 冻结原因, 冻结人, 数据ID, 冻结业务)
+                agentFreezeResult(agentVo.getAgent().getId(),
+                        FreeCause.JSKBG.getValue(),
+                        String.valueOf(FreePerson.XTDJ.getValue()),
+                        dateChangeRequest.getId(),
+                        businfoList);
+            }
+        } else {
+            // 调用冻结接口(preColinfoVoList为空，代理商变更前没有结算卡信息，也需调用冻结接口)
+            agentFreezeResult(agentVo.getAgent().getId(),
+                    FreeCause.JSKBG.getValue(),
+                    String.valueOf(FreePerson.XTDJ.getValue()),
+                    dateChangeRequest.getId(),
+                    businfoList);
+        }
+
+        BusActRelExample example = new BusActRelExample();
+        example.or().andBusIdEqualTo(dateChangeRequest.getId()).andActivStatusEqualTo(AgStatus.Approving.name()).andStatusEqualTo(Status.STATUS_1.status);
+        List<BusActRel> list = busActRelMapper.selectByExample(example);
+        if (list.size() > 0) {
+            logger.info("========用户{}启动数据修改申请{}{}", dataChangeId, userId, "申请进行中，禁止重复提交");
+            return ResultVO.fail("申请进行中，禁止重复提交");
+        }
+
+        //基础信息变更申请-启动流程
+        List<String> stringType = new ArrayList<String>();
+        List<String> stringPro = new ArrayList<String>();
+        List<String> stringDis = new ArrayList<String>();
+        String stringJump = null;
+        List<Dict> dictList_one = dictOptionsService.dictList(DictGroup.DATA_CHANGE.name(), DictGroup.MARKET_ONE.name());
+        List<Dict> dictList_two = dictOptionsService.dictList(DictGroup.DATA_CHANGE.name(), DictGroup.MARKET_TWO.name());
+        List<AgentBusInfo> agentBusInfoList = agentBusinfoService.queryAgentBusInfo(dateChangeRequest.getDataId());
+        for (AgentBusInfo agentBusInfo : agentBusInfoList) {
+            PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+            if (platForm.getPlatformType().equals("RJPOS") || platForm.getPlatformType().equals("RJQZ")) {
+                stringType.add(dictList_two.get(0).getdItemvalue());
+            } else {
+                stringType.add(dictList_one.get(0).getdItemvalue());
+            }
+            COrganization org_pro = departmentService.getById(agentBusInfo.getAgDocPro());
+            stringPro.add(org_pro.getCode());
+            COrganization org_dis = departmentService.getById(agentBusInfo.getAgDocDistrict());
+            stringDis.add(org_dis.getCode());
+        }
+        ArrayList<String> arrayType = new ArrayList<>(new HashSet<>(stringType));
+        logger.info("市场部参数:{}" + JSONObject.toJSONString(arrayType));
+        if (arrayType.size()==0 || arrayType==null) {
+            logger.info("代理商启动审批异常，未获取到市场部审批参数{}", JSONObject.toJSON(agentBusInfoList));
+            throw new MessageException("代理商启动审批异常，未获取到市场部审批参数");
+        }
+        ArrayList<String> arrayPro = new ArrayList<>(new HashSet<>(stringPro));
+        logger.info("省区参数:{}" + JSONObject.toJSONString(arrayPro));
+        if (arrayPro.size()==0 || arrayPro==null) {
+            logger.info("代理商启动审批异常，未获取到省区审批参数{}", JSONObject.toJSON(agentBusInfoList));
+            throw new MessageException("代理商启动审批异常，未获取到省区审批参数");
+        }
+        ArrayList<String> arrayDis = new ArrayList<>(new HashSet<>(stringDis));
+        logger.info("去除'beijing'前的大区参数:{}" + JSONObject.toJSONString(arrayDis));
+        if (arrayDis.size()==0 || arrayDis==null) {
+            logger.info("代理商启动审批异常，未获取到大区审批参数{}", JSONObject.toJSON(agentBusInfoList));
+            throw new MessageException("代理商启动审批异常，未获取到大区审批参数");
+        } else {
+            // arrayDis!=0 || arrayDis!=null, 去除"beijing"参数, 再次判断arrayDis是否有值, 有则传参"no"不跳过大区, 无则传参"yes"跳过大区
+            arrayDis.remove("beijing");
+        }
+        logger.info("去除'beijing'后的大区参数:{}" + JSONObject.toJSONString(arrayDis));
+        if (arrayDis.size()==0 || arrayDis==null) {
+            stringJump = "yes";
+        } else {
+            stringJump = "no";
+        }
+
+        FastMap fastMap_dept = FastMap.fastMap("makUserList", arrayType) // 市场部审批人参数
+                .putKeyV("proList", arrayPro) // 省区审批人部门代码
+                .putKeyV("docList", arrayDis) // 大区审批人部门代码
+                .putKeyV("jumpDoc", stringJump) // 大区是否跳过
+                .putKeyV("rejectCount","0"); // 拒绝数量，初始值0，有拒绝就置为1
+        String workId = dictOptionsService.getApproveVersion("financeAgent");
+        dateChangeRequest.setAppyStatus(AgStatus.Approving.status);
+        int updateDateChange = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
+        if (1 != updateDateChange) {
+            logger.info("代理商审批，启动审批异常，更新记录状态{}:{}", dateChangeRequest.getId(), userId);
+            throw new MessageException("更新记录状态异常");
+        }
+        if (StringUtils.isEmpty(workId)) {
+            logger.info("========用户{}启动数据修改申请{}{}", dataChangeId, userId, "审批流启动失败字典中未配置部署流程");
+            throw new MessageException("审批流启动失败字典中未配置部署流程!");
+        }
+
+        String proce = activityService.createDeloyFlow(null, workId,null,null, fastMap_dept);
+        if (proce == null) {
+            logger.info("========用户{}启动数据修改申请{}{}", dataChangeId, userId, "数据修改审批，审批流启动失败");
+            logger.info("数据修改审批，审批流启动失败{}:{}", dataChangeId, userId);
+            throw new MessageException("审批流启动失败!");
+        }
+        //代理商业务视频关系
+        BusActRel record = new BusActRel();
+        record.setBusId(dateChangeRequest.getId());
+        record.setActivId(proce);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(userId);
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(dateChangeRequest.getDataType());//流程关系类型是数据申请类型
+        record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(dateChangeRequest.getDataId());
+        record.setDataShiro(BusActRelBusType.DC_AG_Colinfo.key);
+        Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
+        if (agent != null) {
+            record.setAgentName(agent.getAgName());
+        }
+        if (1 != busActRelMapper.insertSelective(record)) {
+            logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}", dateChangeRequest.getId(), proce);
+            throw  new MessageException("添加审批关系失败");
+        }
+        return ResultVO.success(null);
+    }
+
+    /**
+     * 基础信息申请修改，校验结算卡是否变更
+     * @param agentColinfoVo
+     * @param agentColinfoPre
+     * @return
+     */
     public AgentResult verifyColinfoIsChange(AgentColinfoVo agentColinfoVo, AgentColinfoVo agentColinfoPre) {
         if (!agentColinfoVo.getCloType().equals(agentColinfoPre.getCloType())
                 || !agentColinfoVo.getCloRealname().equals(agentColinfoPre.getCloRealname())
@@ -363,7 +611,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             try {
                 if(AgStatus.Approved.name().equals(agStatus)){
                     //收款账户修改
-                    if(DataChangeApyType.DC_Colinfo.name().equals(dr.getDataType())) {
+                    if(DataChangeApyType.DC_Colinfo.name().equals(dr.getDataType()) || DataChangeApyType.DC_AG_Colinfo.name().equals(dr.getDataType())) {
                         //更新入库
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
                         vo.getAgent().setcUser(rel.getcUser());     //直接新增收款账户时 此字段不可为空
@@ -378,6 +626,19 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
                         if(res.isSuccess()){
+                            //结算卡审批状态更新为审批通过
+                            List<AgentColinfo> query_colinfo = agentColinfoMapper.queryByAgentId(vo.getAgent().getId());
+                            if (query_colinfo.size()!=1) {
+                                logger.info("收款账户不唯一：{}{}", vo.getAgent().getId(),JSONObject.toJSON(query_colinfo));
+                                throw new ProcessException("收款账户不唯一");
+                            } else {
+                                AgentColinfo agentColinfo = query_colinfo.get(0);
+                                agentColinfo.setCloReviewStatus(AgStatus.Approved.status);
+                                if (1 != agentColinfoMapper.updateByPrimaryKeySelective(agentColinfo)) {
+                                    throw new ProcessException("更新收款账户审批状态失败");
+                                }
+                            }
+
                             //调整业务出款机构
                             ResultVO adjustFinOrg =  dataChangeActivityService.adjustFinanceOrgByAccount(vo.getAgent().getId());
                             if(!adjustFinOrg.isSuccess()){
@@ -469,9 +730,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                         throw new ProcessException("更新修改代理商失败");
                                     }
                                 }
-
                                 for (String fileId : attrs) {
-
                                     Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
                                     if(attachment!=null){
                                         if(AttDataTypeStatic.YYZZ.code.equals(attachment.getAttDataType()+"")){
@@ -481,7 +740,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                             isHaveFRSFZ = true;
                                         }
                                     }
-
                                     AttachmentRel record = new AttachmentRel();
                                     record.setAttId(fileId);
                                     record.setSrcId(db_agent.getId());
@@ -497,11 +755,11 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     }
                                 }
                             }
-
                             logger.info("===============================更新代理商基础信息成功");
                             logger.info("===============================更新合同信息开始");
                             ResultVO updateAgentContractVoRes = agentContractService.updateAgentContractVo(vo.getContractVoList(), vo.getAgent(),vo.getAgent().getcUser());
                             logger.info("===============================更新合同信息结束");
+
                             Agent preVoAgent = preVo.getAgent();
                             if (voColinfoVoList.size()>0){
                                 if (voColinfoVoList.size() != preVoColinfoVoList.size()){       //新增收款账户
@@ -515,7 +773,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     //建立收款账户和平台码的关系
                                     AgentColinfo agentColinfoVo=voColinfoVoList.get(0);
                                     for (AgentBusInfo agentBusInfo : agentBusInfoList) {        //为业务平台建立结算卡关系
-
                                         AgentColinfoRel agentColinfoRel = new AgentColinfoRel();
                                         agentColinfoRel.setcUse(rel.getcUser());
                                         agentColinfoRel.setAgentid(voAgent.getId());
@@ -537,7 +794,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                         for (AgentColinfoVo oldColinfo:preVoColinfoVoList){
                                             if (newColinfo.getId().equals(oldColinfo.getId())){
                                                 checkTemp = checkNewAccount(newColinfo,oldColinfo);
-
                                                 synTemp=isMustSyn(newColinfo,oldColinfo,voAgent,preVoAgent);
                                             }
                                         }
@@ -572,7 +828,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                             logger.info("========================同步至业务系统完成");
                                             break;
                                         }else if (!synTemp){//同步至业务系统
-
                                             logger.info("========================修复业务结算卡关系");
                                             AgentColinfo agentColinfo_db = agentColinfoService.selectByAgentId(vo.getAgent().getId());
                                             if(agentColinfo_db!=null && StringUtils.isNotBlank(agentColinfo_db.getId())){
@@ -587,7 +842,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                                 }
                                             }
                                             logger.info("========================修复业务结算卡关系");
-
                                             for (AgentBusInfo agentBusInfo : agentBusInfoList) {
                                                 agentNetInNotityService.asynNotifyPlatform(agentBusInfo.getId(),NotifyType.NetInEdit.getValue());
                                             }
@@ -596,9 +850,26 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     }
                                 }
                             }
+
+                            AgentColinfo agentColinfo_afterChange = agentColinfoService.selectByAgentId(vo.getAgent().getId());
+                            try {
+                                logger.info("===================开始执行kafka消息分发");
+                                agentKafkaService.sendPayMentMessage(vo.getAgent().getId(),
+                                        vo.getAgent().getAgName(),
+                                        "", "",
+                                        KafkaMessageType.CARD,
+                                        KafkaMessageTopic.CardChange.code,
+                                        JSONObject.toJSONString(agentColinfo_afterChange)
+                                );
+                                logger.info("===================结束kafka消息分发");
+                            } catch (Exception e) {
+                                logger.info("kafka接口调用失败,AG码", vo.getAgent().getId());
+                                e.printStackTrace();
+                            }
                         }
 
-                        //结算卡申请，审批通过后，自动解冻(冻结原因为"基本信息缺失","结算卡变更冻结"的数据，如代理商没有其他冻结数据，则需要更新解冻代理商数据的冻结状态)
+                        // 省区/代理商-结算卡申请，审批通过后，自动解冻(冻结原因为"基本信息缺失","结算卡变更冻结","认证冻结"的数据，如代理商没有其他冻结数据，则需要更新解冻代理商数据的冻结状态)
+                        // 调用解冻接口 (传参：AG, 解冻原因, 冻结原因, 解冻人, 冻结业务)
                         String data_id = dr.getId();
                         String agent_id = vo.getAgent().getId();
                         String freeze_cause_XXQS = FreeCause.XXQS.getValue();
@@ -619,17 +890,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                         if (resultCheck_XXQS.isOK()) {
                                             Map<String, Object> checkMapData_XXQS = resultCheck_XXQS.getMapData();
                                             String ag_id = (String) checkMapData_XXQS.get("agentId");
-                                            AgentFreezePort agentFreezePort = new AgentFreezePort();
-                                            agentFreezePort.setAgentId(ag_id);
-                                            agentFreezePort.setUnfreezeCause(UnfreeCause.XTJD.getValue());
-                                            agentFreezePort.setOperationPerson(String.valueOf(UnfreePerson.XTJD.getValue()));
-                                            agentFreezePort.setFreezeCause(FreeCause.XXQS.getValue());
-                                            agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-                                            AgentResult agentResult_XXQS = agentFreezeService.agentUnFreeze(agentFreezePort);
-                                            if (!agentResult_XXQS.isOK()) {
-                                                logger.info("代理商{},解冻失败:{}", ag_id, agentResult_XXQS.getMsg());
-                                                throw new ProcessException(agentResult_XXQS.getMsg());
-                                            }
+                                            agentUnFreezeResult(ag_id,
+                                                    UnfreeCause.XTJD.getValue(),
+                                                    FreeCause.XXQS.getValue(),
+                                                    String.valueOf(UnfreePerson.XTJD.getValue()));
                                         }
                                     }
                                 }
@@ -637,72 +901,43 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 if (resultCheck_JSKBG.isOK()) {
                                     Map<String, Object> checkMapData = resultCheck_JSKBG.getMapData();
                                     String ag_id = (String) checkMapData.get("agentId");
-                                    AgentFreezePort agentFreezePort = new AgentFreezePort();
-                                    agentFreezePort.setAgentId(ag_id);
-                                    agentFreezePort.setUnfreezeCause(UnfreeCause.XTJD.getValue());
-                                    agentFreezePort.setOperationPerson(String.valueOf(UnfreePerson.XTJD.getValue()));
-                                    agentFreezePort.setFreezeCause(FreeCause.JSKBG.getValue());
-                                    agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-                                    AgentResult agentResult_JSKBG = agentFreezeService.agentUnFreeze(agentFreezePort);
-                                    if (!agentResult_JSKBG.isOK()) {
-                                        logger.info("代理商{},解冻失败:{}", ag_id, agentResult_JSKBG.getMsg());
-                                        throw new ProcessException(agentResult_JSKBG.getMsg());
-                                    }
+                                    agentUnFreezeResult(ag_id,
+                                            UnfreeCause.XTJD.getValue(),
+                                            FreeCause.JSKBG.getValue(),
+                                            String.valueOf(UnfreePerson.XTJD.getValue()));
                                 }
                                 AgentResult resultCheck_RZDJ = agentFreezeService.checkAgentFreezeExists(agent_id, freeze_cause_RZDJ, freeze_type);
                                 if (resultCheck_RZDJ.isOK()) {
                                     Map<String, Object> checkMapData = resultCheck_RZDJ.getMapData();
                                     String ag_id = (String) checkMapData.get("agentId");
-                                    AgentFreezePort agentFreezePort = new AgentFreezePort();
-                                    agentFreezePort.setAgentId(ag_id);
-                                    agentFreezePort.setUnfreezeCause(UnfreeCause.XTJD.getValue());
-                                    agentFreezePort.setOperationPerson(String.valueOf(UnfreePerson.XTJD.getValue()));
-                                    agentFreezePort.setFreezeCause(FreeCause.RZDJ.getValue());
-                                    agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-                                    AgentResult agentResult_RZDJ = agentFreezeService.agentUnFreeze(agentFreezePort);
-                                    if (!agentResult_RZDJ.isOK()) {
-                                        logger.info("代理商{},解冻失败:{}", ag_id, agentResult_RZDJ.getMsg());
-                                        throw new ProcessException(agentResult_RZDJ.getMsg());
-                                    }
+                                    agentUnFreezeResult(ag_id,
+                                            UnfreeCause.XTJD.getValue(),
+                                            FreeCause.RZDJ.getValue(),
+                                            String.valueOf(UnfreePerson.XTJD.getValue()));
                                 }
                             } else {
                                 AgentResult resultCheck_XXQS_TWO = agentFreezeService.checkAgentFreezeExists(agent_id, freeze_cause_XXQS, freeze_type);
                                 if (resultCheck_XXQS_TWO.isOK()) {
                                     Map<String, Object> checkMapData = resultCheck_XXQS_TWO.getMapData();
                                     String ag_id = (String) checkMapData.get("agentId");
-                                    AgentFreezePort agentFreezePort = new AgentFreezePort();
-                                    agentFreezePort.setAgentId(ag_id);
-                                    agentFreezePort.setUnfreezeCause(UnfreeCause.XTJD.getValue());
-                                    agentFreezePort.setOperationPerson(String.valueOf(UnfreePerson.XTJD.getValue()));
-                                    agentFreezePort.setFreezeCause(FreeCause.XXQS.getValue());
-                                    agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-                                    AgentResult agentResult_XXQS_TWO = agentFreezeService.agentUnFreeze(agentFreezePort);
-                                    if (!agentResult_XXQS_TWO.isOK()) {
-                                        logger.info("代理商{},解冻失败:{}", ag_id, agentResult_XXQS_TWO.getMsg());
-                                        throw new ProcessException(agentResult_XXQS_TWO.getMsg());
-                                    }
+                                    agentUnFreezeResult(ag_id,
+                                            UnfreeCause.XTJD.getValue(),
+                                            FreeCause.XXQS.getValue(),
+                                            String.valueOf(UnfreePerson.XTJD.getValue()));
                                 }
                                 AgentResult resultCheck_RZDJ_TWO = agentFreezeService.checkAgentFreezeExists(agent_id, freeze_cause_RZDJ, freeze_type);
                                 if (resultCheck_RZDJ_TWO.isOK()) {
                                     Map<String, Object> checkMapData = resultCheck_RZDJ_TWO.getMapData();
                                     String ag_id = (String) checkMapData.get("agentId");
-                                    AgentFreezePort agentFreezePort = new AgentFreezePort();
-                                    agentFreezePort.setAgentId(ag_id);
-                                    agentFreezePort.setUnfreezeCause(UnfreeCause.XTJD.getValue());
-                                    agentFreezePort.setOperationPerson(String.valueOf(UnfreePerson.XTJD.getValue()));
-                                    agentFreezePort.setFreezeCause(FreeCause.RZDJ.getValue());
-                                    agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-                                    AgentResult agentResult_RZDJ = agentFreezeService.agentUnFreeze(agentFreezePort);
-                                    if (!agentResult_RZDJ.isOK()) {
-                                        logger.info("代理商{},解冻失败:{}", ag_id, agentResult_RZDJ.getMsg());
-                                        throw new ProcessException(agentResult_RZDJ.getMsg());
-                                    }
+                                    agentUnFreezeResult(ag_id,
+                                            UnfreeCause.XTJD.getValue(),
+                                            FreeCause.RZDJ.getValue(),
+                                            String.valueOf(UnfreePerson.XTJD.getValue()));
                                 }
                             }
                         }
                         //代理商新修改
                     }else if(DataChangeApyType.DC_Agent.name().equals(dr.getDataType())){
-
                         //更新入库
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
                         AgentVo preVo = JSONObject.parseObject(dr.getDataPreContent(), AgentVo.class);
@@ -755,7 +990,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         //入网程序调用
 //                        try {
                         if(vo.getBusInfoVoList()!=null){
-
                             for (AgentBusInfoVo agentBusInfoVo : vo.getBusInfoVoList()) {
 //                                    if(StringUtils.isNotBlank(agentBusInfoVo.getId())) {
 //                                        ImportAgent importAgent = new ImportAgent();
@@ -778,7 +1012,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 //                        } finally {
 //                            agentNotifyService.asynNotifyPlatform();
 //                        }
-
                     }
                     //拒绝更新数据状态
                 }else if(AgStatus.Refuse.name().equals(agStatus)){
@@ -788,8 +1021,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dr)){
                         throw new ProcessException("更新数据申请失败");
                     }
-                    if (DataChangeApyType.DC_Colinfo.name().equals(dr.getDataType())) {
-                        //结算卡申请，审批拒绝后，自动解冻(冻结原因为"结算卡变更冻结"的数据，如代理商没有其他冻结数据，则需要更新解冻代理商数据的冻结状态)
+                    if (DataChangeApyType.DC_Colinfo.name().equals(dr.getDataType()) || DataChangeApyType.DC_AG_Colinfo.name().equals(dr.getDataType())) {
+                        // 结算卡申请，审批拒绝后，自动解冻(冻结原因为"结算卡变更冻结"的数据，如代理商没有其他冻结数据，则需要更新解冻代理商数据的冻结状态)
+                        // 调用解冻接口 (传参：AG, 解冻原因, 冻结原因, 解冻人, 冻结业务)
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
                         String agent_id = vo.getAgent().getId();
                         String freeze_cause_JSKBG = FreeCause.JSKBG.getValue();
@@ -799,18 +1033,25 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             if (resultCheck.isOK()) {
                                 Map<String, Object> checkMapData = resultCheck.getMapData();
                                 String ag_id = (String) checkMapData.get("agentId");
-                                AgentFreezePort agentFreezePort = new AgentFreezePort();
-                                agentFreezePort.setAgentId(ag_id);
-                                agentFreezePort.setUnfreezeCause(UnfreeCause.XTJD.getValue());
-                                agentFreezePort.setOperationPerson(String.valueOf(UnfreePerson.XTJD.getValue()));
-                                agentFreezePort.setFreezeCause(FreeCause.JSKBG.getValue());
-                                agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-                                AgentResult agentResult_JSKBG = agentFreezeService.agentUnFreeze(agentFreezePort);
-                                if (!agentResult_JSKBG.isOK()) {
-                                    logger.info("代理商{},解冻失败:{}", ag_id, agentResult_JSKBG.getMsg());
-                                    throw new ProcessException(agentResult_JSKBG.getMsg());
-                                }
+                                agentUnFreezeResult(ag_id,
+                                        UnfreeCause.XTJD.getValue(),
+                                        FreeCause.JSKBG.getValue(),
+                                        String.valueOf(UnfreePerson.XTJD.getValue()));
                             }
+                          /*  //更改修改状态
+                            AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
+                            AgentColinfoExample.Criteria criteria1 = agentColinfoExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status)
+                                    .andCloReviewStatusEqualTo(AgStatus.Approved.status)
+                                    .andAgentIdEqualTo(agent_id);
+                            List<AgentColinfo> agentColinfoList = agentColinfoMapper.selectByExample(agentColinfoExample);
+                            if(null!=agentColinfoList || agentColinfoList.size()>0) {
+                                AgentColinfo agentColinfo = agentColinfoList.get(0);
+                                agentColinfo.setAmendStatus(AmendStatus.DXG.status);
+                                if (1 != agentColinfoMapper.updateByPrimaryKeySelective(agentColinfo)) {
+                                    logger.info("数据修改申请:{}", "修改状态修改失败");
+                                    throw new ProcessException("数据修改申请,修改状态修改失败！");
+                                }
+                            }*/
                         }
                     }
                 }

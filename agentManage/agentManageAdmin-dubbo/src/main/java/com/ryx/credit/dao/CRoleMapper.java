@@ -33,4 +33,6 @@ public interface CRoleMapper extends BaseMapper<CRole> {
     Long findId();
 
     List<CResource> selectResourcByRoleId(@Param("id") Long id);
+
+    Set<String> findFinanceRoleId(@Param("userId") Long userId);
 }
