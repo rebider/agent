@@ -226,7 +226,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         if (!agentResult.isOK()){
             AppConfig.sendEmails("代理商冻结失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg(), "冻结失败报警");
             log.error("代理商冻结失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg());
-            throw new MessageException("代理商冻结失败");
+            throw new MessageException(agentResult.getMsg());
         }
         Map mapData = (Map) agentResult.getData();
         AgentFreeze date = (AgentFreeze)mapData.get("data");
@@ -256,7 +256,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         if (!agentResult.isOK()){
             AppConfig.sendEmails("代理商解冻失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg(), "解冻失败报警");
             log.error("代理商解冻失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg());
-            throw new MessageException("代理商解冻失败");
+            throw new MessageException(agentResult.getMsg());
         }
         Map mapData = (Map) agentResult.getData();
         AgentFreeze date = (AgentFreeze)mapData.get("data");
