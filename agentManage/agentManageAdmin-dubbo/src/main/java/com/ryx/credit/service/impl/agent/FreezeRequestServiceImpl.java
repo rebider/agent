@@ -971,7 +971,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
             if (agentBusInfos == null || agentBusInfos.size() == 0) {
                 logger.info("找不到的业务平台码:{}", String.valueOf(objectList.get(3)).replaceAll("\r|\n", ""));
-                throw new MessageException("第[" + num + "]行,找不到的业务平台信息:业务平台编号[" + String.valueOf(objectList.get(3)).replaceAll("\r|\n", "")+"],业务平台["+String.valueOf(objectList.get(4)).replaceAll("\r|\n", "")+"']");
+                throw new MessageException("第[" + num + "]行,找不到的业务平台信息:业务平台编号[" + String.valueOf(objectList.get(3)).replaceAll("\r|\n", "")+"],业务平台["+String.valueOf(objectList.get(4)).replaceAll("\r|\n", "")+"]");
             }
 
             if (StringUtils.isBlank(String.valueOf(objectList.get(15)))) {
@@ -1025,7 +1025,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             freezeRequestDetail.setReflowFreeze(String.valueOf(objectList.get(8)).equals("是") ? BigDecimal.ONE : BigDecimal.ZERO);
             freezeRequestDetail.setMonthlyFreeze(String.valueOf(objectList.get(9)).equals("是") ? BigDecimal.ONE : BigDecimal.ZERO);
             freezeRequestDetail.setDailyFreeze(String.valueOf(objectList.get(10)).equals("是") ? BigDecimal.ONE : BigDecimal.ZERO);
-            freezeRequestDetail.setStopProfitFreezeOrg(String.valueOf(objectList.get(11)).equals("是") ? BigDecimal.ONE : BigDecimal.ZERO);
+            freezeRequestDetail.setStopProfitFreeze(String.valueOf(objectList.get(11)).equals("是") ? BigDecimal.ONE : BigDecimal.ZERO);
             freezeRequestDetail.setCashFreeze(String.valueOf(objectList.get(12)).equals("是") ? BigDecimal.ONE : BigDecimal.ZERO);
             freezeRequestDetail.setStopCount(String.valueOf(objectList.get(13)).equals("是") ? BigDecimal.ONE : BigDecimal.ZERO);
             freezeRequestDetail.setNewBusFreeze(String.valueOf(objectList.get(14)).equals("是") ? BigDecimal.ONE : BigDecimal.ZERO);
@@ -1054,13 +1054,40 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             Map userMap = new HashMap();
             int numFreeze = 0;
             for (FreezeRequestDetail freezeRequestDetail : freezeRequestDetaillist) {
-                numFreeze =+1;
+                numFreeze = numFreeze+1;
                 agentFreezePort.setFreezeCause(freezeRequestDetail.getFreezeCause());
                 agentFreezePort.setFreezeNum(freezeRequest.getId());
                 agentFreezePort.setAgentId(freezeRequestDetail.getAgentId());
+                if (freezeRequestDetail.getFreezeType().compareTo(FreeType.AGNET.code)==0){
+                    FreezeDetail freezeDetail = new FreezeDetail();
+                    freezeDetail.setCashFreeze(freezeRequestDetail.getCashFreeze());
+                    freezeDetail.setNewBusFreeze(freezeRequestDetail.getNewBusFreeze());
+                    freezeDetail.setStopCount(freezeRequestDetail.getStopCount());
+                    freezeDetail.setDailyFreeze(freezeRequestDetail.getDailyFreeze());
+                    freezeDetail.setMonthlyFreeze(freezeRequestDetail.getMonthlyFreeze());
+                    freezeDetail.setReflowFreeze(freezeRequestDetail.getReflowFreeze());
+                    freezeDetail.setProfitFreeze(freezeRequestDetail.getProfitFreeze());
+                    freezeDetail.setBusFreeze(freezeRequestDetail.getBusFreeze());
+                    freezeDetail.setStopProfitFreeze(freezeRequestDetail.getStopProfitFreeze());
+                    agentFreezePort.setCurLevel(freezeDetail);
+                }else if (freezeRequestDetail.getFreezeType().compareTo(FreeType.SUB_AGENT.code)==0){
+                    FreezeDetail freezeDetail = new FreezeDetail();
+                    freezeDetail.setCashFreeze(freezeRequestDetail.getCashFreeze());
+                    freezeDetail.setNewBusFreeze(freezeRequestDetail.getNewBusFreeze());
+                    freezeDetail.setStopCount(freezeRequestDetail.getStopCount());
+                    freezeDetail.setDailyFreeze(freezeRequestDetail.getDailyFreeze());
+                    freezeDetail.setMonthlyFreeze(freezeRequestDetail.getMonthlyFreeze());
+                    freezeDetail.setReflowFreeze(freezeRequestDetail.getReflowFreeze());
+                    freezeDetail.setProfitFreeze(freezeRequestDetail.getProfitFreeze());
+                    freezeDetail.setBusFreeze(freezeRequestDetail.getBusFreeze());
+                    freezeDetail.setStopProfitFreeze(freezeRequestDetail.getStopProfitFreeze());
+                    agentFreezePort.setSubLevel(freezeDetail);
+                }else {
+                    throw new MessageException("第[" + numFreeze + "]行,冻结层级错误");
+                }
                 AgentResult checkRuleRest =  checkFreezeRule(agentFreezePort);
                 if (!checkRuleRest.isOK()){
-                    throw new MessageException("第[" + numFreeze + "]行,代理商冻结申请选项不符合规则!");
+                    throw new MessageException("第[" + numFreeze + "]行,"+checkRuleRest.getMsg());
                 }
                 AgentResult verify = verify(agentFreezePort, FreeStatus.DJ.getValue(),BigDecimal.ZERO);
                 if(!verify.isOK()){
