@@ -1360,6 +1360,16 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             if(userMap.get("NOT_RJ")!=null){
                 userList.add(String.valueOf(userMap.get("NOT_RJ")));
             }
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(agentFreezePort.getOperationPerson()));
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                throw new MessageException("部门参数为空");
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+            if(orgCode.equals("finance")){
+                userList.clear();
+                userList.add(dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),FreeApprovalUser.FINANCE.key).getdItemvalue());
+            }
             //Todo:增加判断是否为瑞+方法
             startPar.put("userList",userList);
             //启动审批
