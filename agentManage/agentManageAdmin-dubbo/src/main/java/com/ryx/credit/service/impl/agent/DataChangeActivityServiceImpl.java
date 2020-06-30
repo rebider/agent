@@ -154,7 +154,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     logger.info("数据修改申请:{}", "收款账号已验证超过2次请更换银行卡");
                     throw new MessageException("收款账号已验证超过2次请更换银行卡！");
                 }
-               /* AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
+                AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
                 AgentColinfoExample.Criteria criteria1 = agentColinfoExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status)
                         .andCloReviewStatusEqualTo(AgStatus.Approved.status)
                         .andAgentIdEqualTo(agentVo.getAgent().getId());
@@ -166,7 +166,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         logger.info("数据修改申请:{}", "修改状态修改失败");
                         throw new MessageException("数据修改申请,修改状态修改失败！");
                     }
-                }*/
+                }
             }
         }
         // 省区-结算卡申请，提交审批时，校验结算卡字段是否变更，变更则需冻结代理商状态且生成冻结记录
@@ -426,6 +426,19 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 if (aColinfoPayments.size() > 2) {
                     logger.info("数据修改申请:{}", "收款账号已验证超过2次请更换银行卡");
                     throw new MessageException("收款账号已验证超过2次请更换银行卡！");
+                }
+                AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
+                AgentColinfoExample.Criteria criteria1 = agentColinfoExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status)
+                        .andCloReviewStatusEqualTo(AgStatus.Approved.status)
+                        .andAgentIdEqualTo(agentVo.getAgent().getId());
+                List<AgentColinfo> agentColinfoList = agentColinfoMapper.selectByExample(agentColinfoExample);
+                if(null!=agentColinfoList || agentColinfoList.size()>0){
+                    AgentColinfo agentColinfo = agentColinfoList.get(0);
+                    agentColinfo.setAmendStatus(AmendStatus.XGZ.status);
+                    if(1!=agentColinfoMapper.updateByPrimaryKeySelective(agentColinfo)){
+                        logger.info("数据修改申请:{}", "修改状态修改失败");
+                        throw new MessageException("数据修改申请,修改状态修改失败！");
+                    }
                 }
             }
         }
@@ -1038,7 +1051,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                         FreeCause.JSKBG.getValue(),
                                         String.valueOf(UnfreePerson.XTJD.getValue()));
                             }
-                          /*  //更改修改状态
+                            //更改修改状态
                             AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
                             AgentColinfoExample.Criteria criteria1 = agentColinfoExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status)
                                     .andCloReviewStatusEqualTo(AgStatus.Approved.status)
@@ -1051,7 +1064,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     logger.info("数据修改申请:{}", "修改状态修改失败");
                                     throw new ProcessException("数据修改申请,修改状态修改失败！");
                                 }
-                            }*/
+                            }
                         }
                     }
                 }
