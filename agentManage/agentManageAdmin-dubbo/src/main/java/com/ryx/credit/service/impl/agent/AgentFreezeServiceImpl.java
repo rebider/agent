@@ -1026,6 +1026,28 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 if (agentFreezes== null || agentFreezes.size() == 0){
                     return AgentResult.ok("不需要冻结新增业务");
                 }else {
+
+                    AgentFreezeExample agentFreezeExampleQuerry = new AgentFreezeExample();
+                    AgentFreezeExample.Criteria criteria = agentFreezeExampleQuerry.createCriteria();
+                    criteria.andFreezeTypeIsNull();
+                    criteria.andStatusEqualTo(Status.STATUS_1.status);
+                    criteria.andAgentIdEqualTo(agentFreezes.get(0).getAgentId());
+                    criteria.andFreezeCauseEqualTo(agentFreezes.get(0).getFreezeCause());
+                    criteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+                    criteria.andBusIdEqualTo(busId);
+                    agentFreezeExampleQuerry.or()
+                            .andFreezeTypeEqualTo(FreeType.AGNET.code)
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andAgentIdEqualTo(agentFreezes.get(0).getAgentId())
+                            .andFreezeCauseEqualTo(agentFreezes.get(0).getFreezeCause())
+                            .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString())
+                            .andBusIdEqualTo(busId);
+                    List<AgentFreeze> agentFreezeQs = agentFreezeMapper.selectByExample(agentFreezeExampleQuerry);
+                    if(agentFreezeQs.size()!=0){
+                        return AgentResult.ok("代理商此原因已被冻结:"+FreeCause.getContentByValue(agentFreezes.get(0).getFreezeCause()));
+                    }
+
+
                     AgentFreeze agentFreeze = new AgentFreeze();
                     agentFreeze.setId(idService.genId(TabId.a_agent_freeze));
                     agentFreeze.setAgentId(agentFreezePort.getAgentId());

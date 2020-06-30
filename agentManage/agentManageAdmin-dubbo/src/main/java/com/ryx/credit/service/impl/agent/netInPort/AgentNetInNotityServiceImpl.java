@@ -348,14 +348,14 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
             updateAgent.setcUtime(nowDate);
             int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);
-
+            //新增冻结
             try {
                 AgentFreezePort agentFreezePort = new AgentFreezePort();
                 agentFreezePort.setAgentId(agentBusInfo.getAgentId());
                 agentFreezePort.setBusPlatform(Arrays.asList(String.valueOf(agentBusInfo.getId())));
                 agentFreezePort.setFreezeNum(agentBusInfo.getId());
                 agentFreezePort.setOperationPerson(agentBusInfo.getcUser());
-                agentFreezePort.setRemark("新增业务冻结");
+                agentFreezePort.setRemark("新增业务冻结(自动发起)");
                 AgentResult agentResult = agentFreezeService.freezeNewBus(agentFreezePort);
                 if (!agentResult.isOK()){
                     AppConfig.sendEmails("代理商入网冻结失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg(), "冻结失败报警");
