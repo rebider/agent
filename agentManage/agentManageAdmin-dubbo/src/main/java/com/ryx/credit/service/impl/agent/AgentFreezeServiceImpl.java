@@ -1154,7 +1154,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                             String freezeReqId = freezeRequestDetail.getFreezeReqId();
                             FreezeRequest freezeRequestApp = freezeRequestMapper.selectByPrimaryKey(freezeReqId);
                             if (freezeRequestApp !=null && freezeRequestApp.getReviewsStat().compareTo(AgStatus.Approving.status)==0 && freezeRequestApp.getStatus().compareTo(Status.STATUS_1.status)==0){
-                                throw new MessageException("代理商此原因已申请冻结:"+FreeType.getmsg(freeType));
+                                throw new MessageException("代理商此原因已申请冻结:AG:"+agentFreezePort.getAgentId()+",冻结原因:"+FreeCause.getContentByValue(agentFreezePort.getFreezeCause()));
                             }
                         }
                     }
