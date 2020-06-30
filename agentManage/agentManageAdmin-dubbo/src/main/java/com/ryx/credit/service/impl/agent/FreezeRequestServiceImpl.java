@@ -1333,7 +1333,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 freezeRequestDetail.setVersion(Status.STATUS_1.status);
 
                 if (freezeRequestDetailMapper.insert(freezeRequestDetail)!=1){
-                    throw new MessageException("代理商[" + freezeRequestDetail.getAgentId() + "],代理商冻结申请明细保存失败!");
+                    throw new MessageException("代理商[" + freezeRequestDetail.getAgentId() + "],代理商批量解冻申请明细保存失败!");
                 }
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(freezeRequestDetail.getBusId());
                 if (agentBusInfo!=null){
@@ -1365,7 +1365,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             //启动审批
             String proce = activityService.createDeloyFlow(null, dictOptionsService.getApproveVersion("agentFreeze"), null, null, startPar);
             if (proce == null) {
-                logger.info("批量冻结申请提交审批，审批流启动失败{}:{}", agentFreezePort.getOperationPerson(), freezeRequest.getId());
+                logger.info("批量解冻申请提交审批，审批流启动失败{}:{}", agentFreezePort.getOperationPerson(), freezeRequest.getId());
                 throw new MessageException("审批流启动失败！");
             }
 
@@ -1388,10 +1388,10 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
 //        record.setAgDocPro(agentBusInfo.getAgDocPro());
 //        record.setAgDocDistrict(agentBusInfo.getAgDocDistrict());
             if (1 != busActRelMapper.insertSelective(record)) {
-                logger.info("批量冻结申请提交审批，启动审批异常，添加审批关系失败{}:{}", freezeRequest.getId(), proce);
-                throw new MessageException("批量申请冻结审批流启动失败：添加审批关系失败！");
+                logger.info("批量解冻申请提交审批，启动审批异常，添加审批关系失败{}:{}", freezeRequest.getId(), proce);
+                throw new MessageException("批量申请解冻审批流启动失败：添加审批关系失败！");
             }
-            return AgentResult.ok("批量冻结申请成功");
+            return AgentResult.ok("批量解冻申请成功");
         }catch (MessageException e){
             throw new MessageException(e.getMessage());
         }
