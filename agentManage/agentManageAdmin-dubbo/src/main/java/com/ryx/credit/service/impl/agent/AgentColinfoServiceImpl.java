@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
@@ -11,6 +12,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
+import com.ryx.credit.service.AgentKafkaService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.dict.IdService;
@@ -53,7 +55,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
     private AColinfoPaymentMapper colinfoPaymentMapper;
     @Autowired
     private LivenessDetectionService livenessDetectionService;
-
+    @Autowired
+    private AgentKafkaService agentKafkaService;
 
     /**
      * 代理商入网添加代理商交款项
@@ -810,7 +813,45 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
 
     @Override
-    public FastMap notifyCardChange(String key, String msg) throws Exception {
-        return null;
+    public FastMap notifyCardChange(String type,String ag) throws Exception {
+        //全量结算卡通知
+        if("ALL".equals(type)){
+            List<AgentColinfo> list = agentColinfoMapper.selectColInfoByAgent(null);
+            for (AgentColinfo agentColinfo : list) {
+                try {
+                    agentKafkaService.sendPayMentMessage(agentColinfo.getAgentId(),
+                            agentColinfo.getAccountName(),
+                            agentColinfo.getId(),
+                            null,
+                            KafkaMessageType.CARD,
+                            KafkaMessageTopic.CardChange.code,
+                            JSONObject.toJSONString(agentColinfo)
+                    );
+                } catch (Exception e) {
+                    logger.info("kafka接口调用失败 全量结算卡通知 {}",agentColinfo.getId());
+                    e.printStackTrace();
+                }
+            }
+
+        ///单个结算卡通知
+        }else{
+            List<AgentColinfo> list = agentColinfoMapper.selectColInfoByAgent(ag);
+            for (AgentColinfo agentColinfo : list) {
+                try {
+                    agentKafkaService.sendPayMentMessage(agentColinfo.getAgentId(),
+                            agentColinfo.getAccountName(),
+                            agentColinfo.getId(),
+                            null,
+                            KafkaMessageType.CARD,
+                            KafkaMessageTopic.CardChange.code,
+                            JSONObject.toJSONString(agentColinfo)
+                    );
+                } catch (Exception e) {
+                    logger.info("kafka接口调用失败 单个结算卡通知 {}",agentColinfo.getId());
+                    e.printStackTrace();
+                }
+            }
+        }
+        return FastMap.fastSuccessMap();
     }
 }

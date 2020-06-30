@@ -62,10 +62,10 @@ public interface AgentColinfoService {
 
 
     /**
-     * 结算卡变Kafka通知处理类更处理类
+     * 全量或者单个结算卡变Kafka通知处理类更处理类
      * @return
      * @throws Exception
      */
-    public FastMap notifyCardChange(String key,String msg)throws Exception;
+    public FastMap notifyCardChange(String type,String ag)throws Exception;
 
 }

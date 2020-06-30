@@ -416,4 +416,19 @@
             AND A.STATUS = '1'
             AND A.ID = #{agentId,jdbcType=VARCHAR}
     </select>
+    <select id="selectColInfoByAgent" parameterType="string" resultMap="BaseResultMap">
+        SELECT
+        <include refid="C_Base_Column_List" />
+        FROM
+        A_AGENT_COLINFO C, A_AGENT A
+        WHERE
+        A.ID = C.AGENT_ID
+        AND C.CLO_REVIEW_STATUS=3
+        AND A.AG_STATUS = 'Approved'
+        AND C.STATUS = '1'
+        AND A.STATUS = '1'
+        <if test="agentId!=null and agentId!=''">
+          AND A.ID = #{agentId,jdbcType=VARCHAR}
+        </if>
+    </select>
 </mapper>
