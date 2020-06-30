@@ -97,10 +97,10 @@ public interface TermMachineService {
     AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception;
 
 
-    AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException;
+    AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws ProcessException;
 
 
-    AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception;
+    AgentResult queryCompensateResult(Map<String, Object> map,String platformType) throws Exception;
 
     /**
      * 校验机具是否可变更
@@ -162,4 +162,20 @@ public interface TermMachineService {
      * @throws Exception
      */
     AgentResult agentFNoorbidde (List<String> pamMap, String platformType) throws Exception;
+
+    /**
+     * 换活动解锁
+     * @param pamMap
+     * @return
+     * @throws Exception
+     */
+    AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception;
+
+    /**
+     * 换活动解锁
+     * @param pamMap
+     * @return
+     * @throws Exception
+     */
+    AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception;
 }
