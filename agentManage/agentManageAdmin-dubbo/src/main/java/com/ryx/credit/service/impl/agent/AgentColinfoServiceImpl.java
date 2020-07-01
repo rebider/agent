@@ -813,10 +813,13 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
 
     @Override
-    public FastMap notifyCardChange(String type,String ag) throws Exception {
+    public FastMap notifyCardChange(String type,String ag,String userId) throws Exception {
+        logger.info("结算卡接口调用:{},{},{}",type,ag,userId);
+        if(StringUtils.isBlank(type))return FastMap.fastFailMap();
+        if(StringUtils.isBlank(userId))return FastMap.fastFailMap();
         //全量结算卡通知
         if("ALL".equals(type)){
-            List<AgentColinfo> list = agentColinfoMapper.selectColInfoByAgent(null);
+            List<AgentColinfo> list = agentColinfoMapper.selectColInfoByAgent(null, BusStatus.getAvbList());
             for (AgentColinfo agentColinfo : list) {
                 try {
                     agentKafkaService.sendPayMentMessage(agentColinfo.getAgentId(),
@@ -832,10 +835,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     e.printStackTrace();
                 }
             }
-
         ///单个结算卡通知
-        }else{
-            List<AgentColinfo> list = agentColinfoMapper.selectColInfoByAgent(ag);
+        }else if("NOTALL".equals(type) && StringUtils.isNotBlank(ag)){
+            List<AgentColinfo> list = agentColinfoMapper.selectColInfoByAgent(ag, BusStatus.getAvbList());
             for (AgentColinfo agentColinfo : list) {
                 try {
                     agentKafkaService.sendPayMentMessage(agentColinfo.getAgentId(),

@@ -427,6 +427,17 @@
         AND A.AG_STATUS = 'Approved'
         AND C.STATUS = '1'
         AND A.STATUS = '1'
+        <if test="avbList!=null and avbList.size() > 0">
+          and  exists(select ab.id from a_agent_businfo ab
+            where ab.agent_id=a.id
+                and ab.status=1
+                and ab.clo_review_status=3
+                and ab.bus_status in
+                  <foreach collection="avbList" item="avb"  open="(" separator="," close=")" >
+                    #{avb}
+                  </foreach>
+            )
+        </if>
         <if test="agentId!=null and agentId!=''">
           AND A.ID = #{agentId,jdbcType=VARCHAR}
         </if>

@@ -66,6 +66,6 @@ public interface AgentColinfoService {
      * @return
      * @throws Exception
      */
-    public FastMap notifyCardChange(String type,String ag)throws Exception;
+    public FastMap notifyCardChange(String type,String ag,String userId)throws Exception;
 
 }
