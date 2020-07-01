@@ -16,6 +16,6 @@ public interface CardChangeService {
      * @param msg
      * @return
      */
-    public FastMap notifyCardChange(String key,String msg)throws MessageException;
+    public FastMap notifyCardChange(String key,String msg,String agName)throws MessageException;
 
 }
