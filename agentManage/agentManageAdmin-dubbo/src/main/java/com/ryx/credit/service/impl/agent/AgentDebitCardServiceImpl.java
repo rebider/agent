@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.DataChangeApyType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -90,12 +91,14 @@ public class AgentDebitCardServiceImpl implements AgentDebitCardService {
 
     @Override
     public PageInfo serchDataChangeReqByAg(Map<String, Object> param, PageInfo pageInfo) throws IOException, SQLException {
+        param.put("DC_AG_Colinfo", DataChangeApyType.DC_AG_Colinfo.name());
+        param.put("DC_Colinfo",DataChangeApyType.DC_Colinfo.name());
         Long count = dateChangeRequestMapper.serchDataChangeReqByAgCount(param);
         pageInfo.setTotal(count.intValue());
         List<Map<String, Object>> dataChangeList = dateChangeRequestMapper.serchDataChangeReqByAgList(param);
         List<Map<String, Object>>  list = new ArrayList<>();
-        HashMap<String, Object> map = new HashMap<>();
         for (Map<String, Object> dateChangeReq : dataChangeList) {
+            HashMap<String, Object> map = new HashMap<>();
             Clob data_content = (Clob) dateChangeReq.get("DATA_CONTENT");
             AgentVo vo = JSONObject.parseObject(ClobToString(data_content), AgentVo.class);
             if(null!=vo){

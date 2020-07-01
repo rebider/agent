@@ -325,7 +325,7 @@
   </select>
   <sql id="dataChangeReq_Detail">
     select * from DATA_CHANGE_REQUEST
-    where status=1 and DATA_TYPE='DC_AG_Colinfo' and APPY_STATUS in(2,3)
+    where status=1 and DATA_TYPE in (#{DC_AG_Colinfo},#{DC_Colinfo}) and APPY_STATUS in(2,3)
     <if test="agentId!=null and agentId!=''"> and  DATA_ID = #{agentId} </if>
   </sql>
 </mapper>
