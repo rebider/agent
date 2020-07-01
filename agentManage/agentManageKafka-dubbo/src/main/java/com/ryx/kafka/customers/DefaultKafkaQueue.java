@@ -68,7 +68,8 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
 			if(StringUtils.isNotBlank(msg.topic()) && KafkaMessageTopic.CardChange.code.equals(msg.topic())){
 				LOG.info("接收到结算卡变更通知:{} {}",msg.topic(),key);
 				try {
-				  res =  cardChangeService.notifyCardChange(key,value);
+					KfkSendMessage kfkSendMessage = kfkSendMessageMapper.selectByPrimaryKey(key);
+				  res =  cardChangeService.notifyCardChange(key,value,kfkSendMessage.getAgentName());
 				} catch (MessageException e) {
 					e.printStackTrace();
 					AppConfig.sendEmails("接收到结算卡变更通知清算异常:"+key+" "+e.getMsg(),"接收到结算卡变更通知清算异常:"+key);

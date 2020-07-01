@@ -57,6 +57,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
     private LivenessDetectionService livenessDetectionService;
     @Autowired
     private AgentKafkaService agentKafkaService;
+    @Autowired
+    private AgentMapper agentMapper;
+
 
     /**
      * 代理商入网添加代理商交款项
@@ -828,10 +831,11 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                             && StringUtils.isNotBlank(agentColinfo.getAccountName())
                             && null!=agentColinfo.getCloInvoice()
                             && null!=agentColinfo.getCloTaxPoint()) {
+                        Agent agent = agentMapper.selectByPrimaryKey(agentColinfo.getAgentId());
                         agentKafkaService.sendPayMentMessage(agentColinfo.getAgentId(),
-                                agentColinfo.getAccountName(),
+                                agent.getAgName(),
                                 agentColinfo.getId(),
-                                null,
+                                agentColinfo.getId(),
                                 KafkaMessageType.CARD,
                                 KafkaMessageTopic.CardChange.code,
                                 JSONObject.toJSONString(agentColinfo)
@@ -855,10 +859,11 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                             && StringUtils.isNotBlank(agentColinfo.getAccountName())
                             && null!=agentColinfo.getCloInvoice()
                             && null!=agentColinfo.getCloTaxPoint()) {
+                        Agent agent = agentMapper.selectByPrimaryKey(agentColinfo.getAgentId());
                         agentKafkaService.sendPayMentMessage(agentColinfo.getAgentId(),
-                                agentColinfo.getAccountName(),
+                                agent.getAgName(),
                                 agentColinfo.getId(),
-                                null,
+                                agentColinfo.getId(),
                                 KafkaMessageType.CARD,
                                 KafkaMessageTopic.CardChange.code,
                                 JSONObject.toJSONString(agentColinfo)
