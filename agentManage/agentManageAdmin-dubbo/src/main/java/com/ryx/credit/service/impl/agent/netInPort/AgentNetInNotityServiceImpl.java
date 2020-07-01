@@ -348,40 +348,44 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
             updateAgent.setcUtime(nowDate);
             int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);
-
-            try {
-                AgentFreezePort agentFreezePort = new AgentFreezePort();
-                agentFreezePort.setAgentId(agentBusInfo.getAgentId());
-                agentFreezePort.setBusPlatform(Arrays.asList(String.valueOf(agentBusInfo.getId())));
-                agentFreezePort.setFreezeNum(agentBusInfo.getId());
-                agentFreezePort.setOperationPerson(agentBusInfo.getcUser());
-                agentFreezePort.setRemark("新增业务冻结");
-                AgentResult agentResult = agentFreezeService.freezeNewBus(agentFreezePort);
-                if (!agentResult.isOK()){
-                    AppConfig.sendEmails("代理商入网冻结失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg(), "冻结失败报警");
-                    log.info("入网新增业务调用冻结接口操作: 代理商id：{},返回结果:{},更新数据库失败",agentBusInfo.getAgentId(),agentResult.getMsg());
+            if (record.getNotifyType().equals(NotifyType.NetInAddBus.code)){
+                //新增冻结
+                try {
+                    AgentFreezePort agentFreezePort = new AgentFreezePort();
+                    agentFreezePort.setAgentId(agentBusInfo.getAgentId());
+                    agentFreezePort.setBusPlatform(Arrays.asList(String.valueOf(agentBusInfo.getId())));
+                    agentFreezePort.setFreezeNum(agentBusInfo.getId());
+                    agentFreezePort.setOperationPerson(agentBusInfo.getcUser());
+                    agentFreezePort.setRemark("新增业务冻结(自动发起)");
+                    AgentResult agentResult = agentFreezeService.freezeNewBus(agentFreezePort);
+                    if (!agentResult.isOK()){
+                        AppConfig.sendEmails("代理商入网冻结失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg(), "冻结失败报警");
+                        log.info("入网新增业务调用冻结接口操作: 代理商id：{},返回结果:{},更新数据库失败",agentBusInfo.getAgentId(),agentResult.getMsg());
+                    }
+                }catch (Exception e){
+                    log.info("入网新增业务调用冻结接口操作异常{}",e);
                 }
-            }catch (Exception e){
-                log.info("入网新增业务调用冻结接口操作异常{}",e);
             }
-            //入网合同冻结
-            try {
-                AgentFreezePort agentFreezePort = new AgentFreezePort();
-                agentFreezePort.setAgentId(agent.getId());
-                agentFreezePort.setFreezeCause(FreeCause.HTDJ.getValue());
-                agentFreezePort.setOperationPerson(agent.getcUser());
-                agentFreezePort.setFreezeNum(agent.getId());
-                agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
-                agentFreezePort.setBusPlatform(Arrays.asList(String.valueOf(agentBusInfo.getId())));
-                agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
-                AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
-                if(!agentResult.isOK()){
-                    AppConfig.sendEmails("代理商入网合同冻结失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg(), "冻结失败报警");
-                    log.info("入网新增业务调用合同冻结接口操作: 代理商id：{},返回结果:{}",agentBusInfo.getAgentId(),agentResult.getMsg());
+            if (record.getNotifyType().equals(NotifyType.NetInAdd.code)){
+                //入网合同冻结
+                try {
+                    AgentFreezePort agentFreezePort = new AgentFreezePort();
+                    agentFreezePort.setAgentId(agent.getId());
+                    agentFreezePort.setFreezeCause(FreeCause.HTDJ.getValue());
+                    agentFreezePort.setOperationPerson(agent.getcUser());
+                    agentFreezePort.setFreezeNum(agent.getId());
+                    agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+                    agentFreezePort.setBusPlatform(Arrays.asList(String.valueOf(agentBusInfo.getId())));
+                    agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
+                    AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
+                    if(!agentResult.isOK()){
+                        AppConfig.sendEmails("代理商入网合同冻结失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg(), "冻结失败报警");
+                        log.info("入网新增业务调用合同冻结接口操作: 代理商id：{},返回结果:{}",agentBusInfo.getAgentId(),agentResult.getMsg());
+                    }
+                } catch (MessageException e) {
+                    e.printStackTrace();
+                    log.error("入网新增业务调用冻结接口操作异常{}",e);
                 }
-            } catch (MessageException e) {
-                e.printStackTrace();
-                log.error("入网新增业务调用冻结接口操作异常{}",e);
             }
 
         }else{
