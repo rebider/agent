@@ -342,6 +342,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
             agentFreezePort.setBusPlatform(busPlatform);
             agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
+            FreezeDetail freezeDetail = new FreezeDetail();
+            freezeDetail.setProfitFreeze(BigDecimal.ONE);//分润冻结
+            freezeDetail.setReflowFreeze(BigDecimal.ONE);//返现冻结
+            freezeDetail.setMonthlyFreeze(BigDecimal.ONE);//月结
+            freezeDetail.setDailyFreeze(BigDecimal.ONE);//日结
+            freezeDetail.setCashFreeze(BigDecimal.ONE);//体现结算冻结
+            agentFreezePort.setCurLevel(freezeDetail);
             AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
             if (!agentResult.isOK()) {
                 logger.info("代理商{},冻结失败:{}", agentId, agentResult.getMsg());

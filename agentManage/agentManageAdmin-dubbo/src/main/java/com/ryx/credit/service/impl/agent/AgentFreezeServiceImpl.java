@@ -11,14 +11,12 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentFreezeMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.pojo.admin.CUser;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.AgentExample;
-import com.ryx.credit.pojo.admin.agent.AgentFreeze;
-import com.ryx.credit.pojo.admin.agent.AgentFreezeExample;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.pojo.admin.vo.AgentFreezeVo;
 import com.ryx.credit.service.IUserService;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentFreezeService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.commons.collections.map.HashedMap;
@@ -55,6 +53,8 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
     private IUserService userService;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
 
 
     @Override
@@ -514,6 +514,11 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                         BigDecimal freeze_type = FreeType.AGNET.code;
                         // 调用冻结接口前，检查冻结表是否存在同一AG码同一冻结类型的冻结数据，存在则无需调接口
                         AgentResult resultCheck = checkAgentFreezeExists(agent_id, freeze_cause, freeze_type);
+                        List<AgentBusInfo> agentBusInfos = agentBusinfoService.queryAgentBusInfoFreeze(agent_id);
+                        List<String> businfoList = new LinkedList<>();
+                        for (AgentBusInfo busInfo : agentBusInfos) {
+                            businfoList.add(busInfo.getId());
+                        }
                         if (!resultCheck.isOK()) {
                             // 调用冻结接口
                             AgentFreezePort agentFreezePort = new AgentFreezePort();
@@ -523,6 +528,15 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                             agentFreezePort.setFreezeNum(agent_id);
                             agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
                             agentFreezePort.setRemark(str_remark);
+                            agentFreezePort.setBusPlatform(busPlatform);
+                            agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
+                            FreezeDetail freezeDetail = new FreezeDetail();
+                            freezeDetail.setProfitFreeze(BigDecimal.ONE);//分润冻结
+                            freezeDetail.setReflowFreeze(BigDecimal.ONE);//返现冻结
+                            freezeDetail.setMonthlyFreeze(BigDecimal.ONE);//月结
+                            freezeDetail.setDailyFreeze(BigDecimal.ONE);//日结
+                            freezeDetail.setCashFreeze(BigDecimal.ONE);//体现结算冻结
+                            agentFreezePort.setCurLevel(freezeDetail);
                             AgentResult agentResult = agentFreeze(agentFreezePort);
                             if (!agentResult.isOK()) {
                                 throw new ProcessException(agentResult.getMsg());
