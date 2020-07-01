@@ -14,6 +14,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.pojo.admin.vo.AgentFreezeVo;
+import com.ryx.credit.pojo.admin.vo.FreezeDetail;
 import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentBusinfoFreezeService;
@@ -487,6 +488,13 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                             agentFreezePort.setRemark(str_remark);
                             agentFreezePort.setBusPlatform(businfoList);
                             agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
+                            FreezeDetail freezeDetail = new FreezeDetail();
+                            freezeDetail.setProfitFreeze(BigDecimal.ONE);//分润冻结
+                            freezeDetail.setReflowFreeze(BigDecimal.ONE);//返现冻结
+                            freezeDetail.setMonthlyFreeze(BigDecimal.ONE);//月结
+                            freezeDetail.setDailyFreeze(BigDecimal.ONE);//日结
+                            freezeDetail.setCashFreeze(BigDecimal.ONE);//体现结算冻结
+                            agentFreezePort.setCurLevel(freezeDetail);
                             AgentResult agentResult = agentFreeze(agentFreezePort);
                             if (!agentResult.isOK()) {
                                 log.info("批量冻结基本信息缺失代理商{},冻结失败:{}", agent_id, agentResult.getMsg());
