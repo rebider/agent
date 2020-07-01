@@ -10,6 +10,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
+import com.ryx.credit.pojo.admin.vo.FreezeDetail;
 import com.ryx.credit.profit.dao.FreezeAgentMapper;
 import com.ryx.credit.profit.dao.FreezeOperationRecordMapper;
 import com.ryx.credit.profit.dao.InvoiceSumMapper;
@@ -469,6 +470,13 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
         agentFreezePort.setBusPlatform(busList);
         agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
+        FreezeDetail freezeDetail = new FreezeDetail();
+        freezeDetail.setProfitFreeze(BigDecimal.ONE);//分润冻结
+        freezeDetail.setReflowFreeze(BigDecimal.ONE);//返现冻结
+        freezeDetail.setMonthlyFreeze(BigDecimal.ONE);//月结
+        freezeDetail.setDailyFreeze(BigDecimal.ONE);//日结
+        freezeDetail.setCashFreeze(BigDecimal.ONE);//体现结算冻结
+        agentFreezePort.setCurLevel(freezeDetail);
         AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
         if("200".equals(agentResult.getStatus())){
             logger.info("欠票冻结："+agentId+",代理商冻结成功！");
