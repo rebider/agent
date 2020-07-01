@@ -673,6 +673,18 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 agentFreeze.setNewBusFreezeOrg(agentFreezes.get(0).getNewBusFreeze());
                 agentFreeze.setFreezeId(agentFreezes.get(0).getId());
 
+                if (agentFreeze.getBusFreeze().compareTo(agentFreeze.getBusFreezeOrg())== 0
+                    && agentFreeze.getProfitFreeze().compareTo(agentFreeze.getProfitFreezeOrg()) == 0
+                    && agentFreeze.getReflowFreeze().compareTo(agentFreeze.getReflowFreezeOrg()) == 0
+                    && agentFreeze.getMonthlyFreeze().compareTo(agentFreeze.getMonthlyFreezeOrg()) == 0
+                    && agentFreeze.getDailyFreeze().compareTo(agentFreeze.getDailyFreezeOrg()) == 0
+                    && agentFreeze.getStopProfitFreeze().compareTo(agentFreeze.getStopProfitFreezeOrg()) == 0
+                    && agentFreeze.getCashFreeze().compareTo(agentFreeze.getCashFreezeOrg()) == 0
+                    && agentFreeze.getStopCount().compareTo(agentFreeze.getStopCountOrg()) == 0
+                    && agentFreeze.getNewBusFreeze().compareTo(agentFreeze.getNewBusFreezeOrg()) == 0){
+                    throw new MessageException("变更后信息与原信息一致，请核实重新输入!");
+                }
+
                 if(StringUtils.isNotBlank(agentFreezePort.getRemark())){//备注
                     agentFreeze.setRemark(agentFreezePort.getRemark());
                 }
