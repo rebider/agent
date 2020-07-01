@@ -822,14 +822,23 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
             List<AgentColinfo> list = agentColinfoMapper.selectColInfoByAgent(null, BusStatus.getAvbList());
             for (AgentColinfo agentColinfo : list) {
                 try {
-                    agentKafkaService.sendPayMentMessage(agentColinfo.getAgentId(),
-                            agentColinfo.getAccountName(),
-                            agentColinfo.getId(),
-                            null,
-                            KafkaMessageType.CARD,
-                            KafkaMessageTopic.CardChange.code,
-                            JSONObject.toJSONString(agentColinfo)
-                    );
+                    if(StringUtils.isNotBlank(agentColinfo.getBankRegion())
+                            && StringUtils.isNotBlank(agentColinfo.getBranchLineNum())
+                            && StringUtils.isNotBlank(agentColinfo.getAccountId())
+                            && StringUtils.isNotBlank(agentColinfo.getAccountName())
+                            && null!=agentColinfo.getCloInvoice()
+                            && null!=agentColinfo.getCloTaxPoint()) {
+                        agentKafkaService.sendPayMentMessage(agentColinfo.getAgentId(),
+                                agentColinfo.getAccountName(),
+                                agentColinfo.getId(),
+                                null,
+                                KafkaMessageType.CARD,
+                                KafkaMessageTopic.CardChange.code,
+                                JSONObject.toJSONString(agentColinfo)
+                        );
+                    }else{
+                        logger.info("kafka接口调用失败 全量结算卡通知 未通知数据不全 {}",agentColinfo.getId());
+                    }
                 } catch (Exception e) {
                     logger.info("kafka接口调用失败 全量结算卡通知 {}",agentColinfo.getId());
                     e.printStackTrace();
@@ -840,14 +849,23 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
             List<AgentColinfo> list = agentColinfoMapper.selectColInfoByAgent(ag, BusStatus.getAvbList());
             for (AgentColinfo agentColinfo : list) {
                 try {
-                    agentKafkaService.sendPayMentMessage(agentColinfo.getAgentId(),
-                            agentColinfo.getAccountName(),
-                            agentColinfo.getId(),
-                            null,
-                            KafkaMessageType.CARD,
-                            KafkaMessageTopic.CardChange.code,
-                            JSONObject.toJSONString(agentColinfo)
-                    );
+                    if(StringUtils.isNotBlank(agentColinfo.getBankRegion())
+                            && StringUtils.isNotBlank(agentColinfo.getBranchLineNum())
+                            && StringUtils.isNotBlank(agentColinfo.getAccountId())
+                            && StringUtils.isNotBlank(agentColinfo.getAccountName())
+                            && null!=agentColinfo.getCloInvoice()
+                            && null!=agentColinfo.getCloTaxPoint()) {
+                        agentKafkaService.sendPayMentMessage(agentColinfo.getAgentId(),
+                                agentColinfo.getAccountName(),
+                                agentColinfo.getId(),
+                                null,
+                                KafkaMessageType.CARD,
+                                KafkaMessageTopic.CardChange.code,
+                                JSONObject.toJSONString(agentColinfo)
+                        );
+                    }else{
+                        logger.info("kafka接口调用失败 全量结算卡通知 未通知数据不全 {}",agentColinfo.getId());
+                    }
                 } catch (Exception e) {
                     logger.info("kafka接口调用失败 单个结算卡通知 {}",agentColinfo.getId());
                     e.printStackTrace();
