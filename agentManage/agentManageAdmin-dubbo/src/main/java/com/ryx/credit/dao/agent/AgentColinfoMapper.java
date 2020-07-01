@@ -5,6 +5,7 @@ import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoExample;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -39,4 +40,6 @@ public interface AgentColinfoMapper {
      * @return
      */
     AgentColinfo selectByAgentId(String agentId);
+    List<AgentColinfo> selectColInfoByAgent(@Param("agentId") String agentId, @Param("avbList")List<BigDecimal> status);
+
 }

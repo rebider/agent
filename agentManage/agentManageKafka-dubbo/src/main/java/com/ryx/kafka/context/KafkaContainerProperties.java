@@ -95,6 +95,10 @@ public class KafkaContainerProperties extends ContainerProperties {
             logger.info("动态clientId:{}",WalletQ_client);
         }
         this.topics = (String[])topicslist_cons.toArray(new String[topicslist_cons.size()]);
+        for (String topic : this.topics) {
+            logger.info("监听主题topics:{}",topic);
+        }
+
         this.topicPattern = null;
         this.topicPartitions = null;
     }
