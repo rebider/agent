@@ -12,6 +12,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.FreezeDetail;
 import com.ryx.credit.service.agent.AgentBusinfoFreezeService;
 import com.ryx.credit.service.agent.AgentFreezeService;
 import com.ryx.credit.service.agent.AgentService;
@@ -377,6 +378,13 @@ public class AgentNetInNotityServiceImpl implements AgentNetInNotityService {
                     agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
                     agentFreezePort.setBusPlatform(Arrays.asList(String.valueOf(agentBusInfo.getId())));
                     agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
+                    FreezeDetail freezeDetail = new FreezeDetail();
+                    freezeDetail.setProfitFreeze(BigDecimal.ONE);//分润冻结
+                    freezeDetail.setReflowFreeze(BigDecimal.ONE);//返现冻结
+                    freezeDetail.setMonthlyFreeze(BigDecimal.ONE);//月结
+                    freezeDetail.setDailyFreeze(BigDecimal.ONE);//日结
+                    freezeDetail.setCashFreeze(BigDecimal.ONE);//体现结算冻结
+                    agentFreezePort.setCurLevel(freezeDetail);
                     AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
                     if(!agentResult.isOK()){
                         AppConfig.sendEmails("代理商入网合同冻结失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg(), "冻结失败报警");
