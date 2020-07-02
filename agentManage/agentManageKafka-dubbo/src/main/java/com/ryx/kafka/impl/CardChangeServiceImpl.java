@@ -2,6 +2,7 @@ package com.ryx.kafka.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.PropUtils;
 import com.ryx.credit.common.util.agentUtil.HttpUtil;
@@ -65,7 +66,7 @@ public class CardChangeServiceImpl implements CardChangeService {
 
             para.putKeyV("dataSource","01");//00 POS综管平台 01 集团代理商 02 手刷分润平台 03 瑞展业 04 手刷代付
             para.putKeyV("status","00");//00 正常
-            String url = PropUtils.getProp("qs_notify_card_change_server")+PropUtils.getProp("qs_notify_card_change_url");
+            String url = AppConfig.getProperty("qs_notify_card_change_server")+AppConfig.getProperty("qs_notify_card_change_url");
             logger.info("通知清结算系统 {} {}",url,key);
             String res = HttpUtil.doPost(url,para);
             logger.info("通知清结算系统 {} {} {}",url,key,res);
