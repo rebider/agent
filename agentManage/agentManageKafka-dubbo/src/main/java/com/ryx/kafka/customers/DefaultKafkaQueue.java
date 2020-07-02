@@ -15,6 +15,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaProducerException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.MessageListener;
@@ -39,6 +40,8 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
 	private KafkaTemplate kafkaTemplateService;
 
 	private static KafkaTemplate kafkaTemplate;
+
+	@Value("serverProperties['kafka.producer.defaultTopic']")
 	private static String defaultTopic = "";
 
 	@Autowired
@@ -49,9 +52,6 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
 	@PostConstruct
 	public void init(){
 		kafkaTemplate = kafkaTemplateService;
-		defaultTopic = PropUtils.getProp("kafka.producer.defaultTopic");
-		LOG.info("初始化主题:{}",defaultTopic);
-
 	}
 
 	@Override

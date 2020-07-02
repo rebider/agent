@@ -20,7 +20,7 @@ if [ ${tpid} ]; then
 else
     echo 'App is NOT running.'
 fi
- 
+
 rm -f tpid
 nohup java -jar ./$RESOURCE_NAME  &
 echo $! > tpid

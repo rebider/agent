@@ -830,8 +830,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 try {
                     if(StringUtils.isNotBlank(agentColinfo.getBankRegion())
                             && StringUtils.isNotBlank(agentColinfo.getBranchLineNum())
-                            && StringUtils.isNotBlank(agentColinfo.getAccountId())
-                            && StringUtils.isNotBlank(agentColinfo.getAccountName())
+                            && StringUtils.isNotBlank(agentColinfo.getCloBankAccount())
+                            && StringUtils.isNotBlank(agentColinfo.getCloRealname())
                             && null!=agentColinfo.getCloInvoice()
                             && null!=agentColinfo.getCloTaxPoint()) {
                         Agent agent = agentMapper.selectByPrimaryKey(agentColinfo.getAgentId());
@@ -858,8 +858,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 try {
                     if(StringUtils.isNotBlank(agentColinfo.getBankRegion())
                             && StringUtils.isNotBlank(agentColinfo.getBranchLineNum())
-                            && StringUtils.isNotBlank(agentColinfo.getAccountId())
-                            && StringUtils.isNotBlank(agentColinfo.getAccountName())
+                            && StringUtils.isNotBlank(agentColinfo.getCloBankAccount())
+                            && StringUtils.isNotBlank(agentColinfo.getCloRealname())
                             && null!=agentColinfo.getCloInvoice()
                             && null!=agentColinfo.getCloTaxPoint()) {
                         Agent agent = agentMapper.selectByPrimaryKey(agentColinfo.getAgentId());
@@ -872,7 +872,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                                 JSONObject.toJSONString(agentColinfo)
                         );
                     }else{
-                        logger.info("kafka接口调用失败 全量结算卡通知 未通知数据不全 {}",agentColinfo.getId());
+                        logger.info("kafka接口调用失败 单个结算卡通知 未通知数据不全 {}",agentColinfo.getId());
                     }
                 } catch (Exception e) {
                     logger.info("kafka接口调用失败 单个结算卡通知 {}",agentColinfo.getId());
