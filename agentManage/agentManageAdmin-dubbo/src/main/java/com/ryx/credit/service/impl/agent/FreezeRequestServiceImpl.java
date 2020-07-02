@@ -12,6 +12,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActRuTaskService;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IResourceService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -69,6 +70,8 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
     private AgentBusinfoFreezeService agentBusinfoFreezeService;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private IResourceService iResourceService;
 
 
     @Override
@@ -934,10 +937,67 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             if(orgCode.equals("finance")){
                 logger.info("财务部申请批量冻结:{}",String.valueOf(objectList.get(0)));
                 agentById = agentService.getAgentById(String.valueOf(objectList.get(0)));
+                if (null == agentById) {
+                    logger.info("找不到的代理商:{}", String.valueOf(objectList.get(0)));
+                    throw new MessageException("第[" + num + "]行,找不到的代理商" + objectList.get(0));
+                }
+                Map<String, Object> reqMap = new HashMap<>();
+                reqMap.put("agStatus", AgStatus.Approved.name());
+                reqMap.put("ag", String.valueOf(objectList.get(0)));
+                reqMap.put("busNum", String.valueOf(objectList.get(3)));
+                PlatForm platForm = platFormService.selectByPlatformName(String.valueOf(objectList.get(4)).replaceAll("\r|\n", ""));
+                if (platForm == null) {
+                    logger.info("业务平台不存在:{}", String.valueOf(objectList.get(4)).replaceAll("\r|\n", ""));
+                    throw new MessageException("第[" + num + "]行,业务平台不存在:"+String.valueOf(objectList.get(4)).replaceAll("\r|\n", ""));
+                }
+                reqMap.put("busPlatformList", Arrays.asList( platForm.getPlatformNum()));
+                List<Map<String, Object>> orgCodeResReq = iUserService.orgCode(Long.valueOf(userid));
+                if(orgCodeResReq==null && orgCodeRes.size()!=1){
+                    return null;
+                }
+                reqMap.put("status", Status.STATUS_1.status);
+                List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(Long.valueOf(userid));
+                reqMap.put("platfromPerm",platfromPerm);
+                List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, null);
+                if (agentBusInfoList == null || agentBusInfoList.size()==0){
+                    logger.info("找不到的代理商业务信息:{}", String.valueOf(objectList.get(0)));
+                    throw new MessageException("第[" + num + "]行,找不到的代理商业务信息" + objectList.get(0)+":"+String.valueOf(objectList.get(4)));
+                }
             }else {
                 logger.info("非财务部申请批量冻结:{}",String.valueOf(objectList.get(0)));
                 FastMap par = FastMap.fastMap("ag",String.valueOf(objectList.get(0)));
                 agentById = agentService.queryFreezeById(par,Long.valueOf(userid));
+                Map<String, Object> reqMap = new HashMap<>();
+                if (null == agentById) {
+                    logger.info("找不到的代理商:{}", String.valueOf(objectList.get(0)));
+                    throw new MessageException("第[" + num + "]行,找不到的代理商" + objectList.get(0));
+                }
+                reqMap.put("agStatus", AgStatus.Approved.name());
+                reqMap.put("ag", String.valueOf(objectList.get(0)));
+                reqMap.put("busNum", String.valueOf(objectList.get(3)));
+                PlatForm platForm = platFormService.selectByPlatformName(String.valueOf(objectList.get(4)).replaceAll("\r|\n", ""));
+                if (platForm == null) {
+                    logger.error("业务平台不存在:{}", String.valueOf(objectList.get(4)).replaceAll("\r|\n", ""));
+                    throw new MessageException("第[" + num + "]行,业务平台不存在:"+String.valueOf(objectList.get(4)).replaceAll("\r|\n", ""));
+                }
+                reqMap.put("busPlatformList", Arrays.asList( platForm.getPlatformNum()));
+                List<Map<String, Object>> orgCodeResReq = iUserService.orgCode(Long.valueOf(userid));
+                if(orgCodeResReq==null && orgCodeRes.size()!=1){
+                    return null;
+                }
+                String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+                String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+                reqMap.put("orgId",orgId);
+                reqMap.put("userId",Long.valueOf(userid));
+                reqMap.put("organizationCode", organizationCode);
+                reqMap.put("status", Status.STATUS_1.status);
+                List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(Long.valueOf(userid));
+                reqMap.put("platfromPerm",platfromPerm);
+                List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, null);
+                if (agentBusInfoList == null || agentBusInfoList.size()==0){
+                    logger.error("找不到的代理商业务信息:{}", String.valueOf(objectList.get(0)),String.valueOf(objectList.get(4)));
+                    throw new MessageException("第[" + num + "]行,找不到的代理商业务信息" + objectList.get(0)+":"+String.valueOf(objectList.get(4)));
+                }
             }
             if (null == agentById) {
                 logger.info("找不到的代理商:{}", String.valueOf(objectList.get(0)));
