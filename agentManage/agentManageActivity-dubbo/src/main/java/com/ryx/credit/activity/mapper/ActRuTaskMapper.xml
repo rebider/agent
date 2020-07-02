@@ -521,7 +521,7 @@
       and (
         (
           ri.group_id_='region'
-          and (oa.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%') or ob.CODE like concat(#{params.orgCode,jdbcType=VARCHAR},'%'))
+          and (oa.CODE = #{params.orgCode,jdbcType=VARCHAR} or ob.CODE = #{params.orgCode,jdbcType=VARCHAR})
         )
         <if test="params.orgCode!=null">
           or ri.group_id_ = #{params.orgCode,jdbcType=VARCHAR}
