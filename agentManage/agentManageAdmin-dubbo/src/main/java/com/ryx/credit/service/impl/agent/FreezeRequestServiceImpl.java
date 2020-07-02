@@ -1010,7 +1010,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             if (agentBusInfos != null && agentBusInfos.size() != 1) {
                 logger.info("找不到的业务平台码:{}", String.valueOf(objectList.get(3)).replaceAll("\r|\n", ""));
                 throw new MessageException("第[" + num + "]行,找不到的业务平台信息:业务平台编号[" + String.valueOf(objectList.get(3)).replaceAll("\r|\n", "")+"],业务平台["+String.valueOf(objectList.get(4)).replaceAll("\r|\n", "")+"]");
-            }else {
+            }/*else {
                 if(orgCode.equals("finance")){
 
                 }else {
@@ -1023,7 +1023,7 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                     }
 
                 }
-            }
+            }*/
 
             if (StringUtils.isBlank(String.valueOf(objectList.get(15)))) {
                 logger.info("冻结原因为空:{}", String.valueOf(objectList.get(15)));
