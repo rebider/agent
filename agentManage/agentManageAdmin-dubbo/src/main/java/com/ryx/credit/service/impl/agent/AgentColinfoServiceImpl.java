@@ -968,10 +968,19 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         }
         else {
             AgentColinfo agentColinfo_afterChange = selectByAgentId(agentColinfo.getAgentId());
+            String agName="";
+            if(StringUtils.isNotBlank(String.valueOf(map.get("ag_name")))){
+                agName=String.valueOf(map.get("ag_name"));
+            }else{
+                Agent agent = agentMapper.selectByPrimaryKey(agentColinfo.getAgentId());
+                if(null!=agent){
+                    agName=agent.getAgName();
+                }
+            }
             try {
                 logger.info("===================开始执行kafka消息分发");
                 agentKafkaService.sendPayMentMessage(agentColinfo.getAgentId(),
-                        agentColinfo.getId(),
+                        agName,
                         agentColinfo.getId(), "",
                         KafkaMessageType.CARD,
                         KafkaMessageTopic.CardChange.code,
