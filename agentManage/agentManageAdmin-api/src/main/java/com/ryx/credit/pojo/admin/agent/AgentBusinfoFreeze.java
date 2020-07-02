@@ -204,4 +204,13 @@ public class AgentBusinfoFreeze implements Serializable{
     public void setVersion(BigDecimal version) {
         this.version = version;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(busId.equals(((AgentBusinfoFreeze)obj).busId) && freezeType.equals(((AgentBusinfoFreeze)obj).freezeType) ){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
