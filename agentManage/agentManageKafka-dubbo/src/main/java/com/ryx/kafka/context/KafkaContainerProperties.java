@@ -1,7 +1,6 @@
 package com.ryx.kafka.context;
 
 import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.PropUtils;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.OffsetCommitCallback;
 import org.slf4j.Logger;
