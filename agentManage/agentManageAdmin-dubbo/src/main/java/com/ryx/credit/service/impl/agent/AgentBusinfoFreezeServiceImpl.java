@@ -201,10 +201,13 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
         List<AgentBusinfoFreeze> agentBusinfoFreezeList = agentBusinfoFreezeMapper.selectByExample(agentBusinfoFreezeExample);
         logger.info("业务冻结数据查询结果{}",agentBusinfoFreezeList != null && !agentBusinfoFreezeList.isEmpty() ?agentBusinfoFreezeList.size() :0);
 
-        ArrayList<String> agentBusFreeList = new ArrayList<>();
+        ArrayList<AgentBusinfoFreeze> agentBusFreeList = new ArrayList<>();
         if(null!=agentBusinfoFreezeList || agentBusinfoFreezeList.size()>0){
             for (AgentBusinfoFreeze agentBusinfoFreeze : agentBusinfoFreezeList) {
-                agentBusFreeList.add(agentBusinfoFreeze.getBusId());
+                AgentBusinfoFreeze agent_businfo_freeze = new AgentBusinfoFreeze();
+                agent_businfo_freeze.setBusId(agentBusinfoFreeze.getBusId());
+                agent_businfo_freeze.setFreezeType(agentBusinfoFreeze.getFreezeType());
+                agentBusFreeList.add(agent_businfo_freeze);
                 try {
                     logger.info("开始执行kafka消息分发");
                     AgentResult result = agentKafkaService.sendPayMentMessage(agentBusinfoFreeze.getAgId(),
@@ -231,21 +234,19 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
                 .andBusNumIsNotNull();
         List<AgentBusInfo> busInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
         logger.info("业务平台数据查询结果{}",busInfoList != null && !busInfoList.isEmpty() ?busInfoList.size() :0);
-        ArrayList<String> busList = new ArrayList<>();
         if(null!=busInfoList || busInfoList.size()>0){
-            for (AgentBusInfo agentBusInfo : busInfoList) {
-                busList.add(agentBusInfo.getId());
-            }
+            List<AgentBusinfoFreeze> busList = agentBuinfoFreeze(busInfoList);
             //取差集
-            boolean b = busList.removeAll(agentBusFreeList);
+                boolean b = busList.removeAll(agentBusFreeList);
             if(busList.size()>0){
-                for (String busId : busList) {
-                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+                for (AgentBusinfoFreeze agentBusFreeze : busList) {
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusFreeze.getBusId());
                     try {
                         AgentBusinfoFreeze agentBusinfoFreeze = new AgentBusinfoFreeze();
                         agentBusinfoFreeze.setAgId(agentBusInfo.getAgentId());
                         agentBusinfoFreeze.setBusId(agentBusInfo.getId());
                         agentBusinfoFreeze.setBusNum(agentBusInfo.getBusNum());
+                        agentBusinfoFreeze.setFreezeType(agentBusFreeze.getFreezeType());
                         if(StringUtils.isNotBlank(agentBusInfo.getBusPlatform())){
                             agentBusinfoFreeze.setPlatId(agentBusInfo.getBusPlatform());
                             PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
@@ -284,5 +285,23 @@ public class AgentBusinfoFreezeServiceImpl implements AgentBusinfoFreezeService 
             }
         }
         return AgentResult.ok(agentBusinfoFreezeList);
+    }
+
+    public List<AgentBusinfoFreeze> agentBuinfoFreeze(List<AgentBusInfo> busList){
+        if(null==busList || busList.size()==0){
+            return null;
+        }
+        ArrayList<AgentBusinfoFreeze> list = new ArrayList<>();
+        for (AgentBusInfo agentBusInfo : busList) {
+            AgentBusinfoFreeze agentbusFreeze = new AgentBusinfoFreeze();
+            agentbusFreeze.setBusId(agentBusInfo.getId());
+            agentbusFreeze.setFreezeType(FreeType.AGNET.code);
+            AgentBusinfoFreeze agent_businfo_freeze = new AgentBusinfoFreeze();
+            agent_businfo_freeze.setBusId(agentBusInfo.getId());
+            agent_businfo_freeze.setFreezeType(FreeType.SUB_AGENT.code);
+            list.add(agentbusFreeze);
+            list.add(agent_businfo_freeze);
+        }
+        return list;
     }
 }
