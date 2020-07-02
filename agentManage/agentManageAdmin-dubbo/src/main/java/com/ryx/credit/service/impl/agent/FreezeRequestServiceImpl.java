@@ -917,6 +917,12 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
         AgentFreezePort agentFreezePort = new AgentFreezePort();
         agentFreezePort.setOperationPerson(userid);
         agentFreezePort.setRemark("批量冻结");
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(agentFreezePort.getOperationPerson()));
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                throw new MessageException("部门参数为空");
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
         List<FreezeRequestDetail> freezeRequestDetaillist = new ArrayList<FreezeRequestDetail>();
         for (List<Object> objectList : list) {
             num = num+1;
@@ -924,9 +930,17 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
                 logger.info("请填写代理商唯一码:{}", String.valueOf(objectList.get(0)));
                 throw new MessageException("第[" + num + "]行,请填写代理商唯一码");
             }
-            Agent agentById = agentService.getAgentById(String.valueOf(objectList.get(0)));
+            Agent agentById = null;
+            if(orgCode.equals("finance")){
+                logger.info("财务部申请批量冻结:{}",String.valueOf(objectList.get(0)));
+                agentById = agentService.getAgentById(String.valueOf(objectList.get(0)));
+            }else {
+                logger.info("非财务部申请批量冻结:{}",String.valueOf(objectList.get(0)));
+                FastMap par = FastMap.fastMap("ag",String.valueOf(objectList.get(0)));
+                agentById = agentService.queryFreezeById(par,Long.valueOf(userid));
+            }
             if (null == agentById) {
-                logger.info("代理商编号不存在:{}", String.valueOf(objectList.get(0)));
+                logger.info("找不到的代理商:{}", String.valueOf(objectList.get(0)));
                 throw new MessageException("第[" + num + "]行,找不到的代理商" + objectList.get(0));
             }
             if (StringUtils.isBlank(String.valueOf(objectList.get(1)))) {
@@ -984,10 +998,31 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             agentBusInfo.setBusNum(String.valueOf(objectList.get(3)).replaceAll("\r|\n", ""));
             agentBusInfo.setBusPlatform(platForm.getPlatformNum());
             agentBusInfo.setAgentId(String.valueOf(objectList.get(0)));
+            List<BigDecimal> busStatusList = new ArrayList<>();
+            busStatusList.add(BusStatus.QY.getValue());// 启用
+            busStatusList.add(BusStatus.WJH.getValue());// 未激活
+            busStatusList.add(BusStatus.WQY.getValue());// 未启用
+            busStatusList.add(BusStatus.SD.getValue());// 锁定
+            agentBusInfo.setBusStatusList(busStatusList);
+            agentBusInfo.setStatus(Status.STATUS_1.status);
+            agentBusInfo.setCloReviewStatus(AgStatus.Approved.getValue());
             List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectByAgentBusInfo(agentBusInfo);
-            if (agentBusInfos == null || agentBusInfos.size() == 0) {
+            if (agentBusInfos != null && agentBusInfos.size() != 1) {
                 logger.info("找不到的业务平台码:{}", String.valueOf(objectList.get(3)).replaceAll("\r|\n", ""));
                 throw new MessageException("第[" + num + "]行,找不到的业务平台信息:业务平台编号[" + String.valueOf(objectList.get(3)).replaceAll("\r|\n", "")+"],业务平台["+String.valueOf(objectList.get(4)).replaceAll("\r|\n", "")+"]");
+            }else {
+                if(orgCode.equals("finance")){
+
+                }else {
+                    if(!String.valueOf(stringObjectMap.get("ORGID")).equals(agentBusInfos.get(0).getAgDocPro())){
+                        logger.error("业务平台信息归属信息不一致,业务平台码:{}", String.valueOf(objectList.get(3)).replaceAll("\r|\n", ""));
+                        throw new MessageException("第[" + num + "]行,业务平台信息归属信息不一致:业务平台编号[" + String.valueOf(objectList.get(3)).replaceAll("\r|\n", "")+"],业务平台["+String.valueOf(objectList.get(4)).replaceAll("\r|\n", "")+"]");
+                    }else if (String.valueOf(stringObjectMap.get("ORGPID")).equals( agentBusInfos.get(0).getAgDocDistrict())){
+                        logger.error("业务平台信息归属信息不一致,业务平台码:{}", String.valueOf(objectList.get(3)).replaceAll("\r|\n", ""));
+                        throw new MessageException("第[" + num + "]行,业务平台信息归属信息不一致:业务平台编号[" + String.valueOf(objectList.get(3)).replaceAll("\r|\n", "")+"],业务平台["+String.valueOf(objectList.get(4)).replaceAll("\r|\n", "")+"]");
+                    }
+
+                }
             }
 
             if (StringUtils.isBlank(String.valueOf(objectList.get(15)))) {
@@ -1165,12 +1200,6 @@ public class FreezeRequestServiceImpl implements FreezeRequestService {
             if(userMap.get("NOT_RJ")!=null){
                 userList.add(String.valueOf(userMap.get("NOT_RJ")));
             }
-            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(agentFreezePort.getOperationPerson()));
-            if(orgCodeRes==null && orgCodeRes.size()!=1){
-                throw new MessageException("部门参数为空");
-            }
-            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
             if(orgCode.equals("finance")){
                 userList.clear();
                 userList.add(dictOptionsService.findDictByName(DictGroup.AGENT.name(), DictGroup.FREE_APPROVAL_USER.name(),FreeApprovalUser.FINANCE.key).getdItemvalue());
