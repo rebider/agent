@@ -20,8 +20,8 @@ if [ ${tpid} ]; then
 else
     echo 'App is NOT running.'
 fi
-
+ 
 rm -f tpid
-nohup java -jar ./$RESOURCE_NAME  &
+nohup java -jar  /home/tomcat/web/agentManageKafka/$RESOURCE_NAME  &
 echo $! > tpid
 echo Start Success!
