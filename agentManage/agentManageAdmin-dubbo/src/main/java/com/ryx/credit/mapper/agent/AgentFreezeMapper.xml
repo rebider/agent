@@ -564,8 +564,8 @@
       where aa.status = '1' and aa.ag_status = 'Approved'
       and exists (
         select ab.id from a_agent_businfo ab
-        where ab.agent_id = aa.id and ab.status = '1' and ab.clo_review_status = '3' and ab.bus_status in (0,1,2,3)
-      )
+        where ab.agent_id = aa.id and ab.status = '1' and ab.clo_review_status = '3' and ab.bus_status in (0,1,2,3) and ab.bus_num is not null
+        )
     )
     a order by c_time desc
   </sql>
