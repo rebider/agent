@@ -84,7 +84,7 @@ public interface TermMachineService {
      * @param terminalTransferDetailList
      * @return
      */
-   AgentResult  queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList,String operation)throws Exception;
+   AgentResult  queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList,String operation,String taskId)throws Exception;
 
     /**
      * 查询划拨结果
@@ -97,10 +97,10 @@ public interface TermMachineService {
     AgentResult queryTerminalTransferResult(String serialNumber,String type) throws Exception;
 
 
-    AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException;
+    AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws ProcessException;
 
 
-    AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception;
+    AgentResult queryCompensateResult(Map<String, Object> map,String platformType) throws Exception;
 
     /**
      * 校验机具是否可变更
@@ -136,6 +136,25 @@ public interface TermMachineService {
 
 
     /**
+     * 终端划拨解锁
+     * @param taskId  总批次号
+     * @param serialNumber  单个批次号
+     * @return
+     * @throws Exception
+     */
+    AgentResult terminalTransferunlock(String taskId, String serialNumber,String type) throws Exception;
+
+
+    /**
+     * 终端划拨重新发起
+     * @param param
+     * @return
+     * @throws Exception
+     */
+    AgentResult terminalTransAgain(Map<String,Object> param) throws Exception;
+
+
+    /**
      * 判断代理商是否被禁用
      * @param pamMap
      * @param platformType
@@ -143,4 +162,20 @@ public interface TermMachineService {
      * @throws Exception
      */
     AgentResult agentFNoorbidde (List<String> pamMap, String platformType) throws Exception;
+
+    /**
+     * 换活动解锁
+     * @param pamMap
+     * @return
+     * @throws Exception
+     */
+    AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception;
+
+    /**
+     * 换活动解锁
+     * @param pamMap
+     * @return
+     * @throws Exception
+     */
+    AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception;
 }

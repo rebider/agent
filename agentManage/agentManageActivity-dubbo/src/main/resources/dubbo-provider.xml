@@ -62,5 +62,5 @@
     <dubbo:reference interface="com.ryx.credit.profit.service.ITemplateRecodeService" id="templateRecordService"  timeout="1200000" registry="myGroup"/>
     <dubbo:reference interface="com.ryx.internet.service.InternetCardLogoutService" id="internetCardLogoutService"  timeout="1200000" registry="myGroup"/>
     <dubbo:reference interface="com.ryx.credit.service.order.OrderAdjustService" id="orderAdjustService"  timeout="1200000" registry="myGroup" check="false"/>
-
+    <dubbo:reference interface="com.ryx.credit.service.agent.FreezeRequestService" id="freezeRequestService" timeout="1200000" registry="myGroup" />
 </beans>

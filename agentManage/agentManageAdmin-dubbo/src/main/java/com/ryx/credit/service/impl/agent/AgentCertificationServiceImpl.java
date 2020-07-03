@@ -12,6 +12,8 @@ import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentCertifiVo;
 import com.ryx.credit.pojo.admin.vo.AgentFreezePort;
+import com.ryx.credit.pojo.admin.vo.FreezeDetail;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentCertificationService;
 import com.ryx.credit.service.agent.BusinessCAService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -55,6 +57,8 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
     private DictOptionsService dictOptionsService;
     @Autowired
     private AgentFreezeMapper agentFreezeMapper;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
     @Override
     public PageInfo agentCertifiDetails(Page page, Map map) {
         PageInfo pageInfo = new PageInfo();
@@ -355,13 +359,28 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
             //非在营状态则冻结该代理商
 //                AgentResult agentResultFreeze = queryAgentFreeze(agent.getId());
                       try {
+                          List<AgentBusInfo> aginfo = agentBusinfoService.queryAgentBusInfoFreeze(agent.getId());
+                          List<String> busList = new LinkedList<>();
+                          for (AgentBusInfo busInfo : aginfo) {
+                              busList.add(busInfo.getId());
+                          }
                           AgentFreezePort agentFreezePort = new AgentFreezePort();
                           agentFreezePort.setAgentId(agent.getId());
                           agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
                           agentFreezePort.setFreezeNum(agentCertification.getId());
                           agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
                           agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+                          agentFreezePort.setBusPlatform(busList);
+                          agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
                           agentFreezePort.setRemark("认证结果非在营");
+
+                          FreezeDetail freezeDetail = new FreezeDetail();
+                          freezeDetail.setProfitFreeze(BigDecimal.ONE);//分润冻结
+                          freezeDetail.setReflowFreeze(BigDecimal.ONE);//返现冻结
+                          freezeDetail.setMonthlyFreeze(BigDecimal.ONE);//月结
+                          freezeDetail.setDailyFreeze(BigDecimal.ONE);//日结
+                          freezeDetail.setCashFreeze(BigDecimal.ONE);//体现结算冻结
+                          agentFreezePort.setCurLevel(freezeDetail);
                           logger.info("代理商{}开始冻结",agent.getId());
                           AgentResult agentFreeze = agentFreeze(agentFreezePort);
                           if (agentFreeze.isOK()){
@@ -591,15 +610,29 @@ public class AgentCertificationServiceImpl extends AgentFreezeServiceImpl implem
      */
     private AgentResult AgentfreezeShare(Agent agent,AgentCertification agentCertification,Map map)throws MessageException {
              try {
+                 List<AgentBusInfo> aginfo = agentBusinfoService.queryAgentBusInfoFreeze(agent.getId());
+                 List<String> busList = new LinkedList<>();
+                 for (AgentBusInfo busInfo : aginfo) {
+                     busList.add(busInfo.getId());
+                 }
                  AgentFreezePort agentFreezePort = new AgentFreezePort();
                  agentFreezePort.setAgentId(agent.getId());
                  agentFreezePort.setFreezeCause(FreeCause.RZDJ.code);
                  agentFreezePort.setFreezeNum(agentCertification.getId());
                  agentFreezePort.setOperationPerson(agentCertification.getReqCerUser());
                  agentFreezePort.setFreeType(Arrays.asList(FreeType.AGNET.code));
+                 agentFreezePort.setBusPlatform(busList);
+                 agentFreezePort.setNewBusFreeze(String.valueOf(BigDecimal.ZERO));
                  if(null!=map && StringUtils.isNotBlank(String.valueOf(map.get("remark")))){
                      agentFreezePort.setRemark(String.valueOf(map.get("remark")));
                  }
+                 FreezeDetail freezeDetail = new FreezeDetail();
+                 freezeDetail.setProfitFreeze(BigDecimal.ONE);//分润冻结
+                 freezeDetail.setReflowFreeze(BigDecimal.ONE);//返现冻结
+                 freezeDetail.setMonthlyFreeze(BigDecimal.ONE);//月结
+                 freezeDetail.setDailyFreeze(BigDecimal.ONE);//日结
+                 freezeDetail.setCashFreeze(BigDecimal.ONE);//体现结算冻结
+                 agentFreezePort.setCurLevel(freezeDetail);
                  logger.info("代理商{}开始冻结",agent.getId());
                  AgentResult agentFreeze = agentFreeze(agentFreezePort);
                  if (agentFreeze.isOK()){

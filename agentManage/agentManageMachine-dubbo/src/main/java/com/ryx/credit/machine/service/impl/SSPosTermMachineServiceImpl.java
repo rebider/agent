@@ -357,7 +357,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList, String operation) throws Exception {
+    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailList, String operation,String taskId) throws Exception {
         return AgentResult.fail("未联动");
     }
 
@@ -367,7 +367,7 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws ProcessException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("operation", operation);
         jsonObject.put("isFreeze", "0");
@@ -477,7 +477,8 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
-    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception {
+    public AgentResult queryCompensateResult(Map<String, Object> map, String platformType) throws Exception {
+        String serialNumber = map.get("serialNumber").toString();
         JSONObject data = new JSONObject();
         data.put("serialNumber", serialNumber);
         log.info("实时POS活动调整结果查询请求参数：{}", JSONObject.toJSONString(data));
@@ -622,7 +623,35 @@ public class SSPosTermMachineServiceImpl implements TermMachineService {
     }
 
     @Override
+    public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        return AgentResult.ok();
+    }
+
+    @Override
+    public AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        return AgentResult.fail("实时POS平台暂不支持重新发送！");
+    }
+
+    @Override
     public AgentResult agentFNoorbidde(List<String> pamMap, String platformType) throws Exception {
+        return null;
+    }
+
+    /**
+     * 终端划拨解锁
+     * @param taskId  总批次号
+     * @param serialNumber  单个批次号
+     * @param type
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public AgentResult terminalTransferunlock(String taskId, String serialNumber, String type) throws Exception {
+        return null;
+    }
+
+    @Override
+    public AgentResult terminalTransAgain(Map<String,Object>  param) throws Exception {
         return null;
     }
 }

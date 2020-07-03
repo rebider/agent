@@ -3,6 +3,7 @@ package com.ryx.kafka.customers;
 import com.ryx.credit.common.enumc.KafkaMessageTopic;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.PropUtils;
 import com.ryx.kafka.dao.KfkSendMessageMapper;
@@ -14,6 +15,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaProducerException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.MessageListener;
@@ -26,7 +28,6 @@ import javax.annotation.PostConstruct;
 
 /**
  * @author chenxiao
- * @desc 分润入账申请队列
  */
 @Service("defaultKafkaQueue")
 public class DefaultKafkaQueue implements MessageListener<String,String> {
@@ -39,6 +40,8 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
 	private KafkaTemplate kafkaTemplateService;
 
 	private static KafkaTemplate kafkaTemplate;
+
+	@Value("serverProperties['kafka.producer.defaultTopic']")
 	private static String defaultTopic = "";
 
 	@Autowired
@@ -49,9 +52,6 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
 	@PostConstruct
 	public void init(){
 		kafkaTemplate = kafkaTemplateService;
-		defaultTopic = PropUtils.getProp("kafka.producer.defaultTopic");
-		LOG.info("初始化主题:{}",defaultTopic);
-
 	}
 
 	@Override
@@ -68,24 +68,19 @@ public class DefaultKafkaQueue implements MessageListener<String,String> {
 			if(StringUtils.isNotBlank(msg.topic()) && KafkaMessageTopic.CardChange.code.equals(msg.topic())){
 				LOG.info("接收到结算卡变更通知:{} {}",msg.topic(),key);
 				try {
-				  res =  cardChangeService.notifyCardChange(key,value);
+					KfkSendMessage kfkSendMessage = kfkSendMessageMapper.selectByPrimaryKey(key);
+				  res =  cardChangeService.notifyCardChange(key,value,kfkSendMessage.getAgentName());
 				} catch (MessageException e) {
 					e.printStackTrace();
+					AppConfig.sendEmails("接收到结算卡变更通知清算异常:"+key+" "+e.getMsg(),"接收到结算卡变更通知清算异常:"+key);
+				}catch (Exception e) {
+					e.printStackTrace();
+					AppConfig.sendEmails("接收到结算卡变更通知清算异常:"+key+" "+e.getMessage(),"接收到结算卡变更通知清算异常:"+key);
 				}finally {
 					LOG.info("调用通知清结算接口:{} {}",key,res.get("msg"));
 				}
 			}
-			KfkSendMessage kfkSendMessage = kfkSendMessageMapper.selectByPrimaryKey(key);
-			if("0000".equals(res.get("code"))){
-				kfkSendMessage.setStatus(Status.STATUS_3.status);
-			}else{
-				kfkSendMessage.setStatus(Status.STATUS_4.status);
-			}
-			if(1==kfkSendMessageMapper.updateByPrimaryKeySelective(kfkSendMessage)){
-				LOG.info("接收到结算卡变更通知:{} {}",msg.topic(),key,"更新结果完成");
-			}else{
-				LOG.info("接收到结算卡变更通知:{} {}",msg.topic(),key,"更新结果失败");
-			}
+			LOG.info("接收到结算卡变更通知:{} {}",msg.topic(),key,"更新结果完成");
 		}catch (Exception e){
 			e.printStackTrace();
 			LOG.error("异步队列处理异常：{} {} {} {}",msg.topic(),msg.key(),msg.value(),e.getLocalizedMessage());

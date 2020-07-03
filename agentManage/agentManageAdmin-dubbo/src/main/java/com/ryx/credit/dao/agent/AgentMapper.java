@@ -74,4 +74,6 @@ public interface AgentMapper {
     List<Map<String, Object>> queryAgentColinfoByAgentId(Map<String, Object> reqMap);
 
     List<Map<String, Object>> queryAgentStatusByAgentId(Map<String, Object> reqMap);
+
+    Agent queryFreezeById(@Param("map") Map<String,Object> map);
 }

@@ -1,6 +1,6 @@
 package com.ryx.kafka.context;
 
-import com.ryx.credit.common.util.PropUtils;
+import com.ryx.credit.common.util.AppConfig;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.OffsetCommitCallback;
 import org.slf4j.Logger;
@@ -76,8 +76,8 @@ public class KafkaContainerProperties extends ContainerProperties {
         this.clientId = "";
         this.commitLogLevel = LogIfLevelEnabled.Level.DEBUG;
         Assert.notEmpty(topics, "An array of topicPartitions must be provided");
-        String WalletQ_Topic = PropUtils.getProp("AgentQ_Topic");
-        String WalletQ_client = PropUtils.getProp("AgentQ_client");
+        String WalletQ_Topic = AppConfig.getProperty("AgentQ_Topic");
+        String WalletQ_client = AppConfig.getProperty("AgentQ_client");
         List topicslist_cons = new ArrayList();
         if (!StringUtils.isEmpty(WalletQ_Topic)) {
             List topicslist = Arrays.asList(topics);
@@ -95,6 +95,10 @@ public class KafkaContainerProperties extends ContainerProperties {
             logger.info("动态clientId:{}",WalletQ_client);
         }
         this.topics = (String[])topicslist_cons.toArray(new String[topicslist_cons.size()]);
+        for (String topic : this.topics) {
+            logger.info("监听主题topics:{}",topic);
+        }
+
         this.topicPattern = null;
         this.topicPartitions = null;
     }

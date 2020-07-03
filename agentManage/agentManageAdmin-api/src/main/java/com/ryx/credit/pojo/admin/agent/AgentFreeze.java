@@ -115,6 +115,30 @@ public class AgentFreeze implements Serializable{
         this.agentName = agentName;
     }
 
+    private String busPlatform;
+
+    private String busNum;
+
+    private BigDecimal busFreeze;
+
+    private BigDecimal profitFreeze;
+
+    private BigDecimal reflowFreeze;
+
+    private BigDecimal monthlyFreeze;
+
+    private BigDecimal dailyFreeze;
+
+    private BigDecimal stopProfitFreeze;
+
+    private BigDecimal cashFreeze;
+
+    private BigDecimal stopCount;
+
+    private String busId;
+
+    private BigDecimal newBusFreeze;
+
     public String getId() {
         return id;
     }
@@ -225,5 +249,101 @@ public class AgentFreeze implements Serializable{
 
     public void setFreezeType(BigDecimal freezeType) {
         this.freezeType = freezeType;
+    }
+
+    public String getBusPlatform() {
+        return busPlatform;
+    }
+
+    public void setBusPlatform(String busPlatform) {
+        this.busPlatform = busPlatform == null ? null : busPlatform.trim();
+    }
+
+    public String getBusNum() {
+        return busNum;
+    }
+
+    public void setBusNum(String busNum) {
+        this.busNum = busNum == null ? null : busNum.trim();
+    }
+
+    public BigDecimal getBusFreeze() {
+        return busFreeze;
+    }
+
+    public void setBusFreeze(BigDecimal busFreeze) {
+        this.busFreeze = busFreeze;
+    }
+
+    public BigDecimal getProfitFreeze() {
+        return profitFreeze;
+    }
+
+    public void setProfitFreeze(BigDecimal profitFreeze) {
+        this.profitFreeze = profitFreeze;
+    }
+
+    public BigDecimal getReflowFreeze() {
+        return reflowFreeze;
+    }
+
+    public void setReflowFreeze(BigDecimal reflowFreeze) {
+        this.reflowFreeze = reflowFreeze;
+    }
+
+    public BigDecimal getMonthlyFreeze() {
+        return monthlyFreeze;
+    }
+
+    public void setMonthlyFreeze(BigDecimal monthlyFreeze) {
+        this.monthlyFreeze = monthlyFreeze;
+    }
+
+    public BigDecimal getDailyFreeze() {
+        return dailyFreeze;
+    }
+
+    public void setDailyFreeze(BigDecimal dailyFreeze) {
+        this.dailyFreeze = dailyFreeze;
+    }
+
+    public BigDecimal getStopProfitFreeze() {
+        return stopProfitFreeze;
+    }
+
+    public void setStopProfitFreeze(BigDecimal stopProfitFreeze) {
+        this.stopProfitFreeze = stopProfitFreeze;
+    }
+
+    public BigDecimal getCashFreeze() {
+        return cashFreeze;
+    }
+
+    public void setCashFreeze(BigDecimal cashFreeze) {
+        this.cashFreeze = cashFreeze;
+    }
+
+    public BigDecimal getStopCount() {
+        return stopCount;
+    }
+
+    public void setStopCount(BigDecimal stopCount) {
+        this.stopCount = stopCount;
+    }
+
+    public String getBusId() {
+        return busId;
+    }
+
+    public void setBusId(String busId) {
+        this.busId = busId == null ? null : busId.trim();
+    }
+
+    public BigDecimal getNewBusFreeze() {
+        return newBusFreeze;
+    }
+
+    public void setNewBusFreeze(BigDecimal newBusFreeze) {
+        this.newBusFreeze = newBusFreeze;
     }
 }

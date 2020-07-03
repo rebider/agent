@@ -1112,4 +1112,20 @@ public class AgentServiceImpl implements AgentService {
         }
     }
 
+    @Override
+    public Agent queryFreezeById(Map map, Long userId) {
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if (orgCodeRes == null && orgCodeRes.size() != 1) {
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        String organizationCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
+        map.put("orgId", orgId);
+        map.put("organizationCode", organizationCode);
+        List<Map> platfromPerm = iResourceService.userHasPlatfromPerm(userId);
+        map.put("platfromPerm",platfromPerm);
+        return agentMapper.queryFreezeById(map);
+    }
+
 }

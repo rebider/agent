@@ -170,4 +170,9 @@ public interface AgentBusinfoService {
      */
     public  List<Map> agentBusByDict(FastMap reqMap);
 
+    public List<Map> agentFreezeBus(String agentId,Long userId);
+
+    public List<Map> agentmanageFreezeBus(String agentId,Long userId);
+
+
 }

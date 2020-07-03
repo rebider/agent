@@ -115,4 +115,6 @@ public interface AgentService {
     List<Map<String, Object>> queryAgentColinfoInfo(String agentId) throws MessageException;
 
     AgentResult queryAgentStatusInfo(String agentId) throws MessageException;
+
+    Agent queryFreezeById(Map map,Long userId);
 }

@@ -146,4 +146,10 @@ public interface AgentBusInfoMapper {
      * @return
      */
     List<Map<String, Object>> queryAgentBusInfoByLogisticsDetailSn(Map<String,Object> map);
+    List<Map<String,Object>> queryFreezeBusInfo(@Param("map") Map<String,Object> reqMap);
+
+    List<Map<String,Object>> queryManageFreezeBusInfo( Map<String,Object> reqMap);
+
+
+  
 }

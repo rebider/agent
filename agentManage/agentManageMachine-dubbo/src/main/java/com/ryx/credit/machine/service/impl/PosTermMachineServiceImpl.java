@@ -257,7 +257,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
 
     @Override
-    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailLists, String operation) throws Exception {
+    public AgentResult queryTerminalTransfer(List<TerminalTransferDetail> terminalTransferDetailLists, String operation,String taskId) throws Exception {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("operation", operation);
         List<Map<String, Object>> listDetail = new ArrayList<>();
@@ -287,7 +287,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
 
     @Override
-    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation) throws ProcessException {
+    public AgentResult synOrVerifyCompensate(List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String operation, String isFreeze) throws ProcessException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("operation", operation);
         jsonObject.put("isFreeze", "0");
@@ -404,10 +404,11 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
 
 
     @Override
-    public AgentResult queryCompensateResult(String serialNumber,String platformType) throws Exception{
+    public AgentResult queryCompensateResult(Map<String, Object> map, String platformType) throws Exception {
+        String serialNumber = map.get("serialNumber").toString();
         JSONObject data = new JSONObject();
         data.put("serialNumber", serialNumber);
-        log.info("活动调整结果查询返回：{},{}",serialNumber);
+        log.info("活动调整结果查询返回：{}",serialNumber);
         AgentResult agentResult = request("ORG017", data);
         log.info("活动调整结果查询返回：{},{}",serialNumber,agentResult);
         if(agentResult.isOK()){
@@ -421,17 +422,17 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                 String resMsg = res.getString("resMsg");
                 if(serialNumber.equals(serialNumber_res) && "00".equals(snAdjStatus) && "000000".equals(result_code)){
                      //调整成功
-                     log.info("活动调整成功:{} {}",serialNumber,platformType);
+                     log.info("活动调整成功:{},{}",serialNumber,platformType);
                      return AgentResult.ok("00");
                 }else if(serialNumber.equals(serialNumber_res) && "01".equals(snAdjStatus) && "000000".equals(result_code)) {
                     //调整中
-                    log.info("活动调整中:{} {}",serialNumber,platformType);
+                    log.info("活动调整中:{},{}",serialNumber,platformType);
                     AgentResult result = AgentResult.ok("01");
                     result.setMsg(resMsg);
                     return result;
                 }else if(serialNumber.equals(serialNumber_res) && "02".equals(snAdjStatus) && "000000".equals(result_code)) {
                     //调整失败
-                    log.info("活动调整失败:{} {}",serialNumber,platformType);
+                    log.info("活动调整失败:{},{}",serialNumber,platformType);
                     AgentResult result = AgentResult.ok("02");
                     result.setMsg(resMsg);
                     return result;
@@ -478,5 +479,77 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
         jsonObject.put("orgList", pamMap);
         log.info("代理商禁用pos的请求参数==请求参数:{}",JSONObject.toJSON(jsonObject));
         return  request("ORG023", jsonObject);
+    }
+
+    /**
+     * 终端划拨解锁
+     * @param taskId  总批次号
+     * @param serialNumber  单个批次号
+     * @param type
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public AgentResult terminalTransferunlock(String taskId, String serialNumber, String type) throws Exception {
+        return null;
+    }
+
+    @Override
+    public AgentResult terminalTransAgain(Map<String,Object>  param) throws Exception {
+        return null;
+    }
+
+    @Override
+    public AgentResult unFreezeCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        return AgentResult.ok();
+    }
+
+    @Override
+    public AgentResult resendFailedCompensate(Map<String, Object> pamMap, String platformType) throws Exception {
+        return AgentResult.fail("POS平台暂不支持重新发送！");
+        /*Object o = JSONObject.toJSON(pamMap);
+        JSONObject data = new JSONObject();
+        data.put("serialNumber", serialNumber);
+        log.info("活动调整结果查询返回：{}",pamMap);
+        AgentResult agentResult = request("ORG017", JSONObject.toJSON(pamMap));
+        log.info("活动调整结果查询返回：{},{}",serialNumber,agentResult);
+        if(agentResult.isOK()){
+            String resmsg = agentResult.getMsg();
+            if(resmsg!=null) {
+                JSONObject res_obj = JSONObject.parseObject(resmsg) ;
+                JSONObject res  = res_obj.getJSONObject("data");
+                String result_code = res.getString("result_code");
+                String snAdjStatus = res.getString("transferStatus");
+                String serialNumber_res = res.getString("serialNumber");
+                String resMsg = res.getString("resMsg");
+                if(serialNumber.equals(serialNumber_res) && "00".equals(snAdjStatus) && "000000".equals(result_code)){
+                    //调整成功
+                    log.info("活动调整成功:{},{}",serialNumber,platformType);
+                    return AgentResult.ok("00");
+                }else if(serialNumber.equals(serialNumber_res) && "01".equals(snAdjStatus) && "000000".equals(result_code)) {
+                    //调整中
+                    log.info("活动调整中:{},{}",serialNumber,platformType);
+                    AgentResult result = AgentResult.ok("01");
+                    result.setMsg(resMsg);
+                    return result;
+                }else if(serialNumber.equals(serialNumber_res) && "02".equals(snAdjStatus) && "000000".equals(result_code)) {
+                    //调整失败
+                    log.info("活动调整失败:{},{}",serialNumber,platformType);
+                    AgentResult result = AgentResult.ok("02");
+                    result.setMsg(resMsg);
+                    return result;
+                }else{
+                    //未知结果
+                    AgentResult result = AgentResult.ok("03");
+                    result.setMsg(resMsg);
+                    return result;
+                }
+            }else{
+                //未知结果
+                return AgentResult.ok("03");
+            }
+        }else{
+            return AgentResult.ok("03");
+        }*/
     }
 }

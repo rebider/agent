@@ -1,7 +1,6 @@
 package com.ryx.credit.pojo.admin.agent;
 
 import com.ryx.credit.common.util.Page;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1065,6 +1064,756 @@ public class AgentFreezeExample {
 
         public Criteria andFreezeTypeNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("FREEZE_TYPE not between", value1, value2, "freezeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformIsNull() {
+            addCriterion("BUS_PLATFORM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformIsNotNull() {
+            addCriterion("BUS_PLATFORM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformEqualTo(String value) {
+            addCriterion("BUS_PLATFORM =", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformNotEqualTo(String value) {
+            addCriterion("BUS_PLATFORM <>", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformGreaterThan(String value) {
+            addCriterion("BUS_PLATFORM >", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_PLATFORM >=", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformLessThan(String value) {
+            addCriterion("BUS_PLATFORM <", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformLessThanOrEqualTo(String value) {
+            addCriterion("BUS_PLATFORM <=", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformLike(String value) {
+            addCriterion("BUS_PLATFORM like", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformNotLike(String value) {
+            addCriterion("BUS_PLATFORM not like", value, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformIn(List<String> values) {
+            addCriterion("BUS_PLATFORM in", values, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformNotIn(List<String> values) {
+            addCriterion("BUS_PLATFORM not in", values, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformBetween(String value1, String value2) {
+            addCriterion("BUS_PLATFORM between", value1, value2, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusPlatformNotBetween(String value1, String value2) {
+            addCriterion("BUS_PLATFORM not between", value1, value2, "busPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIsNull() {
+            addCriterion("BUS_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIsNotNull() {
+            addCriterion("BUS_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumEqualTo(String value) {
+            addCriterion("BUS_NUM =", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotEqualTo(String value) {
+            addCriterion("BUS_NUM <>", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumGreaterThan(String value) {
+            addCriterion("BUS_NUM >", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_NUM >=", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLessThan(String value) {
+            addCriterion("BUS_NUM <", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLessThanOrEqualTo(String value) {
+            addCriterion("BUS_NUM <=", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLike(String value) {
+            addCriterion("BUS_NUM like", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotLike(String value) {
+            addCriterion("BUS_NUM not like", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIn(List<String> values) {
+            addCriterion("BUS_NUM in", values, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotIn(List<String> values) {
+            addCriterion("BUS_NUM not in", values, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumBetween(String value1, String value2) {
+            addCriterion("BUS_NUM between", value1, value2, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotBetween(String value1, String value2) {
+            addCriterion("BUS_NUM not between", value1, value2, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusFreezeIsNull() {
+            addCriterion("BUS_FREEZE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusFreezeIsNotNull() {
+            addCriterion("BUS_FREEZE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusFreezeEqualTo(BigDecimal value) {
+            addCriterion("BUS_FREEZE =", value, "busFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusFreezeNotEqualTo(BigDecimal value) {
+            addCriterion("BUS_FREEZE <>", value, "busFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusFreezeGreaterThan(BigDecimal value) {
+            addCriterion("BUS_FREEZE >", value, "busFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusFreezeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("BUS_FREEZE >=", value, "busFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusFreezeLessThan(BigDecimal value) {
+            addCriterion("BUS_FREEZE <", value, "busFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusFreezeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("BUS_FREEZE <=", value, "busFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusFreezeIn(List<BigDecimal> values) {
+            addCriterion("BUS_FREEZE in", values, "busFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusFreezeNotIn(List<BigDecimal> values) {
+            addCriterion("BUS_FREEZE not in", values, "busFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusFreezeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("BUS_FREEZE between", value1, value2, "busFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusFreezeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("BUS_FREEZE not between", value1, value2, "busFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFreezeIsNull() {
+            addCriterion("PROFIT_FREEZE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFreezeIsNotNull() {
+            addCriterion("PROFIT_FREEZE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFreezeEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_FREEZE =", value, "profitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFreezeNotEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_FREEZE <>", value, "profitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFreezeGreaterThan(BigDecimal value) {
+            addCriterion("PROFIT_FREEZE >", value, "profitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFreezeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_FREEZE >=", value, "profitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFreezeLessThan(BigDecimal value) {
+            addCriterion("PROFIT_FREEZE <", value, "profitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFreezeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_FREEZE <=", value, "profitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFreezeIn(List<BigDecimal> values) {
+            addCriterion("PROFIT_FREEZE in", values, "profitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFreezeNotIn(List<BigDecimal> values) {
+            addCriterion("PROFIT_FREEZE not in", values, "profitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFreezeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PROFIT_FREEZE between", value1, value2, "profitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitFreezeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PROFIT_FREEZE not between", value1, value2, "profitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andReflowFreezeIsNull() {
+            addCriterion("REFLOW_FREEZE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReflowFreezeIsNotNull() {
+            addCriterion("REFLOW_FREEZE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReflowFreezeEqualTo(BigDecimal value) {
+            addCriterion("REFLOW_FREEZE =", value, "reflowFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andReflowFreezeNotEqualTo(BigDecimal value) {
+            addCriterion("REFLOW_FREEZE <>", value, "reflowFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andReflowFreezeGreaterThan(BigDecimal value) {
+            addCriterion("REFLOW_FREEZE >", value, "reflowFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andReflowFreezeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("REFLOW_FREEZE >=", value, "reflowFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andReflowFreezeLessThan(BigDecimal value) {
+            addCriterion("REFLOW_FREEZE <", value, "reflowFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andReflowFreezeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("REFLOW_FREEZE <=", value, "reflowFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andReflowFreezeIn(List<BigDecimal> values) {
+            addCriterion("REFLOW_FREEZE in", values, "reflowFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andReflowFreezeNotIn(List<BigDecimal> values) {
+            addCriterion("REFLOW_FREEZE not in", values, "reflowFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andReflowFreezeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REFLOW_FREEZE between", value1, value2, "reflowFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andReflowFreezeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REFLOW_FREEZE not between", value1, value2, "reflowFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andMonthlyFreezeIsNull() {
+            addCriterion("MONTHLY_FREEZE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMonthlyFreezeIsNotNull() {
+            addCriterion("MONTHLY_FREEZE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMonthlyFreezeEqualTo(BigDecimal value) {
+            addCriterion("MONTHLY_FREEZE =", value, "monthlyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andMonthlyFreezeNotEqualTo(BigDecimal value) {
+            addCriterion("MONTHLY_FREEZE <>", value, "monthlyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andMonthlyFreezeGreaterThan(BigDecimal value) {
+            addCriterion("MONTHLY_FREEZE >", value, "monthlyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andMonthlyFreezeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("MONTHLY_FREEZE >=", value, "monthlyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andMonthlyFreezeLessThan(BigDecimal value) {
+            addCriterion("MONTHLY_FREEZE <", value, "monthlyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andMonthlyFreezeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("MONTHLY_FREEZE <=", value, "monthlyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andMonthlyFreezeIn(List<BigDecimal> values) {
+            addCriterion("MONTHLY_FREEZE in", values, "monthlyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andMonthlyFreezeNotIn(List<BigDecimal> values) {
+            addCriterion("MONTHLY_FREEZE not in", values, "monthlyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andMonthlyFreezeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("MONTHLY_FREEZE between", value1, value2, "monthlyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andMonthlyFreezeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("MONTHLY_FREEZE not between", value1, value2, "monthlyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andDailyFreezeIsNull() {
+            addCriterion("DAILY_FREEZE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDailyFreezeIsNotNull() {
+            addCriterion("DAILY_FREEZE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDailyFreezeEqualTo(BigDecimal value) {
+            addCriterion("DAILY_FREEZE =", value, "dailyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andDailyFreezeNotEqualTo(BigDecimal value) {
+            addCriterion("DAILY_FREEZE <>", value, "dailyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andDailyFreezeGreaterThan(BigDecimal value) {
+            addCriterion("DAILY_FREEZE >", value, "dailyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andDailyFreezeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("DAILY_FREEZE >=", value, "dailyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andDailyFreezeLessThan(BigDecimal value) {
+            addCriterion("DAILY_FREEZE <", value, "dailyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andDailyFreezeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("DAILY_FREEZE <=", value, "dailyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andDailyFreezeIn(List<BigDecimal> values) {
+            addCriterion("DAILY_FREEZE in", values, "dailyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andDailyFreezeNotIn(List<BigDecimal> values) {
+            addCriterion("DAILY_FREEZE not in", values, "dailyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andDailyFreezeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DAILY_FREEZE between", value1, value2, "dailyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andDailyFreezeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DAILY_FREEZE not between", value1, value2, "dailyFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopProfitFreezeIsNull() {
+            addCriterion("STOP_PROFIT_FREEZE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopProfitFreezeIsNotNull() {
+            addCriterion("STOP_PROFIT_FREEZE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopProfitFreezeEqualTo(BigDecimal value) {
+            addCriterion("STOP_PROFIT_FREEZE =", value, "stopProfitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopProfitFreezeNotEqualTo(BigDecimal value) {
+            addCriterion("STOP_PROFIT_FREEZE <>", value, "stopProfitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopProfitFreezeGreaterThan(BigDecimal value) {
+            addCriterion("STOP_PROFIT_FREEZE >", value, "stopProfitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopProfitFreezeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("STOP_PROFIT_FREEZE >=", value, "stopProfitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopProfitFreezeLessThan(BigDecimal value) {
+            addCriterion("STOP_PROFIT_FREEZE <", value, "stopProfitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopProfitFreezeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("STOP_PROFIT_FREEZE <=", value, "stopProfitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopProfitFreezeIn(List<BigDecimal> values) {
+            addCriterion("STOP_PROFIT_FREEZE in", values, "stopProfitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopProfitFreezeNotIn(List<BigDecimal> values) {
+            addCriterion("STOP_PROFIT_FREEZE not in", values, "stopProfitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopProfitFreezeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STOP_PROFIT_FREEZE between", value1, value2, "stopProfitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopProfitFreezeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STOP_PROFIT_FREEZE not between", value1, value2, "stopProfitFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andCashFreezeIsNull() {
+            addCriterion("CASH_FREEZE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCashFreezeIsNotNull() {
+            addCriterion("CASH_FREEZE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCashFreezeEqualTo(BigDecimal value) {
+            addCriterion("CASH_FREEZE =", value, "cashFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andCashFreezeNotEqualTo(BigDecimal value) {
+            addCriterion("CASH_FREEZE <>", value, "cashFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andCashFreezeGreaterThan(BigDecimal value) {
+            addCriterion("CASH_FREEZE >", value, "cashFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andCashFreezeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("CASH_FREEZE >=", value, "cashFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andCashFreezeLessThan(BigDecimal value) {
+            addCriterion("CASH_FREEZE <", value, "cashFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andCashFreezeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("CASH_FREEZE <=", value, "cashFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andCashFreezeIn(List<BigDecimal> values) {
+            addCriterion("CASH_FREEZE in", values, "cashFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andCashFreezeNotIn(List<BigDecimal> values) {
+            addCriterion("CASH_FREEZE not in", values, "cashFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andCashFreezeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CASH_FREEZE between", value1, value2, "cashFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andCashFreezeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CASH_FREEZE not between", value1, value2, "cashFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopCountIsNull() {
+            addCriterion("STOP_COUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopCountIsNotNull() {
+            addCriterion("STOP_COUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopCountEqualTo(BigDecimal value) {
+            addCriterion("STOP_COUNT =", value, "stopCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopCountNotEqualTo(BigDecimal value) {
+            addCriterion("STOP_COUNT <>", value, "stopCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopCountGreaterThan(BigDecimal value) {
+            addCriterion("STOP_COUNT >", value, "stopCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopCountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("STOP_COUNT >=", value, "stopCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopCountLessThan(BigDecimal value) {
+            addCriterion("STOP_COUNT <", value, "stopCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopCountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("STOP_COUNT <=", value, "stopCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopCountIn(List<BigDecimal> values) {
+            addCriterion("STOP_COUNT in", values, "stopCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopCountNotIn(List<BigDecimal> values) {
+            addCriterion("STOP_COUNT not in", values, "stopCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopCountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STOP_COUNT between", value1, value2, "stopCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andStopCountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STOP_COUNT not between", value1, value2, "stopCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdIsNull() {
+            addCriterion("BUS_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdIsNotNull() {
+            addCriterion("BUS_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdEqualTo(String value) {
+            addCriterion("BUS_ID =", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdNotEqualTo(String value) {
+            addCriterion("BUS_ID <>", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdGreaterThan(String value) {
+            addCriterion("BUS_ID >", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_ID >=", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdLessThan(String value) {
+            addCriterion("BUS_ID <", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdLessThanOrEqualTo(String value) {
+            addCriterion("BUS_ID <=", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdLike(String value) {
+            addCriterion("BUS_ID like", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdNotLike(String value) {
+            addCriterion("BUS_ID not like", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdIn(List<String> values) {
+            addCriterion("BUS_ID in", values, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdNotIn(List<String> values) {
+            addCriterion("BUS_ID not in", values, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdBetween(String value1, String value2) {
+            addCriterion("BUS_ID between", value1, value2, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdNotBetween(String value1, String value2) {
+            addCriterion("BUS_ID not between", value1, value2, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeIsNull() {
+            addCriterion("NEW_BUS_FREEZE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeIsNotNull() {
+            addCriterion("NEW_BUS_FREEZE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeEqualTo(BigDecimal value) {
+            addCriterion("NEW_BUS_FREEZE =", value, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeNotEqualTo(BigDecimal value) {
+            addCriterion("NEW_BUS_FREEZE <>", value, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeGreaterThan(BigDecimal value) {
+            addCriterion("NEW_BUS_FREEZE >", value, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("NEW_BUS_FREEZE >=", value, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeLessThan(BigDecimal value) {
+            addCriterion("NEW_BUS_FREEZE <", value, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("NEW_BUS_FREEZE <=", value, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeIn(List<BigDecimal> values) {
+            addCriterion("NEW_BUS_FREEZE in", values, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeNotIn(List<BigDecimal> values) {
+            addCriterion("NEW_BUS_FREEZE not in", values, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("NEW_BUS_FREEZE between", value1, value2, "newBusFreeze");
+            return (Criteria) this;
+        }
+
+        public Criteria andNewBusFreezeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("NEW_BUS_FREEZE not between", value1, value2, "newBusFreeze");
             return (Criteria) this;
         }
     }

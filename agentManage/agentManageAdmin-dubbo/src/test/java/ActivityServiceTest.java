@@ -6,6 +6,7 @@ import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentFreeze;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.AgentBusinfoFreezeService;
 import com.ryx.credit.service.agent.AgentCertificationService;
 import com.ryx.credit.service.agent.BusinessCAService;
 import com.ryx.credit.service.order.IPaymentDetailService;
@@ -35,6 +36,15 @@ public class ActivityServiceTest extends BaseSpringTest {
     private AgentCertificationService agentCertificationService;
     @Autowired
     private BusinessCAService businessCAService;
+    @Autowired
+    private AgentBusinfoFreezeService agentBusinfoFreezeService;
+
+    @Test
+    public void c(){
+        AgentFreeze agentFreeze = new AgentFreeze();
+        agentFreeze.setAgentId("AG19103701221");
+        agentBusinfoFreezeService.agentBusinfoFreeze(agentFreeze,"111");
+    }
     @Test
     public void a(){
         List<String> list = new ArrayList<>();

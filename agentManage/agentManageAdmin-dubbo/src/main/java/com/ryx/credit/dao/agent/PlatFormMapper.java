@@ -37,7 +37,7 @@ public interface PlatFormMapper {
 
     String selectBusPlatFormByPlatformNum(String platformNum);
 
-    List selectByOrderIdList(List<String> orderIdList);
+    List<String> selectByOrderIdList(List<String> orderIdList);
 
     PlatForm selectByOrderId(String orderId);
 
