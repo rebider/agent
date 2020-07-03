@@ -227,6 +227,16 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             log.error("代理商冻结失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg());
             throw new MessageException(agentResult.getMsg());
         }
+        //代理商未冻结，需冻结代理商
+        Agent agent = agentMapper.selectByPrimaryKey(agentFreezePort.getAgentId());
+        if(agent.getFreestatus().compareTo(FreeStatus.DJ.getValue())!=0){
+            agent.setFreestatus(FreeStatus.DJ.getValue());
+            int i = agentMapper.updateByPrimaryKeySelective(agent);
+            if(i!=1){
+                throw new MessageException("代理商冻结更新代理商信息失败");
+            }
+        }
+
         Map mapData = (Map) agentResult.getData();
         AgentFreeze date = (AgentFreeze)mapData.get("data");
         AgentResult notifyResult = agentBusinfoFreezeService.agentBusinfoFreeze(date, agentFreezePort.getOperationPerson());
@@ -257,6 +267,31 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             log.error("代理商解冻失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg());
             throw new MessageException(agentResult.getMsg());
         }
+
+        //更新代理商冻结状态
+        AgentFreezeExample qfreezeExample = new AgentFreezeExample();
+        AgentFreezeExample.Criteria qfreezeCriteria = qfreezeExample.createCriteria();
+        qfreezeCriteria.andFreezeTypeIsNull();
+        qfreezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        qfreezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
+        qfreezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+        qfreezeExample.or().andStatusEqualTo(Status.STATUS_1.status)
+                .andFreezeTypeEqualTo(FreeType.AGNET.code)
+                .andAgentIdEqualTo(agentFreezePort.getAgentId())
+                .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
+        List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(qfreezeExample);
+        //没有冻结的 更新代理商状态为解冻
+        if(agentFreezes.size()==0){
+            Agent agent =agentMapper.selectByPrimaryKey(agentFreezePort.getAgentId());
+            agent.setFreestatus(FreeStatus.JD.getValue());
+            log.error("代理商解冻：无冻结记录解冻代理商 {} {}",agent.getId(),agent.getAgName());
+            int i = agentMapper.updateByPrimaryKeySelective(agent);
+            if(i!=1){
+                throw new MessageException("更新代理商信息解冻失败");
+            }
+        }
+
+        //汇总逻辑
         Map mapData = (Map) agentResult.getData();
         AgentFreeze date = (AgentFreeze)mapData.get("data");
         AgentResult notifyResult = agentBusinfoFreezeService.agentBusinfoFreeze(date, agentFreezePort.getOperationPerson());
@@ -1196,23 +1231,15 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                         agentFreeze.setRemark(agentFreezePort.getRemark());
                     }
                     agentFreezeMapper.insert(agentFreeze);
-                    if (freeType.compareTo(FreeType.AGNET.code) == 0){
-                        Map<String,Object> dataMap = (Map<String,Object>)verify.getData();
-                        Agent agent = (Agent)dataMap.get("agent");
-                        if(agent.getFreestatus().compareTo(FreeStatus.DJ.getValue())!=0){
-                            agent.setFreestatus(FreeStatus.DJ.getValue());
-                            int i = agentMapper.updateByPrimaryKeySelective(agent);
-                            if(i!=1){
-                                throw new MessageException("代理商冻结更新代理商信息失败");
-                            }
-                        }
-                    }
                     resMap.put("data",agentFreeze);
                 }
             }
 
 
             return AgentResult.ok(resMap);
+        }catch (Exception exception){
+            log.error("代理商冻结异常:AG:{},冻结原因:{}",agentFreezePort.getAgentId(),FreeCause.getContentByValue(agentFreezePort.getFreezeCause()));
+            throw new MessageException("代理商冻结异常:AG:"+agentFreezePort.getAgentId()+",冻结原因:"+FreeCause.getContentByValue(agentFreezePort.getFreezeCause()));
         }finally {
             if(StringUtils.isNotBlank(indentifier)){
                 redisService.releaseLock(RedisCachKey.AGENT_FREEZE_LOCK + agentFreezePort.getOperationPerson()+agentFreezePort.getFreezeNum(), indentifier);
@@ -1321,34 +1348,6 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                         throw new MessageException("更新解冻失败");
                     }
                     resMap.put("data",agentFreeze);
-                }
-                if (freeType.compareTo(FreeType.AGNET.code) == 0){
-
-                    AgentFreezeExample qfreezeExample = new AgentFreezeExample();
-                    AgentFreezeExample.Criteria qfreezeCriteria = qfreezeExample.createCriteria();
-                    qfreezeCriteria.andFreezeTypeIsNull();
-                    qfreezeCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                    qfreezeCriteria.andAgentIdEqualTo(agentFreezePort.getAgentId());
-                    qfreezeCriteria.andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
-
-                    qfreezeExample.or().andStatusEqualTo(Status.STATUS_1.status)
-                            .andFreezeTypeEqualTo(freeType)
-                            .andAgentIdEqualTo(agentFreezePort.getAgentId())
-                            .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
-
-                    List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(qfreezeExample);
-
-                    //没有冻结的 更新代理商状态为解冻
-                    if(agentFreezes.size()==0){
-                        Map<String,Object> dataMap = (Map<String,Object>)verify.getData();
-                        Agent agent = (Agent)dataMap.get("agent");
-                        agent.setFreestatus(FreeStatus.JD.getValue());
-                        int i = agentMapper.updateByPrimaryKeySelective(agent);
-                        if(i!=1){
-                            throw new MessageException("更新代理商信息解冻失败");
-                        }
-                    }
-
                 }
             }
             return AgentResult.ok(resMap);
