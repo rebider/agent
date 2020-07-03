@@ -332,7 +332,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     }
 
     // 省区/代理商修改申请-调用冻结接口
-    void agentFreezeResult(String agentId, String freezeCause, String freezePerson, String freezeNum, List<String> busPlatform) {
+    void agentFreezeResult(String agentId, String freezeCause, String freezePerson, String freezeNum, List<String> busPlatform) throws Exception{
         try {
             AgentFreezePort agentFreezePort = new AgentFreezePort();
             agentFreezePort.setAgentId(agentId);
@@ -358,11 +358,15 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         } catch (MessageException e) {
             logger.info("代理商{},调用冻结接口失败:{}", agentId, e.getMsg());
             e.printStackTrace();
+            throw new MessageException("代理商调用冻结接口失败:"+agentId+freezeCause);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw e;
         }
     }
 
     // 省区/代理商修改申请-调用解冻接口
-    void agentUnFreezeResult(String agentId, String UnfreezeCause, String freezeCause, String freezePerson) {
+    void agentUnFreezeResult(String agentId, String UnfreezeCause, String freezeCause, String freezePerson) throws Exception{
         try {
             AgentFreezePort agentFreezePort = new AgentFreezePort();
             agentFreezePort.setAgentId(agentId);
@@ -379,6 +383,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         } catch (MessageException e) {
             logger.info("代理商{},调用解冻接口失败:{}", agentId, e.getMsg());
             e.printStackTrace();
+            throw new MessageException("代理商调用解冻接口失败"+ agentId+freezeCause);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -1071,11 +1079,12 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 throw e;
             }
 
-            try {
+            //Todo:明确更新redis代理商业务集合,不需要全部更新
+           /* try {
                 agentQueryService.loadCach();
             } catch (Exception e) {
                 e.printStackTrace();
-            }
+            }*/
 
             return ResultVO.success(dr);
         } catch (Exception e) {
