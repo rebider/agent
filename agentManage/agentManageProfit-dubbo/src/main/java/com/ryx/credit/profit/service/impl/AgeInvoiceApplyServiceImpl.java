@@ -337,7 +337,8 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                    shMessage = "开票公司是：（"+invoiceApply.getInvoiceCompany()+"）未获取到欠票数据！";
                   // throw new MessageException("开票公司是：（"+invoiceApply.getInvoiceCompany()+"）未获取到欠票数据！");
                }
-               BigDecimal subtra = bg.subtract(ownInvoice);  //到票金额-欠票金额
+               BigDecimal subtra = bg.add(invoiceApply.getSumAmt()).subtract(ownInvoice);  //到票金额-欠票金额
+               //BigDecimal subtra = bg.subtract(ownInvoice);
                if(subtra.compareTo(new BigDecimal(9999)) > 0 ){ //到票金额-欠票金额 大于 9999元时 ,跳过该发票处理下面发票
                    errorInfo += "{"+invoiceApply.getInvoiceNumber()+"-"+invoiceApply.getInvoiceCode()+")金额超过本月欠票"+subtra+"元};";
                    return;
