@@ -28,4 +28,7 @@ public interface InvoiceSumMapper {
     List<Map<String,Object>> getListByMap(@Param("page") Page page, @Param("map") Map<String,String> map);
 
     int getCountByMap(@Param("map")Map<String,String> map);
+
+    List<Map> exports(@Param("map") Map<String,String> map);
+
 }

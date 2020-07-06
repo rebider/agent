@@ -28,4 +28,7 @@ public interface IInvoiceSumService {
 
     boolean invocationIntFreeze(String agentId, String user,String id,String reason) throws MessageException;
 
+
+    List<Map> exports ( Map<String, String> param, Map<String,Object> map);
+
 }

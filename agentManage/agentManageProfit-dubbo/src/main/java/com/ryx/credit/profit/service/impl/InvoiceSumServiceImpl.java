@@ -527,4 +527,17 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         return false;
     }
 
+
+    @Override
+    public List<Map> exports(Map<String, String> param, Map<String, Object> map) {
+        if(map != null){
+            String deft = map.get("ORGANIZATIONCODE").toString();
+            if(deft.endsWith("city")){
+                param.put("docPro",map.get("ORGID").toString());
+            }else if((deft.startsWith("region") && !deft.endsWith("city")) || deft.equals("beijing")){
+                param.put("docDis",map.get("ORGID").toString());
+            }
+        }
+       return invoiceSumMapper.exports(param);
+    }
 }

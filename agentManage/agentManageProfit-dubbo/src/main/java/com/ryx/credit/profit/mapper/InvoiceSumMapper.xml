@@ -417,4 +417,22 @@
       </if>
     order by ps.PROFIT_MONTH desc
   </sql>
+
+  <select id="exports" resultType="java.util.Map">
+    select
+    zzz.id, zzz.profitMonth , zzz.agentName, zzz.agentId,
+    zzz.invoiceCompany, zzz.preLeftAmt, zzz.dayProfitAmt,
+    zzz.dayBackAmt, zzz.preProfitMonthAmt,zzz.addInvoiceAmt,
+    zzz.ownInvoice, zzz.adjustAmt, zzz.adjustAccount,
+    zzz.adjustReson, zzz.adjustTime, zzz.topOrgId, zzz.topOrgName,
+    zzz.subAddInvoiceAmt, zzz.rev1,
+    zzz.rev2, zzz.rev3, zzz.tax,zzz.INVOICEAMT,
+    case when zzz.invoiceStatus = '00' then '冻结'
+    when zzz.invoiceStatus = '99' then '解冻'
+    end as invoiceStatus
+    from (
+    <include refid="queryDetail" />
+    )zzz
+  </select>
+
 </mapper>
