@@ -708,10 +708,11 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             pf.setImportBatch(pmsProfitLog.getBatchNo());
 
             String agentId = list.get(i).get("Cell0").trim();
-            String orgID = list.get(i).get("Cell8").trim();
-
-
+            String orgID =null;
             if ("汇总".equals(sheetName)) {
+
+                 orgID = list.get(i).get("Cell8").trim();
+
                 if (null != list.get(i).get("Cell4") && !"".equals(list.get(i).get("Cell4"))) {
                     pmsProfitTempWithBLOBs.setId(list.get(i).get("Cell4"));
                     pf.setBalanceId(list.get(i).get("Cell4"));
@@ -773,6 +774,10 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                     continue;
 
                 }
+
+                pf.setBusCode(list.get(i).get("Cell3"));
+                pf.setOrgId(orgID);
+                pf.setRenitStatus(list.get(i).get("Cell9"));
             } else {
                 pmsProfitTempWithBLOBs.setId(idService.getPPTId());
                 pf.setBalanceId(pmsProfitTempWithBLOBs.getId());
@@ -790,9 +795,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
 
             pf.setUniqueFlag(agentId);
             pf.setAgentName((list.get(i).get("Cell1")).trim());
-            pf.setBusCode(list.get(i).get("Cell3").trim());
-            pf.setOrgId(orgID);
-            pf.setRenitStatus(list.get(i).get("Cell9").trim());
+
 
 
             try {
