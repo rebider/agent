@@ -2,6 +2,8 @@ package com.ryx.credit.common.enumc;
 
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author chenliang
@@ -40,5 +42,15 @@ public enum ProfitDataImportType {
             }
         }
         return "";
+    }
+
+
+    public static Map<String,String> getContentMap(){
+        Map<String,String> resultMap = new HashMap<>();
+        ProfitDataImportType[] fundType = ProfitDataImportType.values();
+        for(ProfitDataImportType cc : fundType){
+            resultMap.put(cc.key,cc.msg);
+        }
+        return resultMap;
     }
 }
