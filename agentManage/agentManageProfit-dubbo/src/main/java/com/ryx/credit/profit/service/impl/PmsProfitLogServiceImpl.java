@@ -273,9 +273,6 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                     Row hssfRow = sheet.getRow(0);
                     columnNum = hssfRow.getPhysicalNumberOfCells();
                 }
-                if (columnNum < 5) {
-                    throw new MessageException("Sheet[" + i + "][" + sheetName + "]页列数不足! ");
-                }
 
                 //汇总页面写入出款流水并且输出
                 if ("汇总".equals(sheetName)) {
@@ -629,12 +626,26 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
         for (int i = 0; i < list.size(); i++) {
             String sheetRow = sheetName + ((i + 2) + (theadi * count));
 
+            if (list.get(i).get("Cell0") == null || "".equals(list.get(i).get("Cell0"))) {
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行代理商AG码为空");
+                saveSheetList.add(saveSheetMap);
+                continue;
+            }
+
             if (list.get(i).get("Cell1") == null || "".equals(list.get(i).get("Cell1"))) {
                 Map<String, Object> saveSheetMap = new HashMap<>();
                 saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行代理商名称为空");
                 saveSheetList.add(saveSheetMap);
                 continue;
             }
+            if (list.get(i).get("Cell2") == null || "".equals(list.get(i).get("Cell2"))) {
+                Map<String, Object> saveSheetMap = new HashMap<>();
+                saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行月份为空");
+                saveSheetList.add(saveSheetMap);
+                continue;
+            }
+
 //            if (list.get(i).get("Cell3") == null || "".equals(list.get(i).get("Cell3"))) {
 //                Map<String, Object> saveSheetMap = new HashMap<>();
 //                saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行品牌码为空");
@@ -719,6 +730,12 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                 if (list.get(i).get("Cell7") == null || "".equals(list.get(i).get("Cell7"))) {
                     Map<String, Object> saveSheetMap = new HashMap<>();
                     saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行实际收款代理商名称为空");
+                    saveSheetList.add(saveSheetMap);
+                    continue;
+                }
+                if (list.get(i).get("Cell8") == null || "".equals(list.get(i).get("Cell8"))) {
+                    Map<String, Object> saveSheetMap = new HashMap<>();
+                    saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行代理商平台码为空");
                     saveSheetList.add(saveSheetMap);
                     continue;
                 }
