@@ -402,8 +402,10 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> disposeUploadExcelSuccess(PmsProfitLog pmsProfitLog, String path) throws MessageException {
         String uploadPath = null;
+        boolean hzIsNo = false;
         if (ProfitDataImportType.MXDL.key.equals(pmsProfitLog.getImportType())) {
             uploadPath = path + pmsProfitLog.getUploadPath();
+            hzIsNo = true;
         } else {
             uploadPath = path + pmsProfitLog.getResultPath();
         }
@@ -415,6 +417,9 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             int rowNum = 0;
             Sheet sheet = wookbook.getSheetAt(i);
             String sheetName = sheet.getSheetName();
+            if(hzIsNo &&"汇总".equals(sheetName)){
+                throw new RuntimeException("分润明细导入中不允许有汇总sheet页");
+            }
             int columnNum = 0;
             List<Map<String, String>> rsList = new ArrayList<>();
             // 获取到Excel文件中的所有行数
