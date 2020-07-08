@@ -532,6 +532,14 @@
             )
             )
         </if>
+        <if test="region != null and region != ''">
+            and t.unique_flag in (
+            select agent_id from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
+            select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
+            where cu.ID= #{region,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
+            )
+            )
+        </if>
         <if test="isAgent !=null">
             and t.unique_flag in (
             select distinct ab.AGENT_ID
@@ -585,6 +593,14 @@
             from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu where cu.ID=
             #{city,jdbcType=VARCHAR})
             connect by PRIOR o.id=o.PID
+            )
+            )
+        </if>
+        <if test="region != null and region != ''">
+            and t.unique_flag in (
+            select agent_id from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
+            select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
+            where cu.ID= #{region,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
             )
         </if>
@@ -643,6 +659,14 @@
             )
             )
         </if>
+        <if test="region != null and region != ''">
+            and t.unique_flag in (
+            select agent_id from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
+            select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
+            where cu.ID= #{region,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
+            )
+            )
+        </if>
         <include refid="OracleDialectSuffix"/>
     </select>
 
@@ -687,6 +711,14 @@
             select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
+            )
+            )
+        </if>
+        <if test="region != null and region != ''">
+            and t.unique_flag in (
+            select agent_id from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
+            select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
+            where cu.ID= #{region,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
             )
         </if>
@@ -857,6 +889,14 @@
             )
             )
         </if>
+        <if test="region != null and region != ''">
+            and t.unique_flag in (
+            select agent_id from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
+            select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
+            where cu.ID= #{region,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
+            )
+            )
+        </if>
         <if test="isAgent !=null">
             and t.unique_flag in (
             select distinct ab.AGENT_ID
@@ -908,6 +948,14 @@
             select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
+            )
+            )
+        </if>
+        <if test="region != null and region != ''">
+            and t.unique_flag in (
+            select agent_id from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
+            select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
+            where cu.ID= #{region,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
             )
         </if>
