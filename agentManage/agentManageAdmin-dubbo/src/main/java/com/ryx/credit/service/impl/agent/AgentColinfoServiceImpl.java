@@ -245,6 +245,10 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         try {
             if (agent == null) throw new MessageException("代理商信息不能为空");
             for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
+                //身份证统一处理大写
+                if(StringUtils.isNotBlank(agentColinfoVo.getAgLegalCernum()))
+                    agentColinfoVo.setAgLegalCernum(agentColinfoVo.getAgLegalCernum().toUpperCase());
+
                 if (null != agentColinfoVo.getCloTaxPoint() && agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal(1)) >= 0) {
                     throw new MessageException("税点不能大于1");
                 }
@@ -277,7 +281,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 //对公时 判断收款账户名是否与代理商名称一致 不一致则抛异常提示信息
                 if (agentColinfoVo.getCloType().compareTo(new BigDecimal(1)) == 0 && !"1".equals(saveStatus)) {
                     if (agentName.equals(trueName)) {
-                        agentColinfoVo.setAgLegalCernum(agent.getAgLegalCernum());
+                        agentColinfoVo.setAgLegalCernum(agent.getAgLegalCernum().toUpperCase());
                     } else if (!agentName.equals(trueName)) {
                         throw new ProcessException("收款账户名与代理商名称不一致");
                     }
@@ -310,9 +314,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                         db_AgentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
                     }
                     if (agLegalName.equals(trueName)) {
-                        db_AgentColinfo.setAgLegalCernum(agent.getAgLegalCernum());
+                        db_AgentColinfo.setAgLegalCernum(agent.getAgLegalCernum().toUpperCase());
                     } else {
-                        db_AgentColinfo.setAgLegalCernum(agentColinfoVo.getAgLegalCernum());
+                        db_AgentColinfo.setAgLegalCernum(agentColinfoVo.getAgLegalCernum().toUpperCase());
                     }
                     db_AgentColinfo.setAmendStatus(AmendStatus.YXG.status);
                     db_AgentColinfo.setcUtime(Calendar.getInstance().getTime());
