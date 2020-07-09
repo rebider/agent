@@ -525,16 +525,16 @@
             and t.BALANCE_ID = #{BALANCE_ID,jdbcType=VARCHAR}
         </if>
         <if test="city != null and city != ''">
-            and t.unique_flag in (
-            select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
+            and t.ORG_ID in (
+            select BUS_NUM from A_AGENT_BUSINFO where AG_DOC_PRO in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
             )
         </if>
         <if test="region != null and region != ''">
-            and t.unique_flag in (
-            select agent_id from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
+            and t.ORG_ID in (
+            select BUS_NUM from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{region,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
@@ -587,18 +587,16 @@
             and t.BALANCE_ID = #{BALANCE_ID,jdbcType=VARCHAR}
         </if>
         <if test="city != null and city != ''">
-            and t.unique_flag in (
-            select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
-            select o.id
-            from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu where cu.ID=
-            #{city,jdbcType=VARCHAR})
-            connect by PRIOR o.id=o.PID
+            and t.ORG_ID in (
+            select BUS_NUM from A_AGENT_BUSINFO where AG_DOC_PRO in (
+            select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
+            where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
             )
         </if>
         <if test="region != null and region != ''">
-            and t.unique_flag in (
-            select agent_id from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
+            and t.ORG_ID in (
+            select BUS_NUM from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{region,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
@@ -614,6 +612,7 @@
         </if>
         )
     </select>
+
 
     <select id="queryAllListWithLower" resultType="java.util.Map">
         <include refid="OracleDialectPrefix"/>
@@ -652,16 +651,16 @@
             and t.BALANCE_ID = #{BALANCE_ID,jdbcType=VARCHAR}
         </if>
         <if test="city != null and city != ''">
-            and t.unique_flag in (
-            select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
+            and t.ORG_ID in (
+            select BUS_NUM from A_AGENT_BUSINFO where AG_DOC_PRO in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
             )
         </if>
         <if test="region != null and region != ''">
-            and t.unique_flag in (
-            select agent_id from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
+            and t.ORG_ID in (
+            select BUS_NUM from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{region,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
@@ -707,16 +706,16 @@
             and t.BALANCE_ID = #{BALANCE_ID,jdbcType=VARCHAR}
         </if>
         <if test="city != null and city != ''">
-            and t.unique_flag in (
-            select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
+            and t.ORG_ID in (
+            select BUS_NUM from A_AGENT_BUSINFO where AG_DOC_PRO in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
             )
         </if>
         <if test="region != null and region != ''">
-            and t.unique_flag in (
-            select agent_id from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
+            and t.ORG_ID in (
+            select BUS_NUM from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{region,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
@@ -882,16 +881,16 @@
         and aa.FREESTATUS = '1'
         and t.BILL_STATUS in('01','03','05')
         <if test="city != null and city != ''">
-            and t.unique_flag in (
-            select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
+            and t.ORG_ID in (
+            select BUS_NUM from A_AGENT_BUSINFO where AG_DOC_PRO in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
             )
         </if>
         <if test="region != null and region != ''">
-            and t.unique_flag in (
-            select agent_id from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
+            and t.ORG_ID in (
+            select BUS_NUM from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{region,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
@@ -944,16 +943,16 @@
         and aa.FREESTATUS = '1'
         and t.BILL_STATUS in('01','03','05')
         <if test="city != null and city != ''">
-            and t.unique_flag in (
-            select agent_id from A_AGENT_BUSINFO where AG_DOC_PRO in (
+            and t.ORG_ID in (
+            select BUS_NUM from A_AGENT_BUSINFO where AG_DOC_PRO in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{city,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
             )
         </if>
         <if test="region != null and region != ''">
-            and t.unique_flag in (
-            select agent_id from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
+            and t.ORG_ID in (
+            select BUS_NUM from A_AGENT_BUSINFO where AG_DOC_DISTRICT in (
             select o.id from C_ORGANIZATION o start with o.ID =(select cu.ORGANIZATION_ID from C_USER cu
             where cu.ID= #{region,jdbcType=VARCHAR}) connect by PRIOR o.id=o.PID
             )
