@@ -1,7 +1,9 @@
-package com.ryx.credit.profit.dao;
+package com.ryx.credit.pft.month.dao;
 
 import com.ryx.credit.common.util.Page;
-import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.profit.pojo.PmsProfit;
+import com.ryx.credit.profit.pojo.PmsProfitLog;
+import com.ryx.credit.profit.pojo.PmsProfitLogExample;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

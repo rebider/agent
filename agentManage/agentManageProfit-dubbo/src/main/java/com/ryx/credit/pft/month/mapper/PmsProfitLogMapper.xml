@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.credit.profit.dao.PmsProfitLogMapper">
+<mapper namespace="com.ryx.credit.pft.month.dao.PmsProfitLogMapper">
   <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PmsProfitLog">
     <id column="BATCH_NO" jdbcType="VARCHAR" property="batchNo" />
     <result column="UPLOAD_PATH" jdbcType="VARCHAR" property="uploadPath" />

@@ -1,4 +1,4 @@
-package com.ryx.credit.profit.service.impl;
+package com.ryx.credit.pft.month.service.impl;
 
 import com.ryx.credit.common.enumc.BillStatus;
 import com.ryx.credit.common.enumc.FreeCause;
@@ -6,7 +6,8 @@ import com.ryx.credit.common.enumc.FreeStatus;
 import com.ryx.credit.common.enumc.ProfitDataImportType;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.profit.dao.PmsProfitMapper;
+
+import com.ryx.credit.pft.month.dao.PmsProfitMapper;
 import com.ryx.credit.profit.pojo.PmsProfit;
 import com.ryx.credit.profit.service.IProfitManageService;
 import com.ryx.credit.service.dict.IdService;
@@ -14,13 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service("profitManageService")
 public class ProfitManageServiceImpl implements IProfitManageService {
