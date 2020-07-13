@@ -141,7 +141,13 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
                 invocationIntUnFreeze(invoiceSum.getAgentId(),param.get("user").toString(),"到票解冻");
                 invoiceSum.setInvoiceStatus("99");
             }
-        } catch (Exception e) {
+        }catch (MessageException e){
+            e.printStackTrace();
+            logger.info("冻结和解冻代理商失败");
+            resultMap.put("returnCode", 0000);
+            resultMap.put("returnInfo", e.getMsg());
+            return resultMap;
+        }catch (Exception e) {
             e.printStackTrace();
             logger.info("冻结和解冻代理商失败");
             resultMap.put("returnCode", 0000);
@@ -481,16 +487,8 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         if("200".equals(agentResult.getStatus())){
             logger.info("欠票冻结："+agentId+",代理商冻结成功！");
             return true;
-        }else if("500".equals(agentResult.getStatus())){
-            if("系统处理中,请勿重复提交！".equals(agentResult.getMsg())){
-                logger.info("欠票冻结："+agentId+",系统处理中,请勿重复提交！");
-                return true;
-            }else if("代理商此原因已被冻结".equals(agentResult.getMsg())){
-                logger.info("欠票冻结："+agentId+",代理商此原因已被冻结");
-                return true;
-            }else{
-                throw new MessageException("代理商欠票冻结：代理商："+agentId+agentResult.getMsg());
-            }
+        }else {
+            logger.info("代理商欠票冻结：代理商："+agentId+"*"+agentResult.getMsg());
         }
         return false;
     }
@@ -513,16 +511,8 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         if("200".equals(agentResult.getStatus())){
             logger.info("发票管理解冻："+agentId+",代理商解冻成功！");
             return true;
-        }else if("500".equals(agentResult.getStatus())){
-            if("系统处理中,请勿重复提交！".equals(agentResult.getMsg())){
-                logger.info("欠票解冻："+agentId+",系统处理中,请勿重复提交！");
-                return true;  //"解冻信息不存在"
-            }else if("解冻信息不存在".equals(agentResult.getMsg())){
-                logger.info("欠票解冻："+agentId+",解冻信息不存在");
-                return true;
-            }else{
-                throw new MessageException("代理商欠票冻结：代理商："+agentId+agentResult.getMsg());
-            }
+        }else {
+            logger.info("代理商欠票冻结：代理商："+agentId+"*"+agentResult.getMsg());
         }
         return false;
     }
