@@ -761,7 +761,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             }
             //冻结内容--分润 返现冻结 PROFIT_FREEZR REFLOW_FREEZE
             if(null!=agentBusinfoFreeze.getProfitFreeze()){
-                map.put("profitFreezr",agentBusinfoFreeze.getProfitFreeze());
+                map.put("profitFreeze",agentBusinfoFreeze.getProfitFreeze());
             }
             if(null!=agentBusinfoFreeze.getReflowFreeze()){
                 map.put("reflowFreeze",agentBusinfoFreeze.getReflowFreeze());
