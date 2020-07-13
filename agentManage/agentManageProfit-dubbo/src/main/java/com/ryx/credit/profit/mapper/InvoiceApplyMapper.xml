@@ -925,12 +925,11 @@
     case
     when pa.YS_RESULT = '1' then '通过'
     when pa.YS_RESULT = '0' then '未通过'
-    when pa.YS_RESULT = '2' then '未进行初审'
-    else '未审核' end as YSRESULT,
+    else '' end as YSRESULT,
     case
     when pa.ES_RESULT = '1' then '通过'
     when pa.ES_RESULT = '0' then '未通过'
-    else '未审核' end as ESRESULT,
+    else '' end as ESRESULT,
     case
     when pa.INVOICE_TYPE = '1' then '普通电子发票'
     when pa.INVOICE_TYPE = '2' then '电子发票专票'
