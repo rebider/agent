@@ -237,8 +237,8 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             }
         }
 
-        Map mapData = (Map) agentResult.getData();
-        AgentFreeze date = (AgentFreeze)mapData.get("data");
+        AgentFreeze date = new AgentFreeze();
+        date.setAgentId(agent.getId());
         AgentResult notifyResult = agentBusinfoFreezeService.agentBusinfoFreeze(date, agentFreezePort.getOperationPerson());
         if (!notifyResult.isOK()){
             AppConfig.sendEmails("代理商冻结汇总失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg(), "冻结汇总失败报警");
@@ -292,8 +292,8 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
         }
 
         //汇总逻辑
-        Map mapData = (Map) agentResult.getData();
-        AgentFreeze date = (AgentFreeze)mapData.get("data");
+        AgentFreeze date = new AgentFreeze();
+        date.setAgentId(agentFreezePort.getAgentId());
         AgentResult notifyResult = agentBusinfoFreezeService.agentBusinfoFreeze(date, agentFreezePort.getOperationPerson());
         if (!notifyResult.isOK()){
             AppConfig.sendEmails("代理商解冻汇总失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg(), "解冻汇总失败报警");
@@ -1181,7 +1181,8 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                             .andBusIdEqualTo(busPlatform);
                     List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(agentFreezeExample);
                     if(agentFreezes.size()!=0){
-                        throw new MessageException("代理商此原因已被冻结:"+FreeType.getmsg(freeType));
+                        log.info("存在冻结记录{},跳过",JsonUtil.objectToJson(agentFreezes));
+                        continue;
                     }
                     //检查是否有在审批中的冻结申请
                     FreezeRequestDetailExample freezeRequestDetailExample = new FreezeRequestDetailExample();
@@ -1315,7 +1316,8 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
 
                 List<AgentFreeze> agentFreezeList = agentFreezeMapper.selectByExample(freezeExample);
                 if(agentFreezeList.size()==0){
-                    return AgentResult.fail("解冻信息不存在");
+                    log.info("解冻信息不存在{}",JsonUtil.objectToJson(agentFreezePort));
+                    return AgentResult.ok("解冻信息不存在");
                 }
 //                if(agentFreezeList.size()!=1){
 //                    return AgentResult.fail("解冻信息不唯一,请联系管理员");
