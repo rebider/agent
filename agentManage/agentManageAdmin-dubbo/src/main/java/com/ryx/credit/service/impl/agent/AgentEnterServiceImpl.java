@@ -113,6 +113,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
         try {
             if (agentVo.getAgent() != null && StringUtils.isNotBlank(agentVo.getAgent().getAgBusLic())) {
+                Agent agent = agentVo.getAgent();
+                if(StringUtils.isNotBlank(agent.getAgLegalCernum()))
+                agent.setAgLegalCernum(agent.getAgLegalCernum().toUpperCase());
+
                 AgentResult agentResult = agentService.checkAgBusLicIsEst(agentVo.getAgent().getAgName(), agentVo.getAgent().getAgBusLic());
                 if (agentResult.isOK()) {
                     return ResultVO.fail(agentVo.getAgent().getAgBusLic() + "已存在,编号为：" + agentResult.getData());
@@ -162,6 +166,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 item.setCloReviewStatus(AgStatus.Create.status);
                 String agentName = agent.getAgName();
                 String trueName = item.getCloRealname();
+                //身份证统一大写处理
+                if(StringUtils.isNotBlank(item.getAgLegalCernum()))
+                    item.setAgLegalCernum(item.getAgLegalCernum().toUpperCase());
                 //对公时 判断收款账户名是否与代理商名称一致 不一致则抛异常提示信息
                 if (item.getCloType().compareTo(new BigDecimal(1)) == 0) {
                     if (agentName.equals(trueName)) {
@@ -1236,7 +1243,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             Agent ag = null;
             if (StringUtils.isNotBlank(agent.getAgent().getAgName())) {
-                ag = agentService.updateAgentVo(agent.getAgent(), agent.getAgentTableFile(),userId,saveStatus);
+                Agent ag_agent = agent.getAgent();
+                if(StringUtils.isNotBlank(ag_agent.getAgLegalCernum()))
+                    ag_agent.setAgLegalCernum(ag_agent.getAgLegalCernum().toUpperCase());
+                ag = agentService.updateAgentVo(ag_agent, agent.getAgentTableFile(),userId,saveStatus);
             }
             logger.info("用户{}{}修改代理商信息结果{}", userId, agent.getAgent().getId(), "成功");
 
