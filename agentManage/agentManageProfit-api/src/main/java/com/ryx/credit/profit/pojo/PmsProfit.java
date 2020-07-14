@@ -4,17 +4,15 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class PmsProfit implements Serializable {
-    private String id;
+    private String balanceId;
 
-    private String month;
+    private String settleMonth;
 
     private String uniqueFlag;
 
-    private String agentId;
+    private String agentName;
 
     private String busCode;
-
-    private String busName;
 
     private String sheetName;
 
@@ -26,15 +24,9 @@ public class PmsProfit implements Serializable {
 
     private String profitType;
 
-    private String profitHz;
+    private String billStatus;
 
-    private String payCondition;
-
-    private String status;
-
-    private String freeReason;
-
-    private BigDecimal payTranMoney;
+    private BigDecimal balanceAmt;
 
     private String importTime;
 
@@ -44,33 +36,54 @@ public class PmsProfit implements Serializable {
 
     private String updatePerson;
 
-    private String freeTime;
-
-    private String payTime;
-
     private BigDecimal sheetOrder;
 
     private BigDecimal orderNumber;
 
-    private String queryField;// 查询条件
+    private String batchNo;
 
-    private String profitAmt;// 分润金额
+    private String remitFailReason;
 
+    private String balanceBankNo;
 
-    public String getId() {
-        return id;
+    private String balanceBankName;
+
+    private String balanceAcctName;
+
+    private String balanceAcctNo;
+
+    private String sunbmitCheckTime;
+
+    private String sunbmitRemitTime;
+
+    private String settleDate;
+
+    private String importBatch;
+
+    private String realityAgId;
+
+    private String realityAgName;
+
+    private String remark;
+
+    private String orgId;
+
+    private String renitStatus;
+
+    public String getBalanceId() {
+        return balanceId;
     }
 
-    public void setId(String id) {
-        this.id = id == null ? null : id.trim();
+    public void setBalanceId(String balanceId) {
+        this.balanceId = balanceId == null ? null : balanceId.trim();
     }
 
-    public String getMonth() {
-        return month;
+    public String getSettleMonth() {
+        return settleMonth;
     }
 
-    public void setMonth(String month) {
-        this.month = month == null ? null : month.trim();
+    public void setSettleMonth(String settleMonth) {
+        this.settleMonth = settleMonth == null ? null : settleMonth.trim();
     }
 
     public String getUniqueFlag() {
@@ -81,12 +94,12 @@ public class PmsProfit implements Serializable {
         this.uniqueFlag = uniqueFlag == null ? null : uniqueFlag.trim();
     }
 
-    public String getAgentId() {
-        return agentId;
+    public String getAgentName() {
+        return agentName;
     }
 
-    public void setAgentId(String agentId) {
-        this.agentId = agentId == null ? null : agentId.trim();
+    public void setAgentName(String agentName) {
+        this.agentName = agentName == null ? null : agentName.trim();
     }
 
     public String getBusCode() {
@@ -95,14 +108,6 @@ public class PmsProfit implements Serializable {
 
     public void setBusCode(String busCode) {
         this.busCode = busCode == null ? null : busCode.trim();
-    }
-
-    public String getBusName() {
-        return busName;
-    }
-
-    public void setBusName(String busName) {
-        this.busName = busName == null ? null : busName.trim();
     }
 
     public String getSheetName() {
@@ -145,44 +150,20 @@ public class PmsProfit implements Serializable {
         this.profitType = profitType == null ? null : profitType.trim();
     }
 
-    public String getProfitHz() {
-        return profitHz;
+    public String getBillStatus() {
+        return billStatus;
     }
 
-    public void setProfitHz(String profitHz) {
-        this.profitHz = profitHz == null ? null : profitHz.trim();
+    public void setBillStatus(String billStatus) {
+        this.billStatus = billStatus == null ? null : billStatus.trim();
     }
 
-    public String getPayCondition() {
-        return payCondition;
+    public BigDecimal getBalanceAmt() {
+        return balanceAmt;
     }
 
-    public void setPayCondition(String payCondition) {
-        this.payCondition = payCondition == null ? null : payCondition.trim();
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status == null ? null : status.trim();
-    }
-
-    public String getFreeReason() {
-        return freeReason;
-    }
-
-    public void setFreeReason(String freeReason) {
-        this.freeReason = freeReason == null ? null : freeReason.trim();
-    }
-
-    public BigDecimal getPayTranMoney() {
-        return payTranMoney;
-    }
-
-    public void setPayTranMoney(BigDecimal payTranMoney) {
-        this.payTranMoney = payTranMoney;
+    public void setBalanceAmt(BigDecimal balanceAmt) {
+        this.balanceAmt = balanceAmt;
     }
 
     public String getImportTime() {
@@ -217,22 +198,6 @@ public class PmsProfit implements Serializable {
         this.updatePerson = updatePerson == null ? null : updatePerson.trim();
     }
 
-    public String getFreeTime() {
-        return freeTime;
-    }
-
-    public void setFreeTime(String freeTime) {
-        this.freeTime = freeTime == null ? null : freeTime.trim();
-    }
-
-    public String getPayTime() {
-        return payTime;
-    }
-
-    public void setPayTime(String payTime) {
-        this.payTime = payTime == null ? null : payTime.trim();
-    }
-
     public BigDecimal getSheetOrder() {
         return sheetOrder;
     }
@@ -249,19 +214,123 @@ public class PmsProfit implements Serializable {
         this.orderNumber = orderNumber;
     }
 
-    public String getQueryField() {
-        return queryField;
+    public String getBatchNo() {
+        return batchNo;
     }
 
-    public void setQueryField(String queryField) {
-        this.queryField = queryField;
+    public void setBatchNo(String batchNo) {
+        this.batchNo = batchNo == null ? null : batchNo.trim();
     }
 
-    public String getProfitAmt() {
-        return profitAmt;
+    public String getRemitFailReason() {
+        return remitFailReason;
     }
 
-    public void setProfitAmt(String profitAmt) {
-        this.profitAmt = profitAmt;
+    public void setRemitFailReason(String remitFailReason) {
+        this.remitFailReason = remitFailReason == null ? null : remitFailReason.trim();
+    }
+
+    public String getBalanceBankNo() {
+        return balanceBankNo;
+    }
+
+    public void setBalanceBankNo(String balanceBankNo) {
+        this.balanceBankNo = balanceBankNo == null ? null : balanceBankNo.trim();
+    }
+
+    public String getBalanceBankName() {
+        return balanceBankName;
+    }
+
+    public void setBalanceBankName(String balanceBankName) {
+        this.balanceBankName = balanceBankName == null ? null : balanceBankName.trim();
+    }
+
+    public String getBalanceAcctName() {
+        return balanceAcctName;
+    }
+
+    public void setBalanceAcctName(String balanceAcctName) {
+        this.balanceAcctName = balanceAcctName == null ? null : balanceAcctName.trim();
+    }
+
+    public String getBalanceAcctNo() {
+        return balanceAcctNo;
+    }
+
+    public void setBalanceAcctNo(String balanceAcctNo) {
+        this.balanceAcctNo = balanceAcctNo == null ? null : balanceAcctNo.trim();
+    }
+
+    public String getSunbmitCheckTime() {
+        return sunbmitCheckTime;
+    }
+
+    public void setSunbmitCheckTime(String sunbmitCheckTime) {
+        this.sunbmitCheckTime = sunbmitCheckTime == null ? null : sunbmitCheckTime.trim();
+    }
+
+    public String getSunbmitRemitTime() {
+        return sunbmitRemitTime;
+    }
+
+    public void setSunbmitRemitTime(String sunbmitRemitTime) {
+        this.sunbmitRemitTime = sunbmitRemitTime == null ? null : sunbmitRemitTime.trim();
+    }
+
+    public String getSettleDate() {
+        return settleDate;
+    }
+
+    public void setSettleDate(String settleDate) {
+        this.settleDate = settleDate == null ? null : settleDate.trim();
+    }
+
+    public String getImportBatch() {
+        return importBatch;
+    }
+
+    public void setImportBatch(String importBatch) {
+        this.importBatch = importBatch == null ? null : importBatch.trim();
+    }
+
+    public String getRealityAgId() {
+        return realityAgId;
+    }
+
+    public void setRealityAgId(String realityAgId) {
+        this.realityAgId = realityAgId == null ? null : realityAgId.trim();
+    }
+
+    public String getRealityAgName() {
+        return realityAgName;
+    }
+
+    public void setRealityAgName(String realityAgName) {
+        this.realityAgName = realityAgName == null ? null : realityAgName.trim();
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
+    }
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId == null ? null : orgId.trim();
+    }
+
+    public String getRenitStatus() {
+        return renitStatus;
+    }
+
+    public void setRenitStatus(String renitStatus) {
+        this.renitStatus = renitStatus == null ? null : renitStatus.trim();
     }
 }

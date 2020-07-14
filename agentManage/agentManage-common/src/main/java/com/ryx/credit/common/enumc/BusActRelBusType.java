@@ -42,9 +42,10 @@ public enum BusActRelBusType {
     orderAdjust("/BusActRelBusType/orderAdj","机具数量调整申请"),
     cashierApprove("/BusActRelBusType/cashierApprove","订单调整出纳申请"),
     cardRenew("/BusActRelBusType/cardRenew","物联网卡续费申请"),
-    cardLogout("/BusActRelBusType/cardLogout","物联网卡注销申请"),
     freeze("/BusActRelBusType/agentFreezeApproval","冻结解冻申请"),
-    DC_AG_Colinfo("/BusActRelBusType/DC_AG_Colinfo","代理商发起基础信息修改申请");
+    DC_AG_Colinfo("/BusActRelBusType/DC_AG_Colinfo","代理商发起基础信息修改申请"),
+    cardLogout("/BusActRelBusType/cardLogout","物联网卡注销申请"),
+    BALANCE_APPLY("/BusActRelBusType/BALANCE_APPLY","分润出款审批");
 
 
     public String key;

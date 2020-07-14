@@ -1,13 +1,46 @@
 package com.ryx.credit.profit.pojo;
 
-public class PmsProfitTemp extends PmsProfitTempKey {
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+public class PmsProfitTemp implements Serializable {
+    private String id;
+
+    private String month;
+
     private String uniqueFlag;
 
-    private String agentId;
+    private String agentName;
 
     private String busCode;
 
     private String busName;
+
+    private String sheetName;
+
+    private BigDecimal orderNumber;
+
+    private String importPerson;
+
+    private String importType;
+
+    private String importBatch;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
+    }
+
+    public String getMonth() {
+        return month;
+    }
+
+    public void setMonth(String month) {
+        this.month = month == null ? null : month.trim();
+    }
 
     public String getUniqueFlag() {
         return uniqueFlag;
@@ -17,12 +50,12 @@ public class PmsProfitTemp extends PmsProfitTempKey {
         this.uniqueFlag = uniqueFlag == null ? null : uniqueFlag.trim();
     }
 
-    public String getAgentId() {
-        return agentId;
+    public String getAgentName() {
+        return agentName;
     }
 
-    public void setAgentId(String agentId) {
-        this.agentId = agentId == null ? null : agentId.trim();
+    public void setAgentName(String agentName) {
+        this.agentName = agentName == null ? null : agentName.trim();
     }
 
     public String getBusCode() {
@@ -39,5 +72,45 @@ public class PmsProfitTemp extends PmsProfitTempKey {
 
     public void setBusName(String busName) {
         this.busName = busName == null ? null : busName.trim();
+    }
+
+    public String getSheetName() {
+        return sheetName;
+    }
+
+    public void setSheetName(String sheetName) {
+        this.sheetName = sheetName == null ? null : sheetName.trim();
+    }
+
+    public BigDecimal getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(BigDecimal orderNumber) {
+        this.orderNumber = orderNumber;
+    }
+
+    public String getImportPerson() {
+        return importPerson;
+    }
+
+    public void setImportPerson(String importPerson) {
+        this.importPerson = importPerson == null ? null : importPerson.trim();
+    }
+
+    public String getImportType() {
+        return importType;
+    }
+
+    public void setImportType(String importType) {
+        this.importType = importType == null ? null : importType.trim();
+    }
+
+    public String getImportBatch() {
+        return importBatch;
+    }
+
+    public void setImportBatch(String importBatch) {
+        this.importBatch = importBatch == null ? null : importBatch.trim();
     }
 }

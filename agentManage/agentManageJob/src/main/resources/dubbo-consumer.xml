@@ -37,4 +37,8 @@
     <!-- 退货任务消费者 -->
     <dubbo:reference interface="com.ryx.credit.service.order.OsnOperateReturnService" id="osnOperateReturnService" timeout="1200000" registry="myGroup" />
     <dubbo:reference interface="com.ryx.credit.service.ActBusRelScanView" id="actBusRelScanView" timeout="1200000" registry="myGroup" />
+
+    <!--profit-->
+    <dubbo:reference interface="com.ryx.credit.profit.service.PBalanceSerialService" id="pBalanceSerialService" timeout="1200000" registry="myGroup"/>
+
 </beans>

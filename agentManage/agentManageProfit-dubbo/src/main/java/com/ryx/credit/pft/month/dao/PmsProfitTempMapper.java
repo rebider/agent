@@ -1,4 +1,4 @@
-package com.ryx.credit.profit.dao;
+package com.ryx.credit.pft.month.dao;
 
 import com.ryx.credit.profit.pojo.PmsProfitTemp;
 import com.ryx.credit.profit.pojo.PmsProfitTempExample;

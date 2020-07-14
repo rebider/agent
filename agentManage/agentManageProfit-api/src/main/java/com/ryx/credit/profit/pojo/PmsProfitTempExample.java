@@ -138,6 +138,76 @@ public class PmsProfitTempExample implements Serializable {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
+        public Criteria andIdIsNull() {
+            addCriterion("ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdIsNotNull() {
+            addCriterion("ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdEqualTo(String value) {
+            addCriterion("ID =", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdNotEqualTo(String value) {
+            addCriterion("ID <>", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdGreaterThan(String value) {
+            addCriterion("ID >", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdGreaterThanOrEqualTo(String value) {
+            addCriterion("ID >=", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdLessThan(String value) {
+            addCriterion("ID <", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdLessThanOrEqualTo(String value) {
+            addCriterion("ID <=", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdLike(String value) {
+            addCriterion("ID like", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdNotLike(String value) {
+            addCriterion("ID not like", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdIn(List<String> values) {
+            addCriterion("ID in", values, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdNotIn(List<String> values) {
+            addCriterion("ID not in", values, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdBetween(String value1, String value2) {
+            addCriterion("ID between", value1, value2, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdNotBetween(String value1, String value2) {
+            addCriterion("ID not between", value1, value2, "id");
+            return (Criteria) this;
+        }
+
         public Criteria andMonthIsNull() {
             addCriterion("MONTH is null");
             return (Criteria) this;
@@ -205,206 +275,6 @@ public class PmsProfitTempExample implements Serializable {
 
         public Criteria andMonthNotBetween(String value1, String value2) {
             addCriterion("MONTH not between", value1, value2, "month");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderNumberIsNull() {
-            addCriterion("ORDER_NUMBER is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderNumberIsNotNull() {
-            addCriterion("ORDER_NUMBER is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderNumberEqualTo(BigDecimal value) {
-            addCriterion("ORDER_NUMBER =", value, "orderNumber");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderNumberNotEqualTo(BigDecimal value) {
-            addCriterion("ORDER_NUMBER <>", value, "orderNumber");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderNumberGreaterThan(BigDecimal value) {
-            addCriterion("ORDER_NUMBER >", value, "orderNumber");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderNumberGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("ORDER_NUMBER >=", value, "orderNumber");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderNumberLessThan(BigDecimal value) {
-            addCriterion("ORDER_NUMBER <", value, "orderNumber");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderNumberLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("ORDER_NUMBER <=", value, "orderNumber");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderNumberIn(List<BigDecimal> values) {
-            addCriterion("ORDER_NUMBER in", values, "orderNumber");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderNumberNotIn(List<BigDecimal> values) {
-            addCriterion("ORDER_NUMBER not in", values, "orderNumber");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderNumberBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("ORDER_NUMBER between", value1, value2, "orderNumber");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderNumberNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("ORDER_NUMBER not between", value1, value2, "orderNumber");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameIsNull() {
-            addCriterion("SHEET_NAME is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameIsNotNull() {
-            addCriterion("SHEET_NAME is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameEqualTo(String value) {
-            addCriterion("SHEET_NAME =", value, "sheetName");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameNotEqualTo(String value) {
-            addCriterion("SHEET_NAME <>", value, "sheetName");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameGreaterThan(String value) {
-            addCriterion("SHEET_NAME >", value, "sheetName");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameGreaterThanOrEqualTo(String value) {
-            addCriterion("SHEET_NAME >=", value, "sheetName");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameLessThan(String value) {
-            addCriterion("SHEET_NAME <", value, "sheetName");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameLessThanOrEqualTo(String value) {
-            addCriterion("SHEET_NAME <=", value, "sheetName");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameLike(String value) {
-            addCriterion("SHEET_NAME like", value, "sheetName");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameNotLike(String value) {
-            addCriterion("SHEET_NAME not like", value, "sheetName");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameIn(List<String> values) {
-            addCriterion("SHEET_NAME in", values, "sheetName");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameNotIn(List<String> values) {
-            addCriterion("SHEET_NAME not in", values, "sheetName");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameBetween(String value1, String value2) {
-            addCriterion("SHEET_NAME between", value1, value2, "sheetName");
-            return (Criteria) this;
-        }
-
-        public Criteria andSheetNameNotBetween(String value1, String value2) {
-            addCriterion("SHEET_NAME not between", value1, value2, "sheetName");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonIsNull() {
-            addCriterion("IMPORT_PERSON is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonIsNotNull() {
-            addCriterion("IMPORT_PERSON is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonEqualTo(String value) {
-            addCriterion("IMPORT_PERSON =", value, "importPerson");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonNotEqualTo(String value) {
-            addCriterion("IMPORT_PERSON <>", value, "importPerson");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonGreaterThan(String value) {
-            addCriterion("IMPORT_PERSON >", value, "importPerson");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonGreaterThanOrEqualTo(String value) {
-            addCriterion("IMPORT_PERSON >=", value, "importPerson");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonLessThan(String value) {
-            addCriterion("IMPORT_PERSON <", value, "importPerson");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonLessThanOrEqualTo(String value) {
-            addCriterion("IMPORT_PERSON <=", value, "importPerson");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonLike(String value) {
-            addCriterion("IMPORT_PERSON like", value, "importPerson");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonNotLike(String value) {
-            addCriterion("IMPORT_PERSON not like", value, "importPerson");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonIn(List<String> values) {
-            addCriterion("IMPORT_PERSON in", values, "importPerson");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonNotIn(List<String> values) {
-            addCriterion("IMPORT_PERSON not in", values, "importPerson");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonBetween(String value1, String value2) {
-            addCriterion("IMPORT_PERSON between", value1, value2, "importPerson");
-            return (Criteria) this;
-        }
-
-        public Criteria andImportPersonNotBetween(String value1, String value2) {
-            addCriterion("IMPORT_PERSON not between", value1, value2, "importPerson");
             return (Criteria) this;
         }
 
@@ -478,73 +348,73 @@ public class PmsProfitTempExample implements Serializable {
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdIsNull() {
-            addCriterion("AGENT_ID is null");
+        public Criteria andAgentNameIsNull() {
+            addCriterion("AGENT_NAME is null");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdIsNotNull() {
-            addCriterion("AGENT_ID is not null");
+        public Criteria andAgentNameIsNotNull() {
+            addCriterion("AGENT_NAME is not null");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdEqualTo(String value) {
-            addCriterion("AGENT_ID =", value, "agentId");
+        public Criteria andAgentNameEqualTo(String value) {
+            addCriterion("AGENT_NAME =", value, "agentName");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdNotEqualTo(String value) {
-            addCriterion("AGENT_ID <>", value, "agentId");
+        public Criteria andAgentNameNotEqualTo(String value) {
+            addCriterion("AGENT_NAME <>", value, "agentName");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdGreaterThan(String value) {
-            addCriterion("AGENT_ID >", value, "agentId");
+        public Criteria andAgentNameGreaterThan(String value) {
+            addCriterion("AGENT_NAME >", value, "agentName");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdGreaterThanOrEqualTo(String value) {
-            addCriterion("AGENT_ID >=", value, "agentId");
+        public Criteria andAgentNameGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_NAME >=", value, "agentName");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdLessThan(String value) {
-            addCriterion("AGENT_ID <", value, "agentId");
+        public Criteria andAgentNameLessThan(String value) {
+            addCriterion("AGENT_NAME <", value, "agentName");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdLessThanOrEqualTo(String value) {
-            addCriterion("AGENT_ID <=", value, "agentId");
+        public Criteria andAgentNameLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_NAME <=", value, "agentName");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdLike(String value) {
-            addCriterion("AGENT_ID like", value, "agentId");
+        public Criteria andAgentNameLike(String value) {
+            addCriterion("AGENT_NAME like", value, "agentName");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdNotLike(String value) {
-            addCriterion("AGENT_ID not like", value, "agentId");
+        public Criteria andAgentNameNotLike(String value) {
+            addCriterion("AGENT_NAME not like", value, "agentName");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdIn(List<String> values) {
-            addCriterion("AGENT_ID in", values, "agentId");
+        public Criteria andAgentNameIn(List<String> values) {
+            addCriterion("AGENT_NAME in", values, "agentName");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdNotIn(List<String> values) {
-            addCriterion("AGENT_ID not in", values, "agentId");
+        public Criteria andAgentNameNotIn(List<String> values) {
+            addCriterion("AGENT_NAME not in", values, "agentName");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdBetween(String value1, String value2) {
-            addCriterion("AGENT_ID between", value1, value2, "agentId");
+        public Criteria andAgentNameBetween(String value1, String value2) {
+            addCriterion("AGENT_NAME between", value1, value2, "agentName");
             return (Criteria) this;
         }
 
-        public Criteria andAgentIdNotBetween(String value1, String value2) {
-            addCriterion("AGENT_ID not between", value1, value2, "agentId");
+        public Criteria andAgentNameNotBetween(String value1, String value2) {
+            addCriterion("AGENT_NAME not between", value1, value2, "agentName");
             return (Criteria) this;
         }
 
@@ -685,6 +555,346 @@ public class PmsProfitTempExample implements Serializable {
 
         public Criteria andBusNameNotBetween(String value1, String value2) {
             addCriterion("BUS_NAME not between", value1, value2, "busName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameIsNull() {
+            addCriterion("SHEET_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameIsNotNull() {
+            addCriterion("SHEET_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameEqualTo(String value) {
+            addCriterion("SHEET_NAME =", value, "sheetName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameNotEqualTo(String value) {
+            addCriterion("SHEET_NAME <>", value, "sheetName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameGreaterThan(String value) {
+            addCriterion("SHEET_NAME >", value, "sheetName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameGreaterThanOrEqualTo(String value) {
+            addCriterion("SHEET_NAME >=", value, "sheetName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameLessThan(String value) {
+            addCriterion("SHEET_NAME <", value, "sheetName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameLessThanOrEqualTo(String value) {
+            addCriterion("SHEET_NAME <=", value, "sheetName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameLike(String value) {
+            addCriterion("SHEET_NAME like", value, "sheetName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameNotLike(String value) {
+            addCriterion("SHEET_NAME not like", value, "sheetName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameIn(List<String> values) {
+            addCriterion("SHEET_NAME in", values, "sheetName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameNotIn(List<String> values) {
+            addCriterion("SHEET_NAME not in", values, "sheetName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameBetween(String value1, String value2) {
+            addCriterion("SHEET_NAME between", value1, value2, "sheetName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSheetNameNotBetween(String value1, String value2) {
+            addCriterion("SHEET_NAME not between", value1, value2, "sheetName");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNumberIsNull() {
+            addCriterion("ORDER_NUMBER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNumberIsNotNull() {
+            addCriterion("ORDER_NUMBER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNumberEqualTo(BigDecimal value) {
+            addCriterion("ORDER_NUMBER =", value, "orderNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNumberNotEqualTo(BigDecimal value) {
+            addCriterion("ORDER_NUMBER <>", value, "orderNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNumberGreaterThan(BigDecimal value) {
+            addCriterion("ORDER_NUMBER >", value, "orderNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNumberGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORDER_NUMBER >=", value, "orderNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNumberLessThan(BigDecimal value) {
+            addCriterion("ORDER_NUMBER <", value, "orderNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNumberLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORDER_NUMBER <=", value, "orderNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNumberIn(List<BigDecimal> values) {
+            addCriterion("ORDER_NUMBER in", values, "orderNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNumberNotIn(List<BigDecimal> values) {
+            addCriterion("ORDER_NUMBER not in", values, "orderNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNumberBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORDER_NUMBER between", value1, value2, "orderNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNumberNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORDER_NUMBER not between", value1, value2, "orderNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonIsNull() {
+            addCriterion("IMPORT_PERSON is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonIsNotNull() {
+            addCriterion("IMPORT_PERSON is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonEqualTo(String value) {
+            addCriterion("IMPORT_PERSON =", value, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonNotEqualTo(String value) {
+            addCriterion("IMPORT_PERSON <>", value, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonGreaterThan(String value) {
+            addCriterion("IMPORT_PERSON >", value, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonGreaterThanOrEqualTo(String value) {
+            addCriterion("IMPORT_PERSON >=", value, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonLessThan(String value) {
+            addCriterion("IMPORT_PERSON <", value, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonLessThanOrEqualTo(String value) {
+            addCriterion("IMPORT_PERSON <=", value, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonLike(String value) {
+            addCriterion("IMPORT_PERSON like", value, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonNotLike(String value) {
+            addCriterion("IMPORT_PERSON not like", value, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonIn(List<String> values) {
+            addCriterion("IMPORT_PERSON in", values, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonNotIn(List<String> values) {
+            addCriterion("IMPORT_PERSON not in", values, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonBetween(String value1, String value2) {
+            addCriterion("IMPORT_PERSON between", value1, value2, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportPersonNotBetween(String value1, String value2) {
+            addCriterion("IMPORT_PERSON not between", value1, value2, "importPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeIsNull() {
+            addCriterion("IMPORT_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeIsNotNull() {
+            addCriterion("IMPORT_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeEqualTo(String value) {
+            addCriterion("IMPORT_TYPE =", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotEqualTo(String value) {
+            addCriterion("IMPORT_TYPE <>", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeGreaterThan(String value) {
+            addCriterion("IMPORT_TYPE >", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("IMPORT_TYPE >=", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeLessThan(String value) {
+            addCriterion("IMPORT_TYPE <", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeLessThanOrEqualTo(String value) {
+            addCriterion("IMPORT_TYPE <=", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeLike(String value) {
+            addCriterion("IMPORT_TYPE like", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotLike(String value) {
+            addCriterion("IMPORT_TYPE not like", value, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeIn(List<String> values) {
+            addCriterion("IMPORT_TYPE in", values, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotIn(List<String> values) {
+            addCriterion("IMPORT_TYPE not in", values, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeBetween(String value1, String value2) {
+            addCriterion("IMPORT_TYPE between", value1, value2, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportTypeNotBetween(String value1, String value2) {
+            addCriterion("IMPORT_TYPE not between", value1, value2, "importType");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchIsNull() {
+            addCriterion("IMPORT_BATCH is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchIsNotNull() {
+            addCriterion("IMPORT_BATCH is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchEqualTo(String value) {
+            addCriterion("IMPORT_BATCH =", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotEqualTo(String value) {
+            addCriterion("IMPORT_BATCH <>", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchGreaterThan(String value) {
+            addCriterion("IMPORT_BATCH >", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchGreaterThanOrEqualTo(String value) {
+            addCriterion("IMPORT_BATCH >=", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchLessThan(String value) {
+            addCriterion("IMPORT_BATCH <", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchLessThanOrEqualTo(String value) {
+            addCriterion("IMPORT_BATCH <=", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchLike(String value) {
+            addCriterion("IMPORT_BATCH like", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotLike(String value) {
+            addCriterion("IMPORT_BATCH not like", value, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchIn(List<String> values) {
+            addCriterion("IMPORT_BATCH in", values, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotIn(List<String> values) {
+            addCriterion("IMPORT_BATCH not in", values, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchBetween(String value1, String value2) {
+            addCriterion("IMPORT_BATCH between", value1, value2, "importBatch");
+            return (Criteria) this;
+        }
+
+        public Criteria andImportBatchNotBetween(String value1, String value2) {
+            addCriterion("IMPORT_BATCH not between", value1, value2, "importBatch");
             return (Criteria) this;
         }
     }

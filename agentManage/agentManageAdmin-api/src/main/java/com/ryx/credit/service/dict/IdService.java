@@ -25,4 +25,8 @@ public interface IdService {
 
     public String genAbFreezeId(TabId tablename,Integer userid);
 
+    String getPPTId();
+
+    String getPPT2Id();
+
 }

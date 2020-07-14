@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PBalanceSerialMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PBalanceSerial">
+    <result column="BALANCE_ID" jdbcType="VARCHAR" property="balanceId" />
+    <result column="BALANCE_BATCH_NO" jdbcType="VARCHAR" property="balanceBatchNo" />
+    <result column="SETTLE_MONTH" jdbcType="VARCHAR" property="settleMonth" />
+    <result column="SETTLE_DATE" jdbcType="VARCHAR" property="settleDate" />
+    <result column="AG_ID" jdbcType="VARCHAR" property="agId" />
+    <result column="AG_NAME" jdbcType="VARCHAR" property="agName" />
+    <result column="BRAND_NO" jdbcType="VARCHAR" property="brandNo" />
+    <result column="IMPORT_BATCH" jdbcType="VARCHAR" property="importBatch" />
+    <result column="REAL_AG_ID" jdbcType="VARCHAR" property="realAgId" />
+    <result column="REAL_AG_NAME" jdbcType="VARCHAR" property="realAgName" />
+    <result column="BALANCE_AMT" jdbcType="DECIMAL" property="balanceAmt" />
+    <result column="BALANCE_BANK_NO" jdbcType="VARCHAR" property="balanceBankNo" />
+    <result column="BALANCE_BANK_NAME" jdbcType="VARCHAR" property="balanceBankName" />
+    <result column="BALANCE_ACCT_TYPE" jdbcType="VARCHAR" property="balanceAcctType" />
+    <result column="BALANCE_ACCT_NO" jdbcType="VARCHAR" property="balanceAcctNo" />
+    <result column="BALANCE_ACCT_NAME" jdbcType="VARCHAR" property="balanceAcctName" />
+    <result column="BALANCE_STATUS" jdbcType="VARCHAR" property="balanceStatus" />
+    <result column="BALANCE_DESC" jdbcType="VARCHAR" property="balanceDesc" />
+    <result column="SUBMIT_TER" jdbcType="VARCHAR" property="submitTer" />
+    <result column="SUBMIT_TIME" jdbcType="VARCHAR" property="submitTime" />
+    <result column="SYNC_TIME" jdbcType="VARCHAR" property="syncTime" />
+    <result column="CHECK_STATUS" jdbcType="VARCHAR" property="checkStatus" />
+    <result column="RECON_STATUS" jdbcType="VARCHAR" property="reconStatus" />
+    <result column="RECON_REMARK" jdbcType="VARCHAR" property="reconRemark" />
+    <result column="BALANCE_BANK_VERSION" jdbcType="VARCHAR" property="balanceBankVersion" />
+    <result column="CKWC_TIME" jdbcType="VARCHAR" property="ckwcTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    BALANCE_ID, BALANCE_BATCH_NO, SETTLE_MONTH, SETTLE_DATE, AG_ID, AG_NAME, BRAND_NO, 
+    IMPORT_BATCH, REAL_AG_ID, REAL_AG_NAME, BALANCE_AMT, BALANCE_BANK_NO, BALANCE_BANK_NAME, 
+    BALANCE_ACCT_TYPE, BALANCE_ACCT_NO, BALANCE_ACCT_NAME, BALANCE_STATUS, BALANCE_DESC, 
+    SUBMIT_TER, SUBMIT_TIME, SYNC_TIME, CHECK_STATUS, RECON_STATUS, RECON_REMARK, BALANCE_BANK_VERSION, 
+    CKWC_TIME
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PBalanceSerialExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_BALANCE_SERIAL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PBalanceSerialExample">
+    delete from P_BALANCE_SERIAL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PBalanceSerial">
+    insert into P_BALANCE_SERIAL (BALANCE_ID, BALANCE_BATCH_NO, SETTLE_MONTH, 
+      SETTLE_DATE, AG_ID, AG_NAME, 
+      BRAND_NO, IMPORT_BATCH, REAL_AG_ID, 
+      REAL_AG_NAME, BALANCE_AMT, BALANCE_BANK_NO, 
+      BALANCE_BANK_NAME, BALANCE_ACCT_TYPE, BALANCE_ACCT_NO, 
+      BALANCE_ACCT_NAME, BALANCE_STATUS, BALANCE_DESC, 
+      SUBMIT_TER, SUBMIT_TIME, SYNC_TIME, 
+      CHECK_STATUS, RECON_STATUS, RECON_REMARK, 
+      BALANCE_BANK_VERSION, CKWC_TIME)
+    values (#{balanceId,jdbcType=VARCHAR}, #{balanceBatchNo,jdbcType=VARCHAR}, #{settleMonth,jdbcType=VARCHAR}, 
+      #{settleDate,jdbcType=VARCHAR}, #{agId,jdbcType=VARCHAR}, #{agName,jdbcType=VARCHAR}, 
+      #{brandNo,jdbcType=VARCHAR}, #{importBatch,jdbcType=VARCHAR}, #{realAgId,jdbcType=VARCHAR}, 
+      #{realAgName,jdbcType=VARCHAR}, #{balanceAmt,jdbcType=DECIMAL}, #{balanceBankNo,jdbcType=VARCHAR}, 
+      #{balanceBankName,jdbcType=VARCHAR}, #{balanceAcctType,jdbcType=VARCHAR}, #{balanceAcctNo,jdbcType=VARCHAR}, 
+      #{balanceAcctName,jdbcType=VARCHAR}, #{balanceStatus,jdbcType=VARCHAR}, #{balanceDesc,jdbcType=VARCHAR}, 
+      #{submitTer,jdbcType=VARCHAR}, #{submitTime,jdbcType=VARCHAR}, #{syncTime,jdbcType=VARCHAR}, 
+      #{checkStatus,jdbcType=VARCHAR}, #{reconStatus,jdbcType=VARCHAR}, #{reconRemark,jdbcType=VARCHAR}, 
+      #{balanceBankVersion,jdbcType=VARCHAR}, #{ckwcTime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PBalanceSerial">
+    insert into P_BALANCE_SERIAL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="balanceId != null">
+        BALANCE_ID,
+      </if>
+      <if test="balanceBatchNo != null">
+        BALANCE_BATCH_NO,
+      </if>
+      <if test="settleMonth != null">
+        SETTLE_MONTH,
+      </if>
+      <if test="settleDate != null">
+        SETTLE_DATE,
+      </if>
+      <if test="agId != null">
+        AG_ID,
+      </if>
+      <if test="agName != null">
+        AG_NAME,
+      </if>
+      <if test="brandNo != null">
+        BRAND_NO,
+      </if>
+      <if test="importBatch != null">
+        IMPORT_BATCH,
+      </if>
+      <if test="realAgId != null">
+        REAL_AG_ID,
+      </if>
+      <if test="realAgName != null">
+        REAL_AG_NAME,
+      </if>
+      <if test="balanceAmt != null">
+        BALANCE_AMT,
+      </if>
+      <if test="balanceBankNo != null">
+        BALANCE_BANK_NO,
+      </if>
+      <if test="balanceBankName != null">
+        BALANCE_BANK_NAME,
+      </if>
+      <if test="balanceAcctType != null">
+        BALANCE_ACCT_TYPE,
+      </if>
+      <if test="balanceAcctNo != null">
+        BALANCE_ACCT_NO,
+      </if>
+      <if test="balanceAcctName != null">
+        BALANCE_ACCT_NAME,
+      </if>
+      <if test="balanceStatus != null">
+        BALANCE_STATUS,
+      </if>
+      <if test="balanceDesc != null">
+        BALANCE_DESC,
+      </if>
+      <if test="submitTer != null">
+        SUBMIT_TER,
+      </if>
+      <if test="submitTime != null">
+        SUBMIT_TIME,
+      </if>
+      <if test="syncTime != null">
+        SYNC_TIME,
+      </if>
+      <if test="checkStatus != null">
+        CHECK_STATUS,
+      </if>
+      <if test="reconStatus != null">
+        RECON_STATUS,
+      </if>
+      <if test="reconRemark != null">
+        RECON_REMARK,
+      </if>
+      <if test="balanceBankVersion != null">
+        BALANCE_BANK_VERSION,
+      </if>
+      <if test="ckwcTime != null">
+        CKWC_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="balanceId != null">
+        #{balanceId,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceBatchNo != null">
+        #{balanceBatchNo,jdbcType=VARCHAR},
+      </if>
+      <if test="settleMonth != null">
+        #{settleMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="settleDate != null">
+        #{settleDate,jdbcType=VARCHAR},
+      </if>
+      <if test="agId != null">
+        #{agId,jdbcType=VARCHAR},
+      </if>
+      <if test="agName != null">
+        #{agName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandNo != null">
+        #{brandNo,jdbcType=VARCHAR},
+      </if>
+      <if test="importBatch != null">
+        #{importBatch,jdbcType=VARCHAR},
+      </if>
+      <if test="realAgId != null">
+        #{realAgId,jdbcType=VARCHAR},
+      </if>
+      <if test="realAgName != null">
+        #{realAgName,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceAmt != null">
+        #{balanceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="balanceBankNo != null">
+        #{balanceBankNo,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceBankName != null">
+        #{balanceBankName,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceAcctType != null">
+        #{balanceAcctType,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceAcctNo != null">
+        #{balanceAcctNo,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceAcctName != null">
+        #{balanceAcctName,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceStatus != null">
+        #{balanceStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceDesc != null">
+        #{balanceDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="submitTer != null">
+        #{submitTer,jdbcType=VARCHAR},
+      </if>
+      <if test="submitTime != null">
+        #{submitTime,jdbcType=VARCHAR},
+      </if>
+      <if test="syncTime != null">
+        #{syncTime,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null">
+        #{checkStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="reconStatus != null">
+        #{reconStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="reconRemark != null">
+        #{reconRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceBankVersion != null">
+        #{balanceBankVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="ckwcTime != null">
+        #{ckwcTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PBalanceSerialExample" resultType="java.lang.Long">
+    select count(*) from P_BALANCE_SERIAL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+  <!--************************************以下为自动生成代码**********************************-->
+
+  <select id="getListByMap" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix"/>
+    <include refid="getListByMap_sql"/>
+    <include refid="OracleDialectSuffix"/>
+  </select>
+
+  <select id="getCountByMap" resultType="java.lang.Long" >
+    select count(1) from (
+    <include refid="getListByMap_sql"/>
+    ) zzz
+  </select>
+
+  <sql id="getListByMap_sql">
+    select zzz.*,cu.NAME,pp.BATCH_NO,pp.IMPORT_BATCH IMPORT_BATCH1,ap.PLATFORM_NAME,
+      case when zzz.IMPORT_BATCH = '77' then '一次请款'
+      when zzz.IMPORT_BATCH = '88' then '二次请款'
+      when zzz.IMPORT_BATCH = '99' then '补出款'
+      else '分润数据导入' end as PROFIT_TYPE1,
+      case when zzz.BALANCE_STATUS='00' then '未出款'
+      when zzz.BALANCE_STATUS='01' then '出款中'
+      when zzz.BALANCE_STATUS='02' then '出款成功'
+      when zzz.BALANCE_STATUS='03' then '出款失败'
+      else '未知' end as BALANCE_STATUS1,
+      case when zzz.NOTICE_RESULT = '00' then '否'
+      when zzz.NOTICE_RESULT = '01' then '是'
+      when zzz.NOTICE_RESULT = '02' then '修改完成'
+      else '' end NOTICE_RESULT1
+    from (
+      select pb.BALANCE_ID, pb.BALANCE_BATCH_NO, pb.SETTLE_MONTH, pb.SETTLE_DATE, pb.AG_ID, pb.AG_NAME, pb.BRAND_NO,
+      pb.REAL_AG_ID, pb.REAL_AG_NAME, pb.BALANCE_AMT,pb.BALANCE_DESC, pb.SUBMIT_TER, pb.SUBMIT_TIME, pb.SYNC_TIME,
+      pb.CHECK_STATUS,pb.RECON_STATUS, pb.RECON_REMARK, pb.BALANCE_BANK_VERSION, pb.CKWC_TIME,pb.BALANCE_STATUS,
+      pb.IMPORT_BATCH,
+      pr.BALANCE_BANK_NO, pr.BALANCE_BANK_NAME,  pr.BALANCE_ACCT_NO, pr.BALANCE_ACCT_NAME,  pr.BALANCE_ID REPLY_ID,
+      pr.CK_TIME,pr.NOTICE_RESULT,pr.NOTICE_TIME
+      from P_BALANCE_SERIAL pb
+      left join  P_REFUND_SERIAL  pr on pb.BALANCE_ID = pr.FIRST_BALANCE_ID where pb.BALANCE_STATUS = '03'
+
+      union all
+
+      select pb.BALANCE_ID, pb.BALANCE_BATCH_NO, pb.SETTLE_MONTH, pb.SETTLE_DATE, pb.AG_ID, pb.AG_NAME, pb.BRAND_NO,
+      pb.REAL_AG_ID, pb.REAL_AG_NAME, pb.BALANCE_AMT,pb.BALANCE_DESC, pb.SUBMIT_TER, pb.SUBMIT_TIME, pb.SYNC_TIME,
+      pb.CHECK_STATUS,pb.RECON_STATUS, pb.RECON_REMARK, pb.BALANCE_BANK_VERSION, pb.CKWC_TIME,pb.BALANCE_STATUS,
+      pb.IMPORT_BATCH,pb.BALANCE_BANK_NO, pb.BALANCE_BANK_NAME,  pb.BALANCE_ACCT_NO, pb.BALANCE_ACCT_NAME, REPLY_ID,
+      CKWC_TIME CK_TIME,'' NOTICE_RESULT,'' NOTICE_TIME
+      from P_BALANCE_SERIAL pb where pb.BALANCE_STATUS <![CDATA[<>]]> '03'
+    ) zzz
+    left join C_USER cu on cu.ID = zzz.SUBMIT_TER
+    left join PMS_PROFIT pp on zzz.BALANCE_ID = pp.BALANCE_ID
+    left join A_PLATFORM ap on zzz.BRAND_NO = ap.PLATFORM_NUM
+    where 1= 1
+    <if test="param.agDoc != '' and param.agDoc != null">
+      and zzz.AG_ID in (
+      select distinct AGENT_ID from A_AGENT_BUSINFO
+      where AG_DOC_PRO in
+      ( select id from C_ORGANIZATION where PID = #{param.agDoc} ) or AG_DOC_PRO = #{param.agDoc}
+      )
+    </if>
+    <if test="param.agDis != '' and param.agDis != null">
+      and zzz.AG_ID in (
+      select distinct AGENT_ID from A_AGENT_BUSINFO
+      where AG_DOC_DISTRICT = #{param.agDis}
+      )
+    </if>
+    <if test="param.agentId != '' and param.agentId != null">
+      and zzz.AG_ID  = #{param.agentId}
+    </if>
+    <if test="param.agentName != '' and param.agentName != null">
+      and zzz.AG_NAME  = #{param.agentName}
+    </if>
+    <choose>
+      <when test="param.startMonth != '' and param.startMonth !=null and param.endMonth !='' and param.endMonth != null ">
+        and zzz.SETTLE_MONTH between #{param.startMonth} and #{param.endMonth}
+      </when>
+      <when test="param.startMonth != '' and param.startMonth !=null">
+        and zzz.SETTLE_MONTH = #{param.startMonth}
+      </when>
+      <when test="param.endMonth != '' and param.endMonth !=null">
+        and zzz.SETTLE_MONTH = #{param.endMonth}
+      </when>
+    </choose>
+    <if test="param.busPlayNum != '' and param.busPlayNum != null">
+      and zzz.BRAND_NO  = #{param.busPlayNum}
+    </if>
+    <if test="param.busPlayName != '' and param.busPlayName != null">
+      and zzz.BRAND_NO  = #{param.busPlayName}
+    </if>
+    <if test="param.balanceBatchId != '' and param.balanceBatchId != null">
+      and zzz.BALANCE_BATCH_NO  = #{param.balanceBatchId}
+    </if>
+    <!--<choose>
+      <when test="param.settleDateStart != '' and param.settleDateStart !=null and param.settleDateEnd !='' and param.settleDateEnd != null">
+        and zzz.SETTLE_DATE between #{param.settleDateStart} and #{param.settleDateEnd}
+      </when>
+      <when test="param.settleDateStart != '' and param.settleDateStart !=null">
+        and zzz.SETTLE_DATE = #{param.settleDateStart}
+      </when>
+      <when test="param.settleDateEnd != '' and param.settleDateEnd !=null">
+        and zzz.SETTLE_DATE = #{param.settleDateEnd}
+      </when>
+    </choose>-->
+    <if test="param.importBatch != '' and param.importBatch != null">
+      and zzz.IMPORT_BATCH  = #{param.importBatch}
+    </if>
+    <if test="param.balanceId != '' and param.balanceId != null">
+      and zzz.BALANCE_ID  = #{param.balanceId}
+    </if>
+    <!--<choose>
+      <when test="param.paymentTimeStart != '' and param.paymentTimeStart !=null and param.paymentTimeEnd !='' and param.paymentTimeEnd != null">
+        and zzz.SYNC_TIME between #{param.paymentTimeStart} and #{param.paymentTimeEnd}
+      </when>
+      <when test="param.paymentTimeStart != '' and param.paymentTimeStart !=null">
+        and zzz.SYNC_TIME = #{param.settleDateStart}
+      </when>
+      <when test="param.paymentTimeEnd != '' and param.paymentTimeEnd !=null">
+        and zzz.SYNC_TIME = #{param.settleDateEnd}
+      </when>
+    </choose>-->
+    <choose>
+    <when test="param.cktjDateStart != '' and param.cktjDateStart !=null and param.cktjDateEnd !='' and param.cktjDateEnd != null">
+      and zzz.SUBMIT_TIME between #{param.cktjDateStart} and #{param.cktjDateEnd}
+    </when>
+    <when test="param.cktjDateStart != '' and param.cktjDateStart !=null">
+      and zzz.SUBMIT_TIME = #{param.cktjDateStart}
+    </when>
+    <when test="param.cktjDateEnd != '' and param.cktjDateEnd !=null">
+      and zzz.SUBMIT_TIME = #{param.cktjDateEnd}
+    </when>
+  </choose>
+    <choose>
+    <when test="param.ckwcStart != '' and param.ckwcStart !=null and param.ckwcEnd !='' and param.ckwcEnd != null">
+      and zzz.CKWC_TIME between #{param.ckwcStart} and #{param.ckwcEnd}
+    </when>
+    <when test="param.ckwcStart != '' and param.ckwcStart !=null">
+      and zzz.CKWC_TIME = #{param.ckwcStart}
+    </when>
+    <when test="param.ckwcEnd != '' and param.ckwcEnd !=null">
+      and zzz.CKWC_TIME = #{param.ckwcEnd}
+    </when>
+  </choose>
+    order by  zzz.SETTLE_MONTH desc,zzz.SYNC_TIME desc
+  </sql>
+
+  <select id="getRefundLog" resultType="java.util.Map" parameterType="java.lang.String">
+    select pr.FIRST_BALANCE_ID,pr.CK_TIME,pr.REFUND_REMARK,
+         pr.PRE_BALANCE_ID,pr.BALANCE_ID,'出款失败' as BALANCE_STATUS
+    from P_REFUND_SERIAL pr
+    where FIRST_BALANCE_ID  = #{balanceId}
+    order by CK_TIME asc
+  </select>
+
+  <select id="statisticalData" resultType="java.util.Map">
+    select count(1) as count,nvl(sum(zzz.BALANCE_AMT),0) as amt from (
+    <include refid="getCount_sql"/>
+    ) zzz
+  </select>
+
+  <sql id="getCount_sql">
+    select * from P_BALANCE_SERIAL zzz
+    where 1= 1
+    <if test="param.agDoc != '' and param.agDoc != null">
+      and zzz.AG_ID in (
+      select distinct AGENT_ID from A_AGENT_BUSINFO
+      where AG_DOC_PRO in
+      ( select id from C_ORGANIZATION where PID = #{param.agDoc} ) or AG_DOC_PRO = #{param.agDoc}
+      )
+    </if>
+    <if test="param.agDis != '' and param.agDis != null">
+      and zzz.AG_ID in (
+      select distinct AGENT_ID from A_AGENT_BUSINFO
+      where AG_DOC_DISTRICT = #{param.agDis}
+      )
+    </if>
+    <if test="param.agentId != '' and param.agentId != null">
+      and zzz.AG_ID  = #{param.agentId}
+    </if>
+    <if test="param.agentName != '' and param.agentName != null">
+      and zzz.AG_NAME  = #{param.agentName}
+    </if>
+    <choose>
+      <when test="param.startMonth != '' and param.startMonth !=null and param.endMonth !='' and param.endMonth != null ">
+        and zzz.SETTLE_MONTH between #{param.startMonth} and #{param.endMonth}
+      </when>
+      <when test="param.startMonth != '' and param.startMonth !=null">
+        and zzz.SETTLE_MONTH = #{param.startMonth}
+      </when>
+      <when test="param.endMonth != '' and param.endMonth !=null">
+        and zzz.SETTLE_MONTH = #{param.endMonth}
+      </when>
+    </choose>
+    <if test="param.busPlayNum != '' and param.busPlayNum != null">
+      and zzz.BRAND_NO  = #{param.busPlayNum}
+    </if>
+    <if test="param.busPlayName != '' and param.busPlayName != null">
+      and zzz.BRAND_NO  = #{param.busPlayName}
+    </if>
+    <if test="param.balanceBatchId != '' and param.balanceBatchId != null">
+      and zzz.BALANCE_BATCH_NO  = #{param.balanceBatchId}
+    </if>
+    <if test="param.importBatch != '' and param.importBatch != null">
+      and zzz.IMPORT_BATCH  = #{param.importBatch}
+    </if>
+    <if test="param.balanceId != '' and param.balanceId != null">
+      and zzz.BALANCE_ID  = #{param.balanceId}
+    </if>
+    <choose>
+      <when test="param.cktjDateStart != '' and param.cktjDateStart !=null and param.cktjDateEnd !='' and param.cktjDateEnd != null">
+        and zzz.SUBMIT_TIME between #{param.cktjDateStart} and #{param.cktjDateEnd}
+      </when>
+      <when test="param.cktjDateStart != '' and param.cktjDateStart !=null">
+        and zzz.SUBMIT_TIME = #{param.cktjDateStart}
+      </when>
+      <when test="param.cktjDateEnd != '' and param.cktjDateEnd !=null">
+        and zzz.SUBMIT_TIME = #{param.cktjDateEnd}
+      </when>
+    </choose>
+    <choose>
+      <when test="param.ckwcStart != '' and param.ckwcStart !=null and param.ckwcEnd !='' and param.ckwcEnd != null">
+        and zzz.CKWC_TIME between #{param.ckwcStart} and #{param.ckwcEnd}
+      </when>
+      <when test="param.ckwcStart != '' and param.ckwcStart !=null">
+        and zzz.CKWC_TIME = #{param.ckwcStart}
+      </when>
+      <when test="param.ckwcEnd != '' and param.ckwcEnd !=null">
+        and zzz.CKWC_TIME = #{param.ckwcEnd}
+      </when>
+    </choose>
+    order by  zzz.SETTLE_MONTH desc,zzz.SYNC_TIME desc
+  </sql>
+
+
+
+  <select id="getNeedNoticeList" resultType="java.util.Map">
+    select  * from (
+    select  pr.BALANCE_ID,pr.FIRST_BALANCE_ID,
+    pb.BALANCE_BANK_NAME,pb.BALANCE_BATCH_NO,pb.BALANCE_ACCT_NAME,
+    pb.BALANCE_ACCT_NO,pb.BALANCE_BANK_VERSION,
+    pb.AG_ID,pb.AG_NAME,pr.NOTICE_RESULT,
+    row_number() over (partition by  FIRST_BALANCE_ID order by CK_TIME desc ) rn
+    from P_REFUND_SERIAL pr
+    inner join P_BALANCE_SERIAL pb on pr.FIRST_BALANCE_ID = pb.BALANCE_ID
+    where 1 =1
+    and pb.BALANCE_STATUS = '03'
+    )
+    where rn=1
+    and NOTICE_RESULT = '00'
+  </select>
+
+  <update id="updateNoticeStatus">
+    <foreach collection="list" item="item" index="index" open="begin" close=";end;" separator=";">
+      update P_REFUND_SERIAL pr
+      set pr.NOTICE_RESULT = #{status}
+      WHERE pr.BALANCE_ID =#{item.BALANCE_ID}
+    </foreach>
+  </update>
+
+</mapper>
