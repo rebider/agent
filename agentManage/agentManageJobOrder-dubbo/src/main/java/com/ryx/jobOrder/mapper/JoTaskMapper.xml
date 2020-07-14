@@ -325,6 +325,9 @@
     <result column="joTaskAcceptTime" jdbcType="VARCHAR" property="joTaskAcceptTime" />
     <result column="joDealPersonId" jdbcType="VARCHAR" property="joDealPersonId" />
     <result column="joDealPersonName" jdbcType="VARCHAR" property="joDealPersonName" />
+    <result column="dealGroup" jdbcType="VARCHAR" property="dealGroup" />
+    <result column="joTaskContent" jdbcType="VARCHAR" property="joTaskContent" />
+    <result column="joTaskNextTime" jdbcType="VARCHAR" property="joTaskNextTime" />
   </resultMap>
   <sql id="JoTaskVo_Column_List">
     jo.ID, jo.AG_ID, jo.AG_NAME, jo.BUS_ID, jo.BUS_NUM, jo.PALTFORM_NUM, jo.PLATFORM_NAME,
@@ -337,7 +340,8 @@
     jo.ACCEPT_NOW_GROUP, jo.DEAL_TIME_START, jo.DEAL_TIME_END, jo.DEAL_TIME_LENGTH, jo.JO_PROGRESS,
     jt.id as joTaskId, jt.jo_task_status  as joTaskStatus, jt.jo_task_time as joTaskTime,
     jt.jo_task_accept_time as joTaskAcceptTime, jt.deal_person_id as joDealPersonId,
-    jt.deal_person_name as joDealPersonName
+    jt.deal_person_name as joDealPersonName, jt.deal_Group as dealGroup,
+    jt.JO_TASK_CONTENT as joTaskContent, jt.JO_TASK_NEXT_TIME as joTaskNextTime
   </sql>
   <select id="selectByJoTaskVo"  resultMap="JoTaskVoBaseResultMap">
     <include refid="OracleDialectPrefix" />
