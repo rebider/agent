@@ -120,7 +120,7 @@ public class AgentDebitCardServiceImpl implements AgentDebitCardService {
                 if (null != voPre.getColinfoVoList() && voPre.getColinfoVoList().size() > 0) {
                     List<AgentColinfoVo> colinfoVoList = voPre.getColinfoVoList();
                     AgentColinfoVo agentColinfoVo = colinfoVoList.get(0);
-                    map.put("CLO_BANK_ACCOUNT",agentColinfoVo.getCloBankAccount());
+                    map.put("CLO_BANK_ACCOUNT_PRE",agentColinfoVo.getCloBankAccount());
                     map.put("CLO_TYPE_PRE",agentColinfoVo.getCloType());
                     map.put("CLO_BANK_PRE",agentColinfoVo.getCloBank());
                     map.put("CLO_BANK_BRANCH_PRE",agentColinfoVo.getCloBankBranch());
