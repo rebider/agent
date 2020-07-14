@@ -149,7 +149,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
                     dealWithFirst(param,role,user,userName);
                 }else if(list1.size() >=1){ // 发票汇总
                     InvoiceApply invoiceApply = list1.get(0);
-                    dealWithSecond(invoiceApply,role,user,userName);
+                    dealWithSecond(invoiceApply,role,map.get("ID").toString(),userName);
                 }
             }
 

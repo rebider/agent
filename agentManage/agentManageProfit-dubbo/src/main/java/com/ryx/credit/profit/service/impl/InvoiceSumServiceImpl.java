@@ -484,7 +484,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         freezeDetail.setCashFreeze(BigDecimal.ONE);//体现结算冻结
         agentFreezePort.setCurLevel(freezeDetail);
         AgentResult agentResult = agentFreezeService.agentFreeze(agentFreezePort);
-        if("200".equals(agentResult.getStatus())){
+        if("200".equals(agentResult.getStatus().toString())){
             logger.info("欠票冻结："+agentId+",代理商冻结成功！");
             return true;
         }else {
@@ -508,7 +508,7 @@ public class InvoiceSumServiceImpl implements IInvoiceSumService {
         agentFreezePort.setFreezeCause("QPDJ");
         agentFreezePort.setUnfreezeCause(reason);
         AgentResult agentResult = agentFreezeService.agentUnFreeze(agentFreezePort);
-        if("200".equals(agentResult.getStatus())){
+        if("200".equals(agentResult.getStatus().toString())){
             logger.info("发票管理解冻："+agentId+",代理商解冻成功！");
             return true;
         }else {
