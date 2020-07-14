@@ -261,6 +261,7 @@ public class JobOrderTaskServiceImpl implements JobOrderTaskService {
         joTaskNew.setJoTaskStatus(JoTaskStatus.WSL.getValue());
         joTaskNew.setDealGroup(joTask.getDealGroup());
         joTaskNew.setDealGroupId(joTask.getDealGroupId());
+        joTaskNew.setSecondDealGroup(joTask.getSecondDealGroup());
         joTaskNew.setBackDealGroup(joTaskOld.getDealGroup());
         joTaskNew.setBackDealPerson(joTaskOld.getDealPersonName());
         if(JoPowerGroup.SQ.key.equals(dealCode)){

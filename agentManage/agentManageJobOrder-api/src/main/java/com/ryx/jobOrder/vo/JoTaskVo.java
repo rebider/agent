@@ -48,6 +48,55 @@ public class JoTaskVo extends JoOrder {
 
     private List<Map>  platfromPerm;
 
+    private String dealGroup;
+
+    private String joTaskContent;
+
+    private String joTaskNextTime;
+
+    private String attId;
+    private String attName;
+
+    public String getAttId() {
+        return attId;
+    }
+
+    public void setAttId(String attId) {
+        this.attId = attId;
+    }
+
+    public String getAttName() {
+        return attName;
+    }
+
+    public void setAttName(String attName) {
+        this.attName = attName;
+    }
+
+    public String getDealGroup() {
+        return dealGroup;
+    }
+
+    public void setDealGroup(String dealGroup) {
+        this.dealGroup = dealGroup;
+    }
+
+    public String getJoTaskContent() {
+        return joTaskContent;
+    }
+
+    public void setJoTaskContent(String joTaskContent) {
+        this.joTaskContent = joTaskContent;
+    }
+
+    public String getJoTaskNextTime() {
+        return joTaskNextTime;
+    }
+
+    public void setJoTaskNextTime(String joTaskNextTime) {
+        this.joTaskNextTime = joTaskNextTime;
+    }
+
     public List<Map> getPlatfromPerm() {
         return platfromPerm;
     }
