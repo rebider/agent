@@ -2,11 +2,10 @@ package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PmsProfitLogExample implements Serializable {
+public class PmsProfitLogExample {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -694,76 +693,6 @@ public class PmsProfitLogExample implements Serializable {
 
         public Criteria andStatusNotBetween(String value1, String value2) {
             addCriterion("STATUS not between", value1, value2, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteIsNull() {
-            addCriterion("NOTE is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteIsNotNull() {
-            addCriterion("NOTE is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteEqualTo(String value) {
-            addCriterion("NOTE =", value, "note");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteNotEqualTo(String value) {
-            addCriterion("NOTE <>", value, "note");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteGreaterThan(String value) {
-            addCriterion("NOTE >", value, "note");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteGreaterThanOrEqualTo(String value) {
-            addCriterion("NOTE >=", value, "note");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteLessThan(String value) {
-            addCriterion("NOTE <", value, "note");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteLessThanOrEqualTo(String value) {
-            addCriterion("NOTE <=", value, "note");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteLike(String value) {
-            addCriterion("NOTE like", value, "note");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteNotLike(String value) {
-            addCriterion("NOTE not like", value, "note");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteIn(List<String> values) {
-            addCriterion("NOTE in", values, "note");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteNotIn(List<String> values) {
-            addCriterion("NOTE not in", values, "note");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteBetween(String value1, String value2) {
-            addCriterion("NOTE between", value1, value2, "note");
-            return (Criteria) this;
-        }
-
-        public Criteria andNoteNotBetween(String value1, String value2) {
-            addCriterion("NOTE not between", value1, value2, "note");
             return (Criteria) this;
         }
 

@@ -138,6 +138,7 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
         Set<String> dbUrls = roleService.selectShiroUrl((Long) param.get("userId"),dbUrlsPid,"/BusActRelBusType");//审批类型权限
         Set<String> netInUrls = roleService.selectShiroUrl((Long) param.get("userId"),netInUrlsPid,"");//品牌权限
         Set<String> roleNames = roleService.findFinanceRole((Long) param.get("userId"));//角色编号
+//        Set<String> roleNames = roleService.findFinanceRoleId((Long) param.get("userId"));
 
         param.put("roleIds",roleNames);
         param.put("dbUrls",dbUrls);

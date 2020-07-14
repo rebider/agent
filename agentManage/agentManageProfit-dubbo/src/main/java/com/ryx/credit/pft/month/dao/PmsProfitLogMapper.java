@@ -1,7 +1,9 @@
-package com.ryx.credit.profit.dao;
+package com.ryx.credit.pft.month.dao;
 
 import com.ryx.credit.common.util.Page;
-import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.profit.pojo.PmsProfit;
+import com.ryx.credit.profit.pojo.PmsProfitLog;
+import com.ryx.credit.profit.pojo.PmsProfitLogExample;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -24,11 +26,35 @@ public interface PmsProfitLogMapper {
 
     int updateByPrimaryKey(PmsProfitLog record);
 
-    List<Map<String,Object>> checkoutData(@Param("agentId")  String agentId ,@Param("busCode") String busCode);
+    List<Map<String,Object>> checkoutData(Map<String,Object> param);
 
     Map<String,Object> getLoginName(@Param("userId")  String userId );
 
     int  save(PmsProfit record);
+
+    /**
+     * 获取页面按钮控制
+     * @param MONTH
+     * @return
+     */
+    Map<String, Object> btnIsNo(@Param("MONTH") String MONTH);
+
+    /**
+     * 按钮插入表
+     * @param param
+     * @return
+     */
+    Map<String, Object> btnInsert(Map<String, String> param);
+
+    /**
+     * 按钮修改表
+     * @param param
+     * @return
+     */
+    Map<String, Object> btnUpdate(Map<String, String> param);
+
+
+
 
     List<Map<String,Object>> selectByMap(@Param("param")Map<String,String>param,@Param("page") Page page);
 

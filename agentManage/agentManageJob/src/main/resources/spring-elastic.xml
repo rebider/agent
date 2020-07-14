@@ -232,6 +232,7 @@
    <import resource="spring-elastic-order.xml"/>
    <import resource="spring-elastic-card.xml"/>
    <import resource="spring-elastic-timer.xml"/>
+    <import resource="spring-elastic-profit.xml"/>
 
 
 
