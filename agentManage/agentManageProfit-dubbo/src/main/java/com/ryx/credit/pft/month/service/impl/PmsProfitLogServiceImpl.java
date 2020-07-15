@@ -759,6 +759,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                 }
                 try {
                     pf.setBalanceAmt(new BigDecimal(list.get(i).get("Cell5")));
+                    pf.setBalanceAmt( new BigDecimal(Integer.valueOf(pf.getBalanceAmt()==null?"0":String.valueOf(pf.getBalanceAmt()))));
                 } catch (Exception e) {
                     Map<String, Object> saveSheetMap = new HashMap<>();
                     saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行解析分润金额出错");
@@ -907,7 +908,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                             cellValue = formater.format(date);
                         } else {
                             // 有些数字过大，直接输出使用的是科学计数法： 2.67458622E8 要进行处理
-                            DecimalFormat df = new DecimalFormat("####.#####################");
+                            DecimalFormat df = new DecimalFormat("####.##");
                             cellValue = df.format(cell.getNumericCellValue());
                         }
                     }
@@ -932,7 +933,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                                     .createFormulaEvaluator();
                             evaluator.evaluateFormulaCell(cell);
                             // 有些数字过大，直接输出使用的是科学计数法： 2.67458622E8 要进行处理
-                            DecimalFormat df = new DecimalFormat("####.#####################");
+                            DecimalFormat df = new DecimalFormat("####.##");
                             cellValue = df.format(cell.getNumericCellValue());
                         }
                     }
