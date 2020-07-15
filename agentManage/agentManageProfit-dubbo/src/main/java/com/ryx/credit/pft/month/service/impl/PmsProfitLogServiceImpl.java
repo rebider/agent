@@ -680,7 +680,6 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             pmsProfitTempWithBLOBs.setMonth(pmsProfitLog.getMonth());
             pmsProfitTempWithBLOBs.setUniqueFlag((list.get(i).get("Cell0")));
             pmsProfitTempWithBLOBs.setAgentName((list.get(i).get("Cell1")));
-            pmsProfitTempWithBLOBs.setBusCode("#");
             pmsProfitTempWithBLOBs.setSheetHead(callMapToXML(listOne.get(0)));
             pmsProfitTempWithBLOBs.setSheetData(callMapToXML(list.get(i)));
             pmsProfitTempWithBLOBs.setSheetName(sheetName);
@@ -705,15 +704,12 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             pf.setUpdateTime(pf.getImportTime());
             pf.setOrderNumber(new BigDecimal((list.get(i).get("rowNum"))));
             pf.setImportBatch(pmsProfitLog.getBatchNo());
-            pf.setBusCode("#");
+
 
             String agentId = list.get(i).get("Cell0").trim();
             String orgID =null;
             if ("汇总".equals(sheetName)) {
                 pmsProfitTempWithBLOBs.setBusCode(list.get(i).get("Cell3"));
-                if(pmsProfitTempWithBLOBs.getBusCode() ==null||"".equals(pmsProfitTempWithBLOBs.getBusCode())){
-                    pmsProfitTempWithBLOBs.setBusCode("#");
-                }
                  orgID = list.get(i).get("Cell8").trim();
 
                 if (null != list.get(i).get("Cell4") && !"".equals(list.get(i).get("Cell4"))) {
