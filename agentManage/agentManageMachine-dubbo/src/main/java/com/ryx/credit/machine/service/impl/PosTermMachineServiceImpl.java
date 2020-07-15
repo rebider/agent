@@ -80,7 +80,8 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
                 activeName = imsTermMachine.getRemark();
             }
             newvo.setMechineName("活动名称:" + activeName + "|型号代码:" + model + "|厂商型号:" + imsPos.getPosModel() + "|价格:" + imsTermMachine.getPrice()
-                    + "|达标金额:" + imsTermMachine.getStandAmt() + "|返还类型:" + BackType.getContentByValue(imsTermMachine.getBackType()));
+                    + "|达标金额:" + imsTermMachine.getStandAmt() + "|返还类型:" + BackType.getContentByValue(imsTermMachine.getBackType())
+                    + "|备注:" + imsTermMachine.getRemark());
             newvo.setStandAmt(String.valueOf(imsTermMachine.getStandAmt()));
             newvo.setBackType(imsTermMachine.getBackType());
             termMachineVoList.add(newvo);
