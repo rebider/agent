@@ -254,7 +254,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             int sheetCount  = wookbook.getNumberOfSheets();
             if(ProfitDataImportType.DYDL.key.equals(pmsProfitLog.getImportType())||ProfitDataImportType.DEDL.key.equals(pmsProfitLog.getImportType())||ProfitDataImportType.DSDL.key.equals(pmsProfitLog.getImportType())) {
                 if(sheetCount!=1){
-                    throw new MessageException("一次请款,二次请款以及补出款只能有个sheet页面，并且sheet名为--汇总");
+                    throw new MessageException("一次请款,二次请款以及补出款只能有一个sheet页面，并且sheet名为--汇总");
                 }
             }
             String successResultPath = null;
@@ -680,7 +680,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             pmsProfitTempWithBLOBs.setMonth(pmsProfitLog.getMonth());
             pmsProfitTempWithBLOBs.setUniqueFlag((list.get(i).get("Cell0")));
             pmsProfitTempWithBLOBs.setAgentName((list.get(i).get("Cell1")));
-            pmsProfitTempWithBLOBs.setBusCode(list.get(i).get("Cell3"));
+            pmsProfitTempWithBLOBs.setBusCode("#");
             pmsProfitTempWithBLOBs.setSheetHead(callMapToXML(listOne.get(0)));
             pmsProfitTempWithBLOBs.setSheetData(callMapToXML(list.get(i)));
             pmsProfitTempWithBLOBs.setSheetName(sheetName);
@@ -705,11 +705,15 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             pf.setUpdateTime(pf.getImportTime());
             pf.setOrderNumber(new BigDecimal((list.get(i).get("rowNum"))));
             pf.setImportBatch(pmsProfitLog.getBatchNo());
+            pf.setBusCode("#");
 
             String agentId = list.get(i).get("Cell0").trim();
             String orgID =null;
             if ("汇总".equals(sheetName)) {
-
+                pmsProfitTempWithBLOBs.setBusCode(list.get(i).get("Cell3"));
+                if(pmsProfitTempWithBLOBs.getBusCode() ==null||"".equals(pmsProfitTempWithBLOBs.getBusCode())){
+                    pmsProfitTempWithBLOBs.setBusCode("#");
+                }
                  orgID = list.get(i).get("Cell8").trim();
 
                 if (null != list.get(i).get("Cell4") && !"".equals(list.get(i).get("Cell4"))) {
@@ -774,7 +778,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
 
                 }
 
-                pf.setBusCode(list.get(i).get("Cell3"));
+                pf.setBusCode(pmsProfitTempWithBLOBs.getBusCode());
                 pf.setOrgId(orgID);
                 pf.setRenitStatus(list.get(i).get("Cell9"));
             } else {
@@ -903,7 +907,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                             cellValue = formater.format(date);
                         } else {
                             // 有些数字过大，直接输出使用的是科学计数法： 2.67458622E8 要进行处理
-                            DecimalFormat df = new DecimalFormat("####.########");
+                            DecimalFormat df = new DecimalFormat("####.#####################");
                             cellValue = df.format(cell.getNumericCellValue());
                         }
                     }
@@ -928,7 +932,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                                     .createFormulaEvaluator();
                             evaluator.evaluateFormulaCell(cell);
                             // 有些数字过大，直接输出使用的是科学计数法： 2.67458622E8 要进行处理
-                            DecimalFormat df = new DecimalFormat("####.########");
+                            DecimalFormat df = new DecimalFormat("####.#####################");
                             cellValue = df.format(cell.getNumericCellValue());
                         }
                     }
