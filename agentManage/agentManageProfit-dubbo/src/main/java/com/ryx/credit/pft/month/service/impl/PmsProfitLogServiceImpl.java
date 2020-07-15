@@ -907,7 +907,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                             cellValue = formater.format(date);
                         } else {
                             // 有些数字过大，直接输出使用的是科学计数法： 2.67458622E8 要进行处理
-                            DecimalFormat df = new DecimalFormat("####.########");
+                            DecimalFormat df = new DecimalFormat("####.#####################");
                             cellValue = df.format(cell.getNumericCellValue());
                         }
                     }
@@ -932,7 +932,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                                     .createFormulaEvaluator();
                             evaluator.evaluateFormulaCell(cell);
                             // 有些数字过大，直接输出使用的是科学计数法： 2.67458622E8 要进行处理
-                            DecimalFormat df = new DecimalFormat("####.########");
+                            DecimalFormat df = new DecimalFormat("####.#####################");
                             cellValue = df.format(cell.getNumericCellValue());
                         }
                     }
