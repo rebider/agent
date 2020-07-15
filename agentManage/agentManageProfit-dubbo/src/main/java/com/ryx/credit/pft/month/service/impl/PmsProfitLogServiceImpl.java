@@ -711,6 +711,9 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
             String orgID =null;
             if ("汇总".equals(sheetName)) {
                 pmsProfitTempWithBLOBs.setBusCode(list.get(i).get("Cell3"));
+                if(pmsProfitTempWithBLOBs.getBusCode() ==null||"".equals(pmsProfitTempWithBLOBs.getBusCode())){
+                    pmsProfitTempWithBLOBs.setBusCode("#");
+                }
                  orgID = list.get(i).get("Cell8").trim();
 
                 if (null != list.get(i).get("Cell4") && !"".equals(list.get(i).get("Cell4"))) {
@@ -775,7 +778,7 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
 
                 }
 
-                pf.setBusCode(list.get(i).get("Cell3"));
+                pf.setBusCode(pmsProfitTempWithBLOBs.getBusCode());
                 pf.setOrgId(orgID);
                 pf.setRenitStatus(list.get(i).get("Cell9"));
             } else {
