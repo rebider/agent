@@ -926,6 +926,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         if(StringUtils.isNotBlank(bus.getBusNum())){
             bus.setBusStatus(BusinessStatus.pause.status);
         }
+        //激活返现如果为空默认填写自己
+        if(StringUtils.isBlank(bus.getBusActivationParent())) {
+            bus.setBusActivationParent(bus.getId());
+        }
         if (agentBusinfoService.updateAgentBusInfo(bus) != 1) {
             logger.info("代理商审批通过，更新业务本信息失败{}:{}", processingId, bus.getId());
             throw new ProcessException("代理商审批通过，更新业务本信息失败");
@@ -1086,6 +1090,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
             agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
             agentBusInfo.setApproveTime(Calendar.getInstance().getTime());//审批通过时间
+            //激活返现如果为空默认填写自己
+            if(StringUtils.isBlank(agentBusInfo.getBusActivationParent())) {
+                agentBusInfo.setBusActivationParent(agentBusInfo.getId());
+            }
             if (agentBusinfoService.updateAgentBusInfo(agentBusInfo) != 1) {
                 logger.info("代理商审批通过，更新业务本信息失败{}:{}", processingId, agentBusInfo.getId());
                 throw new ProcessException("代理商审批通过，更新业务本信息失败");
