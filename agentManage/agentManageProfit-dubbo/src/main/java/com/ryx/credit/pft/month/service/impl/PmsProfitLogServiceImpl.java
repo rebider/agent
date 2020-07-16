@@ -741,18 +741,18 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                 }
                 List<Map<String, Object>> mapre = new ArrayList<>();
                 String agentIdrealy = list.get(i).get("Cell6").trim();
-                try {
-                    mapre = checkoutData(FastMap.fastMap("agentId", agentIdrealy));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new MessageException(sheetName + "实际代理商数据查询失败");
-                }
-                if (mapre.size() < 1) {
-                    Map<String, Object> saveSheetMap = new HashMap<>();
-                    saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行不存在此实际收款代理商唯一码" + agentIdrealy);
-                    saveSheetList.add(saveSheetMap);
-                    continue;
-                }
+//                try {
+//                    mapre = checkoutData(FastMap.fastMap("agentId", agentIdrealy));
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    throw new MessageException(sheetName + "实际代理商数据查询失败");
+//                }
+//                if (mapre.size() < 1) {
+//                    Map<String, Object> saveSheetMap = new HashMap<>();
+//                    saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行不存在此实际收款代理商唯一码" + agentIdrealy);
+//                    saveSheetList.add(saveSheetMap);
+//                    continue;
+//                }
                 try {
                     pf.setBalanceAmt(new BigDecimal(list.get(i).get("Cell5")));
                     pf.setBalanceAmt( new BigDecimal(Integer.valueOf(pf.getBalanceAmt()==null?"0":String.valueOf(pf.getBalanceAmt()))));
@@ -766,14 +766,14 @@ public class PmsProfitLogServiceImpl implements IPmsProfitLogService {
                 pf.setRealityAgId((list.get(i).get("Cell6")));
                 pf.setRealityAgName(list.get(i).get("Cell7").trim());
 
-                List<Map<String, Object>> mapData = checkoutData(FastMap.fastMap("agentId", agentId).putKeyV("orgID", orgID));
-                if (mapData.size() < 1) {
-                    Map<String, Object> saveSheetMap = new HashMap<>();
-                    saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行O码" + orgID + "不属于代理商唯一码" + agentId);
-                    saveSheetList.add(saveSheetMap);
-                    continue;
-
-                }
+//                List<Map<String, Object>> mapData = checkoutData(FastMap.fastMap("agentId", agentId).putKeyV("orgID", orgID));
+//                if (mapData.size() < 1) {
+//                    Map<String, Object> saveSheetMap = new HashMap<>();
+//                    saveSheetMap.put(sheetRow, sheetName + "sheet页第" + ((i + 2) + (theadi * count)) + "行O码" + orgID + "不属于代理商唯一码" + agentId);
+//                    saveSheetList.add(saveSheetMap);
+//                    continue;
+//
+//                }
 
                 pf.setBusCode(pmsProfitTempWithBLOBs.getBusCode());
                 pf.setOrgId(orgID);
