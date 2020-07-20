@@ -176,27 +176,29 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             for (AgentBusInfo busInfo : agentBusInfos) {
                 businfoList.add(busInfo.getId());
             }
-            AgentVo preAgentVo = JSONObject.parseObject(dateChangeRequest.getDataPreContent(), AgentVo.class);
-            List<AgentColinfoVo> preColinfoVoList = preAgentVo.getColinfoVoList();
-            if (preColinfoVoList.size() != 0 && preColinfoVoList != null) {
-                AgentColinfoVo preAgentColinfoVo = preColinfoVoList.get(0); // 变更前
-                AgentColinfoVo agentColinfoVo = colinfoVoList.get(0); // 变更后
-                AgentResult agentVerify = verifyColinfoIsChange(agentColinfoVo, preAgentColinfoVo);
-                if (agentVerify.isOK()) {
-                    // 调用冻结接口 (传参：AG, 冻结原因, 冻结人, 数据ID, 冻结业务)
+            if (businfoList!=null && businfoList.size()!=0) {
+                AgentVo preAgentVo = JSONObject.parseObject(dateChangeRequest.getDataPreContent(), AgentVo.class);
+                List<AgentColinfoVo> preColinfoVoList = preAgentVo.getColinfoVoList();
+                if (preColinfoVoList.size() != 0 && preColinfoVoList != null) {
+                    AgentColinfoVo preAgentColinfoVo = preColinfoVoList.get(0); // 变更前
+                    AgentColinfoVo agentColinfoVo = colinfoVoList.get(0); // 变更后
+                    AgentResult agentVerify = verifyColinfoIsChange(agentColinfoVo, preAgentColinfoVo);
+                    if (agentVerify.isOK()) {
+                        // 调用冻结接口 (传参：AG, 冻结原因, 冻结人, 数据ID, 冻结业务)
+                        agentFreezeResult(agentVo.getAgent().getId(),
+                                FreeCause.JSKBG.getValue(),
+                                String.valueOf(FreePerson.XTDJ.getValue()),
+                                dateChangeRequest.getId(),
+                                businfoList);
+                    }
+                } else {
+                    // 调用冻结接口(preColinfoVoList为空，代理商变更前没有结算卡信息，也需调用冻结接口)
                     agentFreezeResult(agentVo.getAgent().getId(),
                             FreeCause.JSKBG.getValue(),
                             String.valueOf(FreePerson.XTDJ.getValue()),
                             dateChangeRequest.getId(),
                             businfoList);
                 }
-            } else {
-                // 调用冻结接口(preColinfoVoList为空，代理商变更前没有结算卡信息，也需调用冻结接口)
-                agentFreezeResult(agentVo.getAgent().getId(),
-                        FreeCause.JSKBG.getValue(),
-                        String.valueOf(FreePerson.XTDJ.getValue()),
-                        dateChangeRequest.getId(),
-                        businfoList);
             }
         }
 
@@ -465,27 +467,29 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         for (AgentBusInfo busInfo : agentBusInfos) {
             businfoList.add(busInfo.getId());
         }
-        AgentVo preAgentVo = JSONObject.parseObject(dateChangeRequest.getDataPreContent(), AgentVo.class);
-        List<AgentColinfoVo> preColinfoVoList = preAgentVo.getColinfoVoList();
-        if (preColinfoVoList.size() != 0 && preColinfoVoList != null) {
-            AgentColinfoVo preAgentColinfoVo = preColinfoVoList.get(0); // 变更前
-            AgentColinfoVo agentColinfoVo = colinfoVoList.get(0); // 变更后
-            AgentResult agentVerify = verifyColinfoIsChange(agentColinfoVo, preAgentColinfoVo);
-            if (agentVerify.isOK()) {
-                // 调用冻结接口 (传参：AG, 冻结原因, 冻结人, 数据ID, 冻结业务)
+        if (businfoList!=null && businfoList.size()!=0) {
+            AgentVo preAgentVo = JSONObject.parseObject(dateChangeRequest.getDataPreContent(), AgentVo.class);
+            List<AgentColinfoVo> preColinfoVoList = preAgentVo.getColinfoVoList();
+            if (preColinfoVoList.size() != 0 && preColinfoVoList != null) {
+                AgentColinfoVo preAgentColinfoVo = preColinfoVoList.get(0); // 变更前
+                AgentColinfoVo agentColinfoVo = colinfoVoList.get(0); // 变更后
+                AgentResult agentVerify = verifyColinfoIsChange(agentColinfoVo, preAgentColinfoVo);
+                if (agentVerify.isOK()) {
+                    // 调用冻结接口 (传参：AG, 冻结原因, 冻结人, 数据ID, 冻结业务)
+                    agentFreezeResult(agentVo.getAgent().getId(),
+                            FreeCause.JSKBG.getValue(),
+                            String.valueOf(FreePerson.XTDJ.getValue()),
+                            dateChangeRequest.getId(),
+                            businfoList);
+                }
+            } else {
+                // 调用冻结接口(preColinfoVoList为空，代理商变更前没有结算卡信息，也需调用冻结接口)
                 agentFreezeResult(agentVo.getAgent().getId(),
                         FreeCause.JSKBG.getValue(),
                         String.valueOf(FreePerson.XTDJ.getValue()),
                         dateChangeRequest.getId(),
                         businfoList);
             }
-        } else {
-            // 调用冻结接口(preColinfoVoList为空，代理商变更前没有结算卡信息，也需调用冻结接口)
-            agentFreezeResult(agentVo.getAgent().getId(),
-                    FreeCause.JSKBG.getValue(),
-                    String.valueOf(FreePerson.XTDJ.getValue()),
-                    dateChangeRequest.getId(),
-                    businfoList);
         }
 
         BusActRelExample example = new BusActRelExample();
