@@ -55,6 +55,6 @@ public interface DataChangeActivityService {
      */
     ResultVO adjustFinanceOrgByAccount(String agentId)throws Exception;
 
-
+    void agentUnFreezeResult(String agentId, String UnfreezeCause, String freezeCause, String freezePerson) throws Exception;
 
 }

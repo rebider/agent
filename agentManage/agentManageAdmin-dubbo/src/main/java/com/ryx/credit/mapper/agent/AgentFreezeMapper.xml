@@ -64,7 +64,7 @@
     BUS_PLATFORM, BUS_NUM, BUS_FREEZE, PROFIT_FREEZE, REFLOW_FREEZE, MONTHLY_FREEZE, 
     DAILY_FREEZE, STOP_PROFIT_FREEZE, CASH_FREEZE, STOP_COUNT, BUS_ID, NEW_BUS_FREEZE
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreezeExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentFreezeExample" resultMap="BaseResultMap" flushCache="true">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">

@@ -258,6 +258,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
      */
 
     @Override
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     public AgentResult agentUnFreeze(AgentFreezePort agentFreezePort)throws MessageException{
 
         //本地冻结事务
@@ -267,7 +268,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
             log.error("代理商解冻失败："+ JsonUtil.objectToJson(agentFreezePort)+agentResult.getMsg());
             throw new MessageException(agentResult.getMsg());
         }
-
+        log.info("开始查询是否有冻结的记录{}开始{}",agentFreezePort.getAgentId(),new Date());
         //更新代理商冻结状态
         AgentFreezeExample qfreezeExample = new AgentFreezeExample();
         AgentFreezeExample.Criteria qfreezeCriteria = qfreezeExample.createCriteria();
@@ -280,6 +281,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 .andAgentIdEqualTo(agentFreezePort.getAgentId())
                 .andFreezeStatusEqualTo(FreeStatus.DJ.getValue().toString());
         List<AgentFreeze> agentFreezes = agentFreezeMapper.selectByExample(qfreezeExample);
+        log.info("冻结查询数据{}查询时间{}",JSONObject.toJSONString(agentFreezes),new Date());
         //没有冻结的 更新代理商状态为解冻
         if(agentFreezes.size()==0){
             Agent agent =agentMapper.selectByPrimaryKey(agentFreezePort.getAgentId());
@@ -290,7 +292,7 @@ public class AgentFreezeServiceImpl implements AgentFreezeService {
                 throw new MessageException("更新代理商信息解冻失败");
             }
         }
-
+        log.info("开始查询是否有冻结的记录{}结束",agentFreezePort.getAgentId(),new Date());
         //汇总逻辑
         Map mapData = (Map) agentResult.getData();
         AgentFreeze date = (AgentFreeze)mapData.get("data");
