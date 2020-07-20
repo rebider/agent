@@ -366,7 +366,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     }
 
     // 省区/代理商修改申请-调用解冻接口
-    void agentUnFreezeResult(String agentId, String UnfreezeCause, String freezeCause, String freezePerson) throws Exception{
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    public void agentUnFreezeResult(String agentId, String UnfreezeCause, String freezeCause, String freezePerson) throws Exception{
         try {
             AgentFreezePort agentFreezePort = new AgentFreezePort();
             agentFreezePort.setAgentId(agentId);
@@ -918,7 +919,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                         if (resultCheck_XXQS.isOK()) {
                                             Map<String, Object> checkMapData_XXQS = resultCheck_XXQS.getMapData();
                                             String ag_id = (String) checkMapData_XXQS.get("agentId");
-                                            agentUnFreezeResult(ag_id,
+                                            dataChangeActivityService.agentUnFreezeResult(ag_id,
                                                     UnfreeCause.XTJD.getValue(),
                                                     FreeCause.XXQS.getValue(),
                                                     String.valueOf(UnfreePerson.XTJD.getValue()));
@@ -929,7 +930,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 if (resultCheck_JSKBG.isOK()) {
                                     Map<String, Object> checkMapData = resultCheck_JSKBG.getMapData();
                                     String ag_id = (String) checkMapData.get("agentId");
-                                    agentUnFreezeResult(ag_id,
+                                    dataChangeActivityService.agentUnFreezeResult(ag_id,
                                             UnfreeCause.XTJD.getValue(),
                                             FreeCause.JSKBG.getValue(),
                                             String.valueOf(UnfreePerson.XTJD.getValue()));
@@ -938,7 +939,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 if (resultCheck_RZDJ.isOK()) {
                                     Map<String, Object> checkMapData = resultCheck_RZDJ.getMapData();
                                     String ag_id = (String) checkMapData.get("agentId");
-                                    agentUnFreezeResult(ag_id,
+                                    dataChangeActivityService.agentUnFreezeResult(ag_id,
                                             UnfreeCause.XTJD.getValue(),
                                             FreeCause.RZDJ.getValue(),
                                             String.valueOf(UnfreePerson.XTJD.getValue()));
@@ -948,7 +949,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 if (resultCheck_XXQS_TWO.isOK()) {
                                     Map<String, Object> checkMapData = resultCheck_XXQS_TWO.getMapData();
                                     String ag_id = (String) checkMapData.get("agentId");
-                                    agentUnFreezeResult(ag_id,
+                                    dataChangeActivityService.agentUnFreezeResult(ag_id,
                                             UnfreeCause.XTJD.getValue(),
                                             FreeCause.XXQS.getValue(),
                                             String.valueOf(UnfreePerson.XTJD.getValue()));
@@ -957,7 +958,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 if (resultCheck_RZDJ_TWO.isOK()) {
                                     Map<String, Object> checkMapData = resultCheck_RZDJ_TWO.getMapData();
                                     String ag_id = (String) checkMapData.get("agentId");
-                                    agentUnFreezeResult(ag_id,
+                                    dataChangeActivityService.agentUnFreezeResult(ag_id,
                                             UnfreeCause.XTJD.getValue(),
                                             FreeCause.RZDJ.getValue(),
                                             String.valueOf(UnfreePerson.XTJD.getValue()));
@@ -1061,7 +1062,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             if (resultCheck.isOK()) {
                                 Map<String, Object> checkMapData = resultCheck.getMapData();
                                 String ag_id = (String) checkMapData.get("agentId");
-                                agentUnFreezeResult(ag_id,
+                                dataChangeActivityService.agentUnFreezeResult(ag_id,
                                         UnfreeCause.XTJD.getValue(),
                                         FreeCause.JSKBG.getValue(),
                                         String.valueOf(UnfreePerson.XTJD.getValue()));
