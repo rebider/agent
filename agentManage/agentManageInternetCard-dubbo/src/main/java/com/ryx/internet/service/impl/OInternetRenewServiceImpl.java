@@ -855,7 +855,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                 }
                 oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
                 //续费成功到期时间加一年
-                oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
+                oInternetCard.setExpireTime(DateUtil.getOneYearLaterNow(oInternetCard.getExpireTime()));
 
                 oInternetCard.setStop(Status.STATUS_0.status);
                 oInternetCard.setRenew(Status.STATUS_0.status);
@@ -1435,7 +1435,7 @@ public class OInternetRenewServiceImpl implements OInternetRenewService {
                     }
                     oInternetCard.setRenewStatus(InternetRenewStatus.YXF.getValue());
                     //续费成功到期时间加一年
-                    oInternetCard.setExpireTime(DateUtil.getOneYearLater(oInternetCard.getExpireTime()));
+                    oInternetCard.setExpireTime(DateUtil.getOneYearLaterNow(oInternetCard.getExpireTime()));
 
                     oInternetCard.setStop(Status.STATUS_0.status);
                     oInternetCard.setRenew(Status.STATUS_0.status);
